@@ -70,7 +70,7 @@ echo "<script src=\"js/google.fastbutton.js\" async> </script>";
 
 echo "<script>\n";
 mmogame_change_javascript( $rinstance->type, 'js/mmogame.js');
-$class = "mmogame_{$rinstance->type}_{$rinstance->model}";
+$class = 'mmogame'.ucfirst($rinstance->type).ucfirst($rinstance->model);
 mmogame_change_javascript( $rinstance->type, 'js/gate.js', '[CLASS]', $class);
 mmogame_change_javascript( $rinstance->type, "type/{$rinstance->type}/js/{$rinstance->type}.js");
 mmogame_change_javascript( $rinstance->type, "type/{$rinstance->type}/js/{$rinstance->type}_{$rinstance->model}.js");

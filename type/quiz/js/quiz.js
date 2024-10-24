@@ -1,6 +1,6 @@
-class mmogame_quiz extends mmogame {
+class mmogameQuiz extends mmogame {
     constructor() {
-        super()
+        super();
         this.hideSubmit = false;
     }
 
@@ -37,12 +37,12 @@ class mmogame_quiz extends mmogame {
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        let d = { "command": "getattempt", "mmogameid": this.mmogameid, "pin" : this.pin, "kinduser" : this.kinduser, "user": this.auserid,
-            "maxwidth" : this.maxImageWidth, "maxheight": this.maxImageHeight, "subcommand" : subcommand};
+        let d = { "command": "getattempt", "mmogameid": this.mmogameid, "pin": this.pin, "kinduser": this.kinduser,
+            "user": this.auserid, "maxwidth": this.maxImageWidth, "maxheight": this.maxImageHeight, "subcommand": subcommand};
         if (this.helpurl == undefined) {
             d['helpurl'] = 1;
         }
-        let data = JSON.stringify(d);     
+        let data = JSON.stringify(d);
         xmlhttp.send(data);
     }
 
@@ -55,17 +55,17 @@ class mmogame_quiz extends mmogame {
         }
 
         if (json.name != undefined) {
-			window.document.title = json.name;
+            window.document.title = json.name;
         }
 
         if (json.helpurl != undefined) {
             this.helpUrl = json.helpurl;
         }
-        
-		if (json.errorcode != undefined) {
-			return this.createDivMessage(json.errorcode);
-		}
-		
+
+        if (json.errorcode != undefined) {
+            return this.createDivMessage(json.errorcode);
+        }
+
         this.state = json.state;
         this.fastjson = json.fastjson;
         this.timefastjson = json.timefastjson;
@@ -88,7 +88,7 @@ class mmogame_quiz extends mmogame {
         this.single = json.single;
         this.errorcode = json.errorcode;
 
-        this.readJsonFiles(json)
+        this.readJsonFiles(json);
         if (json.state != 0) {
             this.createScreen(json, false);
         }
@@ -107,12 +107,12 @@ class mmogame_quiz extends mmogame {
             return;
         }
         let time = (new Date()).getTime();
-        let dif =  this.timeclose - time / 1000;
+        let dif = this.timeclose - time / 1000;
 
         if (dif <= 0) {
             dif = 0;
         }
-        dif = Math.round(dif)
+        dif = Math.round(dif);
         if (dif <= 0) {
             this.labelTimer.innerHTML = '';
             this.onTimeout();
@@ -125,7 +125,7 @@ class mmogame_quiz extends mmogame {
         }
 
         let instance = this;
-        this.timerTimeout = setTimeout(function(){ 
+        this.timerTimeout = setTimeout(function() {
             instance.updateLabelTimer();
         }, 500);
     }
@@ -146,7 +146,7 @@ class mmogame_quiz extends mmogame {
 
         if (this.endofgame) {
             this.createDivMessage('LANGM_GAME_OVER_' + this.errorcode);
-            this.show_score(json);
+            this.showScore(json);
             return;
         }
 
@@ -155,7 +155,7 @@ class mmogame_quiz extends mmogame {
         } else {
             this.createScreenHorizontal(disabled);
         }
-        this.show_score(json);
+        this.showScore(json);
     }
 
     createScreenVertical(disabled) {
@@ -179,13 +179,13 @@ class mmogame_quiz extends mmogame {
                 }
                 return defSize[1] + ansSize[1] < maxHeight ? -1 : 1;
             }
-        )
+        );
 
         this.radioSize = Math.round(this.fontSize);
         this.explainLeft = 0;
         let defSize = this.createDefinition(0, 0, maxWidth, false, this.fontSize);
 
-        this.nextTop = instance.createAnswer(0,  defSize[1] + this.padding, maxWidth, false, this.fontSize, disabled);
+        this.nextTop = instance.createAnswer(0, defSize[1] + this.padding, maxWidth, false, this.fontSize, disabled);
         this.nextLeft = this.areaWidth - this.iconSize - this.padding;
         
         if (this.nextTop + this.padding >= this.areaHeight) {
@@ -196,14 +196,14 @@ class mmogame_quiz extends mmogame {
             this.btnSubmit = this.createImageButton(this.body, (this.areaWidth - this.iconSize) / 2, this.nextTop, 0, this.iconSize,
                 "", 'assets/submit.svg', false, 'submit');
             this.btnSubmit.addEventListener("click",
-                function(){
+                function() {
                     if (this.btnSubmit != undefined) {
                         instance.area.removeChild(this.btnSubmit);
                         this.btnSubmit = undefined;
                     }
                     instance.sendAnswer(true);
                 }
-            )
+            );
         }
 
         this.stripLeft = this.padding;
@@ -223,7 +223,7 @@ class mmogame_quiz extends mmogame {
         for (let step = 1; step <= 2; step++) {
             let defSize;
             this.fontSize = this.findbest(step == 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize, 0, 0, function(fontSize, step) {
-                    defSize = instance.createDefinition(0, 0, width - instance.padding, true, fontSize)
+                    defSize = instance.createDefinition(0, 0, width - instance.padding, true, fontSize);
 
                     if (defSize[0] >= width) {
                         return 1;
@@ -234,14 +234,14 @@ class mmogame_quiz extends mmogame {
                     }
                     return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
                 }
-            )
+            );
             if (defSize[0] <= width && defSize[1] <= instance.areaHeight) {
                 break;
             }
         }
 
         this.radioSize = Math.round(this.fontSize);
-        let defSize = this.createDefinition(0, 0, width - this.padding, false, this.fontSize);
+        this.createDefinition(0, 0, width - this.padding, false, this.fontSize);
 
         this.nextTop = instance.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled) + this.padding;
         this.nextLeft = width + Math.min(3 * this.iconSize + 2 * this.padding, width - this.iconSize);
@@ -252,7 +252,9 @@ class mmogame_quiz extends mmogame {
 
         this.btnSubmit = this.createImageButton(this.body, width + (width - this.iconSize) / 2, this.nextTop, 0, this.iconSize,
             "", 'assets/submit.svg', false, 'submit');
-        this.btnSubmit.addEventListener("click", function(){ instance.sendAnswer(true); });
+        this.btnSubmit.addEventListener("click", function(){
+            instance.sendAnswer(true);
+        });
 
         this.stripLeft = width + this.padding;
         this.stripTop = this.nextTop;
@@ -261,14 +263,14 @@ class mmogame_quiz extends mmogame {
     }
 
     createAnswer(left, top, width, onlyMetrics, fontSize, disabled) {
-        return this.createAnswer_multichoice(left, top, width, onlyMetrics, fontSize, disabled);
+        return this.createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled);
     }
 
-    createAnswer_multichoice(left, top, width, onlyMetrics, fontSize, disabled) {
+    createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled) {
         let n = this.answers.length;
         let instance = this;
 
-        let aChecked = [], aCorrect = [];
+        let aChecked = [];
         if (this.answer != undefined) {
             aChecked = this.answer.split(",");
         }
@@ -279,7 +281,6 @@ class mmogame_quiz extends mmogame {
         }
 
         this.multichoiceLeft = left;
-        let useRadioBox = true;
         this.aItemAnswer = new Array(n);
         this.aItemLabel = new Array(n);
         this.aItemCorrectX = new Array(n);
@@ -293,7 +294,7 @@ class mmogame_quiz extends mmogame {
             label.style.position = "absolute";
             label.style.width = this.labelWidth + "px";
 
-            label.innerHTML =  this.repairHTML(this.answers[i], this.mapFiles, this.mapFilesWidth, this.mapFilesHeight);
+            label.innerHTML = this.repairHTML(this.answers[i], this.mapFiles, this.mapFilesWidth, this.mapFilesHeight);
 
             label.style.font = "FontAwesome";
             label.style.fontSize = fontSize + "px";
@@ -328,7 +329,7 @@ class mmogame_quiz extends mmogame {
                 if (!item.classList.contains("disabled")) {
                     instance.onClickRadio(i, this.colorDefinition, this.colorScore, true);
                 }
-            })
+            });
 
             new FastButton(label, function() {
                 instance.onClickRadio(i, instance.colorDefinition, instance.colorScore, true);
@@ -337,7 +338,7 @@ class mmogame_quiz extends mmogame {
             this.area.appendChild(item);
             this.area.appendChild(label);
             if (label.scrollHeight > fontSize) {
-                topRadio = Math.round(top  + (label.scrollHeight - fontSize) / 2);
+                topRadio = Math.round(top + (label.scrollHeight - fontSize) / 2);
                 item.style.top = topRadio + "px";
             }
 
@@ -362,7 +363,7 @@ class mmogame_quiz extends mmogame {
             vspace = this.areaHeight - heightControls - this.iconSize;
             if (vspace > this.padding) {
                 let move = Math.round(vspace / 3);
-                for(let i = 0; i < n; i++) {
+                for (let i = 0; i < n; i++) {
                     this.aItemAnswer[i].style.top = (parseInt(this.aItemAnswer[i].style.top) + move) + "px";
                     this.aItemLabel[i].style.top = (parseInt(this.aItemLabel[i].style.top) + move) + "px";
                 }
@@ -372,16 +373,16 @@ class mmogame_quiz extends mmogame {
                     this.divDefinition.style.top = this.aItemLabel[0].style.top;
                     this.divDefinition.style.height = Math.max(heightControls, this.definitionHeight) + "px";
                 }
-				top += move;
+                top += move;
             }
         }
 
         return top;
     }
-    
+
     onClickRadio(i, colorBack, color, callSendAnswer) {
         for (let j = 0; j < this.aItemAnswer.length; j++) {
-            let item = this.aItemAnswer[j]
+            let item = this.aItemAnswer[j];
             let disabled = item.classList.contains("disabled");
 
             if (i == j) {
@@ -403,66 +404,10 @@ class mmogame_quiz extends mmogame {
     }
 
     createAnswer_shortanswer(left, top, width, onlyMetrics, fontSize) {
-
-        let vspace;
-
         if (onlyMetrics) {
             return [width - 1, fontSize];
         }
-
         return top + fontSize + this.padding;
-
-        if (onlyMetrics == false) {
-            if (this.vertical) {
-                vspace = this.areaHeight - (this.definitionHeight + this.padding + fontSize + this.padding + this.iconSize);
-                vspace = vspace >= 0 ? Math.round(vspace / 4) : 0;
-                this.divDefinition.style.top = (parseInt(this.divDefinition.style.top) + vspace) + "px";
-            } else {
-                vspace = this.iconSize / 2;
-                this.divDefinition.style.top = (parseInt(this.divDefinition.style.top) + 2 * vspace) + "px";
-                this.nextTop += Math.round(this.iconSize / 2);
-            }
-        }
-
-        var div = document.createElement("input");
-        this.divShortAnswer = div;
-        div.style.position = "absolute";
-        div.style.width = (width - this.padding) + "px";
-        div.style.type = "text";
-        div.style.fontSize = fontSize + "px";
-        div.value = this.answer;
-
-        if (onlyMetrics) {
-            this.body.appendChild(div);
-            let ret = [div.scrollWidth - 1, Math.max(div.scrollHeight, fontSize)];
-            this.body.removeChild(div);
-            return ret;
-        }
-
-        this.explainLeft = left;
-        div.style.left = left + "px";
-        div.style.top = (2*vspace + top) + "px";
-        div.autofocus = true;
-        div.style.background = this.getColorHex(this.colorBackground);
-        div.style.color = this.getColorContrast(this.colorBackground);
-
-        this.body.appendChild(div);
-        let instance = this;
-        div.addEventListener("keyup", function(){
-            if (instance.autosave) {
-                instance.answer = div.value;
-                instance.sendAnswer(false);
-            }  
-        })
-        div.addEventListener("keydown", function() { 
-            if (event.key === "Enter") {
-                instance.answer = div.value;
-                instance.sendAnswer(true);
-            }
-        })
-        div.focus();
-
-        return top + div.scrollHeight + this.padding + 3 * vspace;
     }
 
     sendAnswer(submit, subcommand) {
@@ -481,12 +426,12 @@ class mmogame_quiz extends mmogame {
                 }
                 instance.onServerAnswer(json, false);
             }
-        }
+        };
         xmlhttp.open("POST", this.url, true);
 
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        let a = {"command": "answer", "mmogameid": this.mmogameid, "pin" : this.pin, 'kinduser': this.kinduser,
-            "user": this.auserid, "attempt" : this.attempt, "answer" : this.answer, 'submit': submit ? 1 : 0};
+        let a = {"command": "answer", "mmogameid": this.mmogameid, "pin": this.pin, 'kinduser': this.kinduser,
+            "user": this.auserid, "attempt": this.attempt, "answer": this.answer, 'submit': submit ? 1 : 0};
         if (subcommand != undefined) {
             a['subcommand'] = subcommand;
         }
@@ -501,11 +446,11 @@ class mmogame_quiz extends mmogame {
             if (this.readyState == 4 && this.status == 200) {
                 instance.sendGetAttempt();
             }
-        }
+        };
         xmlhttp.open("POST", this.url, true)
 
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        var data = JSON.stringify({"command": "timeout", "mmogameid": this.mmogameid, "pin" : this.pin, 'kinduser': this.kinduser, "user": this.auserid, "attempt" : this.attempt});
+        var data = JSON.stringify({"command": "timeout", "mmogameid": this.mmogameid, "pin": this.pin, 'kinduser': this.kinduser, "user": this.auserid, "attempt": this.attempt});
         xmlhttp.send(data);
     }
 
@@ -545,42 +490,43 @@ class mmogame_quiz extends mmogame {
             this.autoResizeText(ans2, w, this.iconSize, false, this.minFontSize, this.maxFontSize, 0.9);
         }
 
-        this.show_score(json);
+        this.showScore(json);
     }
 
     getSVGcorrect(size, iscorrect, colorCorrect, colorError) {
         if (iscorrect) {
             let c = colorCorrect != undefined ? this.getColorHex(colorCorrect) : '#398439';
             return "<svg aria-hidden=\"true\" class=\"svg-icon iconCheckmarkLg\" width=\"" + size + "\" height=\"" + size + "\" viewBox=\"0 0 36 36\"><path fill=\"" + c + "\" d=\"m6 14 8 8L30 6v8L14 30l-8-8v-8z\"></path></svg>";
-        } else{
+        } else {
             let c = colorError != undefined ? this.getColorHex(colorError) : '#398439';
-            return "<svg width=\"" + size + "\" height=\"" + size + "\" class=\"bi bi-x-lg\" viewBox=\"0 0 18 18\"> <path fill=\"" + c + "\" d=\"M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z\"/></svg>";
+            return "<svg width=\"" + size + "\" height=\"" + size +
+                "\" class=\"bi bi-x-lg\" viewBox=\"0 0 18 18\"> <path fill=\"" + c + "\" d=\"M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z\"/></svg>";
         }
     }
 
     OnServerAnswer_multichoice(json) {
         let aCorrect = json.correct.split(",");
 
-        for (let i = 0; i < this.answersID.length; i++) {            
+        for (let i = 0; i < this.answersID.length; i++) {
             let label = this.aItemLabel[i];
-			let checked = this.aItemAnswer[i].classList.contains("checked");
+            let checked = this.aItemAnswer[i].classList.contains("checked");
             let iscorrect;
-			
+
             if (aCorrect.includes(this.answersID[i])) {
-                iscorrect = true;          
-            } else if(json.correct != undefined && checked) {
+                iscorrect = true;
+            } else if (json.correct != undefined && checked) {
                 iscorrect = false;
             } else {
                 continue;
             }
-			let height = label.scrollHeight;
-			let width = label.scrollWidth - this.radioSize;
+            let height = label.scrollHeight;
+            let width = label.scrollWidth - this.radioSize;
             label.style.left = (parseInt(label.style.left) + this.radioSize) + "px";
             label.style.width = width + "px";
-			if (iscorrect) {
-				label.innerHTML = '<b><u>' + label.innerHTML + '</u></b>';
-			}
-			this.autoResizeText(label, width, height, true, this.minFontSize, this.maxFontSize, 0.9);
+            if (iscorrect) {
+                label.innerHTML = '<b><u>' + label.innerHTML + '</u></b>';
+            }
+            this.autoResizeText(label, width, height, true, this.minFontSize, this.maxFontSize, 0.9);
 
             let t = parseInt(this.aItemAnswer[i].style.top);
             let div = this.createDiv(this.area, this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
@@ -605,14 +551,14 @@ class mmogame_quiz extends mmogame {
             clearTimeout(this.timeoutFastJSON);
         }
         let instance = this;
-        this.timeoutFastJSON = setTimeout(function(){
+        this.timeoutFastJSON = setTimeout(function() {
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = function() {
                 this.timeoutFastJSON = undefined;
                 if (this.readyState == 4 && this.status == 200) {
                     instance.onServerFastJson(this.response);
                 }
-            }
+            };
 
             let url = instance.url.substr(0, instance.url.length - 8) + "state.php";
 
@@ -637,19 +583,19 @@ class mmogame_quiz extends mmogame {
 const state_alone_play = 1;
 const state_alone_last = 1;
 
-class mmogame_quiz_alone extends mmogame_quiz {
+class mmogameQuizAlone extends mmogameQuiz {
     constructor() {
         super();
         this.cIcons = this.hasHelp() ? 5 : 4;
         this.autosave = true;
         this.autosubmit = true;
         this.type = 'alone';   
-    } 
+    }
 
     createIconBar() {
         let i = 0;
 
-        this.nickNameHeight = Math.round(this.iconSize /  3);
+        this.nickNameHeight = Math.round(this.iconSize / 3);
 
         this.buttonAvatarLeft = this.padding + i * (this.iconSize + this.padding);
         this.buttonAvatarHeight = Math.round(this.iconSize - this.iconSize / 3);
@@ -657,19 +603,19 @@ class mmogame_quiz_alone extends mmogame_quiz {
         this.createButtonsAvatar(1, Math.round(this.padding + (i++) * (this.iconSize + this.padding)));
         this.buttonsAvatar[1].style.top = (this.padding + this.nickNameHeight) + "px";
 
-        let h = this.iconSize - this.buttonAvatarHeight;
         this.divNickname = this.createDiv(this.body, this.buttonAvatarLeft, this.padding, this.iconSize, this.buttonAvatarTop);
 
-        this.createDivScorePercent(this.padding + (i++) * (this.iconSize + this.padding), this.padding + this.nickNameHeight, 1, true);
+        this.createDivScorePercent(this.padding + (i++) * (this.iconSize + this.padding), this.padding + this.nickNameHeight, 1,
+            true);
 
         this.createButtonSound(this.padding + (i++) * (this.iconSize + this.padding), this.padding + this.nickNameHeight);
         let instance = this;
         if (this.hasHelp()) {
-            this.createButtonHelp(this.padding +  (i++) * (this.iconSize + this.padding), this.padding);
-            this.buttonHelp.addEventListener("click", function(){ instance.onClickHelp(this); });
+            this.createButtonHelp(this.padding + (i++) * (this.iconSize + this.padding), this.padding);
+            this.buttonHelp.addEventListener("click", function(){
+                instance.onClickHelp(this);
+            });
         }
-
-        let height = window.innerHeight;
 
         let copyrightHeight = this.getCopyrightHeight();
 
@@ -678,7 +624,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
 
         this.areaHeight = Math.round(window.innerHeight - this.areaTop - copyrightHeight);
 
-        this.createDivColor(this.body, 0, window.innerHeight - copyrightHeight - 1, window.innerWidth - 1, copyrightHeight, this.getColorGray(this.colorCopyright));
+        this.createDivColor(this.body, 0, window.innerHeight - copyrightHeight - 1, window.innerWidth - 1, copyrightHeight,
+            this.getColorGray(this.colorCopyright));
         this.vertical = this.areaHeight > this.areaWidth;
 
         this.maxImageWidth = (this.vertical ? this.areaWidth : this.areaWidth / 2);
@@ -711,7 +658,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
         button.innerHTML = '';
 
         let h = this.iconSize / 2;
-        let div  = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
+        let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
         div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore2);
         this.labelPercent = div;
@@ -725,9 +672,9 @@ class mmogame_quiz_alone extends mmogame_quiz {
         this.labelPercentRank = div;
     }
     
-    update_percent(json) {
-        if (this.labelPercent != undefined ) {
-            let s = json.percentcompleted == undefined ? '' : '<b>' + Math.round(100 * json.percentcompleted) + ' %</b>'
+    updatePercent(json) {
+        if (this.labelPercent != undefined) {
+            let s = json.percentcompleted == undefined ? '' : '<b>' + Math.round(100 * json.percentcompleted) + ' %</b>';
             if (this.labelPercent.innerHTML != s) {
                 this.labelPercent.innerHTML = s;
                 this.autoResizeText(this.labelPercent, this.iconSize - 2 * this.padding, this.iconSize / 2, false, 0, 0, 1);
@@ -739,7 +686,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
         super.onServerAnswer(json, timeout);
 
         if (json.submit != 0) {
-            this.update_percent(json);
+            this.updatePercent(json);
         }
     }
 
@@ -765,19 +712,19 @@ class mmogame_quiz_alone extends mmogame_quiz {
         if (json.state == 0 && param == undefined) {
             json.qtype = '';
             super.onServerGetAttempt(json, param);
-            this.show_score(json);
+            this.showScore(json);
 
             return this.createDivMessageStart('[LANGM_WAIT_TO_START]');
         }
 
         super.onServerGetAttempt(json, param);
-        this.update_percent(json)
+        this.updatePercent(json)
         if (this.btnSubmit != undefined) {
             this.btnSubmit.style.visibility = "hidden";
         }
     }
-    
-    show_score(json) {
+
+    showScore(json) {
         let rank = json.rank;
         let rankc = json.completedrank;
         if (rank != undefined && rankc != undefined) {
@@ -792,7 +739,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
 
         let s = json.sumscore;
         json.sumscore = this.labelScore.innerHTML;
-        super.show_score(json);
+        super.showScore(json);
         json.sumscore = s;
         s = json.sumscore == undefined ? '' : '<b>' + json.sumscore + '</b>';
         if (this.labelScore.innerHTML != s) {
@@ -815,5 +762,5 @@ class mmogame_quiz_alone extends mmogame_quiz {
     </tr>
 </table>
         `;
-    }    
+    }
 }

@@ -118,7 +118,7 @@ class mmogame {
 
     /**
      * Sets the variable code.
-     @param string code
+     @param string $code
      */
     public function set_errorcode($code) {
         $this->error = $code;
@@ -277,8 +277,8 @@ class mmogame {
     /**
      * Return coresponding auserid from a user.
      * @param object $db
-     * @param string kind (the kind of user e.g. Moodle, GUID)
-     * @param string userid
+     * @param string $kind (the kind of user e.g. Moodle, GUID)
+     * @param string $userid
      * @param boolean $create
      */
     public static function get_auserid_from_db($db, $kind, $userid, $create) {
@@ -299,7 +299,7 @@ class mmogame {
     /**
      * Return coresponding auserid from a user (details are in object variable $data).
      * @param object $db
-     * @param object data
+     * @param object $data
      * @return int
      */
     public static function get_asuerid_from_object($db, $data) {
@@ -320,7 +320,7 @@ class mmogame {
 
     /**
      * Marks user as loged in.
-     * @param int auserid
+     * @param int $auserid
      */
     public function login_user($auserid) {
         $this->db->update_record( 'mmogame_aa_users',
@@ -333,8 +333,8 @@ class mmogame {
      * Returns a game object
      *
      * @param object $db
-     * @param int id
-     * @param int pin
+     * @param int $id
+     * @param int $pin
      * @return object
      */
     public static function getgame($db, $id, $pin) {
@@ -358,8 +358,8 @@ class mmogame {
      * Returns a game object
      *
      * @param object $db
-     * @param int id
-     * @param int pin
+     * @param int $id
+     * @param int $pin
      * @return object
      */
     public static function getgame_first($db, $id) {
@@ -460,6 +460,8 @@ class mmogame {
     }
 
     /**
+     * @param int $auserid
+     *
      * Returns the grade for user auserid
      */
     public function get_grade($auserid) {

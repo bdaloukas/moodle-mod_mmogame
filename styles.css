@@ -1,31 +1,33 @@
 .mmogame_imgbutton {
     position: absolute;
     padding: 0;
-    border-radius: 0em;
+    border-radius: 0;
     text-shadow: 1px 1px var(--c-sh-txt, rgba(0, 0, 0, 0.5));
     filter: none;
     cursor: pointer;
 }
-.mmogame_imgbutton:hover, .mmogame_imgbutton:focus {
+.mmogame_imgbutton:hover,
+.mmogame_imgbutton:focus {
     outline: none;
     filter: contrast(0.65);
 }
 
 .mmogame_imgbutton:active {
-    transform: translatey(0.125em);
+    transform: translateY(0.125em);
 }
 
 .mmogame_imgbutton_disabled {
     cursor: not-allowed;
     pointer-events: none;
-    opacity:0.5;
+    opacity: 0.5;
 }
 
 .mmogame_buttons {
     position: absolute;
     border: solid .125em transparent;
     padding: 0;
-    width: $button-w; height: $button-h;
+    width: $button-w;
+    height: $button-h;
     border-radius: .5*$button-h;
     color: #fff;
     text-shadow: 1px 1px var(--c-sh-txt, #{rgba(#000, .5)});
@@ -33,12 +35,15 @@
     transition: .2s ease-out;
     cursor: pointer;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
         outline: none;
         filter: none
     }
-  
-    &:active { transform: translatey($move-act); }
+
+    &:active {
+        transform: translatey($move-act);
+    }
 }
 
 .mmogame_button {
@@ -52,7 +57,8 @@
     cursor: pointer;
 }
 
-.mmogame_button:hover, .mmogame_button:focus {
+.mmogame_button:hover,
+.mmogame_button:focus {
     outline: none;
 
     filter: contrast(0.65);

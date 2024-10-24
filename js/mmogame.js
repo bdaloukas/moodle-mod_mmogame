@@ -77,10 +77,10 @@ class mmogame {
         this.url = url;
         this.mmogameid = id;
         this.pin = pin;
-		this.kinduser = kinduser;
-		if (this.kinduser == undefined || this.kinduser == "") {
-			this.kinduser = "usercode";
-		}
+        this.kinduser = kinduser;
+        if (this.kinduser == undefined || this.kinduser == "") {
+            this.kinduser = "usercode";
+        }
         this.auserid = auserid
         if (this.auserid == 0 && this.kinduser == 'guid') {
             this.auserid = this.getUserGUID();
@@ -93,8 +93,8 @@ class mmogame {
         if (this.kinduser == undefined) {
             this.onAfterOpenGame();
         } else {
-			this.onAfterOpenGame();
-		}
+            this.onAfterOpenGame();
+        }
     }
 
     createImageButton(parent, left, top, width, height, classname, filename, wrap, alt) {
@@ -303,7 +303,7 @@ class mmogame {
         let instance = this;
 
         for (var i=0; i <= 10; i++) {
-            var el = document.createElement("div");
+            let el = document.createElement("div");
             el.style.left = 0;
             el.style.top = 0;
             el.style.width = width + "px";
@@ -338,33 +338,34 @@ class mmogame {
             }
         }
         item.style.fontSize = fitSize + "px";
-		
+
         if (newWidth > width || newHeight > height) {
-            this.autoResizeText_br(item);
+            this.autoResizeTextBr(item);
             newWidth = item.scrollWidth;
             newHeight = item.scrollHeight;
-            this.autoResizeText_image(item, newWidth > width ? newWidth - width : 0,  newHeight > height ? newHeight - height : 0, minRatio);
+            this.autoResizeText_image(item, newWidth > width ? newWidth - width : 0, newHeight > height ? newHeight - height : 0,
+                minRatio);
         } else {
             return [item.scrollWidth - 1, item.scrollHeight];
         }
 
-            var el = document.createElement("div");
-            el.style.width = width + "px";
-            el.style.height = 0;
-            el.visibility = "hidden";
-            if (!wrap) {
-                el.style.whiteSpace = "nowrap";
-            }
-            el.innerHTML = item.innerHTML;
-            this.body.appendChild(el);
-            el.style.fontSize = item.style.fontSize;
-            let size = [el.scrollWidth - 1, el.scrollHeight];
-            this.body.removeChild(el);
+        let el = document.createElement("div");
+        el.style.width = width + "px";
+        el.style.height = 0;
+        el.visibility = "hidden";
+        if (!wrap) {
+            el.style.whiteSpace = "nowrap";
+        }
+        el.innerHTML = item.innerHTML;
+        this.body.appendChild(el);
+        el.style.fontSize = item.style.fontSize;
+        let size = [el.scrollWidth - 1, el.scrollHeight];
+        this.body.removeChild(el);
 
-            return size;
+        return size;
     }
 
-    autoResizeText_br(item) {
+    autoResizeTextBr(item) {
         let s = item.innerHTML;
         let change = false;
         while (s.substr(0, 4) == '<br>') {
@@ -458,7 +459,8 @@ class mmogame {
     }
 
     uuid4() {
-        const ho = (n, p) => this.pad(n.toString(16), p, 0); /// Return the hexadecimal text representation of number `n`, padded with zeroes to be of length `p`
+        /// Return the hexadecimal text representation of number `n`, padded with zeroes to be of length `p`
+        const ho = (n, p) => this.pad(n.toString(16), p, 0);
         const view = new DataView(new ArrayBuffer(16)); /// Create a view backed by a 16-byte buffer
         crypto.getRandomValues(new Uint8Array(view.buffer)); /// Fill the buffer with random data
         view.setUint8(6, (view.getUint8(6) & 0xf) | 0x40); /// Patch the 6th byte to reflect a version 4 UUID
@@ -540,9 +542,11 @@ class mmogame {
 
         this.colors = colors;
         var instance = this;
-        this.colors.sort(function(a, b) {return instance.getContrast(a) - instance.getContrast(b)});
+        this.colors.sort(function(a, b) {
+            return instance.getContrast(a) - instance.getContrast(b);
+        });
 
-        this.colorBackground = this.colors[ 0];
+        this.colorBackground = this.colors[0];
         this.body.style.background = this.getColorHex(this.colorBackground);
 
         return this.colors;
@@ -561,7 +565,7 @@ class mmogame {
         const lines = text.match(/[^\r\n]+/g);
         lines.forEach(line => {
             fitFontWidth = Math.min(fitFontWidth, width / ctx.measureText(line).width);
-        })
+        });
         let fitFontHeight = height / (lines.length * 1.2);
 
         let fontSize = Math.min(fitFontHeight, fitFontWidth);
@@ -600,9 +604,9 @@ class mmogame {
                 ix = 0;
                 iy++;
             }
-            var letter = letters[ i]
+            var letter = letters[i];
             if (letter == "-") {
-                aButton[ i] = null;
+                aButton[i] = null;
                 ix++;
                 continue;
             }
@@ -632,7 +636,7 @@ class mmogame {
 
     repairHTML(s, mapFiles, mapFilesWidth, mapFilesHeight) {
         if (s == undefined) {
-            return;
+            return '';
         }
         while (s.substr(0, 4) == '<br>') {
             s = s.substr(4).trim();
@@ -652,9 +656,9 @@ class mmogame {
                         s2 = s2.substr(0, posw) + s2.substr(posw2 + 1);
                     }
                 }
-                posw = s2.indexOf("height=")
+                posw = s2.indexOf("height=");
                 if (posw != 0) {
-                    let posw2 = s2.substr(posw + 1, 1) == "\"" ? s2.indexOf("\"", posw + 2) : s2.indexOf(" ", posw + 2)
+                    let posw2 = s2.substr(posw + 1, 1) == "\"" ? s2.indexOf("\"", posw + 2) : s2.indexOf(" ", posw + 2);
                     if (posw2 != 0) {
                         s2 = s2.substr(0, posw) + s2.substr(posw2 + 1);
                     }
@@ -697,9 +701,9 @@ class mmogame {
         if (pos >= 0) {
             s2 = s2.substr(0, pos) + s2.substr(pos + 13);
         }
-        
+
         if (s.substr(0, 5) == "<div>") {
-            s = s.substr(5)
+            s = s.substr(5);
             if (s.substr(-6, 6) == '</div>') {
                 s = s.subtr(0, s.length - 6);
             }
@@ -747,11 +751,11 @@ class mmogame {
         button.innerHTML = '';
 
         let h = this.iconSize / 2;
-        let div  = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
+        let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
         div.style.lineHeight = (this.iconSize / 2) + "px";
-        div.style.textAlign="center";
+        div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
-        div.title = '[LANGM_GRADE]'
+        div.title = '[LANGM_GRADE]';
         if (num == 1) {
             this.labelScore = div;
         } else {
@@ -760,7 +764,7 @@ class mmogame {
 
         h = this.iconSize / 3;
         div = this.createDiv(this.body, left, top, this.iconSize, h);
-        div.style.textAlign="center";
+        div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
         button.disabled = true;
         if (num == 1) {
@@ -827,7 +831,7 @@ class mmogame {
             div.title = "[LANGM_GRADE_OPONENT]";
         }
 
-        h = this.iconSize / 3
+        h = this.iconSize / 3;
         div = this.createDiv(this.body, left, top, this.iconSize / 2, h);
         div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
@@ -852,7 +856,7 @@ class mmogame {
         let label = num == 1 ? this.labelScoreRank : this.labelScoreRank2;
 
         div  = this.createDiv(this.body, left + this.iconSize / 2, top, this.iconSize / 2, h);
-        div.style.textAlign="center";
+        div.style.textAlign = "center";
         div.style.fontName = label.style.fontName;
         div.style.fontSize = h + "px";
         div.style.lineHeight = h + "px";
@@ -866,7 +870,7 @@ class mmogame {
 
         label = num == 1 ? this.labelAddScore : this.labelAddScore2;
         div  = this.createDiv(this.body, left + this.iconSize / 2, parseFloat(this.labelScore.style.top), this.iconSize / 2, this.iconSize / 2);
-        div.style.textAlign="center";
+        div.style.textAlign = "center";
         div.style.lineHeight = Math.round(this.iconSize / 2) + "px";
         div.style.fontName = label.style.fontName;
         div.style.fontSize = label.style.fontSize;
@@ -874,7 +878,7 @@ class mmogame {
         div.style.color = label.style.color;
         div.title = '[LANGM_PERCENT]';
         this.autoResizeText(div, this.iconSize / 2, this.iconSize / 2, false)
-        if (num == 1) {;
+        if (num == 1) {
             this.labelScoreB = div;
         } else {
             this.labelScoreB2 = div;
@@ -891,8 +895,8 @@ class mmogame {
         div.style.whiteSpace = "nowrap";
         div.style.lineHeight= sizeIcon + "px";
         div.style.textAlign = "center";
-        div.style.background = this.getColorHex(this.colorBackground); //"#234025"
-        div.style.color = this.getColorContrast(this.colorBackground); //"#DCBFDA"
+        div.style.background = this.getColorHex(this.colorBackground); // "#234025"
+        div.style.color = this.getColorContrast(this.colorBackground); // "#DCBFDA"
         div.name = "timer";
         this.body.appendChild(div);
         this.labelTimer = div;
@@ -907,7 +911,9 @@ class mmogame {
         this.buttonSound = this.createImageButton(this.body, left, top, this.iconSize, this.iconSize, "mmogame_button_red", this.getMuteFile());
         this.buttonSound.alt = '[LANGM_SOUND]';
         var instance = this;
-        this.buttonSound.addEventListener("click", function(){ instance.onClickSound(this); });
+        this.buttonSound.addEventListener("click", function() {
+            instance.onClickSound(this);
+        });
 
         this.buttonSound.title = '[LANGM_SOUND]';
     }
@@ -934,8 +940,6 @@ class mmogame {
     }
 
     findbest(low, up, step1, step2, fn) {
-        let debug = low + "-" + up;
-
         if (low < 1) {
             low = 1;
         }
@@ -954,8 +958,8 @@ class mmogame {
         }
         let prevSize;
         let fitSize = low;
-        let ret, testSize;
-        for (var i=0; i <= 10; i++) {
+        let testSize;
+        for (var i = 0; i <= 10; i++) {
             prevSize = low;
             testSize = (low + up) / 2;
 
@@ -1001,8 +1005,6 @@ class mmogame {
         div.style.paddingRight = this.padding + "px";
         div.id = "definition";
 
-        let instance = this;
-
         this.area.appendChild(div);
         let height = div.scrollHeight + this.padding;
         div.style.height = height + "px";
@@ -1015,7 +1017,7 @@ class mmogame {
     }
 
     onClickDefinition(divDefinition) {
-        let pad = this.createDivColor(this.body, 0, 0, window.innerWidth, window.innerHeight, this.getColorGray(this.colorBackground));
+        this.createDivColor(this.body, 0, 0, window.innerWidth, window.innerHeight, this.getColorGray(this.colorBackground));
 
         var div = document.createElement("div");
         div.style.position = "absolute";
@@ -1049,13 +1051,11 @@ class mmogame {
             return;
         }
 
-        let dif =  Math.round(this.timeclose - ((new Date()).getTime()) / 1000);
+        let dif = Math.round(this.timeclose - ((new Date()).getTime()) / 1000);
         if (dif <= 0) {
             dif = 0;
             this.sendTimeout();
         }
-        let a = this.timeclose - ((new Date()).getTime()) / 1000;
-
         this.labelTimer.innerHTML = (dif < 0 ? "-" : "") + Math.floor(dif / 60.0) + ":" + ("0" + (dif % 60)).substr(-2);
 
         if (dif == 0) {
@@ -1063,8 +1063,8 @@ class mmogame {
         }
 
         let instance = this;
-        setTimeout(function(){ 
-            instance.updateLabelTimer() ;
+        setTimeout(function(){
+            instance.updateLabelTimer();
         }, 500);
     }
 
@@ -1085,7 +1085,7 @@ class mmogame {
         let height = window.innerHeight - this.getCopyrightHeight() - this.padding - top;
         
         if (this.divMessageBackground == undefined) {
-            var div = document.createElement("div");
+            let div = document.createElement("div");
             div.style.position = "absolute";
             div.style.left = left + "px";
             div.style.top = top + "px";
@@ -1097,7 +1097,7 @@ class mmogame {
         }
 
         if (this.divMessage == undefined) {
-            var div = document.createElement("div");
+            let div = document.createElement("div");
             div.style.position = "absolute";
             div.style.left = left + "px";
             div.style.textAlign = "center";
@@ -1130,7 +1130,7 @@ class mmogame {
         let height1 = height / 8;
 
         if (this.divMessageBackground == undefined) {
-            var div = document.createElement("div");
+            let div = document.createElement("div");
             div.style.position = "absolute";
             div.style.left = left + "px";
             div.style.top = top + "px";
@@ -1142,7 +1142,7 @@ class mmogame {
         }
 
         if (this.divMessage == undefined) {
-            var div = document.createElement("div");
+            let div = document.createElement("div");
             div.style.position = "absolute";
             div.style.left = left + "px";
             div.style.textAlign = "center";
@@ -1162,7 +1162,7 @@ class mmogame {
         this.divMessage.style.top  =  top + "px";
 
         if (this.divMessageHelp == undefined) {
-            var div = document.createElement("div");
+            let div = document.createElement("div");
             div.style.position = "absolute";
             div.style.left = left + "px";
             div.style.textAlign = "left";
@@ -1180,7 +1180,7 @@ class mmogame {
             this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));        
         }
     }
-    
+
     removeDivMessage() {
         if (this.divMessage != undefined) {
             this.body.removeChild(this.divMessage);
@@ -1189,7 +1189,7 @@ class mmogame {
         if (this.divMessageHelp != undefined) {
             this.body.removeChild(this.divMessageHelp);
             this.divMessageHelp = undefined;
-        }        
+        }
         if (this.divMessageBackground != undefined) {
             this.divMessageBackground.remove();
             this.divMessageBackground = undefined;
@@ -1198,7 +1198,7 @@ class mmogame {
 
     disableButtons(buttons, disabled) {
         for (let i = 0; i < buttons.length; i++) {
-            let btn = buttons[ i];
+            let btn = buttons[i];
             if (btn != undefined) {
                 if (disabled) {
                     btn.classList.add("mmogame_imgbutton_disabled");
@@ -1224,7 +1224,7 @@ class mmogame {
         return s;
     }
 
-    show_score(json) {
+    showScore(json) {
         let s = json.sumscore == undefined ? '' : '<b>' + json.sumscore + '</b>';
         if (this.labelScore.innerHTML != s) {
             this.labelScore.innerHTML = s;
@@ -1283,7 +1283,7 @@ class mmogame {
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         var data = JSON.stringify({"command": "getavatars", "mmogameid": this.mmogameid, "pin" : this.pin,
-			"kinduser" : this.kinduser, "user": this.auserid, 'count' : count});
+            "kinduser" : this.kinduser, "user": this.auserid, 'count' : count});
         xmlhttp.send(data);
     }
 
@@ -1307,7 +1307,7 @@ class mmogame {
         div.style.whiteSpace = "nowrap";
         div.style.textAlign = "right";
         div.style.color = this.getColorContrast(this.colorBackground);
-        let labSize = this.autoResizeText(div, labelWidth, this.areaHeight, false, this.minFontSize, this.maxFontSize, 1);
+        this.autoResizeText(div, labelWidth, this.areaHeight, false, this.minFontSize, this.maxFontSize, 1);
 
         var divInp = document.createElement("input");
         divInp.style.position = "absolute";
@@ -1348,7 +1348,7 @@ class mmogame {
     }
 
     OnServerGetAvatars(json) {
-		this.params = true;
+        this.params = true;
         if (this.area != undefined) {
             this.body.removeChild(this.area);
         }
@@ -1358,7 +1358,7 @@ class mmogame {
         this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
 
         let w = this.areaWidth - this.iconSize - this.padding;
-        let s = this.buttonsAvatarSrc[ 1];
+        let s = this.buttonsAvatarSrc[1];
         let pos = s.lastIndexOf("/");
         if (pos >= 0) {
             s = s.substr(pos +1);
@@ -1373,8 +1373,8 @@ class mmogame {
             s2 = '';
         }
         let inpNickname = this.createDivName(0, 0, w / 3, 2 * w / 3, "Όνομα", s2);
-		inpNickname.value = json.nickname;
-		inpNickname.focus();
+        inpNickname.value = json.nickname;
+        inpNickname.focus();
 
         let instance = this;
         let btn = this.createImageButton(this.area, w + 2 * this.padding, 0, 0, parseInt(inpNickname.style.fontSize), "", 'assets/submit.svg', false, 'submit');
@@ -1382,9 +1382,9 @@ class mmogame {
             function(){
                 instance.sendSetAvatar(inpNickname.value, -1);
             }
-        )
+        );
 
-        //Colors
+        // Colors
         let div = this.createDiv(this.area, 0, this.iconSize, w / 3, this.iconSize);
         div.innerHTML = "[LANGM_PALETTE]:";
         div.style.textAlign = "right";
@@ -1396,29 +1396,31 @@ class mmogame {
         canvas.style.position = "absolute";
         canvas.style.left = (w / 3 + this.padding) + "px";
         canvas.style.top = this.iconSize + "px";
-        canvas.width  = this.iconSize;
+        canvas.width = this.iconSize;
         canvas.height = this.iconSize;
         canvas.id = "avatarid";
         this.area.appendChild(canvas);
         this.showColorPalette(canvas, this.colors);
-        canvas.addEventListener("click", function(e){
+        canvas.addEventListener("click", function(e) {
             instance.sendGetColorPalettes();
         })
 
         let countX = Math.floor(this.areaWidth / this.iconSize);
         let countY = Math.floor((this.areaHeight - 2 * this.iconSize - 2 * this.padding) / this.iconSize);
-        let left = 0, top = 2 * (this.iconSize + this.padding);
+        let left = 0;
+        let top = 2 * (this.iconSize + this.padding);
+
         for (let i = 0; i < json.count; i++) {
             let btn = this.createCenterImageButton(this.area, left, top, this.iconSize, this.iconSize, "",
-                'assets/avatars/' + json[ 'avatar' + (i + 1)]);
+                'assets/avatars/' + json['avatar' + (i + 1)]);
             btn.addEventListener("click",
-                function(){
-                    instance.sendSetAvatar(inpNickname.value, json[ 'id' + (i + 1)]);
+                function() {
+                    instance.sendSetAvatar(inpNickname.value, json['id' + (i + 1)]);
                 }
-            )
+            );
             left += this.iconSize;
 
-            if((i + 1) % countX == 0) {
+            if ((i + 1) % countX == 0) {
                 top += this.iconSize;
                 left = 0;
             }
@@ -1432,10 +1434,12 @@ class mmogame {
         var strip = width / 5;
         let instance = this;
 
-        colors.sort(function(a, b) {return instance.getContrast(a) - instance.getContrast(b)});
+        colors.sort(function(a, b) {
+            return instance.getContrast(a) - instance.getContrast(b);
+        });
         for (var i = 0; i < 5; i++) {
             ctx.fillStyle = this.getColorHex(colors[i]);
-            ctx.fillRect(i * strip, 0, (i+1)*strip, height);
+            ctx.fillRect(i * strip, 0, (i + 1) * strip, height);
         }
 
         ctx.strokeStyle = "#FFFFFF";
@@ -1456,12 +1460,11 @@ class mmogame {
 
         let countX = Math.floor(this.areaWidth / this.iconSize);
         let countY = Math.floor((this.areaHeight - 2 * this.iconSize - 2 * this.padding) / this.iconSize);
-        let count = countX * countY;
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         var data = JSON.stringify({"command": "setavatar", "mmogameid": this.mmogameid, "pin" : this.pin,
-			'kinduser': this.kinduser, "user": this.auserid, 'avatarid' : avatarid, 'nickname': nickname});
+            'kinduser': this.kinduser, "user": this.auserid, 'avatarid': avatarid, 'nickname': nickname});
         xmlhttp.send(data);
     }
 
@@ -1473,15 +1476,15 @@ class mmogame {
                 let json = JSON.parse(this.responseText);
                 instance.createScreenColorPalette(json);
             }
-        }
+        };
 
         let countX = Math.floor(this.areaWidth / this.iconSize);
         let countY = Math.floor(this.areaHeight / this.iconSize);
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        var data = JSON.stringify({"command": "getcolorpalettes", "mmogameid": this.mmogameid, "pin" : this.pin,
-			'kinduser': this.kinduser, "user": this.auserid, "count": countX * countY});
+        var data = JSON.stringify({"command": "getcolorpalettes", "mmogameid": this.mmogameid, "pin": this.pin,
+            'kinduser': this.kinduser, "user": this.auserid, "count": countX * countY});
         xmlhttp.send(data);
     }
 
@@ -1493,12 +1496,12 @@ class mmogame {
                 instance.colors = undefined;
                 instance.openGame(instance.url, instance.mmogameid, instance.pin, instance.auserid, instance.kinduser);
             }
-        }
+        };
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        var data = JSON.stringify({"command": "setcolorpalette", "mmogameid": this.mmogameid, "pin" : this.pin,
-			'kinduser': this.kinduser, "user": this.auserid, "id": colorpaletteid});
+        var data = JSON.stringify({"command": "setcolorpalette", "mmogameid": this.mmogameid, "pin": this.pin,
+            'kinduser': this.kinduser, "user": this.auserid, "id": colorpaletteid});
         xmlhttp.send(data);
     }
 
@@ -1514,7 +1517,7 @@ class mmogame {
             this.divMessageHelp.style.height = "0px";
             this.body.removeChild(this.divMessageHelp);
             this.divMessageHelp = undefined;
-        } 
+        }
         this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
         let countX = Math.floor(this.areaWidth / (this.iconSize + this.padding));
         let countY = Math.floor(this.areaHeight / (this.iconSize + this.padding));
@@ -1531,18 +1534,20 @@ class mmogame {
                 canvas.style.position = "absolute";
                 canvas.style.left = ((ix % countX) * (this.iconSize + this.padding)) + "px";
                 canvas.style.top = (iy * (this.iconSize + this.padding)) + "px";
-                canvas.width  = this.iconSize;
+                canvas.width = this.iconSize;
                 canvas.height = this.iconSize;
                 canvas.style.cursor = 'pointer';
                 this.area.appendChild(canvas);
-                let a = json[ "palette" + i];
+                let a = json["palette" + i];
                 for (let j = 0; j < a.length; j++) {
                     a[j] = parseInt(a[j]);
                 }
-                this.showColorPalette(canvas, a)
+                this.showColorPalette(canvas, a);
                 let id = json['id' + i];
 
-                canvas.addEventListener("click", function(e){ instance.sendSetColorPalette(id) });
+                canvas.addEventListener("click", function(e){
+                                                                instance.sendSetColorPalette(id);
+                                                            });
             }
         }
         this.area.classList.add("palete");
@@ -1550,7 +1555,7 @@ class mmogame {
 
     setColorsString(s) {
         let a = [0x9B7ED9, 0x79F2F2, 0x67BF5A, 0xD0F252, 0xBF5B21];
-        if (s != undefined && s.length >- 0) {
+        if (s != undefined && s.length >= 0) {
             let b = s.split(",");
             if (b.length == 5) {
                 a = b;
@@ -1569,7 +1574,7 @@ class mmogame {
 
         this.computeTimeStartClose(json);
     }
-    
+
     computeTimeStartClose(json) {
         if (json.timestart != undefined) {
             this.timestart = parseInt(json.timestart) != 0 ? parseInt(json.timestart) + this.difClock : 0;
@@ -1578,9 +1583,9 @@ class mmogame {
             this.timestart = 0;
             this.timeclose = 0;
         }
-        
-        let temp_time = (new Date()).getTime() / 1000;
-        let temp_rest = this.timeclose - temp_time;
+
+        let tempTime = (new Date()).getTime() / 1000;
+        let tempRest = this.timeclose - tempTime;
     }
 
     changeToDisabledCheckRadio(item, color1, color2) {
@@ -1593,21 +1598,21 @@ class mmogame {
 
         return div;
     }
-    
+
     drawRadio(canvas, color1, color2) {
         var ctx = canvas.getContext("2d");
         let size = canvas.width;
         ctx.clearRect(0, 0, size, canvas.height);
 
         ctx.beginPath();
-        ctx.arc(size / 2,  size / 2, size / 2, 0, 2 * Math.PI, false);
+        ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI, false);
         ctx.fillStyle = this.getColorHex(color1);
         ctx.fill();
 
         let checked = canvas.classList.contains("checked");
         if (checked) {
             ctx.beginPath();
-            ctx.arc(size / 2,  size / 2, size / 4, 0, 2 * Math.PI, false);
+            ctx.arc(size / 2, size / 2, size / 4, 0, 2 * Math.PI, false);
             ctx.fillStyle = this.getColorHex(color2);
             ctx.fill();
         }
@@ -1616,7 +1621,7 @@ class mmogame {
     createRadiobox(parent, size, color1, color2, checked, disabled) {
         var canvas = document.createElement('canvas');
         canvas.style.position = "absolute";
-        canvas.width  = size;
+        canvas.width = size;
         canvas.height = size;
         parent.appendChild(canvas);
         if (checked) {
@@ -1634,7 +1639,7 @@ class mmogame {
     createCheckboxCanvas(parent, size, color1, color2, checked, disabled) {
         var canvas = document.createElement('canvas');
         canvas.style.position = "absolute";
-        canvas.width  = size;
+        canvas.width = size;
         canvas.height = size;
         parent.appendChild(canvas);
         if (checked) {
@@ -1685,7 +1690,7 @@ class mmogame {
         }
         if (heightNickName == 0) {
             heightNickName = this.iconSize - this.buttonAvatarHeight;
-        }        
+        }
         if (this.buttonsAvatarLeft == undefined) {
             this.buttonsAvatarLeft = [];
         }
@@ -1704,8 +1709,8 @@ class mmogame {
         if (this.buttonsAvatar == undefined) {
             this.buttonsAvatar = [];
         }
-        this.buttonsAvatar[ num] = this.createImageButton(this.body, left, this.avatarTop, this.iconSize, this.iconSize, "", "")
-        if (num == 2 && this.avatarTop != undefined) {;
+        this.buttonsAvatar[num] = this.createImageButton(this.body, left, this.avatarTop, this.iconSize, this.iconSize, "", "");
+        if (num == 2 && this.avatarTop != undefined) {
             this.buttonsAvatar[num].title = '[LANGM_OPONENT]'
         }
 
@@ -1749,7 +1754,7 @@ class mmogame {
                 s = avatar;
                 let pos = s.lastIndexOf("/");
                 if (pos >= 0) {
-                    s = s.substr(pos +1);
+                    s = s.substr(pos + 1);
                 }
                 pos = s.lastIndexOf(".");
                 if (pos >= 0) {
@@ -1759,7 +1764,7 @@ class mmogame {
             s = this.repairNickname(s);
             if (this.divNicknames[num] != undefined && this.divNicknames[num].innerHTML != s) {
                 this.divNicknames[num].innerHTML = s;
-                this.divNicknames[num].style.textAlign="center";
+                this.divNicknames[num].style.textAlign = "center";
                 this.divNicknames[num].style.color = this.getColorContrast(this.colorsBackground);
                 this.autoResizeText(this.divNicknames[num], this.divNicknamesWidth[num], this.divNicknamesHeight[num], true, 0, 0, 1);
             }
@@ -1770,20 +1775,23 @@ class mmogame {
             this.buttonsAvatarSrc[num] = avatar;
         }
 
-        this.buttonsAvatar[num].alt = this.divNicknames[ num].innerHTML;
+        this.buttonsAvatar[num].alt = this.divNicknames[num].innerHTML;
 
         this.buttonsAvatar[num].style.visibility = 'visible';
         this.divNicknames[num].style.visibility = 'visible';
     }
 
     getSVGprev(size, color) {
-        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 667 667"><defs><clipPath id="a"><path clip-rule="evenodd" d="M500 0L500 500L500 500L0 500L0 500L0 0L0 0L500 0z"/></clipPath></defs><g clip-path="url(#a)" transform="scale(1.3333)"><path transform="matrix(1 0 0 -1 0 500)" d="M256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L445.66214 468.5281L445.66214 468.5281L238.84933 261.7153L238.84933 261.7153L238.84933 261.7153C 235.60168 258.46765 234.11804 254.18806 234.24268 249.92534L234.24268 249.92534L234.24268 249.92534C 234.11804 245.67822 235.60168 241.39864 238.84933 238.15097L238.84933 238.15097L445.6933 31.290157L445.6933 31.290157L445.6933 31.290157L445.6933 31.290157L256.72833 31.290157L256.72833 31.290157L38.12555 249.89291L38.12555 249.89291L256.77502 468.5281zM4.5989075 238.15099L4.5989075 238.15099L4.5989075 238.15099L237.95758 4.791005L237.95758 4.791005L237.95758 4.791005C 241.11176 1.6368077 245.24988 0.09086167 249.3724 0.12201445L249.3724 0.12201445L249.3724 0.12201445C 249.49702 0.12201445 249.59048 0.05970932 249.71638 0.05970932L249.71638 0.05970932L249.71638 0.05970932L249.71638 0.05970932L483.95123 0.05970932L483.95123 0.05970932L483.95123 0.05970932C 492.5714 0.05970932 499.56647 7.0560565 499.56647 15.674933L499.56647 15.674933L499.56647 15.674933C 499.56647 15.799542 499.50415 15.893002 499.50415 16.01891L499.50415 16.01891L499.50415 16.01891C 499.51974 20.141432 497.9738 24.27953 494.83517 27.433727L494.83517 27.433727L272.3747 249.89421L272.3747 249.89421L495.30374 472.822L495.30374 472.822L495.30374 472.822C 501.56543 479.08368 501.56543 489.2342 495.30374 495.49588L495.30374 495.49588L495.30374 495.49588C 491.58752 499.21213 486.5434 500.44656 481.71863 499.7586L481.71863 499.7586L481.71863 499.7586L481.71863 499.7586L251.99702 499.7586L251.99702 499.7586L251.99702 499.7586C 247.17227 500.44528 242.12814 499.2122 238.4119 495.49588L238.4119 495.49588L4.614502 261.6985C 1.3668518 258.45084 -0.11682129 254.17125 0.0078125 249.90852L0.0078125 249.90852L0.0078125 249.90852C -0.11810303 245.67693 1.3655396 241.39864 4.5989075 238.15099z" stroke="#FFF" stroke-width="1.731" fill="' + this.getColorHex(color) + '"/></g></svg>';
+        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 667 667"><defs><clipPath id="a"><path clip-rule="evenodd" d="M500 0L500 500L500 500L0 500L0 500L0 0L0 0L500 0z"/></clipPath></defs><g clip-path="url(#a)" transform="scale(1.3333)"><path transform="matrix(1 0 0 -1 0 500)" d="M256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L445.66214 468.5281L445.66214 468.5281L238.84933 261.7153L238.84933 261.7153L238.84933 261.7153C 235.60168 258.46765 234.11804 254.18806 234.24268 249.92534L234.24268 249.92534L234.24268 249.92534C 234.11804 245.67822 235.60168 241.39864 238.84933 238.15097L238.84933 238.15097L445.6933 31.290157L445.6933 31.290157L445.6933 31.290157L445.6933 31.290157L256.72833 31.290157L256.72833 31.290157L38.12555 249.89291L38.12555 249.89291L256.77502 468.5281zM4.5989075 238.15099L4.5989075 238.15099L4.5989075 238.15099L237.95758 4.791005L237.95758 4.791005L237.95758 4.791005C 241.11176 1.6368077 245.24988 0.09086167 249.3724 0.12201445L249.3724 0.12201445L249.3724 0.12201445C 249.49702 0.12201445 249.59048 0.05970932 249.71638 0.05970932L249.71638 0.05970932L249.71638 0.05970932L249.71638 0.05970932L483.95123 0.05970932L483.95123 0.05970932L483.95123 0.05970932C 492.5714 0.05970932 499.56647 7.0560565 499.56647 15.674933L499.56647 15.674933L499.56647 15.674933C 499.56647 15.799542 499.50415 15.893002 499.50415 16.01891L499.50415 16.01891L499.50415 16.01891C 499.51974 20.141432 497.9738 24.27953 494.83517 27.433727L494.83517 27.433727L272.3747 249.89421L272.3747 249.89421L495.30374 472.822L495.30374 472.822L495.30374 472.822C 501.56543 479.08368 501.56543 489.2342 495.30374 495.49588L495.30374 495.49588L495.30374 495.49588C 491.58752 499.21213 486.5434 500.44656 481.71863 499.7586L481.71863 499.7586L481.71863 499.7586L481.71863 499.7586L251.99702 499.7586L251.99702 499.7586L251.99702 499.7586C 247.17227 500.44528 242.12814 499.2122 238.4119 495.49588L238.4119 495.49588L4.614502 261.6985C 1.3668518 258.45084 -0.11682129 254.17125 0.0078125 249.90852L0.0078125 249.90852L0.0078125 249.90852C -0.11810303 245.67693 1.3655396 241.39864 4.5989075 238.15099z" stroke="#FFF" stroke-width="1.731" fill="' +
+            this.getColorHex(color) + '"/></g></svg>';
     }
 
     getSVGnext(size, color) {
-        return '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 385.201 385.201"><path fill="' + this.getColorHex(color) + '" d="M381.658,183.472L201.878,3.691c-2.43-2.43-5.618-3.621-8.794-3.597 c-0.096,0-0.168-0.048-0.265-0.048H12.364c-6.641,0-12.03,5.39-12.03,12.03c0,0.096,0.048,0.168,0.048,0.265 c-0.012,3.176,1.179,6.364,3.597,8.794l171.384,171.384L3.618,364.263c-4.824,4.824-4.824,12.644,0,17.468 c2.863,2.863,6.749,3.814,10.466,3.284h176.978c3.717,0.529,7.603-0.421,10.466-3.284l180.118-180.118 c2.502-2.502,3.645-5.799,3.549-9.083C385.292,189.27,384.149,185.974,381.658,183.472z M187.381,360.955H41.862l159.329-159.329 c2.502-2.502,3.645-5.799,3.549-9.083c0.096-3.272-1.047-6.569-3.549-9.071L41.838,24.106h145.579l168.412,168.412L187.381,360.955 z"/></svg>';
+        return '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 385.201 385.201"><path fill="' +
+            this.getColorHex(color) +
+            '" d="M381.658,183.472L201.878,3.691c-2.43-2.43-5.618-3.621-8.794-3.597 c-0.096,0-0.168-0.048-0.265-0.048H12.364c-6.641,0-12.03,5.39-12.03,12.03c0,0.096,0.048,0.168,0.048,0.265 c-0.012,3.176,1.179,6.364,3.597,8.794l171.384,171.384L3.618,364.263c-4.824,4.824-4.824,12.644,0,17.468 c2.863,2.863,6.749,3.814,10.466,3.284h176.978c3.717,0.529,7.603-0.421,10.466-3.284l180.118-180.118 c2.502-2.502,3.645-5.799,3.549-9.083C385.292,189.27,384.149,185.974,381.658,183.472z M187.381,360.955H41.862l159.329-159.329 c2.502-2.502,3.645-5.799,3.549-9.083c0.096-3.272-1.047-6.569-3.549-9.071L41.838,24.106h145.579l168.412,168.412L187.381,360.955 z"/></svg>';
     }
-    
+
     setHelpURL(url) {
         this.helpUrl = url;
     }

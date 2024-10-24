@@ -5,18 +5,22 @@
    */
   /** For IE8 and earlier compatibility: https://developer.mozilla.org/en/DOM/element.addEventListener */
   function addListener(el, type, listener, useCapture) {
-    if (el.addEventListener) { 
+    if (el.addEventListener) {
       el.addEventListener(type, listener, useCapture);
       return {
-        destroy: function() { el.removeEventListener(type, listener, useCapture); }
+        destroy: function() {
+                                el.removeEventListener(type, listener, useCapture);
+                            }
       };
     } else {
-      // see: http://stackoverflow.com/questions/5198845/javascript-this-losing-context-in-ie
+      // See: http://stackoverflow.com/questions/5198845/javascript-this-losing-context-in-ie
       var handler = function(e) { listener.handleEvent(window.event, listener); }
       el.attachEvent('on' + type, handler);
 
       return {
-        destroy: function() { el.detachEvent('on' + type, handler); }
+        destroy: function() {
+                    el.detachEvent('on' + type, handler);
+                 }
       };
     }
   }
@@ -25,25 +29,27 @@
 
   /* Construct the FastButton with a reference to the element and click handler. */
   this.FastButton = function(element, handler, useCapture) {
-    // collect functions to call to cleanup events
+    // Collect functions to call to cleanup events
     this.events = [];
     this.touchEvents = [];
     this.element = element;
     this.handler = handler;
     this.useCapture = useCapture;
-    if (isTouch)
+    if (isTouch) {
       this.events.push(addListener(element, 'touchstart', this, this.useCapture));
+    }
     this.events.push(addListener(element, 'click', this, this.useCapture));
   };
 
   /* Remove event handling when no longer needed for this button */
   this.FastButton.prototype.destroy = function() {
-    for (i = this.events.length - 1; i >= 0; i -= 1)
+  for (let i = this.events.length - 1; i >= 0; i -= 1) {
       this.events[i].destroy();
+  }
     this.events = this.touchEvents = this.element = this.handler = this.fastButton = null;
   };
 
-  /* acts as an event dispatcher */
+  /* Acts as an event dispatcher */
   this.FastButton.prototype.handleEvent = function(event) {
     switch (event.type) {
       case 'touchstart': this.onTouchStart(event); break;
@@ -67,28 +73,31 @@
   /* When /if touchmove event is invoked, check if the user has dragged past the threshold of 10px. */
   this.FastButton.prototype.onTouchMove = function(event) {
     if (Math.abs(event.touches[0].clientX - this.startX) > 10 || Math.abs(event.touches[0].clientY - this.startY) > 10) {
-      this.reset(); //if he did, then cancel the touch event
+      this.reset(); // if he did, then cancel the touch event
     }
   };
 
   /* Invoke the actual click handler and prevent ghost clicks if this was a touchend event. */
   this.FastButton.prototype.onClick = function(event) {
-    event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
+    event.stopPropagation ? event.stopPropagation() : (event.cancelBubble = true);
     this.reset();
-    // Use .call to call the method so that we have the correct "this": https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/call
+    // Use .call to call the method so that we have the correct "this":
+    // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/call
     var result = this.handler.call(this.element, event);
-    if (event.type == 'touchend')
-      clickbuster.preventGhostClick(this.startX, this.startY);    
+    if (event.type == 'touchend') {
+      clickbuster.preventGhostClick(this.startX, this.startY);
+    }
     return result;
   };
 
   this.FastButton.prototype.reset = function() {
-    for (i = this.touchEvents.length - 1; i >= 0; i -= 1)
+    for ( let i = this.touchEvents.length - 1; i >= 0; i -= 1) {
       this.touchEvents[i].destroy();
+    }
     this.touchEvents = [];
   };
 
-  this.clickbuster = function() {}
+  this.clickbuster = function() {};
 
   /* Call preventGhostClick to bust all click events that happen within 25px of
    the provided x, y coordinates in the next 2.5s. */
@@ -109,8 +118,8 @@
       var x = clickbuster.coordinates[i];
       var y = clickbuster.coordinates[i + 1];
       if (Math.abs(event.clientX - x) < 25 && Math.abs(event.clientY - y) < 25) {
-        event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
-        event.preventDefault ? event.preventDefault() : (event.returnValue=false);
+        event.stopPropagation ? event.stopPropagation() : (event.cancelBubble = true);
+        event.preventDefault ? event.preventDefault() : (event.returnValue = false);
       }
     }
   };

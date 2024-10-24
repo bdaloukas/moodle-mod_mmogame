@@ -73,7 +73,7 @@ function mmogame_get_moodle_version() {
 /**
  * Given an object containing all the necessary data, will create a new instance and return the id number of the new instance.
  *
- * @param object $game An object from the form in mod.html
+ * @param object $mform An object from the form in mod.html
  *
  * @return int The id of the newly inserted game record
  **/
@@ -122,7 +122,7 @@ function mmogame_delete_instance( $mmogameid) {
 /**
  * Updates some fields before writing to database.
  *
- * @param stdClass $mmogame
+ * @param stdClass $mform
  */
 function mmogame_before_add_or_update( &$mform) {
     global $DB;
@@ -146,7 +146,7 @@ function mmogame_before_add_or_update( &$mform) {
 /**
  * Updates some fields after writing to database.
  *
- * @param stdClass $mmogame
+ * @param stdClass $mform
  */
 function mmogame_after_add_or_update( &$mform) {
     global $DB;

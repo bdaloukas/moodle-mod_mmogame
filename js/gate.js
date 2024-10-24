@@ -18,7 +18,8 @@ class mmogameGate extends mmogame {
 
         switch (kinduser) {
             case 'moodle':
-                if (localStorage.getItem("nickname") !== null && localStorage.getItem("avatarid") !== null && localStorage.getItem("paletteid") !== null) {
+                if (localStorage.getItem("nickname") !== null && localStorage.getItem("avatarid") !== null
+                && localStorage.getItem("paletteid") !== null) {
                     let avatarid = parseInt(localStorage.getItem("avatarid"));
                     let paletteid = parseInt(localStorage.getItem("paletteid"));
                     this.playgame(auserid, localStorage.getItem("nickname"), paletteid, avatarid);
@@ -26,7 +27,8 @@ class mmogameGate extends mmogame {
                 }
                 break;
             case 'guid':
-                if (localStorage.getItem("auserid") !== null && localStorage.getItem("nickname") !== null && localStorage.getItem("avatarid") !== null && localStorage.getItem("paletteid") !== null) {
+                if (localStorage.getItem("auserid") !== null && localStorage.getItem("nickname") !== null
+                && localStorage.getItem("avatarid") !== null && localStorage.getItem("paletteid") !== null) {
                     let avatarid = parseInt(localStorage.getItem("avatarid"));
                     let paletteid = parseInt(localStorage.getItem("paletteid"));
                     this.playgame(localStorage.getItem("auserid"), localStorage.getItem("nickname"), paletteid, avatarid);
@@ -34,20 +36,20 @@ class mmogameGate extends mmogame {
                 }
                 break;
         }
-        
+
         this.createScreen()
     }
 
     createScreen() {
-        this.vertical =  window.innerWidth <  window.innerHeight
+        this.vertical = window.innerWidth < window.innerHeight;
 
         if (this.area != undefined) {
             this.body.removeChild(this.area);
             this.area = undefined;
         }
-        this.removeDivMessage()
+        this.removeDivMessage();
 
-        this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight)
+        this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
 
         if (this.vertical) {
             this.createScreenVertical();
@@ -56,7 +58,7 @@ class mmogameGate extends mmogame {
         }
     }
 
-    createScreenVertical() {        
+    createScreenVertical() {
         let maxHeight = this.areaHeight - 5 * this.padding - this.iconSize;
         let maxWidth = this.areaWidth;
         let instance = this;
@@ -64,11 +66,11 @@ class mmogameGate extends mmogame {
 
         this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function (fontSize, step) {
             size = instance.computeLabelSize(fontSize, ['[LANGM_CODE]: ', '[LANGM_NAME]: ', '[LANGM_PALETTE]']);
-            
-            if (size[ 0] >= maxWidth) { 
+
+            if (size[0] >= maxWidth) {
                 return 1;
             }
-            let heightCode = instance.kinduser != 'guid' && instance.kinduser != 'moodle' ? size[ 1] + instance.padding : 0;
+            let heightCode = instance.kinduser != 'guid' && instance.kinduser != 'moodle' ? size[1] + instance.padding : 0;
             
             let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
             let n = Math.floor(heightColors / instance.iconSize);
@@ -78,7 +80,7 @@ class mmogameGate extends mmogame {
             let rest = heightColors - n * instance.iconSize;
             
             let heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
-            let computedHeight = heightCode + 3 * size[ 1] + 8 * instance.padding + heightColors + heightAvatars;
+            let computedHeight = heightCode + 3 * size[1] + 8 * instance.padding + heightColors + heightAvatars;
 
             return computedHeight < maxHeight ? -1 : 1;
         })
@@ -94,17 +96,19 @@ class mmogameGate extends mmogame {
 
         let bottom;
         if (this.kinduser != 'guid' && this.kinduser != 'moodle') {
-            bottom = this.createCode(0, 0, maxWidth, this.fontSize, size[ 0])
+            bottom = this.createCode(0, 0, maxWidth, this.fontSize, size[0])
             this.edtCode = this.edt;
-            this.edtCode.addEventListener("keyup", function(){ instance.updateSubmit()});            
+            this.edtCode.addEventListener("keyup", function(){
+                                                                instance.updateSubmit()
+                                                             });
         } else {
             bottom = 0;
         }
-        bottom = this.createLabelEditVertical(0, bottom, newWidth - 2 * this.padding, this.fontSize, size[ 0], "[LANGM_NAME]: ") + 2 * this.padding;
+        bottom = this.createLabelEditVertical(0, bottom, newWidth - 2 * this.padding, this.fontSize, size[0], "[LANGM_NAME]: ") + 2 * this.padding;
         this.edtNickname = this.edt;
         this.edtNickname.addEventListener("keyup", function(){ instance.updateSubmit()});           
 
-        let gridHeight = maxHeight - bottom - this.padding - this.iconSize - size[ 1];
+        let gridHeight = maxHeight - bottom - this.padding - this.iconSize - size[1];
         
         let label1 = document.createElement("label");
         label1.style.position = "absolute";
@@ -115,7 +119,8 @@ class mmogameGate extends mmogame {
         label1.style.whiteSpace="nowrap";
         this.area.appendChild(label1);
         
-        let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
+        let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
+            '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
             function(){
                 let elements = instance.area.getElementsByClassName("mmogame_color");
@@ -125,7 +130,8 @@ class mmogameGate extends mmogame {
                 }
                 
                 instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 
-                    0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars, true, false);
+                    0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
+                    true, false);
             }
         )
         label1.style.left = 0;
@@ -141,7 +147,8 @@ class mmogameGate extends mmogame {
         label.style.width = "0 px";
         label.style.whiteSpace="nowrap";
         this.area.appendChild(label);
-        btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize, this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
+        btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize,
+            this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
             function(){
                 let elements = instance.area.getElementsByClassName("mmogame_avatar");
@@ -149,27 +156,27 @@ class mmogameGate extends mmogame {
                 while (elements[0]) {
                     elements[0].parentNode.removeChild(elements[0]);              
                 }
-                
+
                 instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 
                     0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars, false, true);
             }
-        )        
+        )
 
         label.style.left = "0 px";
         label.style.color = this.getColorContrast(this.colorBackground);
         label.style.top = (bottom + gridHeightColors) + "px";
-        
+
         //Vertical
         this.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 
                                           0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars, gridHeightAvatars);
-        
+
         let bottom2 = bottom + gridHeightColors + this.fontSize + this.padding + gridHeightAvatars;
         this.btnSubmit = this.createImageButton(this.area, (maxWidth - this.iconSize) / 2, bottom2, 0,
             this.iconSize, "", 'assets/submit.svg', false, 'submit');
         this.btnSubmit.style.visibility = 'hidden';
         this.btnSubmit.addEventListener("click", function(){ instance.playgame(instance.edtCode == undefined ? 0 : instance.edtCode.value, instance.edtNickname.value, instance.paletteid, instance.avatarid)});
     }
-     
+
     createScreenHorizontal() {        
         let maxHeight = this.areaHeight - 7 * this.padding - this.iconSize;
         let maxWidth = this.areaWidth;
@@ -179,10 +186,10 @@ class mmogameGate extends mmogame {
         this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function (fontSize, step) {
             size = instance.computeLabelSize(fontSize, ['[LANGM_CODE]: ', '[LANGM_NAME]: ', '[LANGM_PALETTE]']);
             
-            if (size[ 0] >= maxWidth) { 
+            if (size[0] >= maxWidth) { 
                 return 1;
             }
-            let heightCode = instance.kinduser != 'guid' && instance.kinduser != 'moodle' ? size[ 1] + instance.padding : 0;
+            let heightCode = instance.kinduser != 'guid' && instance.kinduser != 'moodle' ? size[1] + instance.padding : 0;
             
             let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
             let n = Math.floor(heightColors / instance.iconSize);
@@ -192,7 +199,7 @@ class mmogameGate extends mmogame {
             let rest = heightColors - n * instance.iconSize;
             
             let heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
-            let computedHeight = heightCode + 2 * size[ 1] + 7 * instance.padding + heightColors + heightAvatars;
+            let computedHeight = heightCode + 2 * size[1] + 7 * instance.padding + heightColors + heightAvatars;
             
             return computedHeight < maxHeight ? -1 : 1;
         })
@@ -208,19 +215,21 @@ class mmogameGate extends mmogame {
 
         let bottom;
         if (this.kinduser != 'guid' && this.kinduser != 'moodle') {
-            bottom = this.createCode(0, 0, maxWidth, this.fontSize, size[ 0]);
+            bottom = this.createCode(0, 0, maxWidth, this.fontSize, size[0]);
             this.edtCode = this.edt;
-            this.edtCode.addEventListener("keyup", function(){ instance.updateSubmit()});             
+            this.edtCode.addEventListener("keyup", function(){
+                instance.updateSubmit();
+            });
         } else {
             bottom = 0;
         }
         let sizeLabel = this.computeLabelSize(this.fontSize, ['[LANGM_NAME]: ']);
-        bottom = this.createLabelEdit(0, bottom, newWidth - 2 * this.padding, this.fontSize, sizeLabel[ 0], "[LANGM_NAME]: ");
+        bottom = this.createLabelEdit(0, bottom, newWidth - 2 * this.padding, this.fontSize, sizeLabel[0], "[LANGM_NAME]: ");
 
         this.edtNickname = this.edt;
         this.edtNickname.addEventListener("keyup", function(){ instance.updateSubmit()});            
         
-        let gridHeight = maxHeight - bottom - this.padding;  // - this.iconSize - size[ 1]
+        let gridHeight = maxHeight - bottom - this.padding;  // - this.iconSize - size[1]
         
         let label1 = document.createElement("label");
         label1.style.position = "absolute";
@@ -231,7 +240,8 @@ class mmogameGate extends mmogame {
         label1.style.whiteSpace="nowrap";
         this.area.appendChild(label1);
 
-        let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
+        let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
+            '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
             function(){
                 let elements = instance.area.getElementsByClassName("mmogame_color");
@@ -287,7 +297,7 @@ class mmogameGate extends mmogame {
         this.btnSubmit.style.visibility = 'hidden';
         this.btnSubmit.addEventListener("click", function(){ instance.playgame(instance.edtCode == undefined ? 0 : instance.edtCode.value, instance.edtNickname.value, instance.paletteid, instance.avatarid)});
     }
-    
+
     computeLabelSize(fontSize, aLabel) {
         let maxWidth = 0;
         let maxHeight = 0;
@@ -295,7 +305,7 @@ class mmogameGate extends mmogame {
         for (let i = 0; i < aLabel.length; i++) {
             var label = document.createElement("label");
             label.style.position = "absolute";
-            label.innerHTML = aLabel[ i];
+            label.innerHTML = aLabel[i];
             label.style.whiteSpace = "nowrap";
             label.style.font = "FontAwesome";
             label.style.fontSize = fontSize + "px";
@@ -317,12 +327,12 @@ class mmogameGate extends mmogame {
 
         return [maxWidth, maxHeight];
     }
-    
+
     createLabelEdit(left, top, width, fontSize, labelWidth, title) {
         var label = document.createElement("label");
         label.style.position = "absolute";
 
-        label.innerHTML =  title;
+        label.innerHTML = title;
 
         label.style.font = "FontAwesome";
         label.style.fontSize = fontSize + "px";
@@ -360,7 +370,7 @@ class mmogameGate extends mmogame {
         var label = document.createElement("label");
         label.style.position = "absolute";
 
-        label.innerHTML =  title;
+        label.innerHTML = title;
 
         label.style.font = "FontAwesome";
         label.style.fontSize = fontSize + "px";
@@ -397,11 +407,11 @@ class mmogameGate extends mmogame {
     createCode(left, top, width, fontSize, labelWidth) {
         return this.createLabelEdit(left, top, width, fontSize, labelWidth, "[LANGM_CODE]: ");
     }
-    
+
     createNickName(left, top, width, fontSize, labelWidth) {
         return this.createLabelEdit(left, top, width, fontSize, labelWidth, "[LANGM_NAME]: ");
-    }  
-    
+    }
+
     showAvatars(json, left, top, width, height, countX, countY) {
         this.avatar = undefined;
         let leftOriginal = left
@@ -409,9 +419,9 @@ class mmogameGate extends mmogame {
         let w = Math.round(this.padding / 2) + "px"
         for (let i = 0; i < json.countavatars; i++) {
             let btn = this.createCenterImageButton(this.area, left, top, this.iconSize - this.padding,
-                this.iconSize - this.padding, "", 'assets/avatars/' + json[ 'avatar' + (i + 1)])
+                this.iconSize - this.padding, "", 'assets/avatars/' + json['avatar' + (i + 1)])
             btn.classList.add("mmogame_avatar");
-            let id = json[ 'avatarid' + (i + 1)];
+            let id = json['avatarid' + (i + 1)];
             btn.addEventListener("click",
                 function(){
                     instance.updateAvatar(btn, id, w);
@@ -426,7 +436,7 @@ class mmogameGate extends mmogame {
             }
         }
     }
-    
+
     sendGetColorsAvatars(left, top, gridWidthColors, gridHeight, gridWidthAvatars) {
         
         let gridWidthColors0 = gridWidthColors;
@@ -463,7 +473,7 @@ class mmogameGate extends mmogame {
         let countXcolors = Math.floor(gridWidthColors / this.iconSize);
         let countYcolors = Math.floor(gridHeightColors / this.iconSize);
         gridWidthColors = countXcolors * this.iconSize;
-        
+
         let countXavatars = Math.floor(gridWidthAvatars / this.iconSize);
         let countYavatars = Math.floor((gridHeightAvatars + 2 * this.padding) / this.iconSize);
         gridWidthAvatars = countXavatars * this.iconSize;
@@ -493,11 +503,12 @@ class mmogameGate extends mmogame {
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        var data = JSON.stringify({"command": "getcolorsavatars", "mmogameid": this.mmogameid, "pin" : this.pin,
-			'kinduser': this.kinduser, "user": this.auserid, "countcolors": countXcolors * countYcolors, "countavatars": countXavatars * countYavatars});
+        var data = JSON.stringify({"command": "getcolorsavatars", "mmogameid": this.mmogameid, "pin": this.pin,
+			'kinduser': this.kinduser, "user": this.auserid, "countcolors": countXcolors * countYcolors,
+            "countavatars": countXavatars * countYavatars});
         xmlhttp.send(data);
     }
-  
+
     showColorPalettes(json, left, top, width, height, countX, countY) {
         let instance = this;
         let i = 0;
@@ -508,7 +519,7 @@ class mmogameGate extends mmogame {
                 if (i > json.count) {
                     break;
                 }
-                let a = json[ "palette" + i]
+                let a = json["palette" + i]
                 if (a == undefined) {
                     break;
                 }
@@ -522,7 +533,7 @@ class mmogameGate extends mmogame {
                 canvas.classList.add("mmogame_color");
                 this.area.appendChild(canvas);
                 for (let j = 0; j < a.length; j++) {
-                    a[j] = parseInt(a[ j]);
+                    a[j] = parseInt(a[j]);
                 }
                 this.showColorPalette(canvas, a);
                 let id = json['paletteid' + i];
@@ -566,14 +577,14 @@ class mmogameGate extends mmogame {
 
         this.updateSubmit();
     }
-    
+
     updateSubmit() {
         let hasCode = this.edtCode == undefined ? true : parseInt(this.edtCode.value) > 0;
         let visible = this.avatarid != undefined && this.paletteid != undefined && hasCode && this.edtNickname.value.length > 0;
 
         this.btnSubmit.style.visibility = visible ? 'visible' : 'hidden';
     }
-    
+
     playgame(auserid, nickname, paletteid, avatarid) {
         if (auserid == 0 && this.kinduser == 'guid') {
             auserid = this.getUserGUID();
@@ -593,19 +604,19 @@ class mmogameGate extends mmogame {
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        let d = {"command": "getattempt", "mmogameid": this.mmogameid, "pin" : this.pin, "kinduser" : this.kinduser,
-            "user": auserid, "nickname" : nickname, "paletteid" : paletteid, "avatarid" : avatarid,
-            "maxwidth" : this.maxImageWidth, "maxheight": this.maxImageHeight};
-        if(this.helpurl == undefined) {
+        let d = {"command": "getattempt", "mmogameid": this.mmogameid, "pin": this.pin, "kinduser": this.kinduser,
+            "user": auserid, "nickname": nickname, "paletteid": paletteid, "avatarid": avatarid,
+            "maxwidth": this.maxImageWidth, "maxheight": this.maxImageHeight};
+        if (this.helpurl == undefined) {
             d['helpurl'] = 1;
         }
         let data = JSON.stringify(d);
         xmlhttp.send(data);
     }
-    
+
     onServerGetAttempt(json, auserid) {
-        if(json.errorcode != undefined ) {
-            if(json.errorcode == 'invalidauser') {
+        if (json.errorcode != undefined ) {
+            if (json.errorcode == 'invalidauser') {
                 alert(json.errorcode  + " " + auserid);
                 return;
             } else {
@@ -616,7 +627,7 @@ class mmogameGate extends mmogame {
         game.openGame(this.url, this.mmogameid, this.pin, auserid, this.kinduser, false);
         game.onServerGetAttempt(json);
     }
-    
+
     computeSizes() {
         super.computeSizes();
         this.iconSize = Math.round(0.8 * this.iconSize);

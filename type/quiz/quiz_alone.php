@@ -83,6 +83,9 @@ class mmogame_quiz_alone extends mmogame_quiz {
 
     /**
      * Set the state of current game.
+     *
+     * @param $state
+     * @param array $ret
      */
     public function set_state_json($state, &$ret) {
         $timefastjson = round( microtime( true), 6);
@@ -171,6 +174,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
     /**
      * Return the score of user's answer.
      *
+     * boolean $iscorrect
+     * object $query
      * @return int (now uses negative grading, in the future user will can change it)
      */
     protected function get_score_query($iscorrect, $query) {
@@ -180,7 +185,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
     /**
      * Fill the array $ret wirh information about high scores.
      *
-     * @param
+     * @param int $count
+     * @param $ret
      * @return int (now uses negative grading, in the future user will can change it)
      */
     public function get_highscore($count, &$ret) {
@@ -270,6 +276,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
 
     /**
      * Do nothing on this model.
+     *
+     * @param object $attempt
      */
     public function set_attempt($attempt) {
 
@@ -279,7 +287,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
      * Updates the database and array $ret about the correctness of user's answer
      *
      * @param object $data
-     * @param array &$ret
+     * @param array $ret
      * @return object: the attempt
      */
     public function set_answer_model($data, &$ret) {

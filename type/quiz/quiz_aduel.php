@@ -75,7 +75,6 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Return the aduel class variable.
      *
-     * @param object $attempt
      * @return object (a record from table mmogame_am_aduel_pairs)
      */
     public function get_aduel() {
@@ -85,7 +84,6 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Return the maxalone class variable.
      *
-     * @param object $attempt
      * @return object (a record from table mmogame_am_aduel_pairs)
      */
     public function get_maxalone() {
@@ -281,7 +279,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Saves to array $ret informations about the $attempt.
      *
-     * @param array &$ret (returns info about the current attempt)
+     * @param array $ret (returns info about the current attempt)
      * @param object $attempt
      * @param object $data
      */
@@ -382,7 +380,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Saves to array $ret informations about the $attempt (only for the second player).
      *
-     * @param array &$ret (returns info about the current attempt)
+     * @param array $ret (returns info about the current attempt)
      * @param object $query
      * @param int $attemptid
      */
@@ -411,7 +409,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Saves to array $ret informations about the $attempt (only for the first player).
      *
-     * @param array &$ret (returns info about the current attempt)
+     * @param array $ret (returns info about the current attempt)
      * @param object $query
      * @param int $attemptid
      */
@@ -431,7 +429,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Saves to array $ret informations about the $attempt (only for the second player).
      *
-     * @param array &$ret (returns info about the current attempt)
+     * @param array $ret (returns info about the current attempt)
      * @param object $query
      * @param int $attemptid
      */
@@ -546,7 +544,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * Updates the database and array $ret about the correctness of user's answer
      *
      * @param object $data
-     * @param array &$ret
+     * @param array $ret
      * @return object: the attempt
      */
     public function set_answer_model($data, &$ret) {
