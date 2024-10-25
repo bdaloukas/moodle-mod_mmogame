@@ -63,7 +63,8 @@ class mmogameQuiz extends mmogame {
         }
 
         if (json.errorcode != undefined) {
-            return this.createDivMessage(json.errorcode);
+            this.createDivMessage(json.errorcode);
+            return;
         }
 
         this.state = json.state;
@@ -222,7 +223,8 @@ class mmogameQuiz extends mmogame {
         let instance = this;
         for (let step = 1; step <= 2; step++) {
             let defSize;
-            this.fontSize = this.findbest(step == 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize, 0, 0, function(fontSize, step) {
+            this.fontSize = this.findbest(step == 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize, 0, 0,
+                function(fontSize, step) {
                     defSize = instance.createDefinition(0, 0, width - instance.padding, true, fontSize);
 
                     if (defSize[0] >= width) {
@@ -477,7 +479,7 @@ class mmogameQuiz extends mmogame {
         let instance = this;
         btn.addEventListener("click", function() {
             instance.sendGetAttempt();
-            instance.area.removeChild(btn);          
+            instance.area.removeChild(btn);       
         });
 
         if (!json.iscorrect && this.qtype != "multichoice") {
@@ -496,7 +498,8 @@ class mmogameQuiz extends mmogame {
     getSVGcorrect(size, iscorrect, colorCorrect, colorError) {
         if (iscorrect) {
             let c = colorCorrect != undefined ? this.getColorHex(colorCorrect) : '#398439';
-            return "<svg aria-hidden=\"true\" class=\"svg-icon iconCheckmarkLg\" width=\"" + size + "\" height=\"" + size + "\" viewBox=\"0 0 36 36\"><path fill=\"" + c + "\" d=\"m6 14 8 8L30 6v8L14 30l-8-8v-8z\"></path></svg>";
+            return "<svg aria-hidden=\"true\" class=\"svg-icon iconCheckmarkLg\" width=\"" + size + "\" height=\"" + size +
+                "\" viewBox=\"0 0 36 36\"><path fill=\"" + c + "\" d=\"m6 14 8 8L30 6v8L14 30l-8-8v-8z\"></path></svg>";
         } else {
             let c = colorError != undefined ? this.getColorHex(colorError) : '#398439';
             return "<svg width=\"" + size + "\" height=\"" + size +
@@ -579,8 +582,8 @@ class mmogameQuiz extends mmogame {
     }
 }
 
-const state_alone_play = 1;
-const state_alone_last = 1;
+const stateAlonePlay = 1;
+const stateAloneLast = 1;
 
 class mmogameQuizAlone extends mmogameQuiz {
     constructor() {
@@ -611,7 +614,7 @@ class mmogameQuizAlone extends mmogameQuiz {
         let instance = this;
         if (this.hasHelp()) {
             this.createButtonHelp(this.padding + (i++) * (this.iconSize + this.padding), this.padding);
-            this.buttonHelp.addEventListener("click", function(){
+            this.buttonHelp.addEventListener("click", function() {
                 instance.onClickHelp(this);
             });
         }

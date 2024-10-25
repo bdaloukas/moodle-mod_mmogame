@@ -303,7 +303,7 @@ class mmogame {
         let newHeight = 0;
         let newWidth = 0;
 
-        for (var i=0; i <= 10; i++) {
+        for (var i = 0; i <= 10; i++) {
             let el = document.createElement("div");
             el.style.left = 0;
             el.style.top = 0;
@@ -399,7 +399,7 @@ class mmogame {
         }
         let s = item.innerHTML;
 
-        for (let pos = 0;;) {
+        for (let pos = 0; ;) {
             let pos2 = s.indexOf("<img ", pos);
             if (pos2 < 0) {
                 break;
@@ -410,7 +410,8 @@ class mmogame {
             }
             let s2 = s.substr(pos2, pos3 - pos2) + " ";
 
-            let width = 0, height = 0;
+            let width = 0
+            let height = 0;
             let posw = s2.indexOf("width=");
             if (posw >= 0) {
                 let posw2 = s2.indexOf(" ", posw);
@@ -454,7 +455,9 @@ class mmogame {
 
     pad(num, size) {
         let s = num + "";
-        while (s.length < size) s = "0" + s;
+        while (s.length < size) {
+            s = "0" + s;
+        }
         return s;
     }
 
@@ -466,7 +469,8 @@ class mmogame {
         view.setUint8(6, (view.getUint8(6) & 0xf) | 0x40); // Patch the 6th byte to reflect a version 4 UUID
         view.setUint8(8, (view.getUint8(8) & 0x3f) | 0x80); // Patch the 8th byte to reflect a variant 1 UUID (version 4 UUIDs are)
         // Compile the canonical textual form from the array data
-        return `${ho(view.getUint32(0), 8)}-${ho(view.getUint16(4), 4)}-${ho(view.getUint16(6), 4)}-${ho(view.getUint16(8), 4)}-${ho(view.getUint32(10), 8)}${ho(view.getUint16(14), 4)}`;
+        return `${ho(view.getUint32(0), 8)}-${ho(view.getUint16(4), 4)}-${ho(view.getUint16(6), 4)}-${ho(view.getUint16(8), 4)}-
+        ${ho(view.getUint32(10), 8)}${ho(view.getUint16(14), 4)}`;
     }
 
     computeSizes() {
@@ -497,7 +501,7 @@ class mmogame {
         return '#' + ('0000' + x.toString(16).toUpperCase()).slice(-6);
     }
 
-    getContrast(x) {  
+    getContrast(x) {
         var r = (x & 0xFF0000) >> 16,
             g = (x & 0x00FF00) >> 8,
             b = x & 0x0000FF;
@@ -642,7 +646,7 @@ class mmogame {
         while (s.substr(0, 4) == '<br>') {
             s = s.substr(4).trim();
         }
-        for(;;) {
+        for (;;) {
             let pos = s.indexOf("@@GUID@@");
             if (pos < 0) {
                 break;
@@ -1161,7 +1165,7 @@ class mmogame {
 
         this.autoResizeText(this.divMessage, width, height1, false, this.minFontSize, this.maxFontSize, 0.5);
         top += (height1 - this.divMessage.scrollHeight) / 2;
-        this.divMessage.style.top =  top + "px";
+        this.divMessage.style.top = top + "px";
 
         if (this.divMessageHelp == undefined) {
             let div = document.createElement("div");
@@ -1325,7 +1329,7 @@ class mmogame {
         this.area.appendChild(divInp);
         divInp.autofocus = true;
         let instance = this;
-        divInp.addEventListener("keydown", function() { 
+        divInp.addEventListener("keydown", function() {
             if (event.key === "Enter") {
                 instance.sendSetAvatar(divInp.value, -1);
             }
@@ -1718,7 +1722,7 @@ class mmogame {
         }
         if (this.divNicknamesHeight == undefined) {
             this.divNicknamesHeight = [];
-        }        
+        }
         this.divNicknamesWidth[num] = widthNickName;
         this.divNicknamesHeight[num] = heightNickName;
 
@@ -1739,7 +1743,7 @@ class mmogame {
             this.divNicknames[num].style.visibility = 'hidden';
             return;
         }
-        
+
         if (this.nicknames[num] != nickname || nickname == "") {
             this.nicknames[num] = nickname;
             let s = nickname;
@@ -1809,8 +1813,10 @@ class mmogame {
             c-0.096,0-0.168-0.048-0.265-0.048H12.364c-6.641,0-12.03,5.39-12.03,12.03c0,0.096,0.048,0.168,0.048,0.265
             c-0.012,3.176,1.179,6.364,3.597,8.794l171.384,171.384L3.618,364.263c-4.824,4.824-4.824,12.644,0,17.468
             c2.863,2.863,6.749,3.814,10.466,3.284h176.978c3.717,0.529,7.603-0.421,10.466-3.284l180.118-180.118
-            c2.502-2.502,3.645-5.799,3.549-9.083C385.292,189.27,384.149,185.974,381.658,183.472z M187.381,360.955H41.862l159.329-159.329
-            c2.502-2.502,3.645-5.799,3.549-9.083c0.096-3.272-1.047-6.569-3.549-9.071L41.838,24.106h145.579l168.412,168.412L187.381,360.955 z"/></svg>`;
+            c2.502-2.502,3.645-5.799,3.549-9.083C385.292,189.27,384.149,185.974,381.658,183.472z
+            M187.381,360.955H41.862l159.329-159.329
+            c2.502-2.502,3.645-5.799,3.549-9.083c0.096-3.272-1.047-6.569-3.549-9.071L41.838,24.106h145.579l168.412,168.412L187.381,360.955
+            z"/></svg>`;
     }
 
     setHelpURL(url) {

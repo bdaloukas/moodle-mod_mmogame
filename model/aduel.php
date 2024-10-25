@@ -203,7 +203,7 @@ class mmogameModel_aduel {
      * @param int $scoreloss (score if first player loses)
      * @param int $scoredraw (score if it a draw)
      * @param int $adueladdscore
-     * @param int (the score)
+     * @return int (the score)
      */
     public static function finish_attempt($mmogame, $aduel, $iscorrect1, $iscorrect2,
     $isclosed1, $isclosed2, $scorewin, $scorelose, $scoredraw, &$adueladdscore) {

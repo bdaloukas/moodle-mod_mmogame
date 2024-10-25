@@ -35,7 +35,7 @@ class mmogameGate extends mmogame {
                     return;
                 }
                 break;
-        };
+        }
 
         this.createScreen();
     }
@@ -96,9 +96,9 @@ class mmogameGate extends mmogame {
         if (this.kinduser != 'guid' && this.kinduser != 'moodle') {
             bottom = this.createCode(0, 0, maxWidth, this.fontSize, size[0])
             this.edtCode = this.edt;
-            this.edtCode.addEventListener("keyup", function(){
-                                                                instance.updateSubmit();
-                                                             });
+            this.edtCode.addEventListener("keyup", function() {
+                instance.updateSubmit();
+            });
         } else {
             bottom = 0;
         }
@@ -109,8 +109,6 @@ class mmogameGate extends mmogame {
             instance.updateSubmit();
         });
 
-        let gridHeight = maxHeight - bottom - this.padding - this.iconSize - size[1];
-        
         let label1 = document.createElement("label");
         label1.style.position = "absolute";
         label1.innerHTML = "[LANGM_PALETTE]";
@@ -119,7 +117,7 @@ class mmogameGate extends mmogame {
         label1.style.width = "0px";
         label1.style.whiteSpace = "nowrap";
         this.area.appendChild(label1);
-        
+
         let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
             '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
@@ -129,7 +127,7 @@ class mmogameGate extends mmogame {
                 while (elements[0]) {
                     elements[0].parentNode.removeChild(elements[0]);
                 }
-                
+
                 instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors,
                     0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
                     true, false);
@@ -158,7 +156,7 @@ class mmogameGate extends mmogame {
                     elements[0].parentNode.removeChild(elements[0]);
                 }
 
-                instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 
+                instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors,
                     0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
                     false, true);
             }
@@ -169,7 +167,7 @@ class mmogameGate extends mmogame {
         label.style.top = (bottom + gridHeightColors) + "px";
 
         // Vertical
-        this.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 
+        this.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors,
                                           0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars,
                                           gridHeightAvatars);
 
@@ -191,24 +189,22 @@ class mmogameGate extends mmogame {
 
         this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function(fontSize, step) {
             size = instance.computeLabelSize(fontSize, ['[LANGM_CODE]: ', '[LANGM_NAME]: ', '[LANGM_PALETTE]']);
-            
-            if (size[0] >= maxWidth) { 
+
+            if (size[0] >= maxWidth) {
                 return 1;
             }
             let heightCode = instance.kinduser != 'guid' && instance.kinduser != 'moodle' ? size[1] + instance.padding : 0;
-            
+
             let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
             let n = Math.floor(heightColors / instance.iconSize);
             if (n == 0) {
                 return 1;
             }
-            let rest = heightColors - n * instance.iconSize;
-            
             let heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
             let computedHeight = heightCode + 2 * size[1] + 7 * instance.padding + heightColors + heightAvatars;
-            
+
             return computedHeight < maxHeight ? -1 : 1;
-        })
+        });
 
         let gridWidthColors = maxWidth - this.padding;
         let gridWidthAvatars = maxWidth - this.padding;
@@ -223,7 +219,7 @@ class mmogameGate extends mmogame {
         if (this.kinduser != 'guid' && this.kinduser != 'moodle') {
             bottom = this.createCode(0, 0, maxWidth, this.fontSize, size[0]);
             this.edtCode = this.edt;
-            this.edtCode.addEventListener("keyup", function(){
+            this.edtCode.addEventListener("keyup", function() {
                 instance.updateSubmit();
             });
         } else {
@@ -233,9 +229,9 @@ class mmogameGate extends mmogame {
         bottom = this.createLabelEdit(0, bottom, newWidth - 2 * this.padding, this.fontSize, sizeLabel[0], "[LANGM_NAME]: ");
 
         this.edtNickname = this.edt;
-        this.edtNickname.addEventListener("keyup", function(){ instance.updateSubmit()});            
-
-        let gridHeight = maxHeight - bottom - this.padding;  // - this.iconSize - size[1]
+        this.edtNickname.addEventListener("keyup", function() {
+            instance.updateSubmit();
+        });
 
         let label1 = document.createElement("label");
         label1.style.position = "absolute";
@@ -253,9 +249,9 @@ class mmogameGate extends mmogame {
                 let elements = instance.area.getElementsByClassName("mmogame_color");
 
                 while (elements[0]) {
-                    elements[0].parentNode.removeChild(elements[0]);            
+                    elements[0].parentNode.removeChild(elements[0]);
                 }
-                
+
                 instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 0,
                     bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
                     true, false);
@@ -272,12 +268,12 @@ class mmogameGate extends mmogame {
         label.style.font = "FontAwesome";
         label.style.fontSize = this.fontSize + "px";
         label.style.width = "0 px";
-        label.style.whiteSpace="nowrap";
+        label.style.whiteSpace = "nowrap";
         this.area.appendChild(label);
         btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize,
             this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
-            function(){
+            function() {
                 let elements = instance.area.getElementsByClassName("mmogame_avatar");
 
                 while (elements[0]) {
@@ -285,9 +281,10 @@ class mmogameGate extends mmogame {
                 }
 
                 instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 0,
-                    bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars, false, true);
+                    bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
+                    false, true);
             }
-        )  
+        );
 
         // Avatar
         label.style.left = "0 px";
@@ -332,7 +329,7 @@ class mmogameGate extends mmogame {
             if (label.scrollHeight > maxHeight) {
                 maxHeight = label.scrollHeight;
             }
-            this.area.removeChild(label);    
+            this.area.removeChild(label);
         }
 
         return [maxWidth, maxHeight];
@@ -433,10 +430,10 @@ class mmogameGate extends mmogame {
             btn.classList.add("mmogame_avatar");
             let id = json['avatarid' + (i + 1)];
             btn.addEventListener("click",
-                function(){
+                function() {
                     instance.updateAvatar(btn, id, w);
                 }
-            )
+            );
 
             left += this.iconSize;
 
@@ -466,7 +463,7 @@ class mmogameGate extends mmogame {
                 instance.showAvatars(json, left + gridWidthColors + instance.padding, top, gridWidthAvatars, gridHeight,
                     countXavatars, countYavatars);
             }
-        }
+        };
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
@@ -577,7 +574,7 @@ class mmogameGate extends mmogame {
             this.avatar.style.borderStyle = "none";
         }
         this.avatar = avatar;
-        avatar.style.borderStyle = "outset" ;
+        avatar.style.borderStyle = "outset";
 
         avatar.style.borderLeftWidth = w;
         avatar.style.borderTopWidth = w;
@@ -626,9 +623,9 @@ class mmogameGate extends mmogame {
     }
 
     onServerGetAttempt(json, auserid) {
-        if (json.errorcode != undefined ) {
+        if (json.errorcode != undefined) {
             if (json.errorcode == 'invalidauser') {
-                alert(json.errorcode  + " " + auserid);
+                alert(json.errorcode + " " + auserid);
                 return;
             } else {
                 alert("Problem " + json.errorcode + "#");

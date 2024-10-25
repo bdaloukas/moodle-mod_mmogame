@@ -302,7 +302,6 @@ class mmogameQuizAduel extends mmogameQuiz {
 
         this.isWaitOponent = false;
         if (this.aItemAnswer != undefined && json.correct != undefined) {
-            let aCorrect = json.correct.split(",");
             for (let i = 0; i < this.aItemAnswer.length; i++) {
                 this.aItemAnswer[i].classList.add("disabled");
             }
@@ -322,7 +321,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         btn.title = '[LANG_NEXT_QUESTION]';
         let instance = this;
         btn.addEventListener("click", function() {
-            instance.sendGetAttempt(false); 
+            instance.sendGetAttempt(false);
             instance.area.removeChild(btn);
         });
 
@@ -387,7 +386,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             let height = this.aItemLabel[i].scrollHeight;
 
             if (iscorrect) {
-                this.aItemLabel[i].innerHTML = '<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>';           
+                this.aItemLabel[i].innerHTML = '<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>';
             }
             let move = (iscorrect2 != undefined ? 2 : 1) * this.radioSize;
             if (iscorrect1 == undefined && iscorrect2 == undefined) {
@@ -535,7 +534,8 @@ class mmogameQuizAduel extends mmogameQuiz {
         }
 
         if (newstate != this.state || newTimeFastJSON != this.timefastjson) {
-            return this.sendGetAttempt();
+            this.sendGetAttempt();
+            return;
         }
 
         this.sendFastJSON();
@@ -554,7 +554,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         var data = JSON.stringify({"command": "gethighscore", "mmogameid": this.mmogameid, "pin": this.pin,
-            'kinduser': this.kinduser, "user": this.auserid, "count" : 10});
+            'kinduser': this.kinduser, "user": this.auserid, "count": 10});
         xmlhttp.send(data);
     }
 
@@ -617,7 +617,6 @@ class mmogameQuizAduel extends mmogameQuiz {
         let text = ctx.measureText("[LANG_GRADE]");
         let width2 = text.width;
 
-        let width3 = this.areaWith - width1 - width2;
         let col1 = 0;
         let col2 = col1 + width1 + this.padding;
         let col3 = col2 + width2 + this.padding;
