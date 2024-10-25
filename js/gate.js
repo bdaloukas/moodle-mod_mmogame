@@ -543,7 +543,7 @@ class mmogameGate extends mmogame {
                 this.showColorPalette(canvas, a);
                 let id = json['paletteid' + i];
 
-                canvas.addEventListener("click", function(){
+                canvas.addEventListener("click", function() {
                     instance.updateColorPalete(canvas, id);
                 });
             }

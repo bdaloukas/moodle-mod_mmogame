@@ -715,7 +715,7 @@ class mmogame {
      * Writes filecontents in the state file.
      *
      * @param int $state
-     * @param string $fielcontents
+     * @param string $filecontents
      */
     public function save_state_file($state, $filecontents) {
         global $CFG;
@@ -755,7 +755,7 @@ class mmogame {
      *
      * @param int $state
      * @param string $statecontents
-     * @param $filecontents
+     * @param string $filecontents
      * @param int $timefastjson
      */
     public function save_state($state, $statecontents, $filecontents, $timefastjson) {

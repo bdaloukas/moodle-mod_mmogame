@@ -479,7 +479,7 @@ class mmogameQuiz extends mmogame {
         let instance = this;
         btn.addEventListener("click", function() {
             instance.sendGetAttempt();
-            instance.area.removeChild(btn);       
+            instance.area.removeChild(btn);
         });
 
         if (!json.iscorrect && this.qtype != "multichoice") {
@@ -630,46 +630,6 @@ class mmogameQuizAlone extends mmogameQuiz {
         this.maxImageHeight = (this.vertical ? this.areaHeight / 2 : this.areaWidth);
     }
 
-    createDivPercent(left, top, num, oneLine) {
-        var button = document.createElement("button");
-        button.classList.add("mmogame_button");
-        button.style.left = left + "px";
-        button.style.top = top + "px";
-        button.style.width = this.iconSize + "px";
-        button.style.height = this.iconSize + "px";
-        button.style.lineHeight = this.iconSize + "px";
-        button.style.textAlign = "center";
-        button.style.borderRadius = this.iconSize + "px";
-        button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
-        button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
-        button.title = "[LANGM_PERCENT]";
-        button.alt = "[LANGM_PERCENT]";
-        this.buttonPercent = button;
-        button.style.background = this.getColorHex(this.colorScore2);
-        button.style.color = this.getColorContrast(this.colorScore2);
-
-        this.body.appendChild(button);
-
-        button.innerHTML = '-100 %-';
-        button.style.whiteSpace = "nowrap";
-        this.autoResizeText(button, this.iconSize, this.iconSize, false, 0, 0, 1);
-        button.innerHTML = '';
-
-        let h = this.iconSize / 2;
-        let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
-        div.style.textAlign = "center";
-        div.style.color = this.getColorContrast(this.colorScore2);
-        this.labelPercent = div;
-
-        h = this.iconSize / 3;
-        div = this.createDiv(this.body, left, top, this.iconSize, h);
-        div.style.textAlign = "center";
-        div.style.lineHeight = h + "px";
-        div.style.color = this.getColorContrast(this.colorScore2);
-        button.disabled = true;
-        this.labelPercentRank = div;
-    }
-
     updatePercent(json) {
         if (this.labelPercent != undefined) {
             let s = json.percentcompleted == undefined ? '' : '<b>' + Math.round(100 * json.percentcompleted) + ' %</b>';
@@ -750,7 +710,7 @@ class mmogameQuizAlone extends mmogameQuiz {
         json.completedrank = rankc;
     }
 
-    showHelpScreen(div, width, height) {
+    showHelpScreen(div) {
         div.innerHTML = `<br>
 <div>[LANG_ALONE_HELP]</div><br>
 

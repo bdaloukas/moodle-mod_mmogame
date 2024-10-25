@@ -62,6 +62,7 @@ $string['kinduser_guid'] = 'GUID';
 $string['kinduser_moodle'] = 'Moodle';
 $string['kinduser_usercode'] = 'User code';
 $string['missing_pin'] = 'Missing pin';
+$string['mmogame:addinstance'] = 'Add a new mmoGame';
 $string['modulename'] = 'Multiple Player Online Game';
 $string['modulename_help'] = 'This module contains multiple player online games';
 $string['modulenameplural'] = 'MMOGames';

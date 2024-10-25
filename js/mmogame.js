@@ -410,7 +410,7 @@ class mmogame {
             }
             let s2 = s.substr(pos2, pos3 - pos2) + " ";
 
-            let width = 0
+            let width = 0;
             let height = 0;
             let posw = s2.indexOf("width=");
             if (posw >= 0) {
@@ -1595,54 +1595,6 @@ class mmogame {
         return canvas;
     }
 
-    createCheckboxCanvas(parent, size, color1, color2, checked, disabled) {
-        var canvas = document.createElement('canvas');
-        canvas.style.position = "absolute";
-        canvas.width = size;
-        canvas.height = size;
-        parent.appendChild(canvas);
-        if (checked) {
-            canvas.classList.add("checked");
-        }
-        if (disabled) {
-            canvas.classList.add("disabled");
-        }
-
-        this.drawCombobox(canvas, color1, color2);
-
-        return canvas;
-    }
-
-    drawCombobox(canvas, color1, color2) {
-        var ctx = canvas.getContext("2d");
-        let size = canvas.width;
-        ctx.clearRect(0, 0, size, canvas.height);
-
-        ctx.beginPath();
-        ctx.strokeStyle = this.getColorHex(color1);
-        ctx.lineWidth = Math.round(size / 10);
-        ctx.rect(0, 0, size, size);
-        ctx.stroke();
-
-        let checked = canvas.classList.contains("checked");
-        if (checked) {
-            ctx.fillStyle = this.getColorHex(color1);
-            ctx.rect(0, 0, size, size);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.strokeStyle = this.getColorHex(0xFFFFFF);
-            let width = Math.round(size / 7);
-            ctx.lineWidth = width;
-            let dx = size / 4;
-            let dy = size / 4;
-            ctx.moveTo(dx, size / 2);
-            ctx.lineTo(size / 2, size - dy - width / 2);
-            ctx.lineTo(size - dx, dy);
-            ctx.stroke();
-        }
-    }
-
     createButtonsAvatar(num, left, widthNickName = 0, heightNickName = 0) {
         if (widthNickName == 0) {
             widthNickName = this.iconSize;
@@ -1774,8 +1726,8 @@ class mmogame {
             c2.863,2.863,6.749,3.814,10.466,3.284h176.978c3.717,0.529,7.603-0.421,10.466-3.284l180.118-180.118
             c2.502-2.502,3.645-5.799,3.549-9.083C385.292,189.27,384.149,185.974,381.658,183.472z
             M187.381,360.955H41.862l159.329-159.329
-            c2.502-2.502,3.645-5.799,3.549-9.083c0.096-3.272-1.047-6.569-3.549-9.071L41.838,24.106h145.579l168.412,168.412L187.381,360.955
-            z"/></svg>`;
+            c2.502-2.502,3.645-5.799,3.549-9.083c0.096-3.272-1.047-6.569-3.549-9.071L41.838,24.106h145.579l168.412,
+            168.412L187.381,360.955 z"/></svg>`;
     }
 
     setHelpURL(url) {

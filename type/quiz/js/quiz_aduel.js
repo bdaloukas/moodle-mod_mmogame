@@ -155,7 +155,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             json.qtype = '';
             super.onServerGetAttempt(json, param);
             this.showScore(json);
-            this.onServerGetAttemptHideButtons();            
+            this.onServerGetAttemptHideButtons();
             this.createDivMessageStart('[LANGM_WAIT_TO_START]');
             return;
         }
@@ -239,9 +239,9 @@ class mmogameQuizAduel extends mmogameQuiz {
         let instance = this;
         this.timeout = setTimeout(function() {
             instance.sendGetAttempt(true);
-        x}, this.timeoutMSEC);        
+        }, this.timeoutMSEC);
     }
-    
+
     onServerGetAttemptHideButtons() {
         this.button5050.style.visibility = 'hidden';
         this.buttonSkip.style.visibility = 'hidden';
@@ -698,7 +698,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         }
     }
 
-    showHelpScreen(div, width, height) {
+    showHelpScreen(div) {
         div.innerHTML = `
 <div>[LANG_ADUEL_HELP]</div>
 

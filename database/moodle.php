@@ -76,7 +76,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $table
      * @param array $a
      * @param int $returnid
-     * @param object customsequence
+     * @param object $customsequence
      * @return true if the insertions is ok, otherwise false.
      */
     public function insert_record_raw($table, $a, $returnid, $customsequence) {
@@ -109,7 +109,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $select
      * @param array $params
      * @param string $fields
-     * @return object.
+     * @return object
      */
     public function get_record_select($table, $select, ?array $params=null, $fields='*') {
         global $DB;
