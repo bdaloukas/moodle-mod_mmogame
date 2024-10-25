@@ -64,7 +64,7 @@ class mmogameGate extends mmogame {
         let instance = this;
         let size;
 
-        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function(fontSize, step) {
+        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, function(fontSize) {
             size = instance.computeLabelSize(fontSize, ['[LANGM_CODE]: ', '[LANGM_NAME]: ', '[LANGM_PALETTE]']);
 
             if (size[0] >= maxWidth) {
@@ -187,7 +187,7 @@ class mmogameGate extends mmogame {
         let instance = this;
         let size;
 
-        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function(fontSize, step) {
+        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, function(fontSize) {
             size = instance.computeLabelSize(fontSize, ['[LANGM_CODE]: ', '[LANGM_NAME]: ', '[LANGM_PALETTE]']);
 
             if (size[0] >= maxWidth) {

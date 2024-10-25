@@ -172,7 +172,7 @@ class mmogame {
         return button;
     }
 
-    createCenterImageButton(parent, left, top, width, height, classname, filename, wrap) {
+    createCenterImageButton(parent, left, top, width, height, classname, filename) {
         var button = document.createElement("img");
         button.classList.add("mmogame_imgbutton");
         button.style.position = "absolute";
@@ -724,7 +724,7 @@ class mmogame {
         }
     }
 
-    createDivScore(left, top, num, oneLine) {
+    createDivScore(left, top, num) {
         var button = document.createElement("button");
         button.style.position = "absolute";
         button.classList.add("mmogame_button");
@@ -790,11 +790,7 @@ class mmogame {
         }
     }
 
-    createDivScorePercent1(left, top, num, oneLine) {
-        this.createDivScore(left, top, num, oneLine);
-    }
-
-    createDivScorePercent(left, top, num, oneLine) {
+    createDivScorePercent(left, top, num) {
         var button = document.createElement("button");
         button.style.position = "absolute";
         button.classList.add("mmogame_button");
@@ -945,23 +941,11 @@ class mmogame {
         this.mapFilesHeight.set(json.fileg1, json.height1);
     }
 
-    findbest(low, up, step1, step2, fn) {
+    findbest(low, up, fn) {
         if (low < 1) {
             low = 1;
         }
 
-        let step = step1;
-        if (step1 != step2) {
-            for (step = step1; step <= step2; step++) {
-                let cmp = fn(low, step);
-                if (cmp <= 0) {
-                    break;
-                }
-            }
-            if (step > step2) {
-                return low;
-            }
-        }
         let prevSize;
         let fitSize = low;
         let testSize;
@@ -969,7 +953,7 @@ class mmogame {
             prevSize = low;
             testSize = (low + up) / 2;
 
-            let cmp = fn(testSize, step);
+            let cmp = fn(testSize);
             if (cmp <= 0) {
                 fitSize = testSize;
                 low = testSize;

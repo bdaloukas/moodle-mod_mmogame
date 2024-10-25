@@ -168,7 +168,7 @@ class mmogameQuiz extends mmogame {
         }
         let instance = this;
         let maxWidth = this.areaWidth;
-        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function(fontSize, step) {
+        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, function(fontSize) {
                 let defSize = instance.createDefinition(0, 0, maxWidth - 1, true, fontSize);
 
                 if (defSize[0] >= maxWidth) {
@@ -223,8 +223,8 @@ class mmogameQuiz extends mmogame {
         let instance = this;
         for (let step = 1; step <= 2; step++) {
             let defSize;
-            this.fontSize = this.findbest(step == 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize, 0, 0,
-                function(fontSize, step) {
+            this.fontSize = this.findbest(step == 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
+                function(fontSize) {
                     defSize = instance.createDefinition(0, 0, width - instance.padding, true, fontSize);
 
                     if (defSize[0] >= width) {
@@ -607,8 +607,7 @@ class mmogameQuizAlone extends mmogameQuiz {
 
         this.divNickname = this.createDiv(this.body, this.buttonAvatarLeft, this.padding, this.iconSize, this.buttonAvatarTop);
 
-        this.createDivScorePercent(this.padding + (i++) * (this.iconSize + this.padding), this.padding + this.nickNameHeight, 1,
-            true);
+        this.createDivScorePercent(this.padding + (i++) * (this.iconSize + this.padding), this.padding + this.nickNameHeight, 1);
 
         this.createButtonSound(this.padding + (i++) * (this.iconSize + this.padding), this.padding + this.nickNameHeight);
         let instance = this;
