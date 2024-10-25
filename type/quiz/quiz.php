@@ -120,7 +120,7 @@ class mmogame_quiz extends mmogame {
     /**
      * Saves to array $ret informations about the $attempt.
      *
-     * @param array &$ret (returns info about the current attempt)
+     * @param array $ret (returns info about the current attempt)
      * @param object $attempt
      * @param object $data
      * @return object (the query of attempt)
@@ -174,7 +174,7 @@ class mmogame_quiz extends mmogame {
     /**
      * Return the score with negative values. If "n" is the number of answer, if it correct returns (n-1) else returns (-1)
      *
-     * @param boolean iscorrect
+     * @param boolean $iscorrect
      * @param object $query
      * @return int
      */

@@ -47,7 +47,11 @@ class mmogameqbank {
     /**
      * The base function for a new attempt.
      *
-     * @param object $mmogame
+     * @param int $auserid
+     * @param int $count
+     * @param boolean $stopatend
+     * @param boolean $usenumattempt
+     * @param array $queries
      */
     public function get_attempt_new($auserid, $count, $stopatend, $usenumattempt, $queries) {
         $db = $this->mmogame->get_db();
@@ -94,8 +98,8 @@ class mmogameqbank {
      * Returns the id of selected queries.
      *
      * @param int $auserid
-     * @param int teamid
-     * @param int count (how many queries they want)
+     * @param int $teamid
+     * @param int $count (how many queries they want)
      *
      * @return array of int or false if no queries found.
      */

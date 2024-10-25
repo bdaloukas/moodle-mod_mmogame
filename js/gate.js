@@ -35,9 +35,9 @@ class mmogameGate extends mmogame {
                     return;
                 }
                 break;
-        }
+        };
 
-        this.createScreen()
+        this.createScreen();
     }
 
     createScreen() {
@@ -64,21 +64,19 @@ class mmogameGate extends mmogame {
         let instance = this;
         let size;
 
-        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function (fontSize, step) {
+        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function(fontSize, step) {
             size = instance.computeLabelSize(fontSize, ['[LANGM_CODE]: ', '[LANGM_NAME]: ', '[LANGM_PALETTE]']);
 
             if (size[0] >= maxWidth) {
                 return 1;
             }
             let heightCode = instance.kinduser != 'guid' && instance.kinduser != 'moodle' ? size[1] + instance.padding : 0;
-            
+
             let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
             let n = Math.floor(heightColors / instance.iconSize);
             if (n == 0) {
                 return 1;
             }
-            let rest = heightColors - n * instance.iconSize;
-            
             let heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
             let computedHeight = heightCode + 3 * size[1] + 8 * instance.padding + heightColors + heightAvatars;
 
@@ -99,41 +97,44 @@ class mmogameGate extends mmogame {
             bottom = this.createCode(0, 0, maxWidth, this.fontSize, size[0])
             this.edtCode = this.edt;
             this.edtCode.addEventListener("keyup", function(){
-                                                                instance.updateSubmit()
+                                                                instance.updateSubmit();
                                                              });
         } else {
             bottom = 0;
         }
-        bottom = this.createLabelEditVertical(0, bottom, newWidth - 2 * this.padding, this.fontSize, size[0], "[LANGM_NAME]: ") + 2 * this.padding;
+        bottom = this.createLabelEditVertical(0, bottom, newWidth - 2 * this.padding, this.fontSize, size[0],
+            "[LANGM_NAME]: ") + 2 * this.padding;
         this.edtNickname = this.edt;
-        this.edtNickname.addEventListener("keyup", function(){ instance.updateSubmit()});           
+        this.edtNickname.addEventListener("keyup", function() {
+            instance.updateSubmit();
+        });
 
         let gridHeight = maxHeight - bottom - this.padding - this.iconSize - size[1];
         
         let label1 = document.createElement("label");
         label1.style.position = "absolute";
-        label1.innerHTML =  "[LANGM_PALETTE]";
+        label1.innerHTML = "[LANGM_PALETTE]";
         label1.style.font = "FontAwesome";
         label1.style.fontSize = this.fontSize + "px";
         label1.style.width = "0px";
-        label1.style.whiteSpace="nowrap";
+        label1.style.whiteSpace = "nowrap";
         this.area.appendChild(label1);
         
         let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
             '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
-            function(){
+            function() {
                 let elements = instance.area.getElementsByClassName("mmogame_color");
 
                 while (elements[0]) {
-                    elements[0].parentNode.removeChild(elements[0]);           
+                    elements[0].parentNode.removeChild(elements[0]);
                 }
                 
-                instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 
+                instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors,
                     0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
                     true, false);
             }
-        )
+        );
         label1.style.left = 0;
         label1.style.color = this.getColorContrast(this.colorBackground);
         label1.style.top = bottom + "px";
@@ -141,49 +142,54 @@ class mmogameGate extends mmogame {
 
         let label = document.createElement("label");
         label.style.position = "absolute";
-        label.innerHTML =  "[LANGM_AVATARS]";
+        label.innerHTML = "[LANGM_AVATARS]";
         label.style.font = "FontAwesome";
         label.style.fontSize = this.fontSize + "px";
         label.style.width = "0 px";
-        label.style.whiteSpace="nowrap";
+        label.style.whiteSpace = "nowrap";
         this.area.appendChild(label);
         btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize,
             this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
-            function(){
+            function() {
                 let elements = instance.area.getElementsByClassName("mmogame_avatar");
 
                 while (elements[0]) {
-                    elements[0].parentNode.removeChild(elements[0]);              
+                    elements[0].parentNode.removeChild(elements[0]);
                 }
 
                 instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 
-                    0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars, false, true);
+                    0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
+                    false, true);
             }
-        )
+        );
 
         label.style.left = "0 px";
         label.style.color = this.getColorContrast(this.colorBackground);
         label.style.top = (bottom + gridHeightColors) + "px";
 
-        //Vertical
+        // Vertical
         this.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 
-                                          0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars, gridHeightAvatars);
+                                          0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars,
+                                          gridHeightAvatars);
 
         let bottom2 = bottom + gridHeightColors + this.fontSize + this.padding + gridHeightAvatars;
         this.btnSubmit = this.createImageButton(this.area, (maxWidth - this.iconSize) / 2, bottom2, 0,
             this.iconSize, "", 'assets/submit.svg', false, 'submit');
         this.btnSubmit.style.visibility = 'hidden';
-        this.btnSubmit.addEventListener("click", function(){ instance.playgame(instance.edtCode == undefined ? 0 : instance.edtCode.value, instance.edtNickname.value, instance.paletteid, instance.avatarid)});
+        this.btnSubmit.addEventListener("click", function() {
+            instance.playgame(instance.edtCode == undefined ? 0 : instance.edtCode.value, instance.edtNickname.value,
+                instance.paletteid, instance.avatarid);
+        });
     }
 
-    createScreenHorizontal() {        
+    createScreenHorizontal() {
         let maxHeight = this.areaHeight - 7 * this.padding - this.iconSize;
         let maxWidth = this.areaWidth;
         let instance = this;
         let size;
 
-        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function (fontSize, step) {
+        this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, 0, 0, function(fontSize, step) {
             size = instance.computeLabelSize(fontSize, ['[LANGM_CODE]: ', '[LANGM_NAME]: ', '[LANGM_PALETTE]']);
             
             if (size[0] >= maxWidth) { 
@@ -228,22 +234,22 @@ class mmogameGate extends mmogame {
 
         this.edtNickname = this.edt;
         this.edtNickname.addEventListener("keyup", function(){ instance.updateSubmit()});            
-        
+
         let gridHeight = maxHeight - bottom - this.padding;  // - this.iconSize - size[1]
-        
+
         let label1 = document.createElement("label");
         label1.style.position = "absolute";
-        label1.innerHTML =  "[LANGM_PALETTE]";
+        label1.innerHTML = "[LANGM_PALETTE]";
         label1.style.font = "FontAwesome";
         label1.style.fontSize = this.fontSize + "px";
         label1.style.width = "0px";
-        label1.style.whiteSpace="nowrap";
+        label1.style.whiteSpace = "nowrap";
         this.area.appendChild(label1);
 
         let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
             '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
-            function(){
+            function() {
                 let elements = instance.area.getElementsByClassName("mmogame_color");
 
                 while (elements[0]) {
@@ -251,9 +257,10 @@ class mmogameGate extends mmogame {
                 }
                 
                 instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 0,
-                    bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars, true, false);
+                    bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
+                    true, false);
             }
-        )
+        );
         label1.style.left = 0;
         label1.style.color = this.getColorContrast(this.colorBackground);
         label1.style.top = bottom + "px";
@@ -261,47 +268,52 @@ class mmogameGate extends mmogame {
 
         let label = document.createElement("label");
         label.style.position = "absolute";
-        label.innerHTML =  "[LANGM_AVATARS]";
+        label.innerHTML = "[LANGM_AVATARS]";
         label.style.font = "FontAwesome";
         label.style.fontSize = this.fontSize + "px";
         label.style.width = "0 px";
         label.style.whiteSpace="nowrap";
         this.area.appendChild(label);
-        btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize, this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
+        btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize,
+            this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
             function(){
                 let elements = instance.area.getElementsByClassName("mmogame_avatar");
 
                 while (elements[0]) {
-                    elements[0].parentNode.removeChild(elements[0]);            
+                    elements[0].parentNode.removeChild(elements[0]);
                 }
-                
+
                 instance.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 0,
                     bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars, false, true);
             }
-        )        
+        )  
 
-        //mmogame_avatar
+        // Avatar
         label.style.left = "0 px";
         label.style.color = this.getColorContrast(this.colorBackground);
         label.style.top = (bottom + gridHeightColors) + "px";
 
-        //Horizontal
-        this.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 
+        // Horizontal
+        this.sendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors,
                                           0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars,
                                           gridHeightAvatars);
-        
+
         let bottom2 = bottom + gridHeightColors + this.fontSize + this.padding + gridHeightAvatars;
         this.btnSubmit = this.createImageButton(this.area, (maxWidth - this.iconSize) / 2, bottom2, 0,
             this.iconSize, "", 'assets/submit.svg', false, 'submit');
         this.btnSubmit.style.visibility = 'hidden';
-        this.btnSubmit.addEventListener("click", function(){ instance.playgame(instance.edtCode == undefined ? 0 : instance.edtCode.value, instance.edtNickname.value, instance.paletteid, instance.avatarid)});
+        this.btnSubmit.addEventListener("click",
+            function() {
+                instance.playgame(instance.edtCode == undefined ? 0 : instance.edtCode.value, instance.edtNickname.value,
+                    instance.paletteid, instance.avatarid);
+            });
     }
 
     computeLabelSize(fontSize, aLabel) {
         let maxWidth = 0;
         let maxHeight = 0;
-        
+
         for (let i = 0; i < aLabel.length; i++) {
             var label = document.createElement("label");
             label.style.position = "absolute";
@@ -313,16 +325,14 @@ class mmogameGate extends mmogame {
             label.style.height = "0px";
             this.area.appendChild(label);
 
-            let newWidth = label.scrollWidth;
-
             if (label.scrollWidth > maxWidth) {
                 maxWidth = label.scrollWidth;
             }
-            
+
             if (label.scrollHeight > maxHeight) {
                 maxHeight = label.scrollHeight;
             }
-            this.area.removeChild(label);     
+            this.area.removeChild(label);    
         }
 
         return [maxWidth, maxHeight];
@@ -347,7 +357,7 @@ class mmogameGate extends mmogame {
         label.style.color = this.getColorContrast(this.colorBackground);
 
         let ret = top + Math.max(label.scrollHeight, fontSize) + this.padding;
-        
+
         let leftEdit = (left + labelWidth + this.padding);
         var div = document.createElement("input");
         this.divShortAnswer = div;
@@ -356,7 +366,7 @@ class mmogameGate extends mmogame {
         div.style.type = "text";
         div.style.fontSize = fontSize + "px";
 
-        div.style.left = leftEdit  + "px";
+        div.style.left = leftEdit + "px";
         div.style.top = top + "px";
         div.autofocus = true;
 
@@ -394,8 +404,8 @@ class mmogameGate extends mmogame {
         div.style.type = "text";
         div.style.fontSize = fontSize + "px";
 
-        div.style.left = leftEdit  + "px";
-        div.style.top = top  + "px";
+        div.style.left = leftEdit + "px";
+        div.style.top = top + "px";
         div.autofocus = true;
 
         this.area.appendChild(div);
@@ -414,12 +424,12 @@ class mmogameGate extends mmogame {
 
     showAvatars(json, left, top, width, height, countX, countY) {
         this.avatar = undefined;
-        let leftOriginal = left
-        let instance = this 
-        let w = Math.round(this.padding / 2) + "px"
+        let leftOriginal = left;
+        let instance = this;
+        let w = Math.round(this.padding / 2) + "px";
         for (let i = 0; i < json.countavatars; i++) {
             let btn = this.createCenterImageButton(this.area, left, top, this.iconSize - this.padding,
-                this.iconSize - this.padding, "", 'assets/avatars/' + json['avatar' + (i + 1)])
+                this.iconSize - this.padding, "", 'assets/avatars/' + json['avatar' + (i + 1)]);
             btn.classList.add("mmogame_avatar");
             let id = json['avatarid' + (i + 1)];
             btn.addEventListener("click",
@@ -438,7 +448,6 @@ class mmogameGate extends mmogame {
     }
 
     sendGetColorsAvatars(left, top, gridWidthColors, gridHeight, gridWidthAvatars) {
-        
         let gridWidthColors0 = gridWidthColors;
         let countXcolors = Math.floor(gridWidthColors / this.iconSize);
         let countYcolors = Math.floor((gridHeight + 2 * this.padding) / this.iconSize);
@@ -461,15 +470,15 @@ class mmogameGate extends mmogame {
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        var data = JSON.stringify({"command": "getcolorsavatars", "mmogameid": this.mmogameid, "pin" : this.pin,
-			'kinduser': this.kinduser, "user": this.auserid, "countcolors": countXcolors * countYcolors,
+        var data = JSON.stringify({"command": "getcolorsavatars", "mmogameid": this.mmogameid, "pin": this.pin,
+            'kinduser': this.kinduser, "user": this.auserid, "countcolors": countXcolors * countYcolors,
             "countavatars": countXavatars * countYavatars});
         xmlhttp.send(data);
     }
 
     sendGetColorsAvatarsVertical(leftColors, topColors, gridWidthColors, gridHeightColors, leftAvatars, topAvatars,
     gridWidthAvatars, gridHeightAvatars, updateColors = true, updateAvatars = true) {
-        
+
         let countXcolors = Math.floor(gridWidthColors / this.iconSize);
         let countYcolors = Math.floor(gridHeightColors / this.iconSize);
         gridWidthColors = countXcolors * this.iconSize;
@@ -499,12 +508,12 @@ class mmogameGate extends mmogame {
                         countYavatars);
                 }
             }
-        }
+        };
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         var data = JSON.stringify({"command": "getcolorsavatars", "mmogameid": this.mmogameid, "pin": this.pin,
-			'kinduser': this.kinduser, "user": this.auserid, "countcolors": countXcolors * countYcolors,
+            'kinduser': this.kinduser, "user": this.auserid, "countcolors": countXcolors * countYcolors,
             "countavatars": countXavatars * countYavatars});
         xmlhttp.send(data);
     }
@@ -513,13 +522,13 @@ class mmogameGate extends mmogame {
         let instance = this;
         let i = 0;
         this.canvasColor = undefined;
-        for(let iy = 0; iy < countY; iy++) {
-            for(let ix = 0; ix < countX; ix++) {
+        for (let iy = 0; iy < countY; iy++) {
+            for (let ix = 0; ix < countX; ix++) {
                 i++;
                 if (i > json.count) {
                     break;
                 }
-                let a = json["palette" + i]
+                let a = json["palette" + i];
                 if (a == undefined) {
                     break;
                 }
@@ -527,7 +536,7 @@ class mmogameGate extends mmogame {
                 canvas.style.position = "absolute";
                 canvas.style.left = (left + (ix % countX) * this.iconSize) + "px";
                 canvas.style.top = (top + iy * this.iconSize) + "px";
-                canvas.width  = this.iconSize - this.padding * 3 / 2;
+                canvas.width = this.iconSize - this.padding * 3 / 2;
                 canvas.height = this.iconSize - this.padding * 3 / 2;
                 canvas.style.cursor = 'pointer';
                 canvas.classList.add("mmogame_color");
@@ -538,7 +547,9 @@ class mmogameGate extends mmogame {
                 this.showColorPalette(canvas, a);
                 let id = json['paletteid' + i];
 
-                canvas.addEventListener("click", function(e){ instance.updateColorPalete(canvas, id) });
+                canvas.addEventListener("click", function(e){
+                    instance.updateColorPalete(canvas, id);
+                });
             }
         }
         this.area.classList.add("palete");
@@ -600,7 +611,7 @@ class mmogameGate extends mmogame {
             if (this.readyState == 4 && this.status == 200) {
                 instance.onServerGetAttempt(JSON.parse(this.responseText), auserid);
             }
-        }
+        };
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");

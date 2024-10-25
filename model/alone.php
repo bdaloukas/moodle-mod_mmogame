@@ -34,7 +34,7 @@ class mmogameModel_alone {
      * Administrator can change numgame or state
      *
      * @param object $data
-     * @param game object $game
+     * @param object $game
      */
     public static function json_setadmin($data, $game) {
         $instance = $game->get_rinstance();
@@ -58,7 +58,7 @@ class mmogameModel_alone {
      * Return info for administrator
      *
      * @param object $data (not used)
-     * @param game object $game
+     * @param object $game
      * @param array $ret
      */
     public static function json_getadmin($data, $game, &$ret) {

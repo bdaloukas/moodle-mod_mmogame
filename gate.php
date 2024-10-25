@@ -53,7 +53,7 @@ $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$rinstance->mmogameid]);
 <meta name="description" content="MMOGAME Gate.">
 <title><?php echo $rinstance->name != '' ? $rinstance->name : $rgame->name; ?></title>
 <style type="text/css">
-<?php echo file_get_contents( dirname(__FILE__)."/css/mmogame.css"); ?>
+<?php echo file_get_contents( dirname(__FILE__)."/styles.css"); ?>
 </style>
 <body onload="runmmogame()">
 

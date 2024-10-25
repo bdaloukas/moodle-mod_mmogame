@@ -18,7 +18,7 @@
  * Form for creating and modifying a game
  *
  * @package    mod_mmogame
- * @copyright  2019 Vasilis Daloukas
+ * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;

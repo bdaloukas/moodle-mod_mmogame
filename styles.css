@@ -38,11 +38,11 @@
     &:hover,
     &:focus {
         outline: none;
-        filter: none
+        filter: none;
     }
 
     &:active {
-        transform: translatey($move-act);
+        transform: translateY($move-act);
     }
 }
 
@@ -65,5 +65,5 @@
 }
 
 .mmogame_button:active {
-    transform: translatey(0.125em);
+    transform: translateY(0.125em);
 }

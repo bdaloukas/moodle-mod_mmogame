@@ -138,7 +138,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * @return object (a new attempt of false if no attempt)
      */
     protected function get_attempt_new1() {
-        $queries = $this->get_queries_aduel( 4, mt_rand( 1, 2) == 1);
+        $queries = $this->get_queries_aduel( 4);
         if ($queries === false) {
             return false;
         }
@@ -427,13 +427,12 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     }
 
     /**
-     * Saves to array $ret informations about the $attempt (only for the second player).
+     * Return the queries for ADuel.
      *
-     * @param array $ret (returns info about the current attempt)
-     * @param object $query
-     * @param int $attemptid
+     * @param array $count (how many)
+     * @return array or false
      */
-    public function get_queries_aduel($count, $mostused) {
+    public function get_queries_aduel($count) {
         // Get the ids of all the queries.
         $ids = $this->qbank->get_queries_ids();
         if ($ids === false) {

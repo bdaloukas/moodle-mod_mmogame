@@ -48,7 +48,7 @@ if (has_capability('mod/mmogame:manage', $context)) {
  *
  * @param int $id
  * @param object $mmogame
- * @param string $url: url for playing the game
+ * @param string $url (url for playing the game)
  **/
 function mmogame_quiz_manage($id, $mmogame, $url) {
     global $OUTPUT;

@@ -42,10 +42,10 @@
 /**
  * Upgrades database
  *
- * @param int oldversion
+ * @param int $oldversion
  */
 function xmldb_mmogame_upgrade( $oldversion) {
-    global $CFG, $DB;
+    global $DB;
 
     $dbman = $DB->get_manager();
 

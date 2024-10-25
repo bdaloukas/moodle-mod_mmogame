@@ -355,11 +355,10 @@ class mmogame {
     }
 
     /**
-     * Returns a game object
+     * Returns this first game object of a given mmogame (this is used by Moodle)
      *
      * @param object $db
      * @param int $id
-     * @param int $pin
      * @return object
      */
     public static function getgame_first($db, $id) {
@@ -460,9 +459,9 @@ class mmogame {
     }
 
     /**
-     * @param int $auserid
-     *
      * Returns the grade for user auserid
+     *
+     * @param int $auserid
      */
     public function get_grade($auserid) {
 
@@ -557,6 +556,8 @@ class mmogame {
 
     /**
      * Returns info about avatar for the user auserid.
+     *
+     * @param int $auserid
      */
     public function get_avatar_info($auserid) {
         $sql = "SELECT g.*, a.directory, a.filename, a.id as aid, c.color1, c.color2, c.color3, c.color4, c.color5".
@@ -613,7 +614,7 @@ class mmogame {
     /**
      * Returns the available avatars for user auserid.
      *
-     * @param int auserid
+     * @param int $auserid
      */
     public function get_avatars($auserid) {
         $info = $this->get_avatar_info( $auserid);
@@ -636,7 +637,7 @@ class mmogame {
      *
      * @param int $auserid
      * @param string $nickname
-     * @param int avatarid
+     * @param int $avatarid
      */
     public function set_avatar($auserid, $nickname, $avatarid) {
         $info = $this->get_avatar_info( $auserid);
@@ -690,7 +691,7 @@ class mmogame {
      * Set the colorpaletterid for the user auserid.
      *
      * @param int $auserid
-     * @param int colorpaletteid
+     * @param int $colorpaletteid
      */
     public function set_colorpalette($auserid, $colorpaletteid) {
         $info = $this->get_avatar_info( $auserid);
@@ -701,7 +702,6 @@ class mmogame {
      * Returns fastjson=unique string for fast checking.
      *
      * @param int $id (put at the end of return value)
-     * @param string (a unique string)
      */
     protected function get_fastjson_default($id) {
         $s = dechex( mt_rand( 1, 15));
@@ -712,7 +712,7 @@ class mmogame {
     }
 
     /**
-     * Writes $filecontents in the state file.
+     * Writes filecontents in the state file.
      *
      * @param int $state
      * @param string $fielcontents
@@ -755,8 +755,8 @@ class mmogame {
      *
      * @param int $state
      * @param string $statecontents
-     * @param filecontents
-     * @param int timefastjson
+     * @param $filecontents
+     * @param int $timefastjson
      */
     public function save_state($state, $statecontents, $filecontents, $timefastjson) {
 
@@ -822,11 +822,10 @@ class mmogame {
     }
 
     /**
-     * Compare the contrast of $a and $b and returns -1,0 or 1.
+     * Returns the contract of a color.
      *
-     * @param string $a
-     * @param string $b
-     * @return int (the result of comparison)
+     * @param int $color
+     * @return int (the contrast)
      */
     public static function get_contrast($color) {
         $red    = ( $color >> 16 ) & 0xFF;    // Red is the Left Most Byte.

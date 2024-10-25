@@ -151,15 +151,15 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      *
      * @param object $game
      * @param string $ret
-     * @param int num
-     * @param id id
-     * @param int layout
+     * @param int $num
+     * @param id $id
+     * @param int $layout
      * @param array $files
      * @param string $fileconcent
      * @param int $filewidth
      * @param int $fileheight
-     * @param int maxwidth
-     * @param int maxheight
+     * @param int $maxwidth
+     * @param int $maxheight
      */
     public function load_json($game, &$ret, $num, $id, $layout, &$files, $fillconcept,
     &$filewidth, &$fileheight, $maxwidth = 0, $maxheight = 0) {
@@ -215,6 +215,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * Reads all records with id in $ids from databases.
      *
      * @param string $ids
+     * @param boolean $loadextra
      * @param string $fields
      */
     protected function loads($ids, $loadextra = true, $fields='id,qtype,questiontext as definition') {
@@ -234,8 +235,8 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
     /**
      * Return the id from $answer.
      *
-     * @param string $ids
-     * @param string $fields
+     * @param object $query
+     * @param string $answer
      */
     protected static function get_answerid($query, $answer) {
         if ($query->qtype == 'shortanswer') {
@@ -400,6 +401,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
     /**
      * Check if a question need stirring of answers (only for multichoice answers)
      *
+     * @param object $query
      * @return true or false
      */
     public function needs_layout($query) {
@@ -409,6 +411,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
     /**
      * Return the layout (a string that is needed to put the answers in the correct order)
      *
+     * @param object $query
      * @return string
      */
     public function get_layout($query) {
@@ -436,7 +439,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * Set the answers in the correct order
      *
      * @param object $query
-     * @param string layout
+     * @param string $layout
      * @return string
      */
     public function set_layout(&$query, $layout) {
@@ -548,8 +551,8 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @param int $courseid
      * @param object $db
      * @param string $s
-     * @param int %itemid
-     * @param int %instanceid
+     * @param int $itemid
+     * @param int $instanceid
      * @param string $module
      * @param string $component
      * @param string $filearea

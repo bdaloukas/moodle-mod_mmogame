@@ -27,7 +27,8 @@
 /**
  * Given an ID of an instance of this module, this function will permanently delete the instance and any data that depends on it.
  *
- * @param int $mmogameid Id of the module instance
+ * @param int $mmogameid: Id of the module instance
+ * @param int $instanceid
  * @return boolean Success/Failure
  **/
 function mmogametype_quiz_delete_instance( $mmogameid, $instanceid) {
@@ -42,7 +43,7 @@ function mmogametype_quiz_delete_instance( $mmogameid, $instanceid) {
 /**
  * Actual implementation of the reset course functionality, delete all the game responses for course $data->courseid.
  *
- * @param stdClass $data the data submitted from the reset course.
+ * @param object $data: the data submitted from the reset course.
  * @param string $ids: id of all mmogame that have to be deleted.
  */
 function mmogametype_quiz_reset_userdata( $data, $ids) {

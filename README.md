@@ -19,6 +19,8 @@ Created by: Vasilis Daloukas (https://scholar.google.com/citations?user=jFFbeLsA
 
 Many ideas and code were taken from other Moodle modules and Moodle itself
 
+All the svg files are from https://openclipart.org/ & https://freesvg.org/ with Creative Commons 0 license.
+
 This module gets input from questions and plays some games with other player. The games are:
 
 * Quiz

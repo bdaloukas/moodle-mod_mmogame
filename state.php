@@ -18,7 +18,7 @@
  * State
  *
  * @package    mod_mmogame
- * @copyright  2020 Vasilis Daloukas
+ * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -14,7 +14,9 @@
       };
     } else {
       // See: http://stackoverflow.com/questions/5198845/javascript-this-losing-context-in-ie
-      var handler = function(e) { listener.handleEvent(window.event, listener); }
+      var handler = function(e) {
+          listener.handleEvent(window.event, listener);
+      }
       el.attachEvent('on' + type, handler);
 
       return {
@@ -63,7 +65,7 @@
    touchend events. Calling stopPropagation guarantees that other behaviors don’t get a
    chance to handle the same click event. This is executed at the beginning of touch. */
   this.FastButton.prototype.onTouchStart = function(event) {
-    event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
+    event.stopPropagation ? event.stopPropagation() : (event.cancelBubble = true);
     this.touchEvents.push(addListener(this.element, 'touchend', this, this.useCapture));
     this.touchEvents.push(addListener(document.body, 'touchmove', this, this.useCapture));
     this.startX = event.touches[0].clientX;
@@ -73,7 +75,7 @@
   /* When /if touchmove event is invoked, check if the user has dragged past the threshold of 10px. */
   this.FastButton.prototype.onTouchMove = function(event) {
     if (Math.abs(event.touches[0].clientX - this.startX) > 10 || Math.abs(event.touches[0].clientY - this.startY) > 10) {
-      this.reset(); // if he did, then cancel the touch event
+      this.reset(); // If he did, then cancel the touch event
     }
   };
 
@@ -91,7 +93,7 @@
   };
 
   this.FastButton.prototype.reset = function() {
-    for ( let i = this.touchEvents.length - 1; i >= 0; i -= 1) {
+    for (let i = this.touchEvents.length - 1; i >= 0; i -= 1) {
       this.touchEvents[i].destroy();
     }
     this.touchEvents = [];

@@ -14,12 +14,12 @@ class mmogame {
             this.kindSound = 0;
         }
 
-        let size = parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue('font-size'))
+        let size = parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue('font-size'));
         this.minFontSize = size;
         this.maxFontSize = 2 * size;
         this.fontSize = size;
     }
-    
+
     hasHelp() {
         return false;
     }
@@ -34,7 +34,7 @@ class mmogame {
         button.style.top = top + "px";
         button.style.width = width + "px";
         button.style.height = height + "px";
-        button.style.textAlign="center";
+        button.style.textAlign = "center";
         button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
         button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
 
@@ -43,7 +43,7 @@ class mmogame {
         return button;
     }
 
-    isquestion_shortanswer() {
+    isquestionShortanswer() {
         return this.qtype == 'shortanswer';
     }
 
@@ -64,7 +64,7 @@ class mmogame {
         }
         this.area = undefined;
     }
-    
+
     openGame(url, id, pin, auserid, kinduser, callOnAfterOpenGame) {
         this.removeBodyChilds();
         this.area = undefined;
@@ -81,7 +81,7 @@ class mmogame {
         if (this.kinduser == undefined || this.kinduser == "") {
             this.kinduser = "usercode";
         }
-        this.auserid = auserid
+        this.auserid = auserid;
         if (this.auserid == 0 && this.kinduser == 'guid') {
             this.auserid = this.getUserGUID();
         }
@@ -110,7 +110,7 @@ class mmogame {
         button.style.left = left + "px";
         button.style.top = top + "px";
         button.draggable = false;
-        
+
         if (width !== 0) {
             button.style.width = width + "px";
         }
@@ -134,7 +134,7 @@ class mmogame {
         button.style.left = left + "px";
         button.style.top = top + "px";
         button.draggable = false;
-        
+
         if (width !== 0) {
             button.style.width = width + "px";
         }
@@ -157,7 +157,7 @@ class mmogame {
         button.style.position = "absolute";
         button.style.left = left + "px";
         button.style.top = top + "px";
-        
+
         if (width !== 0) {
             button.style.width = width + "px";
         }
@@ -178,7 +178,6 @@ class mmogame {
         button.style.position = "absolute";
         button.draggable = false;
 
-        let instance = this;
         const img = new Image();
         img.onload = function() {
             if (this.width == 0 || this.height == 0) {
@@ -191,7 +190,7 @@ class mmogame {
                 let h = Math.round(this.height * mul);
 
                 button.style.width = w + "px";
-                button.style.height = h + "px";         
+                button.style.height = h + "px";
                 button.style.left = (left + width / 2 - w / 2) + "px";
                 button.style.top = (top + height / 2 - h / 2) + "px";
 
@@ -199,7 +198,7 @@ class mmogame {
                 button.innerHTML = filename;
                 button.style.fontSize = height + "px";
             }
-        }
+        };
         if (filename != undefined && filename != "") {
             img.style.left = left + "px";
             img.style.top = top + "px";
@@ -215,10 +214,9 @@ class mmogame {
     updateImageButton(button, left, top, width, height, filename) {
         button.src = filename;
     }
-    
+
     updateCenterImageButton(button, left, top, width, height, filename) {
 
-        let instance = this;
         let img = new Image();
 
         if (filename != undefined && filename != "") {
@@ -236,7 +234,7 @@ class mmogame {
                 let mul = Math.min(width / this.width, height / this.height);
                 let w = Math.round(this.width * mul);
                 let h = Math.round(this.height * mul);
-                
+
                 // Converts to png for fast.
                 var canvas = document.createElement('canvas');
                 canvas.style.width = w;
@@ -250,7 +248,7 @@ class mmogame {
 
                 button.src = image;
             }
-        }
+        };
     }
 
     createDiv(parent, left, top, width, height) {
@@ -280,11 +278,13 @@ class mmogame {
             return 'assets/sound-off-flat.png';
         } else if (this.kindSound == 2) {
             return 'assets/speak.svg';
+        } else {
+            return 'assets/sound-on-flat.png';
         }
     }
 
     playAudio(audio) {
-        if (this.kindSound != 0 && audio != null) {
+        if (this.kindSound != 0 && audio !== null) {
             if (audio.networkState == 1) {
                 audio.play();
             }
@@ -292,7 +292,7 @@ class mmogame {
     }
 
     autoResizeText(item, width, height, wrap, minFontSize, maxFontSize, minRatio) {
-        var minHeight = 0.9 * height ;
+        var minHeight = 0.9 * height;
         var low = Math.max(1, minFontSize);
         width = Math.round(width);
         height = Math.round(height);
@@ -300,7 +300,8 @@ class mmogame {
 
         var fitSize = low;
         var fitHeight = 0;
-        let instance = this;
+        let newHeight = 0;
+        let newWidth = 0;
 
         for (var i=0; i <= 10; i++) {
             let el = document.createElement("div");
@@ -318,8 +319,8 @@ class mmogame {
             var fontSize = (low + up) / 2;
 
             el.style.fontSize = fontSize + "px";
-            var newHeight = el.scrollHeight;
-            var newWidth = el.scrollWidth - 1;
+            newHeight = el.scrollHeight;
+            newWidth = el.scrollWidth - 1;
 
             this.body.removeChild(el);
 
@@ -343,7 +344,7 @@ class mmogame {
             this.autoResizeTextBr(item);
             newWidth = item.scrollWidth;
             newHeight = item.scrollHeight;
-            this.autoResizeText_image(item, newWidth > width ? newWidth - width : 0, newHeight > height ? newHeight - height : 0,
+            this.autoResizeTextImage(item, newWidth > width ? newWidth - width : 0, newHeight > height ? newHeight - height : 0,
                 minRatio);
         } else {
             return [item.scrollWidth - 1, item.scrollHeight];
@@ -380,7 +381,6 @@ class mmogame {
             }
             let s2 = s.substr(pos1 + 4, pos - pos1 - 4);
             if (s2.trim().length == 0) {
-                let pos3 = s.lastIndexOf('<', pos1 - 1);
                 s = s.substr(0, pos1 + 4) + s.substr(pos + 4);
                 change = true;
                 pos = pos1;
@@ -393,7 +393,7 @@ class mmogame {
         }
     }
 
-    autoResizeText_image(item, subwidth, subheight, minRatio) {
+    autoResizeTextImage(item, subwidth, subheight, minRatio) {
         if (subwidth == 0 && subheight == 0) {
             return;
         }
@@ -444,7 +444,7 @@ class mmogame {
 
     getUserGUID() {
         var guid = window.localStorage.getItem('UserGUID');
-        if (guid == null || guid == '') {
+        if (guid === null || guid == '') {
             guid = this.uuid4();
             window.localStorage.setItem("UserGUID", guid);
         }
@@ -452,20 +452,21 @@ class mmogame {
         return guid;
     }
 
-    pad(num, size){
+    pad(num, size) {
         let s = num + "";
         while (s.length < size) s = "0" + s;
         return s;
     }
 
     uuid4() {
-        /// Return the hexadecimal text representation of number `n`, padded with zeroes to be of length `p`
+        // Return the hexadecimal text representation of number `n`, padded with zeroes to be of length `p`
         const ho = (n, p) => this.pad(n.toString(16), p, 0);
-        const view = new DataView(new ArrayBuffer(16)); /// Create a view backed by a 16-byte buffer
-        crypto.getRandomValues(new Uint8Array(view.buffer)); /// Fill the buffer with random data
-        view.setUint8(6, (view.getUint8(6) & 0xf) | 0x40); /// Patch the 6th byte to reflect a version 4 UUID
-        view.setUint8(8, (view.getUint8(8) & 0x3f) | 0x80); /// Patch the 8th byte to reflect a variant 1 UUID (version 4 UUIDs are)
-        return `${ho(view.getUint32(0), 8)}-${ho(view.getUint16(4), 4)}-${ho(view.getUint16(6), 4)}-${ho(view.getUint16(8), 4)}-${ho(view.getUint32(10), 8)}${ho(view.getUint16(14), 4)}`; /// Compile the canonical textual form from the array data
+        const view = new DataView(new ArrayBuffer(16)); // Create a view backed by a 16-byte buffer
+        crypto.getRandomValues(new Uint8Array(view.buffer)); // Fill the buffer with random data
+        view.setUint8(6, (view.getUint8(6) & 0xf) | 0x40); // Patch the 6th byte to reflect a version 4 UUID
+        view.setUint8(8, (view.getUint8(8) & 0x3f) | 0x80); // Patch the 8th byte to reflect a variant 1 UUID (version 4 UUIDs are)
+        // Compile the canonical textual form from the array data
+        return `${ho(view.getUint32(0), 8)}-${ho(view.getUint16(4), 4)}-${ho(view.getUint16(6), 4)}-${ho(view.getUint16(8), 4)}-${ho(view.getUint32(10), 8)}${ho(view.getUint16(14), 4)}`;
     }
 
     computeSizes() {
@@ -476,7 +477,7 @@ class mmogame {
 
         this.iconSize = Math.round(this.iconSize - this.iconSize / 10 / this.cIcons);
 
-        this.padding =  Math.round(this.iconSize / 10);
+        this.padding = Math.round(this.iconSize / 10);
         this.iconSize -= this.padding;
     }
 
@@ -496,7 +497,7 @@ class mmogame {
         return '#' + ('0000' + x.toString(16).toUpperCase()).slice(-6);
     }
 
-    getContrast(x) {        
+    getContrast(x) {  
         var r = (x & 0xFF0000) >> 16,
             g = (x & 0x00FF00) >> 8,
             b = x & 0x0000FF;
@@ -560,7 +561,7 @@ class mmogame {
         }
 
         ctx.font = "1px " + fontName;
-    
+
         let fitFontWidth = Number.MAX_VALUE;
         const lines = text.match(/[^\r\n]+/g);
         lines.forEach(line => {
@@ -680,7 +681,7 @@ class mmogame {
             return "";
         }
         let s2 = s.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '<br />').trim();
-        
+
         let change = true;
         while (change) {
             change = false;
@@ -725,11 +726,11 @@ class mmogame {
         button.classList.add("mmogame_button");
         button.style.left = left + "px";
         button.style.top = top + "px";
-        button.style.width = this.iconSize  + "px";
+        button.style.width = this.iconSize + "px";
         button.style.height = this.iconSize + "px";
         button.style.lineHeight = this.iconSize + "px";
         button.style.textAlign = "center";
-        button.style.borderRadius=this.iconSize + "px";
+        button.style.borderRadius = this.iconSize + "px";
         button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
         button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
         button.title = "[LANGM_GRADE]";
@@ -774,7 +775,7 @@ class mmogame {
         }
 
         div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize, h);
-        div.style.textAlign="center";
+        div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
         div.title = '[LANGM_GRADE_LAST_QUESTION]';
         button.disabled = true;
@@ -788,9 +789,8 @@ class mmogame {
     createDivScorePercent1(left, top, num, oneLine) {
         this.createDivScore(left, top, num, oneLine);
     }
-    
-    createDivScorePercent(left, top, num, oneLine) {
 
+    createDivScorePercent(left, top, num, oneLine) {
         var button = document.createElement("button");
         button.style.position = "absolute";
         button.classList.add("mmogame_button");
@@ -819,7 +819,7 @@ class mmogame {
         button.disabled = true;
 
         let h = this.iconSize / 2;
-        let div  = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize / 2, this.iconSize / 2);
+        let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize / 2, this.iconSize / 2);
         div.style.lineHeight = (this.iconSize / 2) + "px";
         div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
@@ -843,7 +843,7 @@ class mmogame {
         }
 
         div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2, h);
-        div.style.textAlign="center";
+        div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
         div.title = '[LANGM_GRADE_LAST_QUESTION]';
         button.disabled = true;
@@ -855,7 +855,7 @@ class mmogame {
 
         let label = num == 1 ? this.labelScoreRank : this.labelScoreRank2;
 
-        div  = this.createDiv(this.body, left + this.iconSize / 2, top, this.iconSize / 2, h);
+        div = this.createDiv(this.body, left + this.iconSize / 2, top, this.iconSize / 2, h);
         div.style.textAlign = "center";
         div.style.fontName = label.style.fontName;
         div.style.fontSize = h + "px";
@@ -869,7 +869,8 @@ class mmogame {
         }
 
         label = num == 1 ? this.labelAddScore : this.labelAddScore2;
-        div  = this.createDiv(this.body, left + this.iconSize / 2, parseFloat(this.labelScore.style.top), this.iconSize / 2, this.iconSize / 2);
+        div = this.createDiv(this.body, left + this.iconSize / 2, parseFloat(this.labelScore.style.top), this.iconSize / 2,
+            this.iconSize / 2);
         div.style.textAlign = "center";
         div.style.lineHeight = Math.round(this.iconSize / 2) + "px";
         div.style.fontName = label.style.fontName;
@@ -877,7 +878,7 @@ class mmogame {
         div.style.fontWeight = 'bold';
         div.style.color = label.style.color;
         div.title = '[LANGM_PERCENT]';
-        this.autoResizeText(div, this.iconSize / 2, this.iconSize / 2, false)
+        this.autoResizeText(div, this.iconSize / 2, this.iconSize / 2, false);
         if (num == 1) {
             this.labelScoreB = div;
         } else {
@@ -893,7 +894,7 @@ class mmogame {
         div.style.width = sizeIcon + "px";
         div.style.height = sizeIcon + "px";
         div.style.whiteSpace = "nowrap";
-        div.style.lineHeight= sizeIcon + "px";
+        div.style.lineHeight = sizeIcon + "px";
         div.style.textAlign = "center";
         div.style.background = this.getColorHex(this.colorBackground); // "#234025"
         div.style.color = this.getColorContrast(this.colorBackground); // "#DCBFDA"
@@ -908,7 +909,8 @@ class mmogame {
     }
 
     createButtonSound(left, top) {
-        this.buttonSound = this.createImageButton(this.body, left, top, this.iconSize, this.iconSize, "mmogame_button_red", this.getMuteFile());
+        this.buttonSound = this.createImageButton(this.body, left, top, this.iconSize, this.iconSize, "mmogame_button_red",
+            this.getMuteFile());
         this.buttonSound.alt = '[LANGM_SOUND]';
         var instance = this;
         this.buttonSound.addEventListener("click", function() {
@@ -1063,7 +1065,7 @@ class mmogame {
         }
 
         let instance = this;
-        setTimeout(function(){
+        setTimeout(function() {
             instance.updateLabelTimer();
         }, 500);
     }
@@ -1073,17 +1075,17 @@ class mmogame {
             this.body.removeChild(this.area);
             this.area = undefined;
         }
-        
+
         if (this.divMessageHelp != undefined) {
             this.body.removeChild(this.divMessageHelp);
             this.divMessageHelp = undefined;
-        }        
+        }
 
         let left = this.padding;
         let top = this.areaTop;
         let width = window.innerWidth - 2 * this.padding;
         let height = window.innerHeight - this.getCopyrightHeight() - this.padding - top;
-        
+
         if (this.divMessageBackground == undefined) {
             let div = document.createElement("div");
             div.style.position = "absolute";
@@ -1111,8 +1113,8 @@ class mmogame {
         }
         this.divMessage.innerHTML = message;
         this.body.appendChild(this.divMessage);
-        this.divMessage.style.top  = (height - this.divMessage.scrollHeight) / 2 + "px";
-        
+        this.divMessage.style.top = (height - this.divMessage.scrollHeight) / 2 + "px";
+
         this.autoResizeText(this.divMessage, width, height, false, this.minFontSize, this.maxFontSize, 0.5);
     }
 
@@ -1126,7 +1128,7 @@ class mmogame {
         let top = this.areaTop;
         let width = window.innerWidth - 2 * this.padding;
         let height = window.innerHeight - this.getCopyrightHeight() - this.padding - top;
-        
+
         let height1 = height / 8;
 
         if (this.divMessageBackground == undefined) {
@@ -1156,10 +1158,10 @@ class mmogame {
         }
         this.divMessage.innerHTML = message;
         this.body.appendChild(this.divMessage);
-        
+
         this.autoResizeText(this.divMessage, width, height1, false, this.minFontSize, this.maxFontSize, 0.5);
         top += (height1 - this.divMessage.scrollHeight) / 2;
-        this.divMessage.style.top  =  top + "px";
+        this.divMessage.style.top =  top + "px";
 
         if (this.divMessageHelp == undefined) {
             let div = document.createElement("div");
@@ -1177,7 +1179,7 @@ class mmogame {
             this.divMessageHelp = div;
             this.body.appendChild(this.divMessageHelp);
 
-            this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));        
+            this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));
         }
     }
 
@@ -1214,7 +1216,7 @@ class mmogame {
             return '';
         }
 
-        let s = nickname
+        let s = nickname;
         if (s != '') {
             while (s.indexOf('_') != -1) {
                 s = s.replace('_', ' ');
@@ -1246,13 +1248,13 @@ class mmogame {
             this.labelAddScore.innerHTML = s;
             this.autoResizeText(this.labelAddScore, this.iconSize - 2 * this.padding, this.iconSize / 3, false, 0, 0, 1);
         }
-        
+
         if (this.labelScoreRankB.innerHTML != json.completedrank) {
             this.labelScoreRankB.innerHTML = json.completedrank != undefined ? json.completedrank : '';
-            this.autoResizeText(this.labelScoreRankB, 0.9*this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
+            this.autoResizeText(this.labelScoreRankB, 0.9 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
         }
-        
-        s = json.percentcompleted != undefined  ? Math.round (100 * json.percentcompleted)  + '%' : '';
+
+        s = json.percentcompleted != undefined ? Math.round(100 * json.percentcompleted) + '%' : '';
         if (this.labelScoreB.innerHTML != s) {
             this.labelScoreB.innerHTML = s;
             this.autoResizeText(this.labelScoreB, 0.8 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
@@ -1261,7 +1263,7 @@ class mmogame {
 
     setBlockServer(block) {
         if (block) {
-            this.blockServer = Date.now() + 1000*30;
+            this.blockServer = Date.now() + 1000 * 30;
         } else {
             this.blockServer = 0;
         }
@@ -1282,8 +1284,8 @@ class mmogame {
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        var data = JSON.stringify({"command": "getavatars", "mmogameid": this.mmogameid, "pin" : this.pin,
-            "kinduser" : this.kinduser, "user": this.auserid, 'count' : count});
+        var data = JSON.stringify({"command": "getavatars", "mmogameid": this.mmogameid, "pin": this.pin,
+            "kinduser": this.kinduser, "user": this.auserid, 'count': count});
         xmlhttp.send(data);
     }
 
@@ -1327,7 +1329,7 @@ class mmogame {
             if (event.key === "Enter") {
                 instance.sendSetAvatar(divInp.value, -1);
             }
-        })
+        });
 
         return divInp;
     }
@@ -1361,7 +1363,7 @@ class mmogame {
         let s = this.buttonsAvatarSrc[1];
         let pos = s.lastIndexOf("/");
         if (pos >= 0) {
-            s = s.substr(pos +1);
+            s = s.substr(pos + 1);
         }
         pos = s.lastIndexOf(".");
         if (pos >= 0) {
@@ -1377,9 +1379,10 @@ class mmogame {
         inpNickname.focus();
 
         let instance = this;
-        let btn = this.createImageButton(this.area, w + 2 * this.padding, 0, 0, parseInt(inpNickname.style.fontSize), "", 'assets/submit.svg', false, 'submit');
+        let btn = this.createImageButton(this.area, w + 2 * this.padding, 0, 0, parseInt(inpNickname.style.fontSize), "",
+            'assets/submit.svg', false, 'submit');
         btn.addEventListener("click",
-            function(){
+            function() {
                 instance.sendSetAvatar(inpNickname.value, -1);
             }
         );
@@ -1403,10 +1406,9 @@ class mmogame {
         this.showColorPalette(canvas, this.colors);
         canvas.addEventListener("click", function(e) {
             instance.sendGetColorPalettes();
-        })
+        });
 
         let countX = Math.floor(this.areaWidth / this.iconSize);
-        let countY = Math.floor((this.areaHeight - 2 * this.iconSize - 2 * this.padding) / this.iconSize);
         let left = 0;
         let top = 2 * (this.iconSize + this.padding);
 
@@ -1456,14 +1458,11 @@ class mmogame {
                 instance.updateButtonsAvatar(1, json.avatar);
                 instance.sendGetAttempt();
             }
-        }
-
-        let countX = Math.floor(this.areaWidth / this.iconSize);
-        let countY = Math.floor((this.areaHeight - 2 * this.iconSize - 2 * this.padding) / this.iconSize);
+        };
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        var data = JSON.stringify({"command": "setavatar", "mmogameid": this.mmogameid, "pin" : this.pin,
+        var data = JSON.stringify({"command": "setavatar", "mmogameid": this.mmogameid, "pin": this.pin,
             'kinduser': this.kinduser, "user": this.auserid, 'avatarid': avatarid, 'nickname': nickname});
         xmlhttp.send(data);
     }
@@ -1545,9 +1544,9 @@ class mmogame {
                 this.showColorPalette(canvas, a);
                 let id = json['id' + i];
 
-                canvas.addEventListener("click", function(e){
-                                                                instance.sendSetColorPalette(id);
-                                                            });
+                canvas.addEventListener("click", function(e) {
+                    instance.sendSetColorPalette(id);
+                });
             }
         }
         this.area.classList.add("palete");
@@ -1583,9 +1582,6 @@ class mmogame {
             this.timestart = 0;
             this.timeclose = 0;
         }
-
-        let tempTime = (new Date()).getTime() / 1000;
-        let tempRest = this.timeclose - tempTime;
     }
 
     changeToDisabledCheckRadio(item, color1, color2) {
@@ -1711,7 +1707,7 @@ class mmogame {
         }
         this.buttonsAvatar[num] = this.createImageButton(this.body, left, this.avatarTop, this.iconSize, this.iconSize, "", "");
         if (num == 2 && this.avatarTop != undefined) {
-            this.buttonsAvatar[num].title = '[LANGM_OPONENT]'
+            this.buttonsAvatar[num].title = '[LANGM_OPONENT]';
         }
 
         if (this.divNicknames == undefined) {
@@ -1745,8 +1741,6 @@ class mmogame {
         }
         
         if (this.nicknames[num] != nickname || nickname == "") {
-            let instance = this;
-
             this.nicknames[num] = nickname;
             let s = nickname;
 
@@ -1766,12 +1760,14 @@ class mmogame {
                 this.divNicknames[num].innerHTML = s;
                 this.divNicknames[num].style.textAlign = "center";
                 this.divNicknames[num].style.color = this.getColorContrast(this.colorsBackground);
-                this.autoResizeText(this.divNicknames[num], this.divNicknamesWidth[num], this.divNicknamesHeight[num], true, 0, 0, 1);
+                this.autoResizeText(this.divNicknames[num], this.divNicknamesWidth[num], this.divNicknamesHeight[num], true,
+                    0, 0, 1);
             }
         }
 
         if (avatar != this.buttonsAvatarSrc[num]) {
-            this.updateImageButton(this.buttonsAvatar[num], this.buttonsAvatarLeft[num], this.buttonAvatarTop, this.iconSize, this.buttonAvatarHeight, avatar != "" ? "assets/avatars/" + avatar : "");
+            this.updateImageButton(this.buttonsAvatar[num], this.buttonsAvatarLeft[num], this.buttonAvatarTop, this.iconSize,
+                this.buttonAvatarHeight, avatar != "" ? "assets/avatars/" + avatar : "");
             this.buttonsAvatarSrc[num] = avatar;
         }
 
@@ -1782,14 +1778,39 @@ class mmogame {
     }
 
     getSVGprev(size, color) {
-        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 667 667"><defs><clipPath id="a"><path clip-rule="evenodd" d="M500 0L500 500L500 500L0 500L0 500L0 0L0 0L500 0z"/></clipPath></defs><g clip-path="url(#a)" transform="scale(1.3333)"><path transform="matrix(1 0 0 -1 0 500)" d="M256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L445.66214 468.5281L445.66214 468.5281L238.84933 261.7153L238.84933 261.7153L238.84933 261.7153C 235.60168 258.46765 234.11804 254.18806 234.24268 249.92534L234.24268 249.92534L234.24268 249.92534C 234.11804 245.67822 235.60168 241.39864 238.84933 238.15097L238.84933 238.15097L445.6933 31.290157L445.6933 31.290157L445.6933 31.290157L445.6933 31.290157L256.72833 31.290157L256.72833 31.290157L38.12555 249.89291L38.12555 249.89291L256.77502 468.5281zM4.5989075 238.15099L4.5989075 238.15099L4.5989075 238.15099L237.95758 4.791005L237.95758 4.791005L237.95758 4.791005C 241.11176 1.6368077 245.24988 0.09086167 249.3724 0.12201445L249.3724 0.12201445L249.3724 0.12201445C 249.49702 0.12201445 249.59048 0.05970932 249.71638 0.05970932L249.71638 0.05970932L249.71638 0.05970932L249.71638 0.05970932L483.95123 0.05970932L483.95123 0.05970932L483.95123 0.05970932C 492.5714 0.05970932 499.56647 7.0560565 499.56647 15.674933L499.56647 15.674933L499.56647 15.674933C 499.56647 15.799542 499.50415 15.893002 499.50415 16.01891L499.50415 16.01891L499.50415 16.01891C 499.51974 20.141432 497.9738 24.27953 494.83517 27.433727L494.83517 27.433727L272.3747 249.89421L272.3747 249.89421L495.30374 472.822L495.30374 472.822L495.30374 472.822C 501.56543 479.08368 501.56543 489.2342 495.30374 495.49588L495.30374 495.49588L495.30374 495.49588C 491.58752 499.21213 486.5434 500.44656 481.71863 499.7586L481.71863 499.7586L481.71863 499.7586L481.71863 499.7586L251.99702 499.7586L251.99702 499.7586L251.99702 499.7586C 247.17227 500.44528 242.12814 499.2122 238.4119 495.49588L238.4119 495.49588L4.614502 261.6985C 1.3668518 258.45084 -0.11682129 254.17125 0.0078125 249.90852L0.0078125 249.90852L0.0078125 249.90852C -0.11810303 245.67693 1.3655396 241.39864 4.5989075 238.15099z" stroke="#FFF" stroke-width="1.731" fill="' +
+        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 667 667"><defs>
+            <clipPath id="a"><path clip-rule="evenodd" d="M500 0L500 500L500 500L0 500L0 500L0 0L0 0L500 0z"/></clipPath>
+            </defs><g clip-path="url(#a)" transform="scale(1.3333)"><path transform="matrix(1 0 0 -1 0 500)"
+            d="M256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L445.66214
+            468.5281L445.66214 468.5281L238.84933 261.7153L238.84933 261.7153L238.84933 261.7153C 235.60168 258.46765 234.11804
+            254.18806 234.24268 249.92534L234.24268 249.92534L234.24268 249.92534C 234.11804 245.67822 235.60168 241.39864
+            238.84933 238.15097L238.84933 238.15097L445.6933 31.290157L445.6933 31.290157L445.6933 31.290157L445.6933
+            31.290157L256.72833 31.290157L256.72833 31.290157L38.12555 249.89291L38.12555 249.89291L256.77502
+            468.5281zM4.5989075 238.15099L4.5989075 238.15099L4.5989075 238.15099L237.95758 4.791005L237.95758
+            4.791005L237.95758 4.791005C 241.11176 1.6368077 245.24988 0.09086167 249.3724 0.12201445L249.3724
+            0.12201445L249.3724 0.12201445C 249.49702 0.12201445 249.59048 0.05970932 249.71638 0.05970932L249.71638
+            0.05970932L249.71638 0.05970932L249.71638 0.05970932L483.95123 0.05970932L483.95123 0.05970932L483.95123
+            0.05970932C 492.5714 0.05970932 499.56647 7.0560565 499.56647 15.674933L499.56647 15.674933L499.56647 15.674933C
+            499.56647 15.799542 499.50415 15.893002 499.50415 16.01891L499.50415 16.01891L499.50415 16.01891C 499.51974
+            20.141432 497.9738 24.27953 494.83517 27.433727L494.83517 27.433727L272.3747 249.89421L272.3747 249.89421L495.30374
+            472.822L495.30374 472.822L495.30374 472.822C 501.56543 479.08368 501.56543 489.2342 495.30374 495.49588L495.30374
+            495.49588L495.30374 495.49588C 491.58752 499.21213 486.5434 500.44656 481.71863 499.7586L481.71863
+            499.7586L481.71863 499.7586L481.71863 499.7586L251.99702 499.7586L251.99702 499.7586L251.99702 499.7586C 247.17227
+            500.44528 242.12814 499.2122 238.4119 495.49588L238.4119 495.49588L4.614502 261.6985C 1.3668518 258.45084
+            -0.11682129 254.17125 0.0078125 249.90852L0.0078125 249.90852L0.0078125 249.90852C -0.11810303 245.67693 1.3655396
+            241.39864 4.5989075 238.15099z" stroke="#FFF" stroke-width="1.731" fill="` +
             this.getColorHex(color) + '"/></g></svg>';
     }
 
     getSVGnext(size, color) {
         return '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 385.201 385.201"><path fill="' +
             this.getColorHex(color) +
-            '" d="M381.658,183.472L201.878,3.691c-2.43-2.43-5.618-3.621-8.794-3.597 c-0.096,0-0.168-0.048-0.265-0.048H12.364c-6.641,0-12.03,5.39-12.03,12.03c0,0.096,0.048,0.168,0.048,0.265 c-0.012,3.176,1.179,6.364,3.597,8.794l171.384,171.384L3.618,364.263c-4.824,4.824-4.824,12.644,0,17.468 c2.863,2.863,6.749,3.814,10.466,3.284h176.978c3.717,0.529,7.603-0.421,10.466-3.284l180.118-180.118 c2.502-2.502,3.645-5.799,3.549-9.083C385.292,189.27,384.149,185.974,381.658,183.472z M187.381,360.955H41.862l159.329-159.329 c2.502-2.502,3.645-5.799,3.549-9.083c0.096-3.272-1.047-6.569-3.549-9.071L41.838,24.106h145.579l168.412,168.412L187.381,360.955 z"/></svg>';
+            `" d="M381.658,183.472L201.878,3.691c-2.43-2.43-5.618-3.621-8.794-3.597
+            c-0.096,0-0.168-0.048-0.265-0.048H12.364c-6.641,0-12.03,5.39-12.03,12.03c0,0.096,0.048,0.168,0.048,0.265
+            c-0.012,3.176,1.179,6.364,3.597,8.794l171.384,171.384L3.618,364.263c-4.824,4.824-4.824,12.644,0,17.468
+            c2.863,2.863,6.749,3.814,10.466,3.284h176.978c3.717,0.529,7.603-0.421,10.466-3.284l180.118-180.118
+            c2.502-2.502,3.645-5.799,3.549-9.083C385.292,189.27,384.149,185.974,381.658,183.472z M187.381,360.955H41.862l159.329-159.329
+            c2.502-2.502,3.645-5.799,3.549-9.083c0.096-3.272-1.047-6.569-3.549-9.071L41.838,24.106h145.579l168.412,168.412L187.381,360.955 z"/></svg>`;
     }
 
     setHelpURL(url) {

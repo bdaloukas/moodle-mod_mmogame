@@ -18,15 +18,15 @@
  * Version information
  *
  * @package mod_mmogame
- * @copyright 2020 Vasilis Daloukas
+ * @copyright 2024 Vasilis Daloukas
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_mmogame';  // Full name of the plugin (used for diagnostics).
-$plugin->version   = 2024102402;  // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2024102500;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2010112400;  // Requires Moodle 2.0.
 $plugin->cron      = 0;           // Period for cron to check this module (secs).
-$plugin->release   = '2024-10-24';
+$plugin->release   = '2024-10-25';
 $plugin->maturity = MATURITY_STABLE;

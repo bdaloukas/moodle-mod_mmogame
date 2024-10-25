@@ -108,7 +108,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * Definition for params abouts models
      *
-     * @param $mform
+     * @param object $mform
      */
     protected function definition_models($mform) {
         global $CFG;
@@ -402,6 +402,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * Computes the categories of all question of the current course
      *
+     * @param object $mform
      * @return array of question categories
      */
     public function definition_question(&$mform) {
@@ -418,6 +419,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * Show fields about selecting glossaries
      *
+     * @param object $mform
      * @return array of question categories
      */
     public function definition_glossary(&$mform) {

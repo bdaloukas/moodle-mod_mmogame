@@ -36,7 +36,7 @@ class mmogameModel_aduel {
      * Return info for administrator
      *
      * @param object $data (not used)
-     * @param game object $game
+     * @param object $game
      * @param array $ret
      */
     public static function json_getadmin($data, $game, &$ret) {
@@ -54,7 +54,7 @@ class mmogameModel_aduel {
      * Administrator can change numgame or state
      *
      * @param object $data
-     * @param game object $game
+     * @param object $game
      */
     public static function json_setadmin($data, $game) {
         $instance = $game->get_rinstance();
@@ -224,7 +224,7 @@ class mmogameModel_aduel {
     /**
      * Return an attempt record of the game
      *
-     * @param object $mmogame
+     * @param object $game
      * @param object $aduel
      * @return object (the attempt record)
      */
