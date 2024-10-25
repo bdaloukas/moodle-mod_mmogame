@@ -81,7 +81,7 @@ class mmogameGate extends mmogame {
             let computedHeight = heightCode + 3 * size[1] + 8 * instance.padding + heightColors + heightAvatars;
 
             return computedHeight < maxHeight ? -1 : 1;
-        })
+        });
 
         let gridWidthColors = maxWidth - this.padding;
         let gridWidthAvatars = maxWidth - this.padding;
@@ -94,7 +94,7 @@ class mmogameGate extends mmogame {
 
         let bottom;
         if (this.kinduser != 'guid' && this.kinduser != 'moodle') {
-            bottom = this.createCode(0, 0, maxWidth, this.fontSize, size[0])
+            bottom = this.createCode(0, 0, maxWidth, this.fontSize, size[0]);
             this.edtCode = this.edt;
             this.edtCode.addEventListener("keyup", function() {
                 instance.updateSubmit();
@@ -419,7 +419,7 @@ class mmogameGate extends mmogame {
         return this.createLabelEdit(left, top, width, fontSize, labelWidth, "[LANGM_NAME]: ");
     }
 
-    showAvatars(json, left, top, width, height, countX, countY) {
+    showAvatars(json, left, top, width, height, countX) {
         this.avatar = undefined;
         let leftOriginal = left;
         let instance = this;
@@ -461,7 +461,7 @@ class mmogameGate extends mmogame {
                 let json = JSON.parse(this.responseText);
                 instance.showColorPalettes(json, left, top, gridWidthColors, gridHeight, countXcolors, countYcolors);
                 instance.showAvatars(json, left + gridWidthColors + instance.padding, top, gridWidthAvatars, gridHeight,
-                    countXavatars, countYavatars);
+                    countXavatars);
             }
         };
 
@@ -501,8 +501,7 @@ class mmogameGate extends mmogame {
                         countXcolors, countYcolors);
                 }
                 if (updateAvatars) {
-                    instance.showAvatars(json, leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars,
-                        countYavatars);
+                    instance.showAvatars(json, leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars);
                 }
             }
         };
@@ -544,7 +543,7 @@ class mmogameGate extends mmogame {
                 this.showColorPalette(canvas, a);
                 let id = json['paletteid' + i];
 
-                canvas.addEventListener("click", function(e){
+                canvas.addEventListener("click", function(){
                     instance.updateColorPalete(canvas, id);
                 });
             }

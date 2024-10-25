@@ -56,8 +56,8 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * This function insert a record in database.
      *
-     * @param string $table.
-     * @param array $a.
+     * @param string $table
+     * @param array $a
      * @return true if the insertions is ok, otherwise false.
      */
     public function insert_record($table, $a) {
@@ -73,8 +73,10 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * For rare cases when you also need to specify the ID of the record to be inserted.
      *
-     * @param string $table.
-     * @param array $a.
+     * @param string $table
+     * @param array $a
+     * @param int $returnid
+     * @param object customsequence
      * @return true if the insertions is ok, otherwise false.
      */
     public function insert_record_raw($table, $a, $returnid, $customsequence) {
@@ -91,8 +93,8 @@ class mmogame_database_moodle extends mmogame_database {
      * If you need to perform a complex update using arbitrary SQL, you can use the low level "execute" method.
         Only use this when no specialised method exists.
      *
-     * @param string $sql.
-     * @param array $params.
+     * @param string $sql
+     * @param array $params
      */
     public function execute($sql, $params=null) {
         global $DB;
@@ -103,10 +105,10 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Return a single database record as an object where the given conditions are used in the WHERE clause.
      *
-     * @param string $table.
-     * @param string $select.
-     * @param array $params.
-     * @param string $fields.
+     * @param string $table
+     * @param string $select
+     * @param array $params
+     * @param string $fields
      * @return object.
      */
     public function get_record_select($table, $select, ?array $params=null, $fields='*') {
@@ -118,12 +120,12 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Returns the first record of given creteria.
      *
-     * @param string $table.
-     * @param string $select.
-     * @param array $params.
-     * @param string $sort.
-     * @param string $fields.
-     * @return object.
+     * @param string $table
+     * @param string $select
+     * @param array $params
+     * @param string $sort
+     * @param string $fields
+     * @return object
      */
     public function get_record_select_first($table, $select, ?array $params=null, $sort='', $fields='*') {
         global $DB;
@@ -138,14 +140,14 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Return a list of records as an array of objects where the given conditions are used in the WHERE clause.
      *
-     * @param string $table.
-     * @param string $select.
-     * @param array $params.
-     * @param string $sort.
-     * @param string $fields.
-     * @param int $limitfrom.
-     * @param int $limitto.
-     * @return object.
+     * @param string $table
+     * @param string $select
+     * @param array $params
+     * @param string $sort
+     * @param string $fields
+     * @param int $limitfrom
+     * @param int $limitto
+     * @return object
      */
     public function get_records_select($table, $select, ?array $params=null, $sort='', $fields='*', $limitfrom=0, $limitnum=0) {
         global $DB;
@@ -156,10 +158,10 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Count the records in a table where the given conditions are used in the WHERE clause.
      *
-     * @param string $table.
-     * @param string $select.
-     * @param array $params.
-     * @param string $countitem.
+     * @param string $table
+     * @param string $select
+     * @param array $params
+     * @param string $countitem
      * @return int.
      */
     public function count_records_select($table, $select, ?array $params=null, $countitem="COUNT('*')") {
@@ -171,9 +173,9 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Return a single database record as an object using a custom SELECT query.
      *
-     * @param string $sql.
-     * @param array $params.
-     * @return object.
+     * @param string $sql
+     * @param array $params
+     * @return object
      */
     public function get_record_sql($sql, ?array $params=null) {
         global $DB;
@@ -184,11 +186,11 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Return a list of records as an array of objects using a custom SELECT query.
      *
-     * @param string $sql.
-     * @param array $params.
-     * @param int $limitfrom.
-     * @param int $limitto.
-     * @return array.
+     * @param string $sql
+     * @param array $params
+     * @param int $limitfrom
+     * @param int $limitto
+     * @return array
      */
     public function get_records_sql($sql, ?array $params=null, $limitfrom=0, $limitnum=0) {
         global $DB;
@@ -199,8 +201,8 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Update a record in the table. The data object must have the property "id" set.
      *
-     * @param string $table.
-     * @param array $a.
+     * @param string $table
+     * @param array $a
      */
     public function update_record($table, $a) {
         global $DB;
@@ -216,9 +218,9 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Delete records from the table where the given conditions are used in the WHERE clause.
      *
-     * @param string $table.
-     * @param string $select.
-     * @param array $params.
+     * @param string $table
+     * @param string $select
+     * @param array $params
      */
     public function delete_records_select($table, $select, ?array $params=null) {
         global $DB;
@@ -229,10 +231,10 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Returns the equivalent of if in database.
      *
-     * @param string $condition.
-     * @param string $iftrue.
-     * @param string $iffalse.
-     * @return string.
+     * @param string $condition
+     * @param string $iftrue
+     * @param string $iffalse
+     * @return string
      */
     public function iif($condition, $iftrue, $iffalse) {
         return "IF($condition,$iftrue,$iffalse)";

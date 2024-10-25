@@ -155,7 +155,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @param id $id
      * @param int $layout
      * @param array $files
-     * @param string $fileconcent
+     * @param string $fillconcept
      * @param int $filewidth
      * @param int $fileheight
      * @param int $maxwidth

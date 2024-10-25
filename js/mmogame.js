@@ -1277,20 +1277,6 @@ class mmogame {
         xmlhttp.send(data);
     }
 
-    createDivInput(parent, left, top, width, height) {
-        var div = document.createElement("input");
-        div.style.position = "absolute";
-        div.style.width = width + "px";
-        div.style.type = "text";
-        div.style.left = left + "px";
-        div.style.top = top + "px";
-        div.autofocus = true;
-
-        parent.appendChild(div);
-
-        return div;
-    }
-
     createDivName(left, top, labelWidth, inpWidth, label, value) {
         let div = this.createDiv(this.area, left, top, labelWidth, this.iconSize);
         div.innerHTML = label + ": ";
@@ -1392,7 +1378,7 @@ class mmogame {
         canvas.id = "avatarid";
         this.area.appendChild(canvas);
         this.showColorPalette(canvas, this.colors);
-        canvas.addEventListener("click", function(e) {
+        canvas.addEventListener("click", function() {
             instance.sendGetColorPalettes();
         });
 
@@ -1532,7 +1518,7 @@ class mmogame {
                 this.showColorPalette(canvas, a);
                 let id = json['id' + i];
 
-                canvas.addEventListener("click", function(e) {
+                canvas.addEventListener("click", function() {
                     instance.sendSetColorPalette(id);
                 });
             }
@@ -1570,17 +1556,6 @@ class mmogame {
             this.timestart = 0;
             this.timeclose = 0;
         }
-    }
-
-    changeToDisabledCheckRadio(item, color1, color2) {
-        let div = this.createRadiobox(item.parentElement, item.clientWidth, color1, color2, item.checked);
-        div.style.position = item.style.position;
-        div.style.left = item.style.left;
-        div.style.top = item.style.top;
-
-        item.style.visibility = "hidden";
-
-        return div;
     }
 
     drawRadio(canvas, color1, color2) {

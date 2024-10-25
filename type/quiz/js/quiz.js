@@ -327,7 +327,7 @@ class mmogameQuiz extends mmogame {
             let topRadio = top;
             item.style.top = topRadio + "px";
 
-            item.addEventListener('click', (event) => {
+            item.addEventListener('click', () => {
                 if (!item.classList.contains("disabled")) {
                     instance.onClickRadio(i, this.colorDefinition, this.colorScore, true);
                 }
@@ -423,7 +423,7 @@ class mmogameQuiz extends mmogame {
                 if (submit) {
                     json.submit = 1;
                 }
-                instance.onServerAnswer(json, false);
+                instance.onServerAnswer(json);
             }
         };
         xmlhttp.open("POST", this.url, true);
@@ -454,7 +454,7 @@ class mmogameQuiz extends mmogame {
         xmlhttp.send(data);
     }
 
-    onServerAnswer(json, timeout) {
+    onServerAnswer(json) {
         if (json.submit == 0) {
             return;
         }
@@ -582,9 +582,6 @@ class mmogameQuiz extends mmogame {
     }
 }
 
-const stateAlonePlay = 1;
-const stateAloneLast = 1;
-
 class mmogameQuizAlone extends mmogameQuiz {
     constructor() {
         super();
@@ -683,8 +680,8 @@ class mmogameQuizAlone extends mmogameQuiz {
         }
     }
 
-    onServerAnswer(json, timeout) {
-        super.onServerAnswer(json, timeout);
+    onServerAnswer(json) {
+        super.onServerAnswer(json);
 
         if (json.submit != 0) {
             this.updatePercent(json);

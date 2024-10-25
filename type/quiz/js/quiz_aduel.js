@@ -1,6 +1,3 @@
-const statePlay = 1;
-const stateLast = 1;
-
 class mmogameQuizAduel extends mmogameQuiz {
     constructor() {
         super();
@@ -158,12 +155,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             json.qtype = '';
             super.onServerGetAttempt(json, param);
             this.showScore(json);
-            this.button5050.style.visibility = 'hidden';
-            this.buttonSkip.style.visibility = 'hidden';
-            if (this.btnSubmit != undefined) {
-                this.btnSubmit.style.visibility = "hidden";
-            }
-            this.buttonsAvatar[2].style.visibility = 'hidden';
+            this.onServerGetAttemptHideButtons();            
             this.createDivMessageStart('[LANGM_WAIT_TO_START]');
             return;
         }
@@ -198,7 +190,6 @@ class mmogameQuizAduel extends mmogameQuiz {
         }
 
         this.attempt = json.attempt;
-
         this.aduel_numattempt = json.aduel_numattempt;
         this.aduel_player = json.aduel_player;
         this.aduel_score = json.aduel_score;
@@ -209,11 +200,8 @@ class mmogameQuizAduel extends mmogameQuiz {
                 this.waitOponent();
             }
             this.hideTools();
-            let instance = this;
             this.showScore(json);
-            this.timeout = setTimeout(function() {
-                instance.sendGetAttempt(true);
-            }, this.timeoutMSEC);
+            this.onServerGetAttemptRetry();
             return;
         }
 
@@ -245,6 +233,22 @@ class mmogameQuizAduel extends mmogameQuiz {
 
         this.updateLabelTimer();
         this.sendFastJSON();
+    }
+
+    onServerGetAttemptRetry() {
+        let instance = this;
+        this.timeout = setTimeout(function() {
+            instance.sendGetAttempt(true);
+        x}, this.timeoutMSEC);        
+    }
+    
+    onServerGetAttemptHideButtons() {
+        this.button5050.style.visibility = 'hidden';
+        this.buttonSkip.style.visibility = 'hidden';
+        if (this.btnSubmit != undefined) {
+            this.btnSubmit.style.visibility = "hidden";
+        }
+        this.buttonsAvatar[2].style.visibility = 'hidden';
     }
 
     onTimeout() {
@@ -284,7 +288,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         this.updateButtonTool(this.buttonWizard, -1);
     }
 
-    onServerAnswer(json, timeout) {
+    onServerAnswer(json) {
         if (json.submit == 0) {
             return;
         }
