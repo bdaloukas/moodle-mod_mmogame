@@ -39,7 +39,7 @@ define( 'MMOGAME_USER_MOODLE', 'moodle');
  * @param boolean $trim
  * @return string (the guid)
  */
-function guidv4($trim = true) {
+function mmogame_guidv4($trim = true) {
     // Windows.
     if (function_exists('com_create_guid') === true) {
         if ($trim) {
@@ -71,4 +71,27 @@ function guidv4($trim = true) {
               substr($charid, 20, 12).
               $rbrace;
     return $guidv4;
+}
+
+/**
+ * Returns a list of sub-plugins.
+ *
+ * @return array of strings
+ */
+function mmogame_get_types() {
+    $dir = __DIR__.'/type';
+    $types = [];
+    if (is_dir($dir)) {
+        $files = scandir($dir);
+
+        foreach ($files as $file) {
+            if ($file != "." && $file != "..") {
+                if (is_dir( $dir.'/'.$file)) {
+                    $types[] = $file;
+                }
+            }
+        }
+    }
+
+    return $types;
 }

@@ -45,6 +45,31 @@
  * @param int $oldversion
  */
 function xmldb_mmogame_upgrade( $oldversion) {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < ($ver = 2024102602)) {
+        $table = new xmldb_table('mmogame_aa_grades');
+        $field = new xmldb_field('history');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024102700)) {
+        $table = new xmldb_table('mmogame_aa_grades');
+        $field = new xmldb_field('historyscore');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
 
     return true;
 }

@@ -83,7 +83,7 @@ function mmogame_add_instance( $mform) {
     mmogame_before_add_or_update( $mform);
 
     if (!isset( $mform->guid)) {
-        $mform->guidgame = guidv4();
+        $mform->guidgame = mmogame_guidv4();
     }
 
     $mform->id = $DB->insert_record("mmogame", $mform);

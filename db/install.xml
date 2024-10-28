@@ -132,8 +132,6 @@
         <FIELD NAME="score" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sumscore2" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="numteam" TYPE="int" LENGTH="10" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="history" TYPE="int" LENGTH="10" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="historyscore" TYPE="float" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="percentcompleted" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>

@@ -113,22 +113,15 @@ class mod_mmogame_mod_form extends moodleform_mod {
     protected function definition_models($mform) {
         global $CFG;
 
+        $types = mmogame_get_types();
         $dir = __DIR__.'/type';
         $models = [];
-        if (is_dir($dir)) {
-            $files = scandir($dir);
-
-            foreach ($files as $file) {
-                if ($file != "." && $file != "..") {
-                    if (is_dir( $dir.'/'.$file)) {
-                        require_once( $dir.'/'.$file.'/lib.php');
-                        $function = 'mmogametype_'.$file.'_get_models';
-                        $map = $function();
-                        foreach ($map as $model => $value) {
-                            $models[$file.'-'.$model] = $value;
-                        }
-                    }
-                }
+        foreach( $types as $type) {
+            require_once( $dir.'/'.$type.'/lib.php');
+            $function = 'mmogametype_'.$type.'_get_models';
+            $map = $function();
+            foreach ($map as $model => $value) {
+                $models[$type.'-'.$model] = $value;
             }
         }
 
