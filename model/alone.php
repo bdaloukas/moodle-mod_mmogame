@@ -34,22 +34,22 @@ class mmogameModel_alone {
      * Administrator can change numgame or state
      *
      * @param object $data
-     * @param object $game
+     * @param object $mmogame
      */
-    public static function json_setadmin($data, $game) {
-        $instance = $game->get_rinstance();
+    public static function json_setadmin($data, $mmogame) {
+        $rgame = $mmogame->get_rgame();
 
         $ret = [];
         if (isset( $data->numgame) && $data->numgame > 0) {
-            $instance->numgame = $data->numgame;
-            $game->get_db()->update_record( 'mmogame_aa_instances',
-                ['id' => $instance->id, 'numgame' => $instance->numgame]);
-            $game->update_state( $game->get_rstate()->state);
-            $game->set_state_json( $game->get_rstate()->state, $ret);
+            $rgame->numgame = $data->numgame;
+            $mmogame->get_db()->update_record( 'mmogame',
+                ['id' => $rgame->id, 'numgame' => $rgame->numgame]);
+            $mmogame->update_state( $mmogame->get_rstate()->state);
+            $mmogame->set_state_json( $mmogame->get_rstate()->state, $ret);
         } else if (isset( $data->state)) {
             if ($data->state >= 0 && $data->state <= MMOGAME_ALONE_STATE_LAST) {
-                $game->update_state( $data->state);
-                $game->set_state_json( $data->state, $ret);
+                $mmogame->update_state( $data->state);
+                $mmogame->set_state_json( $data->state, $ret);
             }
         }
     }
@@ -58,18 +58,16 @@ class mmogameModel_alone {
      * Return info for administrator
      *
      * @param object $data (not used)
-     * @param object $game
+     * @param object $mmogame
      * @param array $ret
      */
-    public static function json_getadmin($data, $game, &$ret) {
-        $instance = $game->get_rinstance();
-
+    public static function json_getadmin($data, $mmogame, &$ret) {
         $state = $ret['state'] = $game->get_rstate()->state;
 
-        $ret['stats_users'] = $game->get_db()->count_records_select( 'mmogame_aa_grades', 'ginstanceid=? AND numgame=?',
-            [$instance->id, $instance->numgame]);
-        $ret['stats_answers'] = $game->get_db()->count_records_select( 'mmogame_quiz_attempts',
-            'ginstanceid=? AND numgame=?',
-            [$instance->id, $instance->numgame]);
+        $ret['stats_users'] = $game->get_db()->count_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=?',
+            [$mmogame->get_id(), $mmogame->get_numgame()]);
+        $ret['stats_answers'] = $mmogame->get_db()->count_records_select( 'mmogame_quiz_attempts',
+            'mmogameid=? AND numgame=?',
+            [$mmogame->get_id(), $mmogame->get_numgame()]);
     }
 }

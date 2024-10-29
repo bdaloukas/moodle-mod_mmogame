@@ -55,7 +55,7 @@ class mmogameqbank {
      */
     public function get_attempt_new($auserid, $count, $stopatend, $usenumattempt, $queries) {
         $db = $this->mmogame->get_db();
-        $rinstance = $this->mmogame->get_rinstance();
+        $rgame = $this->mmogame->get_rgame();
         $auserid = $this->mmogame->get_auserid();
 
         if ($queries === false) {
@@ -66,16 +66,15 @@ class mmogameqbank {
         }
 
         if ($usenumattempt) {
-            $rec = $db->get_record_select( $this->mmogame->get_table_attempts(), 'ginstanceid=? AND numgame=? AND auserid=?',
-                [$rinstance->id, $rinstance->numgame, $auserid], 'max(numattempt) as num');
+            $rec = $db->get_record_select( $this->mmogame->get_table_attempts(), 'mmogameid=? AND numgame=? AND auserid=?',
+                [$rgame->id, $rgame->numgame, $auserid], 'max(numattempt) as num');
             $numattempt = $rec->num + 1;
         }
 
         $a = [];
 
-        $a['mmogameid'] = $rinstance->mmogameid;
-        $a['ginstanceid'] = $rinstance->id;
-        $a['numgame'] = $rinstance->numgame;
+        $a['mmogameid'] = $rgame->id;
+        $a['numgame'] = $rgame->numgame;
         $a['auserid'] = $auserid;
         if ($usenumattempt) {
             $a['numattempt'] = $numattempt;
@@ -110,14 +109,14 @@ class mmogameqbank {
         }
 
         $db = $this->mmogame->get_db();
-        $rinstance = $this->mmogame->get_rinstance();
+        $rgame = $this->mmogame->get_rgame();
 
         if ($teamid == null) {
-            $stats = $db->get_records_select( 'mmogame_aa_stats', 'ginstanceid=? AND numgame=? AND auserid=?',
-                [$rinstance->id, $rinstance->numgame, $auserid], '', 'queryid,countused,countcorrect,counterror');
+            $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=?',
+                [$rgame->id, $rgame->numgame, $auserid], '', 'queryid,countused,countcorrect,counterror');
         } else {
-            $stats = $db->get_records_select( 'mmogame_aa_stats', 'ginstanceid=? AND numgame=? AND teamid=?',
-                [$rinstance->id, $rinstance->numgame, $teamid], '', 'queryid,countused,countcorrect,counterror');
+            $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND teamid=?',
+                [$rgame->id, $rgame->numgame, $teamid], '', 'queryid,countused,countcorrect,counterror');
         }
 
         $map = [];
@@ -169,13 +168,13 @@ class mmogameqbank {
      */
     public function update_grades($auserid, $score, $score2, $countscore) {
         $db = $this->mmogame->get_db();
-        $rinstance = $this->mmogame->get_rinstance();
-        $rec = $db->get_record_select( 'mmogame_aa_grades', 'ginstanceid=? AND numgame=? AND auserid=?',
-                [$rinstance->id, $rinstance->numgame, $auserid]);
+        $rgame = $this->mmogame->get_rgame();
+        $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
+                [$rgame->id, $rgame->numgame, $auserid]);
         if ($rec === false) {
             $this->mmogame->get_grade( $auserid);
-            $rec = $db->get_record_select( 'mmogame_aa_grades', 'ginstanceid=? AND numgame=? AND auserid=?',
-                [$rinstance->id, $rinstance->numgame, $auserid]);
+            $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
+                [$rgame->id, $rgame->numgame, $auserid]);
         }
         if ($rec != false) {
             $a = ['id' => $rec->id];
@@ -194,8 +193,7 @@ class mmogameqbank {
             }
         } else {
             $db->insert_record( 'mmogame_aa_grades',
-                ['mmogameid' => $rinstance->mmogameid, 'ginstanceid' => $rinstance->id,
-                'numgame' => $rinstance->numgame, 'auserid' => $auserid, 'sumscore' => max( 0, $score),
+                ['mmogameid' => $rgame->id, 'numgame' => $rgame->numgame, 'auserid' => $auserid, 'sumscore' => max( 0, $score),
                 'countscore' => $countscore,
                 'score' => max( 0, $score), 'sumscore2' => max( 0, $score2), 'timemodified' => time(), ]);
         }
@@ -216,10 +214,10 @@ class mmogameqbank {
      */
     public function update_stats($auserid, $teamid, $queryid, $isused, $iscorrect, $iserror, $values = false) {
         $db = $this->mmogame->get_db();
-        $rinstance = $this->mmogame->get_rinstance();
+        $rgame = $this->mmogame->get_rgame();
 
-        $select = 'ginstanceid=? AND numgame=? ';
-        $a = [$rinstance->id, $rinstance->numgame];
+        $select = 'mmogameid=? AND numgame=? ';
+        $a = [$rgame->id, $rgame->numgame];
         if ($auserid !== null && $auserid != 0 && $auserid !== false) {
             $select .= ' AND auserid=?';
             $a[] = $auserid;
@@ -271,16 +269,16 @@ class mmogameqbank {
                     $n = $rec->countanswers;
                     $percentcompleted = $n != 0 ? $values['countcompleted'] / $n : 0;
                     $sql = "UPDATE {$db->prefix}mmogame_aa_grades ".
-                        "SET percentcompleted=? WHERE ginstanceid=? AND numgame=? AND auserid=?";
-                    $db->execute( $sql, [$percentcompleted, $rinstance->id, $rinstance->numgame, $auserid]);
+                        "SET percentcompleted=? WHERE mmogameid=? AND numgame=? AND auserid=?";
+                    $db->execute( $sql, [$percentcompleted, $rgame->id, $rgame->numgame, $auserid]);
                 }
             }
             $db->update_record( 'mmogame_aa_stats', $a);
         } else {
             $count = $iscorrect + $iserror;
             $percent = $count == 0 ? null : $iscorrect / $count;
-            $a = ['mmogameid' => $rinstance->mmogameid, 'ginstanceid' => $rinstance->id,
-                'numgame' => $rinstance->numgame, 'queryid' => $queryid, 'auserid' => $auserid, 'teamid' => $teamid,
+            $a = ['mmogameid' => $rgame->id,
+                'numgame' => $rgame->numgame, 'queryid' => $queryid, 'auserid' => $auserid, 'teamid' => $teamid,
                 'percent' => $percent, 'countused' => $isused, 'countcorrect' => $iscorrect,
                 'counterror' => $iserror, ];
             if ($values !== false) {

@@ -36,18 +36,16 @@ class mmogameModel_aduel {
      * Return info for administrator
      *
      * @param object $data (not used)
-     * @param object $game
+     * @param object $mmogame
      * @param array $ret
      */
-    public static function json_getadmin($data, $game, &$ret) {
-        $instance = $game->get_rinstance();
+    public static function json_getadmin($data, $mmogame, &$ret) {
         $state = $ret['state'] = $game->get_rstate()->state;
 
-        $ret['stats_users'] = $game->get_db()->count_records_select( 'mmogame_aa_grades', 'ginstanceid=? AND numgame=?',
-            [$instance->id, $instance->numgame]);
+        $params = [$mmogame->get_id(), $mmogame->get_numgame];
+        $ret['stats_users'] = $game->get_db()->count_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=?', $params);
         $ret['stats_answers'] = $game->get_db()->count_records_select( 'mmogame_quiz_attempts',
-            'ginstanceid=? AND numgame=? AND timeanswer <> 0',
-            [$instance->id, $instance->numgame]);
+            'mmogameid=? AND numgame=? AND timeanswer <> 0', $params);
     }
 
     /**
@@ -57,8 +55,6 @@ class mmogameModel_aduel {
      * @param object $game
      */
     public static function json_setadmin($data, $game) {
-        $instance = $game->get_rinstance();
-
         $ret = [];
         if (isset( $data->numgame) && $data->numgame > 0) {
             $instance->numgame = $data->numgame;
@@ -86,10 +82,9 @@ class mmogameModel_aduel {
         $newplayer1 = $newplayer2 = false;
         $auserid = $mmogame->get_auserid();
         $db = $mmogame->get_db();
-        $rinstance = $mmogame->get_rinstance();
 
-        $stat = $db->get_record_select( 'mmogame_aa_stats', 'ginstanceid=? AND numgame=? AND auserid=? AND queryid IS NULL',
-            [$rinstance->id, $rinstance->numgame, $auserid]);
+        $stat = $db->get_record_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=? AND queryid IS NULL',
+            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
         if ($stat === false) {
             $stat = new stdClass();
             $stat->percent = $stat->id = $stat->count1 = $stat->count2 = 0;
@@ -97,9 +92,9 @@ class mmogameModel_aduel {
 
         // Returns one that is started and not finished.
         $recs = $db->get_records_select( 'mmogame_am_aduel_pairs',
-            'ginstanceid=? AND numgame=? AND '.
+            'mmogameid=? AND numgame=? AND '.
             '(auserid1=? AND timestart1 <> 0 AND isclosed1 = 0 OR auserid2=? AND timestart2 <> 0 AND isclosed2 = 0)',
-            [$rinstance->id, $rinstance->numgame, $auserid, $auserid], 'id', '*', 0, 1);
+            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid, $auserid], 'id', '*', 0, 1);
         foreach ($recs as $rec) {
             return $rec;
         }
@@ -115,9 +110,9 @@ class mmogameModel_aduel {
         $sql = "SELECT a.*, s.percent".
             " FROM {$db->prefix}mmogame_am_aduel_pairs a ".
             " LEFT JOIN {$db->prefix}mmogame_aa_stats s ON ".
-            "a.ginstanceid=s.ginstanceid AND a.numgame=s.numgame AND a.auserid1=s.auserid AND s.queryid IS NULL AND teamid IS NULL".
-            " WHERE a.auserid2 IS NULL AND a.ginstanceid=? AND a.numgame=? AND a.auserid1<>? AND a.isclosed1 = 1";
-        $recs = $db->get_records_sql( $sql, [$rinstance->id, $rinstance->numgame, $auserid]);
+            "a.mmogameid=s.mmogameid AND a.numgame=s.numgame AND a.auserid1=s.auserid AND s.queryid IS NULL AND teamid IS NULL".
+            " WHERE a.auserid2 IS NULL AND a.mmogameid=? AND a.numgame=? AND a.auserid1<>? AND a.isclosed1 = 1";
+        $recs = $db->get_records_sql( $sql, [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
 
         if ($stat->count1 - $stat->count2 == 1) {
             if (count( $recs) < 3) {
@@ -127,8 +122,8 @@ class mmogameModel_aduel {
 
         if (count( $recs) == 0) {
             $count = $db->count_records_select( 'mmogame_am_aduel_pairs',
-                'ginstanceid=? AND numgame=? AND auserid1 = ? AND auserid2 IS NULL',
-                [$rinstance->id, $rinstance->numgame, $auserid]);
+                'mmogameid=? AND numgame=? AND auserid1 = ? AND auserid2 IS NULL',
+                [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
 
             if ($count > $mmogame->get_maxalone()) {
                 return false;   // Wait an oponent.
@@ -172,12 +167,10 @@ class mmogameModel_aduel {
      * @param object $stat (the record of table mmogame_aa_stats)
      */
     public static function get_aduel_new($mmogame, &$newplayer1, $stat) {
-        $rinstance = $mmogame->get_rinstance();
         $db = $mmogame->get_db();
 
-        $a = ['mmogameid' => $mmogame->get_id(), 'ginstanceid' => $rinstance->id, 'numgame' => $rinstance->numgame,
-            'auserid1' => $mmogame->get_auserid(), 'timestart1' => time(), 'timelimit' => $mmogame->get_timelimit(),
-            'isclosed1' => 0, 'isclosed2' => 0, ];
+        $a = ['mmogameid' => $mmogame->get_id(), 'numgame' => $mmogame->get_numgame(), 'auserid1' => $mmogame->get_auserid(),
+            'timestart1' => time(), 'timelimit' => $mmogame->get_timelimit(), 'isclosed1' => 0, 'isclosed2' => 0, ];
         $id = $db->insert_record( 'mmogame_am_aduel_pairs', $a);
 
         $newplayer1 = true;
@@ -224,39 +217,38 @@ class mmogameModel_aduel {
     /**
      * Return an attempt record of the game
      *
-     * @param object $game
+     * @param object $mmogame
      * @param object $aduel
      * @return object (the attempt record)
      */
-    public static function get_attempt($game, $aduel) {
+    public static function get_attempt($mmogame, $aduel) {
 
-        $table = $game->get_table_attempts();
-        $instance = $game->get_rinstance();
+        $table = $mmogame->get_table_attempts();
+        $db = $mmogame->get_db();
+        $aduel = $mmogame->get_aduel();
 
-        $recs = $game->get_db()->get_records_select( $table, "auserid=? AND numgame=? AND numteam=? AND timeanswer=0",
-            [$game->get_auserid(), $instance->numgame, $game->get_aduel()->id], 'numattempt');
+        $recs = $mmogame->get_db()->get_records_select( $table, "auserid=? AND numgame=? AND numteam=? AND timeanswer=0",
+            [$mmogame->get_auserid(), $mmogame->get_numgame(), $aduel->id], 'numattempt');
         $time = time();
         foreach ($recs as $rec) {
             if ($rec->timeclose > $time || $rec->timeclose == 0) {
                 if ($rec->timestart == 0) {
                     $rec->timestart = time();
                     $rec->timeclose = $rec->timestart + $aduel->timelimit;
-                    $game->get_db()->update_record( $table,
-                        ['id' => $rec->id, 'timestart' => $rec->timestart, 'timeclose' => $rec->timeclose]);
+                    $db->update_record( $table, ['id' => $rec->id, 'timestart' => $rec->timestart, 'timeclose' => $rec->timeclose]);
                 }
                 return $rec;
             }
             if ($rec->timestart == 0) {
                 $rec->timestart = $time;
                 $rec->timeclose = $time + $aduel->timelimit;
-                $game->get_db()->update_record( $table,
-                    ['id' => $rec->id, 'timestart' => $rec->timestart, 'timeclose' => $rec->timeclose]);
+                $db->update_record( $table, ['id' => $rec->id, 'timestart' => $rec->timestart, 'timeclose' => $rec->timeclose]);
                 return $rec;
             }
         }
 
-        $a = ['id' => $game->get_aduel()->id];
-        if ($game->get_auserid() == $game->get_aduel()->auserid1) {
+        $a = ['id' => $mmogame->get_aduel()->id];
+        if ($mmogame->get_auserid() == $aduel->auserid1) {
             $a['isclosed1'] = 1;
         } else {
             $a['isclosed2'] = 1;

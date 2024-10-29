@@ -31,36 +31,34 @@ require_once(dirname(__FILE__) . '/../../model/aduel.php');
  * @param object $game
  * @param array $ret
  */
-function mmogame_json_quiz_getattempt($data, $game, &$ret) {
+function mmogame_json_quiz_getattempt($data, $mmogame, &$ret) {
     global $CFG;
 
-    $rinstance = $game->get_rinstance();
-
-    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data, $rinstance);
+    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
     if ($auserid === false) {
         $ret['errorcode'] = 'invalidauser';
         return;
     }
-    $game->login_user( $auserid);
+    $mmogame->login_user( $auserid);
 
     $ret['dataroot'] = $CFG->dataroot;
-    $ret['type'] = $rinstance->type;
-    $ret['model'] = $rinstance->model;
+    $ret['type'] = $mmogame->get_type();
+    $ret['model'] = $mmogame->get_model();
 
     if (isset( $data->nickname) && isset( $data->avatarid) && isset( $data->paletteid)) {
-        $info = $game->get_avatar_info( $auserid);
-        $game->get_db()->update_record( 'mmogame_aa_grades',
+        $info = $mmogame->get_avatar_info( $auserid);
+        $mmogame->get_db()->update_record( 'mmogame_aa_grades',
             ['id' => $info->id, 'nickname' => $data->nickname, 'avatarid' => $data->avatarid,
             'colorpaletteid' => $data->paletteid, ]);
     }
 
-    if ($game->get_state() != 0) {
-        $attempt = $game->get_attempt();
+    if ($mmogame->get_state() != 0) {
+        $attempt = $mmogame->get_attempt();
     } else {
         $attempt = false;
     }
 
-    $game->append_json( $ret, $attempt, $data);
+    $mmogame->append_json( $ret, $attempt, $data);
 }
 
 /**
@@ -71,7 +69,7 @@ function mmogame_json_quiz_getattempt($data, $game, &$ret) {
  * @param array $ret
  */
 function mmogame_json_quiz_answer($data, $game, &$ret) {
-    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data, $game->get_rinstance());
+    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data);
     $game->login_user( $auserid);
 
     return $game->set_answer_model( $data, $ret);
@@ -84,9 +82,9 @@ function mmogame_json_quiz_answer($data, $game, &$ret) {
  * @param object $game
  * @param array $ret
  */
-function mmogame_json_quiz_gethighscore($data, $game, &$ret) {
-    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data, $game->get_rinstance());
-    $game->login_user( $auserid);
-    $instance = $game->get_rinstance();
-    $game->get_highscore( $data->count, $ret);
+function mmogame_json_quiz_gethighscore($data, $mmogame, &$ret) {
+    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    $mmogame->login_user( $auserid);
+    $instance = $mmogame->get_rinstance();
+    $mmogame->get_highscore( $data->count, $ret);
 }

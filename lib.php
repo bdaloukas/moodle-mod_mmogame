@@ -85,10 +85,21 @@ function mmogame_add_instance( $mform) {
     if (!isset( $mform->guid)) {
         $mform->guidgame = mmogame_guidv4();
     }
+    if (!isset( $mform->fastjson)) {
+        for (;;) {
+            // Generate a random number with 10 digits.
+            $mform->fastjson = random_int(1000000000, 9999999999); // Generates a 10-digit number.
+
+            // Check if the number already exists in the database.
+            if ($DB->db->get_record_select('mmogame', 'fastjson=?', [$mform->fastjson]) === false) {
+                break;
+            }
+        }
+
+        $mform->fastjson = mmogame::get_new_fastjson();
+    }
 
     $mform->id = $DB->insert_record("mmogame", $mform);
-
-    mmogame_after_add_or_update( $mform);
 
     return $mform->id;
 }
@@ -131,6 +142,12 @@ function mmogame_before_add_or_update( &$mform) {
         return;
     }
 
+    $a = explode( '-', $mform->typemodel);
+    if (count( $a) == 2) {
+        $mform->type = $a[0];
+        $mform->model = $a[1];
+    }
+
     $mform->timemodified = time();
 
     switch ($mform->qbank) {
@@ -141,44 +158,6 @@ function mmogame_before_add_or_update( &$mform) {
             mmogame_before_add_or_update_question( $mform);
             break;
     }
-}
-
-/**
- * Updates some fields after writing to database.
- *
- * @param stdClass $mform
- */
-function mmogame_after_add_or_update( &$mform) {
-    global $DB;
-
-    $recs = $DB->get_records_select( 'mmogame_aa_instances', 'mmogameid=?',
-        [$mform->id], 'id', '*', 0, 1);
-    if (count( $recs) == 0) {
-        global $USER;
-
-        $newrec = new stdClass();
-        $newrec->mmogameid = $mform->id;
-        $newrec->numgame = 1;
-        $newrec->pin = $mform->pin;
-        $newrec->enabled = 1;
-        $newrec->numattempt = 1;
-        $newrec->auserid = mmogame::get_auserid_from_moodle( new mmogame_database_moodle, $USER->id, true);
-        $DB->insert_record( 'mmogame_aa_instances', $newrec);
-        $recs = $DB->get_records_select( 'mmogame_aa_instances', 'mmogameid=?', [$mform->id], 'id', '*', 0, 1);
-    }
-
-    $instance = reset( $recs);
-    $updrec = new stdClass();
-    $updrec->id = $instance->id;
-    $updrec->pin = $mform->pin;
-    $updrec->kinduser = $mform->kinduser;
-    $a = explode( '-', $mform->typemodel);
-    if (count( $a) == 2) {
-        $updrec->type = $a[0];
-        $updrec->model = $a[1];
-    }
-
-    $DB->update_record( 'mmogame_aa_instances', $updrec);
 }
 
 /**
@@ -232,8 +211,6 @@ function mmogame_update_instance( $mmogame) {
     if (!$DB->update_record("mmogame", $mmogame)) {
         return false;
     }
-
-    mmogame_after_add_or_update( $mmogame);
 
     return true;
 }

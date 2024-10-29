@@ -59,21 +59,20 @@ class mmogame_quiz_alone_admin extends moodleform {
      */
     public function definition() {
         $mform = $this->_form;
-        $rinstance = $this->_mmogame->get_rinstance();
+        $rgame = $this->_mmogame->get_rgame();
 
         $state = $this->_mmogame->get_state();
         if ($state == 0) {
             $statename = get_string( 'state0', 'mmogametype_quiz');
         } else {
-            $statename = get_string( $rinstance->model.'_state'.$state, 'mmogametype_quiz');
+            $statename = get_string( $rgame->model.'_state'.$state, 'mmogametype_quiz');
         }
 
         $mform->addElement('hidden', 'id', $this->_id);
         $mform->setType( 'id', PARAM_INT);
 
         // Name of game.
-        $mform->addElement('static', 'gamename', '', get_string('js_name', 'mmogame') . ': '.
-            ($rinstance->name != '' ? $rinstance->name : $this->_mmogame->get_rgame()->name));
+        $mform->addElement('static', 'gamename', '', get_string('js_name', 'mmogame') . ': '.$rgame->name);
         $mform->addElement('html', '<br>');
 
         $mform->addElement('html', '<table border=1>');
@@ -82,10 +81,10 @@ class mmogame_quiz_alone_admin extends moodleform {
         $mform->addElement('html', '<tr>');
         $mform->addElement('html', '<td>'.get_string('numgame', 'mmogame').':</td>');
         $mform->addElement('html', '<td>');
-        if ($rinstance->numgame > 1) {
+        if ($rgame->numgame > 1) {
             $mform->addElement('html', '<button id="prevnumgame" name="prevnumgame">⟪</button>');
         }
-        $mform->addElement('html', '<span class="value" id="numgame">'.$rinstance->numgame.'</span>');
+        $mform->addElement('html', '<span class="value" id="numgame">'.$rgame->numgame.'</span>');
         $mform->addElement('html', '<button id="nextnumgame" name="nextnumgame">⟫</button>');
         $mform->addElement('html', '<td>');
         $mform->addElement('html', '</tr>');

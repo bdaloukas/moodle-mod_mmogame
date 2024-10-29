@@ -34,15 +34,14 @@ $db = new mmogame_database_moodle();
 $mmogameid = required_param('id', PARAM_INT);
 $pin = required_param('pin', PARAM_INT);
 
-$rinstance = $DB->get_record_select( 'mmogame_aa_instances', 'mmogameid=? AND pin=?', [$mmogameid, $pin]);
-if ($rinstance === false) {
+$rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid, $pin]);
+if ($rgame === false) {
     $data = new stdClass();
     $data->mmogameid = $mmogameid;
     $data->pin = $pin;
     echo get_string( 'ivalid_mmogame_or_pin', 'mmogame', $data);
     die;
 }
-$rgame = $DB->get_record_select( 'mmogame', 'id=?', [$rinstance->mmogameid]);
 
 ?>
 <!DOCTYPE html>
@@ -51,7 +50,7 @@ $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$rinstance->mmogameid]);
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="MMOGAME Gate.">
-<title><?php echo $rinstance->name != '' ? $rinstance->name : $rgame->name; ?></title>
+<title><?php echo $rgame->name; ?></title>
 <style type="text/css">
 <?php echo file_get_contents( dirname(__FILE__)."/styles.css"); ?>
 </style>
@@ -64,23 +63,23 @@ $type = $game->get_type();
 $color = $DB->get_record_select( 'mmogame_aa_colorpalettes', 'id=?', [2]);
 $colors = "[$color->color1, $color->color2, $color->color3, $color->color4, $color->color5]";
 
-$usercode = $rinstance->kinduser == 'moodle' ? $USER->id : '0';
+$usercode = $rgame->kinduser == 'moodle' ? $USER->id : '0';
 
 echo "<script src=\"js/google.fastbutton.js\" async> </script>";
 
 echo "<script>\n";
-mmogame_change_javascript( $rinstance->type, 'js/mmogame.js');
-$class = 'mmogame'.ucfirst($rinstance->type).ucfirst($rinstance->model);
-mmogame_change_javascript( $rinstance->type, 'js/gate.js', '[CLASS]', $class);
-mmogame_change_javascript( $rinstance->type, "type/{$rinstance->type}/js/{$rinstance->type}.js");
-mmogame_change_javascript( $rinstance->type, "type/{$rinstance->type}/js/{$rinstance->type}_{$rinstance->model}.js");
+mmogame_change_javascript( $rgame->type, 'js/mmogame.js');
+$class = 'mmogame'.ucfirst($rgame->type).ucfirst($rgame->model);
+mmogame_change_javascript( $rgame->type, 'js/gate.js', '[CLASS]', $class);
+mmogame_change_javascript( $rgame->type, "type/{$rgame->type}/js/{$rgame->type}.js");
+mmogame_change_javascript( $rgame->type, "type/{$rgame->type}/js/{$rgame->type}_{$rgame->model}.js");
 
 ?>
     function runmmogame() {
         let game = new mmogameGate();
         game.repairColors( <?php echo $colors;?>)
         game.open(<?php echo "\"{$CFG->wwwroot}/mod/mmogame/json.php\",{$rgame->id},
-            {$rinstance->pin},{$usercode},\"{$rinstance->kinduser}\"" ?>);
+            {$rgame->pin},{$usercode},\"{$rgame->kinduser}\"" ?>);
     }
 </script>
 

@@ -40,23 +40,11 @@ class mmogame_quiz_alone extends mmogame_quiz {
      *
      * @param object $db (the database)
      * @param object $rgame (a record from table mmogame)
-     * @param object $rinstance (a record from table mmogame_aa_instances)
      */
-    public function __construct($db, $rgame, $rinstance) {
+    public function __construct($db, $rgame) {
         $this->callupdategrades = true;
 
-        if (isset( $rinstance->typeparams)) {
-            $params = json_decode( $rinstance->typeparams);
-
-            if (isset( $params->useshortanswer)) {
-                $rgame->useshortanswer = $params->useshortanswer;
-            }
-            if (isset( $params->usemultichoice)) {
-                $rgame->usemultichoice = $params->usemultichoice;
-            }
-        }
-
-        parent::__construct($db, $rgame, $rinstance, null);
+        parent::__construct($db, $rgame, null);
     }
 
     /**
@@ -66,8 +54,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
      */
     public function get_attempt() {
         $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts',
-            'ginstanceid=? AND numgame=? AND auserid=? AND timeanswer=0',
-            [$this->rinstance->id, $this->rinstance->numgame, $this->get_auserid()]);
+            'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
+            [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
 
         if ($attempt != false) {
             if ($attempt->timestart == 0) {
@@ -150,10 +138,10 @@ class mmogame_quiz_alone extends mmogame_quiz {
 
                 $sql = "SELECT COUNT(*) AS c ".
                     " FROM ".$this->get_db()->prefix."mmogame_aa_stats ".
-                    " WHERE ginstanceid=? AND numgame=? AND auserid=? AND NOT queryid IS NULL ".
+                    " WHERE mmogameid=? AND numgame=? AND auserid=? AND NOT queryid IS NULL ".
                     " AND countcorrect >= 2 * counterror AND countcorrect > 0";
                 $stat = $this->get_db()->get_record_sql(
-                    $sql, [$this->rinstance->id, $this->rinstance->numgame, $attempt->auserid]);
+                    $sql, [$this->rgame->id, $this->rgame->numgame, $attempt->auserid]);
                 $values = ['countcompleted' => $stat->c];
                 $this->qbank->update_stats( $attempt->auserid, null, null, 0,
                     $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0, $values);
@@ -190,8 +178,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
      * @return int (now uses negative grading, in the future user will can change it)
      */
     public function get_highscore($count, &$ret) {
-        $recs = $this->db->get_records_select( 'mmogame_aa_grades', 'ginstanceid=? AND numgame=? AND sumscore > 0',
-            [$this->rinstance->id, $this->rinstance->numgame], 'sumscore DESC', '*', 0, $count);
+        $recs = $this->db->get_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND sumscore > 0',
+            [$this->rgame->id, $this->rgame->numgame], 'sumscore DESC', '*', 0, $count);
         $map = [];
         $rank = 0;
         $prevscore = $prevrank = -1;
@@ -212,8 +200,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
 
             $map[$rec->auserid] = $data;
         }
-        $recs = $this->db->get_records_select( 'mmogame_aa_grades', 'ginstanceid=? AND numgame=? AND percentcompleted > 0',
-            [$this->rinstance->id, $this->rinstance->numgame], 'percentcompleted DESC', '*', 0, $count);
+        $recs = $this->db->get_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND percentcompleted > 0',
+            [$this->rgame->id, $this->rgame->numgame], 'percentcompleted DESC', '*', 0, $count);
         $prevscore = $prevrank = -1;
         $rank = 0;
         foreach ($recs as $rec) {
@@ -301,8 +289,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
             return false;
         }
 
-        if ($attempt->auserid != $this->auserid || $attempt->ginstanceid != $this->rinstance->id
-        || $attempt->numgame != $this->rinstance->numgame) {
+        if ($attempt->auserid != $this->auserid || $attempt->mmogameid != $this->rgame->id
+        || $attempt->numgame != $this->rgame->numgame) {
             return false;
         }
         $this->set_attempt( $attempt);

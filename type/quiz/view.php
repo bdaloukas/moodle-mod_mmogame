@@ -37,7 +37,7 @@ $PAGE->set_url('/mod/mmogame/view.php', ['id' => $cm->id]);
 require_once($CFG->dirroot."/mod/mmogame/model/{$model}.php");
 
 if (has_capability('mod/mmogame:manage', $context)) {
-    $url = $CFG->wwwroot.'/mod/mmogame/gate.php?id='.$mmogame->get_id().'&pin='.$mmogame->get_rinstance()->pin;
+    $url = $CFG->wwwroot.'/mod/mmogame/gate.php?id='.$mmogame->get_id().'&pin='.$mmogame->get_rgame()->pin;
     mmogame_quiz_manage( $id, $mmogame, $url);
 } else {
     redirect( $url);

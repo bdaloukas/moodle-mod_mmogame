@@ -116,7 +116,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $types = mmogame_get_types();
         $dir = __DIR__.'/type';
         $models = [];
-        foreach( $types as $type) {
+        foreach ($types as $type) {
             require_once( $dir.'/'.$type.'/lib.php');
             $function = 'mmogametype_'.$type.'_get_models';
             $map = $function();
@@ -275,17 +275,6 @@ class mod_mmogame_mod_form extends moodleform_mod {
         global $DB;
 
         $mmogameid = isset( $defaultvalues->id) ? $defaultvalues->id : 0;
-
-        if ($mmogameid != 0) {
-            $recs = $DB->get_records_select( 'mmogame_aa_instances', 'mmogameid=?',
-                [$mmogameid], 'id', '*', 0, 1);
-            if (count( $recs)) {
-                $instance = reset( $recs);
-                $defaultvalues->pin = $instance->pin;
-                $defaultvalues->enabled = $instance->enabled;
-                $defaultvalues->striptags = $instance->striptags;
-            }
-        }
 
         if (!isset( $defaultvalues->pin) || $defaultvalues->pin == 0) {
             $db = new mmogame_database_moodle();

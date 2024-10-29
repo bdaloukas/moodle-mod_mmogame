@@ -91,21 +91,21 @@ function get_data() {
 /**
  * Returns an array of existing avatars to select.
  *
- * @param object $game
+ * @param object $mmogame
  * @param object $data
  * @param array $ret (an array of string with exists avatars)
  */
-function dogetavatars( $game, $data, &$ret) {
+function dogetavatars( $mmogame, $data, &$ret) {
     if ($data->countavatars == 0) {
         $ret['countavatars'] = 0;
         return;
     }
-    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data, $game->get_rinstance());
+    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
-    $info = $game->get_avatar_info( $auserid);
+    $info = $mmogame->get_avatar_info( $auserid);
     $ret['nickname'] = $info->nickname;
 
-    $avatars = $game->get_avatars( $auserid);
+    $avatars = $mmogame->get_avatars( $auserid);
 
     $n = 0;
     if ($info->avatarid != 0 && array_key_exists( $info->avatarid, $avatars)) {
@@ -130,16 +130,16 @@ function dogetavatars( $game, $data, &$ret) {
 /**
  * Sets an avatar to a coresponding user.
  *
- * @param object $game
+ * @param object $mmogame
  * @param object $data
  * @param array $ret (an array containing the avatar and nickname)
  */
-function dosetavatar( $game, $data, &$ret) {
-    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data, $game->get_rinstance());
+function dosetavatar( $mmogame, $data, &$ret) {
+    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
-    $game->set_avatar( $auserid, $data->nickname, $data->avatarid);
+    $mmogame->set_avatar( $auserid, $data->nickname, $data->avatarid);
 
-    $info = $game->get_avatar_info( $auserid);
+    $info = $mmogame->get_avatar_info( $auserid);
     $ret['avatar'] = $info->avatar;
     $ret['nickname'] = $info->nickname;
 }
@@ -158,20 +158,20 @@ function usort_mmogame_palettes( $a, $b) {
 /**
  * Returns an array of existing color palettes to select.
  *
- * @param object $game
+ * @param object $mmogame
  * @param object $data
  * @param array $ret (an array of string with exists color palettes)
  */
-function dogetcolorpalettes( $game, $data, &$ret) {
+function dogetcolorpalettes( $mmogame, $data, &$ret) {
     if ($data->countcolors == 0) {
         $ret['countcolors'] = 0;
         return;
     }
 
-    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data, $game->get_rinstance());
+    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
-    $info = $game->get_avatar_info( $auserid);
-    $pals = $game->get_palettes( $auserid);
+    $info = $mmogame->get_avatar_info( $auserid);
+    $pals = $mmogame->get_palettes( $auserid);
 
     $pals2 = [];
 
@@ -191,14 +191,14 @@ function dogetcolorpalettes( $game, $data, &$ret) {
 /**
  * Sets a color palette to a coresponding user.
  *
- * @param object $game
+ * @param object $mmogame
  * @param object $data
  * @param array $ret (the value of key "colors" containg the 5 colors of palette)
  */
-function dosetcolorpalette( $game, $data, &$ret) {
-    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data, $game->get_rinstance());
+function dosetcolorpalette( $mmogame, $data, &$ret) {
+    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data);
 
-    $game->set_colorpalette( $auserid, $data->id);
+    $mmogame->set_colorpalette( $auserid, $data->id);
 
     $info = $game->get_avatar_info( $auserid);
     $ret['colors'] = implode( ',', $info->colors);

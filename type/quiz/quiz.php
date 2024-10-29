@@ -46,30 +46,11 @@ class mmogame_quiz extends mmogame {
      *
      * @param object $db (the database)
      * @param object $rgame (a record from table mmogame)
-     * @param object $rinstance (a record from table mmogame_aa_instances)
      */
-    public function __construct($db, $rgame, $rinstance) {
-        parent::__construct( $db, $rgame, $rinstance);
+    public static function get_new($db, $rgame) {
+        $function = 'mmogame_quiz_'.($rgame->model == '' ? 'alone' : $rgame->model);
 
-        if (isset( $rinstance->typeparams)) {
-            $params = json_decode( $rinstance->typeparams);
-            if (isset( $params->useshortanswer)) {
-                $rgame->useshortanswer = $params->useshortanswer;
-            }
-        }
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param object $db (the database)
-     * @param object $rgame (a record from table mmogame)
-     * @param object $rinstance (a record from table mmogame_aa_instances)
-     */
-    public static function get_new($db, $rgame, $rinstance) {
-        $function = 'mmogame_quiz_'.($rinstance->model == '' ? 'alone' : $rinstance->model);
-
-        return new $function( $db, $rgame, $rinstance, false);
+        return new $function( $db, $rgame, false);
     }
 
     /**
@@ -126,8 +107,6 @@ class mmogame_quiz extends mmogame {
      * @return object (the query of attempt)
      */
     public function append_json(&$ret, $attempt, $data) {
-        $rinstance = $this->get_rinstance();
-
         $auserid = $this->get_auserid();
 
         $info = $this->get_avatar_info( $auserid);
@@ -137,12 +116,12 @@ class mmogame_quiz extends mmogame {
         $ret['colors'] = implode( ',', $info->colors);
         $ret['usercode'] = $info->usercode;
 
-        $ret['fastjson'] = $rinstance->fastjson;
-        $ret['name'] = $rinstance->name;
+        $ret['fastjson'] = $this->rgame->fastjson;
+        $ret['name'] = $this->rgame->name;
         $ret['state'] = $this->rstate->state;
         $ret['rank'] = $this->get_rank_alone( $auserid, 'sumscore');
         $ret['sumscore'] = $info->sumscore;
-        $ret['timefastjson'] = $rinstance->timefastjson;
+        $ret['timefastjson'] = $this->rgame->timefastjson;
 
         $ret['percentcompleted'] = $info->percentcompleted;
         $ret['completedrank'] = $this->get_rank_alone( $auserid, 'percentcompleted');

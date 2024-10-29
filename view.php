@@ -45,7 +45,7 @@ if (! $mmogame = $DB->get_record('mmogame', ['id' => $cm->instance])) {
 // Check login and get context.
 require_login($course->id, false, $cm);
 
-$mmogame = mmogame::getgame_first( new mmogame_database_moodle(), $cm->instance);
+$mmogame = mmogame::getgame( new mmogame_database_moodle(), $cm->instance);
 
 if ($mmogame !== false) {
     require_once($CFG->dirroot.'/mod/mmogame/type/'.$mmogame->get_type().'/view.php');

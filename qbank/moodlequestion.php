@@ -85,7 +85,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
             return $ret;
         }
 
-        if ($this->mmogame->get_rinstance()->striptags) {
+        if ($this->mmogame->get_rgame()->striptags) {
             $ret->definition = strip_tags( $ret->definition);
         }
         if ($needname) {
@@ -110,7 +110,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
             [$query->questionid], 'fraction DESC', 'id,answer,fraction');
         unset( $query->correctid);
         $first = true;
-        $striptags = $this->mmogame->get_rinstance()->striptags;
+        $striptags = $this->mmogame->get_rgame()->striptags;
 
         foreach ($recs as $rec) {
             if ($striptags) {
