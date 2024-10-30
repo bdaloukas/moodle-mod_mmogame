@@ -28,10 +28,9 @@
  * Given an ID of an instance of this module, this function will permanently delete the instance and any data that depends on it.
  *
  * @param int $mmogameid (Id of the module instance)
- * @param int $instanceid
  * @return boolean Success/Failure
  **/
-function mmogametype_quiz_delete_instance( $mmogameid, $instanceid) {
+function mmogametype_quiz_delete_instance( $mmogameid) {
     global $DB;
 
     $a = ['mmogame_quiz_attempts'];

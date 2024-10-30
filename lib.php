@@ -132,7 +132,7 @@ function mmogame_delete_instance( $mmogameid) {
 
     $function = 'mmogametype_'.$rgame->type.'_delete_instance';
     require_once( $CFG->dirroot.'/mod/mmogame/type/'.$rgame->type.'/lib.php');
-    $function( $mmogameid, $instance->id);
+    $function( $mmogameid);
 
     $DB->delete_records_select( 'mmogame', 'id=?', [$mmogameid]);
 
