@@ -22,11 +22,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+define('NO_DEBUG_DISPLAY', true);
+define('ABORT_AFTER_CONFIG', true);
+define('CACHE_DISABLE_ALL', true);
+define('NO_MOODLE_COOKIES', true);
+define('NO_SESSION', true);
+define('AJAX_SCRIPT', true);
+define('NO_OUTPUT_BUFFERING', true);
+define('NO_CONFIG_CHECK', true);
+require('../../config.php');
+
 $fastjson = $_POST['fastjson'];
 $type = $_POST['type'];
 
 $ret = '';
-$filemain = $_POST['dataroot']. '/temp/mmogame/states/'.substr( $fastjson, -2) ."/{$fastjson}";
+$filemain = $CFG->dataroot. '/temp/mmogame/states/'.substr( $fastjson, -2) ."/{$fastjson}";
 if (!file_exists( $filemain.'.txt')) {
     return;
 }
