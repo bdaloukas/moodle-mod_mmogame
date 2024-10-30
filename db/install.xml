@@ -19,7 +19,6 @@
         <FIELD NAME="language" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="qbank" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="qbankparams" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="typeparams" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="modelparams" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="enablejson" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
@@ -30,7 +29,6 @@
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timelimit" TYPE="int" LENGTH="10" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numattempt" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
-        <FIELD NAME="typeparams" TYPE="text" NOTNULL="false"  SEQUENCE="false"/>
         <FIELD NAME="modelparams" TYPE="text" NOTNULL="false"  SEQUENCE="false"/>
         <FIELD NAME="fastjson" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="timefastjson" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>

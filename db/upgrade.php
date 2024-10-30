@@ -381,5 +381,16 @@ function xmldb_mmogame_upgrade( $oldversion) {
 
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
+
+    if ($oldversion < ($ver = 2024103100)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('typeparams');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
     return true;
 }
