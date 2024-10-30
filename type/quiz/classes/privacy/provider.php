@@ -26,6 +26,13 @@ namespace mod_mmogametype_quiz\privacy;
 use mod_mmogame\privacy\mmogame_plugin_request_data;
 use core_privacy\local\metadata\collection;
 
+/**
+ * Privacy class for requesting user data.
+ *
+ * @package    mmogametype_quiz
+ * @copyright  2024 Vasilis Daloukas
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class provider implements
     // This plugin does store personal user data.
     \core_privacy\local\metadata\provider,

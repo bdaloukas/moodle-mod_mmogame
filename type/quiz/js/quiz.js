@@ -31,7 +31,7 @@ class mmogameQuiz extends mmogame {
         var instance = this;
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                instance.onServerGetAttempt(JSON.parse(this.responseText), param, subcommand);
+                instance.onServerGetAttempt(JSON.parse(this.responseText), param);
             }
         };
 
@@ -46,7 +46,7 @@ class mmogameQuiz extends mmogame {
         xmlhttp.send(data);
     }
 
-    onServerGetAttempt(json, param, subcommand) {
+    onServerGetAttempt(json, param) {
         this.computeDifClock(json);
 
         if (this.colors == undefined) {

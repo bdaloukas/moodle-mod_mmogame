@@ -276,6 +276,9 @@ class mod_mmogame_mod_form extends moodleform_mod {
 
         $mmogameid = isset( $defaultvalues->id) ? $defaultvalues->id : 0;
 
+        if( isset( $defaultvalues->type) && isset( $defaultvalues->model)) {
+            $defaultvalues->typemodel = $defaultvalues->type.'-'.$defaultvalues->model;
+        }
         if (!isset( $defaultvalues->pin) || $defaultvalues->pin == 0) {
             $db = new mmogame_database_moodle();
             $defaultvalues->pin = mmogame::get_newpin( $mmogameid, $db, MMOGAME_PIN_DIGITS);

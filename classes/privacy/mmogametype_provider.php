@@ -27,8 +27,13 @@ namespace mod_mmogame\privacy;
 
 use core_privacy\local\request\contextlist;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Privacy class for requesting user data.
+ *
+ * @package    mod_mmogame
+ * @copyright  2024 Vasilis Daloukas
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 interface mmogametype_provider extends \core_privacy\local\request\plugin\subplugin_provider {
 
     /**
