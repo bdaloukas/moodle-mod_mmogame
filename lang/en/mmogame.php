@@ -72,7 +72,6 @@ $string['numquestions'] = 'Number of questions';
 $string['pluginadministration'] = 'MMOGame administration';
 $string['pluginname'] = 'MMOGame';
 $string['privacy:metadata:mmogame_aa_grades'] = 'Grades';
-$string['privacy:metadata:mmogame_grades:auserid'] = 'The user';
 $string['privacy:metadata:mmogame_grades:avatar'] = 'The avatar that is used';
 $string['privacy:metadata:mmogame_grades:colorpalette'] = 'The color palette that is used';
 $string['privacy:metadata:mmogame_grades:mmogame'] = 'The mmoGame activity';

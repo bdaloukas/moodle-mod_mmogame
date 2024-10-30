@@ -9,7 +9,6 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="ginstanceid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="auserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numgame" TYPE="int" LENGTH="10" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numteam" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -32,7 +31,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="auserid" UNIQUE="false" FIELDS="auserid"/>
-        <INDEX NAME="ginstanceidnumattempt" UNIQUE="false" FIELDS="ginstanceid,numattempt"/>
+        <INDEX NAME="mmogameidnumattempt" UNIQUE="false" FIELDS="mmogameid,numattempt"/>
       </INDEXES>
     </TABLE>
 

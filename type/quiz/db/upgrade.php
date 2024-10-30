@@ -50,5 +50,38 @@ function xmldb_mmogametype_quiz_upgrade( $oldversion) {
 
     $dbman = $DB->get_manager();
 
+    if ($oldversion < ($ver = 2024103001)) {
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $index = new xmldb_index('ginstanceidnumattempt', XMLDB_INDEX_NOTUNIQUE, ['ginstanceid', 'numattempt']);
+
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2024103002)) {
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $index = new xmldb_index('mmogameidnumattempt', XMLDB_INDEX_NOTUNIQUE, ['mmogameid', 'numattempt']);
+
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
+        }
+
+         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2024103003)) {
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('ginstanceid');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
     return true;
 }

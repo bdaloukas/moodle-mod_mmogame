@@ -63,12 +63,11 @@ class provider implements
     public static function get_metadata(collection $items): collection {
         // The table 'mmogame' stores a record for each mmogame.
         // It does not contain user personal data, but data is returned from it for contextual requirements.
-error_log("mmogame.get_metadata");
+
         // The table 'mmogame_aa_grades' contains the current grade for each game/user combination.
         $items->add_database_table('mmogame_aa_grades', [
                 'mmogame' => 'privacy:metadata:mmogame_grades:mmogame',
                 'numgame' => 'privacy:metadata:mmogame_grades:numgame',
-                'auserid' => 'privacy:metadata:mmogame_grades:auserid',
                 'avatar' => 'privacy:metadata:mmogame_grades:avatar',
                 'nickname' => 'privacy:metadata:mmogame_grades:nickaname',
                 'colorpalette' => 'privacy:metadata:mmogame_grades:colorpalette',
@@ -79,7 +78,6 @@ error_log("mmogame.get_metadata");
                 'numteam' => 'privacy:metadata:mmogame_grades:numteam',
                 'timemodified' => 'privacy:metadata:mmogame_grades:timemodified',
             ], 'privacy:metadata:mmogame_aa_grades');
-        );
 
         return $items;
     }
