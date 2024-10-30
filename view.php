@@ -25,11 +25,9 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 
 require_once($CFG->libdir.'/gradelib.php');
-require_once($CFG->dirroot.'/mod/mmogame/locallib.php');
 require_once($CFG->dirroot.'/mod/mmogame/database/moodle.php');
 
 require_once(dirname(__FILE__) . '/mmogame.php');
-require_once(dirname(__FILE__) . '/locallib.php');
 $id = required_param('id', PARAM_INT); // Is mmoGame Module ID.
 
 if (! $cm = get_coursemodule_from_id('mmogame', $id)) {

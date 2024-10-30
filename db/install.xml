@@ -43,7 +43,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="kind" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="lastlogin" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="lastip" TYPE="char" LENGTH="15" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>

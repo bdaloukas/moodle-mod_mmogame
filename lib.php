@@ -22,6 +22,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+define( 'MMOGAME_QBANK_MOODLEQUESTION', 'moodlequestion');
+define( 'MMOGAME_QBANK_MOODLEGLOSSARY', 'moodleglossary');
+define( 'MMOGAME_QBANK_NONE', 'none');
+define( 'MMOGAME_QBANK_NUM_CATEGORIES', 3);
+
 /**
  * Returns the context instance of a Module. Is the same for all version of Moodle.
  *
@@ -91,14 +96,21 @@ function mmogame_add_instance( $mform) {
             $mform->fastjson = random_int(1000000000, 9999999999); // Generates a 10-digit number.
 
             // Check if the number already exists in the database.
-            if ($DB->db->get_record_select('mmogame', 'fastjson=?', [$mform->fastjson]) === false) {
+            if ($DB->get_record_select('mmogame', 'fastjson=?', [$mform->fastjson]) === false) {
                 break;
             }
         }
-
-        $mform->fastjson = mmogame::get_new_fastjson();
     }
 
+    if( !isset( $mform->numgame)) {
+        $mform->numgame = 1;
+    }
+    if( !isset( $mform->numattempt)) {
+        $mform->numattempt = 1;
+    }
+    if( !isset( $mform->timefastjson)) {
+        $mform->timefastjson = 0;
+    }
     $mform->id = $DB->insert_record("mmogame", $mform);
 
     return $mform->id;
@@ -210,4 +222,67 @@ function mmogame_update_instance( $mmogame) {
     }
 
     return true;
+}
+
+/**
+ * Returns a unique guid string version 4.
+ *
+ * @param boolean $trim
+ * @return string (the guid)
+ */
+function mmogame_guidv4($trim = true) {
+    // Windows.
+    if (function_exists('com_create_guid') === true) {
+        if ($trim) {
+            return trim(com_create_guid(), '{}');
+        } else {
+            return com_create_guid();
+        }
+    }
+
+    // OSX/Linux.
+    if (function_exists('openssl_random_pseudo_bytes') === true) {
+        $data = openssl_random_pseudo_bytes(16);
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // Set version to 0100.
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // Set bits 6-7 to 10.
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    // Fallback (PHP 4.2+).
+    mt_srand((double)microtime() * 10000);
+    $charid = strtolower(md5(uniqid(rand(), true)));
+    $hyphen = chr(45);                  // Is "-".
+    $lbrace = $trim ? "" : chr(123);    // Is "{".
+    $rbrace = $trim ? "" : chr(125);    // Is "}".
+    $guidv4 = $lbrace.
+              substr($charid,  0,  8).$hyphen.
+              substr($charid,  8,  4).$hyphen.
+              substr($charid, 12,  4).$hyphen.
+              substr($charid, 16,  4).$hyphen.
+              substr($charid, 20, 12).
+              $rbrace;
+    return $guidv4;
+}
+
+/**
+ * Returns a list of sub-plugins.
+ *
+ * @return array of strings
+ */
+function mmogame_get_types() {
+    $dir = __DIR__.'/type';
+    $types = [];
+    if (is_dir($dir)) {
+        $files = scandir($dir);
+
+        foreach ($files as $file) {
+            if ($file != "." && $file != "..") {
+                if (is_dir( $dir.'/'.$file)) {
+                    $types[] = $file;
+                }
+            }
+        }
+    }
+
+    return $types;
 }

@@ -30,7 +30,6 @@ define( 'MMOGAME_KINDUSER_GUID', 'guid');
 define( 'MMOGAME_KINDUSER_MOODLE', 'moodle');
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
-require_once($CFG->dirroot . '/mod/mmogame/locallib.php');
 
 require_once($CFG->dirroot . '/mod/mmogame/database/moodle.php');
 require_once($CFG->dirroot . '/mod/mmogame/mmogame.php');

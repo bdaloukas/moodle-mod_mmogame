@@ -30,7 +30,6 @@ define( 'ERRORCODE_NO_QUERIES', 'no_questions');
 define( 'ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');
 
 require_once(dirname(__FILE__) . '/lib.php');
-require_once(dirname(__FILE__) . '/../../locallib.php');
 
 /**
  * The class mmogame_quiz play the game Quiz.
