@@ -31,7 +31,7 @@ define('AJAX_SCRIPT', true);
 define('NO_OUTPUT_BUFFERING', true);
 define('NO_CONFIG_CHECK', true);
 require('../../config.php');
-            
+
 $fastjson = \core\param::from_type( \core\param::INT->value)->required_param( 'fastjson');
 $type = \core\param::from_type( \core\param::ALPHA->value)->required_param( 'type');
 

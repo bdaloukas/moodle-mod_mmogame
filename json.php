@@ -23,8 +23,8 @@
  */
 
 define( 'AJAX_SCRIPT', 1);
+define('NO_MOODLE_COOKIES', true);
 
-$timestart = microtime( true);
 require( "../../config.php");
 require_once( 'database/moodle.php');
 require_once(dirname(__FILE__) . '/mmogame.php');

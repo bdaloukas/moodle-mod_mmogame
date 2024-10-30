@@ -22,9 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-?>
-<?php
-
+define('NO_MOODLE_COOKIES', true);
 require( "../../config.php");
 
 require_once( 'database/moodle.php');
