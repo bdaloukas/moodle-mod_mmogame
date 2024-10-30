@@ -831,7 +831,7 @@ class mmogame {
      *
      * @param int $mmogameid
      * @param object $db
-     * @param $digits (number of digits for new pin)
+     * @param int $digits (number of digits for new pin)
      * @return int (the new pin)
      */
     public static function get_newpin($mmogameid, $db, $digits) {

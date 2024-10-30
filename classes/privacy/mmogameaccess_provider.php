@@ -42,14 +42,14 @@ interface mmogameaccess_provider extends \core_privacy\local\request\plugin\subp
      * @param   \stdClass       $user The user to export data for
      * @return  \stdClass       The data to be exported for this access rule.
      */
-    public static function export_mmogameaccess_user_data(\game $mmogame, \stdClass $user): \stdClass;
+    public static function export_mmogameaccess_user_data(\mmogame $mmogame, \stdClass $user): \stdClass;
 
     /**
      * Delete all data for all users in the specified game.
      *
      * @param   \mmogame           $mmogame The mmogame being deleted
      */
-    public static function delete_mmogameaccess_data_for_all_users_in_context(\game $mmogame);
+    public static function delete_mmogameaccess_data_for_all_users_in_context(\mmogame $mmogame);
 
     /**
      * Delete all user data for the specified user, in the specified mmogame.

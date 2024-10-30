@@ -623,12 +623,7 @@ class mmogameGate extends mmogame {
 
     onServerGetAttempt(json, auserid) {
         if (json.errorcode != undefined) {
-            if (json.errorcode == 'invalidauser') {
-                alert(json.errorcode + " " + auserid);
-                return;
-            } else {
-                alert("Problem " + json.errorcode + "#");
-            }
+            return;
         }
         let game = new [CLASS]();
         game.openGame(this.url, this.mmogameid, this.pin, auserid, this.kinduser, false);

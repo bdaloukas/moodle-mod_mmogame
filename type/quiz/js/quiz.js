@@ -438,7 +438,7 @@ class mmogameQuiz extends mmogame {
         xmlhttp.send(data);
     }
 
-    sendTimeout(submit) {
+    sendTimeout() {
         var xmlhttp = new XMLHttpRequest();
         var instance = this;
         xmlhttp.onreadystatechange = function() {

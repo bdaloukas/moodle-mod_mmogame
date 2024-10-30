@@ -389,9 +389,6 @@ class mmogameQuizAduel extends mmogameQuiz {
             let width = this.labelWidth;
             let height = this.aItemLabel[i].scrollHeight;
 
-            if (iscorrect) {
-                this.aItemLabel[i].innerHTML = '<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>';
-            }
             let move = (iscorrect2 != undefined ? 2 : 1) * this.radioSize;
             if (iscorrect1 == undefined && iscorrect2 == undefined) {
                 move = 0;
@@ -404,22 +401,30 @@ class mmogameQuizAduel extends mmogameQuiz {
             this.aItemLabel[i].style.width = width + "px";
             this.autoResizeText(this.aItemLabel[i], width, height, true, this.minFontSize, this.maxFontSize, 0.5);
 
-            if (iscorrect1 != undefined) {
-                let t = parseInt(this.aItemAnswer[i].style.top);
-                let div = this.createDiv(this.area, this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
-                div.title = iscorrect1 ? '[LANG_CORRECT_ANSWER]' : '[LANG_WRONG_ANSWER]';
-                div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorScore, this.colorScore);
-            }
-
-            if (iscorrect2 != undefined) {
-                let t = parseInt(this.aItemAnswer[i].style.top);
-                let div = this.createDiv(this.area, this.aItemCorrectX[i] + this.radioSize, t, this.radioSize, this.radioSize);
-                div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect2, this.colorScore2, this.colorScore2);
-                div.title = iscorrect2 ? '[LANG_CORRECT_ANSWER]' : '[LANG_WRONG_ANSWER]';
-            }
+            this->onServerAnswerMultichoiceShowCorrect( i, iscorrect1, iscorrect2);
         }
 
         this.playAudio(foundCorrect ? this.audioYes : this.audioNo);
+    }
+    
+    onServerAnswerMultichoiceShowCorrect( i, iscorrect1, iscorrect2, iscorrect) {
+        if (iscorrect) {
+            this.aItemLabel[i].innerHTML = '<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>';
+        }
+
+        if (iscorrect1 != undefined) {
+            let t = parseInt(this.aItemAnswer[i].style.top);
+            let div = this.createDiv(this.area, this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
+            div.title = iscorrect1 ? '[LANG_CORRECT_ANSWER]' : '[LANG_WRONG_ANSWER]';
+            div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorScore, this.colorScore);
+        }
+
+        if (iscorrect2 != undefined) {
+            let t = parseInt(this.aItemAnswer[i].style.top);
+            let div = this.createDiv(this.area, this.aItemCorrectX[i] + this.radioSize, t, this.radioSize, this.radioSize);
+            div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect2, this.colorScore2, this.colorScore2);
+            div.title = iscorrect2 ? '[LANG_CORRECT_ANSWER]' : '[LANG_WRONG_ANSWER]';
+        }
     }
 
     showCorrectAnswer(json) {
