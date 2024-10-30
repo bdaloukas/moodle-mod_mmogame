@@ -26,5 +26,5 @@ defined('MOODLE_INTERNAL') || die;
     // General settings.
 
     // Time limit.
-    $settings->add(new admin_setting_configtext('mmogame_quiz/timelimit', get_string('timelimit', 'mmogame'),
+    $settings->add(new admin_setting_configtext('mmogametype_quiz/timelimit', get_string('timelimit', 'mmogame'),
             get_string('timelimit', 'mmogame'), 15, PARAM_INT));
