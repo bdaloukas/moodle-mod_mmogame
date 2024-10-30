@@ -57,10 +57,8 @@ class mmogameModel_aduel {
     public static function json_setadmin($data, $game) {
         $ret = [];
         if (isset( $data->numgame) && $data->numgame > 0) {
-            $instance->numgame = $data->numgame;
             $game->get_rstate()->state = 0;
-            $game->get_db()->update_record( 'mmogame_aa_instances',
-                ['id' => $instance->id, 'numgame' => $instance->numgame]);
+            $game->get_db()->update_record( 'mmogame', ['id' => $game->get_id(), 'numgame' => $data->numgame]);
             $game->update_state( $game->get_rstate()->state);
             $game->set_state_json( $game->get_rstate()->state, $ret);
         } else if (isset( $data->state)) {

@@ -113,17 +113,14 @@ function mmogame_add_instance( $mform) {
 function mmogame_delete_instance( $mmogameid) {
     global $CFG, $DB;
 
-    $mmogame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid]);
-    if ($mmogame === false) {
+    $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid]);
+    if ($rgame === false) {
         return true;
     }
 
-    $instances = $DB->get_records_select( 'mmogame_aa_instances', 'mmogameid=?', [$mmogameid]);
-    foreach ($instances as $instance) {
-        $function = 'mmogametype_'.$instance->type.'_delete_instance';
-        require_once( $CFG->dirroot.'/mod/mmogame/type/'.$instance->type.'/lib.php');
-        $function( $mmogameid, $instance->id);
-    }
+    $function = 'mmogametype_'.$rgame->type.'_delete_instance';
+    require_once( $CFG->dirroot.'/mod/mmogame/type/'.$rgame->type.'/lib.php');
+    $function( $mmogameid, $instance->id);
 
     $DB->delete_records_select( 'mmogame', 'id=?', [$mmogameid]);
 

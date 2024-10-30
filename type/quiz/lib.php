@@ -55,10 +55,9 @@ function mmogametype_quiz_reset_userdata( $data, $ids) {
     }
 
     if (!empty($data->reset_mmogame_deleted_course)) {
-        $a = ['mmogame_aa_instances', 'mmogame_quiz_alone_attempts'];
-        $field = '';
+        $a = ['mmogame_quiz_attempts'];
+        $field = 'mmogameid';
         foreach ($a as $table) {
-            $field = ($field == '' ? 'id' : 'mmogameid');
             $DB->delete_records_select( $table,
                 "NOT EXISTS( SELECT * FROM {mmogame} g WHERE {$CFG->prefix}{$table}.{$field}=g.id)");
         }
