@@ -29,7 +29,6 @@
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timelimit" TYPE="int" LENGTH="10" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numattempt" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
-        <FIELD NAME="modelparams" TYPE="text" NOTNULL="false"  SEQUENCE="false"/>
         <FIELD NAME="fastjson" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="timefastjson" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
 		<FIELD NAME="striptags" TYPE="int" LENGTH="1" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>        
