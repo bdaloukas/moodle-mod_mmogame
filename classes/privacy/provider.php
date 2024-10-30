@@ -107,7 +107,7 @@ class provider implements
             'userid'  => $userid,
         ];
 
-        $contextlist->add_from_sql($sql, $params);
+        $resultset->add_from_sql($sql, $params);
 
         return $resultset;
     }
