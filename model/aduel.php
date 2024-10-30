@@ -251,7 +251,7 @@ class mmogameModel_aduel {
         } else {
             $a['isclosed2'] = 1;
         }
-        $game->get_db()->update_record( 'mmogame_am_aduel_pairs', $a);
+        $mmogame->get_db()->update_record( 'mmogame_am_aduel_pairs', $a);
 
         return false;
     }

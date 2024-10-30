@@ -569,7 +569,6 @@ class mmogameQuiz extends mmogame {
             let data = new FormData();
             data.set('fastjson', instance.fastjson);
             data.set('type', instance.type);
-            data.set('dataroot', instance.dataroot);
 
             xmlhttp.send(data);
         }, 1000);
@@ -663,10 +662,6 @@ class mmogameQuizAlone extends mmogameQuiz {
     }
 
     onServerGetAttempt(json, param) {
-        if (json.dataroot != undefined) {
-            this.dataroot = json.dataroot;
-        }
-
         if (json.state == 0 && param == undefined) {
             json.qtype = '';
             super.onServerGetAttempt(json, param);

@@ -25,7 +25,7 @@
 ?>
 <?php
 
-require_once( dirname(__FILE__)."/../../config.php");
+require( "../../config.php");
 
 require_once( 'database/moodle.php');
 require_once(dirname(__FILE__) . '/mmogame.php');

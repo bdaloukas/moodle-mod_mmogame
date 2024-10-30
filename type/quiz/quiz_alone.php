@@ -76,7 +76,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
      * @param array $ret
      */
     public function set_state_json($state, &$ret) {
-        $timefastjson = round( microtime( true), 6);
+        $timefastjson = round( 10 * microtime( true));
 
         $statecontents = $state . "-" . $timefastjson;
         $filecontents = '';

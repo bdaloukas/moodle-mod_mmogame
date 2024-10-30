@@ -41,7 +41,6 @@ function mmogame_json_quiz_getattempt($data, $mmogame, &$ret) {
     }
     $mmogame->login_user( $auserid);
 
-    $ret['dataroot'] = $CFG->dataroot;
     $ret['type'] = $mmogame->get_type();
     $ret['model'] = $mmogame->get_model();
 

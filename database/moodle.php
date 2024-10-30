@@ -189,7 +189,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $sql
      * @param array $params
      * @param int $limitfrom
-     * @param int $limitto
+     * @param int $limitnum
      * @return array
      */
     public function get_records_sql($sql, ?array $params=null, $limitfrom=0, $limitnum=0) {

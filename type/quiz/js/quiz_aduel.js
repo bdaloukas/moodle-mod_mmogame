@@ -135,9 +135,6 @@ class mmogameQuizAduel extends mmogameQuiz {
         if (this.buttonHighScore != undefined) {
             this.buttonHighScore.style.visibility = 'hidden';
         }
-        if (json.dataroot != undefined) {
-            this.dataroot = json.dataroot;
-        }
         this.computeDifClock(json);
         this.timefastjson = json.timefastjson;
         this.fastjson = json.fastjson;
@@ -406,8 +403,8 @@ class mmogameQuizAduel extends mmogameQuiz {
 
         this.playAudio(foundCorrect ? this.audioYes : this.audioNo);
     }
-    
-    onServerAnswerMultichoiceShowCorrect( i, iscorrect1, iscorrect2, iscorrect) {
+
+    onServerAnswerMultichoiceShowCorrect(i, iscorrect1, iscorrect2, iscorrect) {
         if (iscorrect) {
             this.aItemLabel[i].innerHTML = '<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>';
         }

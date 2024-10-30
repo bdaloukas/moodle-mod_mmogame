@@ -34,8 +34,6 @@ use core_privacy\local\request\deletion_criteria;
 use core_privacy\local\metadata\collection;
 use core_privacy\manager;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy Subsystem implementation for mod_mmogame.
  *
