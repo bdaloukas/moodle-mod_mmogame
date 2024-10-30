@@ -63,22 +63,21 @@ class provider implements
     public static function get_metadata(collection $items): collection {
         // The table 'mmogame' stores a record for each mmogame.
         // It does not contain user personal data, but data is returned from it for contextual requirements.
-
+error_log("mmogame.get_metadata");
         // The table 'mmogame_aa_grades' contains the current grade for each game/user combination.
         $items->add_database_table('mmogame_aa_grades', [
                 'mmogame' => 'privacy:metadata:mmogame_grades:mmogame',
-                'ginstance' => 'privacy:metadata:mmogame_grades:ginstance',
                 'numgame' => 'privacy:metadata:mmogame_grades:numgame',
                 'auserid' => 'privacy:metadata:mmogame_grades:auserid',
                 'avatar' => 'privacy:metadata:mmogame_grades:avatar',
                 'nickname' => 'privacy:metadata:mmogame_grades:nickaname',
                 'colorpalette' => 'privacy:metadata:mmogame_grades:colorpalette',
                 'usercode' => 'privacy:metadata:mmogame_grades:usercode',
-                'sumscore' => 'privacy:metadata:game_grades:sumscore',
-                'score' => 'privacy:metadata:game_grades:score',
-                'sumscore2' => 'privacy:metadata:game_grades:sumscore2',
-                'numteam' => 'privacy:metadata:game_grades:numteam',
-                'timemodified' => 'privacy:metadata:game_grades:timemodified',
+                'sumscore' => 'privacy:metadata:mmogame_grades:sumscore',
+                'score' => 'privacy:metadata:mmogame_grades:score',
+                'sumscore2' => 'privacy:metadata:mmogame_grades:sumscore2',
+                'numteam' => 'privacy:metadata:mmogame_grades:numteam',
+                'timemodified' => 'privacy:metadata:mmogame_grades:timemodified',
             ], 'privacy:metadata:mmogame_aa_grades');
         );
 
@@ -96,6 +95,22 @@ class provider implements
 
         $resultset = new contextlist();
 
+        $sql = "SELECT DISTINCT c.id
+                FROM {context} c
+            INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {mmogame} game ON game.id = cm.instance
+            INNER JOIN {mmogame_aa_grades} mg ON mg.mmogameid = game.id
+            INNER JOIN {mmogame_aa_users} mu ON mu.kind=:kinduser AND mu.instance=:userid
+            WHERE mg.userid=mu.id";
+        $params = [
+            'modname'           => 'mmogame',
+            'contextlevel'      => CONTEXT_MODULE,
+            'userid'  => $userid,
+        ];
+
+        $contextlist->add_from_sql($sql, $params);
+
         return $resultset;
     }
 
@@ -110,6 +125,51 @@ class provider implements
         if (!count($contextlist)) {
             return;
         }
+
+        $user = $contextlist->get_user();
+        $userid = $user->id;
+        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+
+        $sql = "SELECT
+                    g.*,
+                    gg.id AS hasgrade,
+                    gg.score AS bestscore,
+                    gg.timemodified AS grademodified,
+                    c.id AS contextid,
+                    cm.id AS cmid
+                  FROM {context} c
+            INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {mmogame} g ON g.id = cm.instance
+             LEFT JOIN {mmogame_aa_grades} gg ON gg.mmogameid = g.id AND gg.userid = :userid
+                 WHERE c.id {$contextsql}";
+
+        $params = [
+            'contextlevel' => CONTEXT_MODULE,
+            'modname' => 'mmogame',
+            'userid' => $userid,
+        ];
+        $params += $contextparams;
+
+        // Fetch the individual games.
+        $games = $DB->get_recordset_sql($sql, $params);
+        foreach ($games as $game) {
+            list($course, $cm) = get_course_and_cm_from_cmid($game->cmid, 'game');
+            $context = mmogame_get_context_module_instance( $cm->id);
+
+            $gamedata = \core_privacy\local\request\helper::get_context_data($context, $contextlist->get_user());
+
+            \core_privacy\local\request\helper::export_context_files($context, $contextlist->get_user());
+
+            $gamedata->accessdata = (object) [];
+
+            if (empty((array) $gamedata->accessdata)) {
+                unset($gamedata->accessdata);
+            }
+
+            writer::with_context($context)->export_data([], $gamedata);
+        }
+        $games->close();
     }
 
     /**
@@ -162,15 +222,6 @@ class provider implements
     }
 
     /**
-     * Store all mmogame attempts for the contextlist.
-     *
-     * @param   approved_contextlist    $contextlist
-     */
-    protected static function export_mmogame_attempts(approved_contextlist $contextlist) {
-
-    }
-
-    /**
      * Get the list of users who have data within a context.
      *
      * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
@@ -181,6 +232,24 @@ class provider implements
         if (!$context instanceof \context_module) {
             return;
         }
+
+        $params = [
+            'contextid' => $context->id,
+            'contextlevel' => CONTEXT_MODULE,
+            'modname' => 'mmogame',
+        ];
+
+        // Find users with mmogame grades.
+        $sql = "SELECT au.instance as userid
+                    FROM {context} c
+                    JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+                    JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                    JOIN {mmogame} game ON game.id = cm.instance
+                    JOIN {mmogame_aa_grades} ga ON ga.mmogameid = game.id
+                    JOIN {mmogame_aa_users} au ON au.kind='moodle' AND au.id=ga.auserid
+                WHERE c.id = :contextid";
+
+        $userlist->add_from_sql('userid', $sql, $params);
     }
 
 
