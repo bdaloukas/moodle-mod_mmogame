@@ -148,17 +148,6 @@ function xmldb_mmogame_upgrade( $oldversion) {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2024102822)) {
-        $table = new xmldb_table('mmogame_aa_users_code');
-        $index = new xmldb_index('ginstanceid_code', XMLDB_INDEX_UNIQUE, ['ginstanceid', 'code']);
-
-        if (!$DB->get_manager()->index_exists($table, $index)) {
-            $DB->get_manager()->add_index($table, $index);
-        }
-
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
-    }
-
     if ($oldversion < ($ver = 2024102900)) {
         $table = new xmldb_table('mmogame_aa_grades');
         $index = new xmldb_index('ginstanceidnumgameauserid', XMLDB_INDEX_UNIQUE, ['ginstanceid', 'numgame', 'auserid']);
