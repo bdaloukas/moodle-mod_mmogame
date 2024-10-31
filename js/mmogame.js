@@ -460,7 +460,7 @@ class mmogame {
         }
         return s;
     }
-    
+
     uuid4() {
         const uuid = new Array(36);
 

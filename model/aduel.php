@@ -191,7 +191,7 @@ class mmogameModel_aduel {
      * @param boolean $isclosed1 Indicates if the first player's duel is closed.
      * @param boolean $isclosed2 Indicates if the second player's duel is closed.
      * @param int $scorewin The score awarded if the first player wins.
-     * @param int $scoreloss The score awarded if the first player loses.
+     * @param int $scorelose The score awarded if the first player loses.
      * @param int $scoredraw The score awarded if the duel ends in a draw.
      * @param int $adueladdscore The score to be added for the duel, passed by reference.
      * @return int The score of the current user based on the outcome of the attempt.
