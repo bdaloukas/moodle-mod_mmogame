@@ -615,7 +615,7 @@ class mmogameGate extends mmogame {
             "user": auserid, "nickname": nickname, "paletteid": paletteid, "avatarid": avatarid,
             "maxwidth": this.maxImageWidth, "maxheight": this.maxImageHeight};
         if (this.helpurl == undefined) {
-            d['helpurl'] = 1;
+            d.helpurl = 1;
         }
         let data = JSON.stringify(d);
         xmlhttp.send(data);

@@ -105,11 +105,11 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Return a single database record as an object where the given conditions are used in the WHERE clause.
      *
-     * @param string $table
-     * @param string $select
-     * @param array $params
-     * @param string $fields
-     * @return object
+     * @param string $table The name of the database table.
+     * @param string $select The SQL condition to use in the WHERE clause.
+     * @param array|null $params Optional parameters for the SQL condition.
+     * @param string $fields Fields to return, defaults to '*'.
+     * @return object|false The database record as an object, or false if not found.
      */
     public function get_record_select($table, $select, ?array $params=null, $fields='*') {
         global $DB;
@@ -118,14 +118,14 @@ class mmogame_database_moodle extends mmogame_database {
     }
 
     /**
-     * Returns the first record of given creteria.
+     * Returns the first record that matches the given criteria.
      *
-     * @param string $table
-     * @param string $select
-     * @param array $params
-     * @param string $sort
-     * @param string $fields
-     * @return object
+     * @param string $table The name of the database table.
+     * @param string $select The SQL condition for the WHERE clause.
+     * @param array|null $params Optional parameters for the SQL condition.
+     * @param string $sort Optional sorting order.
+     * @param string $fields The fields to return, default is '*'.
+     * @return object|false The first matching database record as an object, or false if no record is found.
      */
     public function get_record_select_first($table, $select, ?array $params=null, $sort='', $fields='*') {
         global $DB;
@@ -138,16 +138,16 @@ class mmogame_database_moodle extends mmogame_database {
     }
 
     /**
-     * Return a list of records as an array of objects where the given conditions are used in the WHERE clause.
+     * Returns a list of records as an array of objects where the specified conditions are used in the WHERE clause.
      *
-     * @param string $table
-     * @param string $select
-     * @param array $params
-     * @param string $sort
-     * @param string $fields
-     * @param int $limitfrom
-     * @param int $limitto
-     * @return object
+     * @param string $table The name of the database table.
+     * @param string $select The SQL condition for the WHERE clause.
+     * @param array|null $params Optional parameters for the SQL condition.
+     * @param string $sort Optional sorting order.
+     * @param string $fields The fields to return, default is '*'.
+     * @param int $limitfrom The starting point of records to return, default is 0.
+     * @param int $limitnum The number of records to return, default is 0 (no limit).
+     * @return array An array of database records as objects.
      */
     public function get_records_select($table, $select, ?array $params=null, $sort='', $fields='*', $limitfrom=0, $limitnum=0) {
         global $DB;
@@ -171,11 +171,11 @@ class mmogame_database_moodle extends mmogame_database {
     }
 
     /**
-     * Return a single database record as an object using a custom SELECT query.
+     * Returns a single database record as an object using a custom SELECT query.
      *
-     * @param string $sql
-     * @param array $params
-     * @return object
+     * @param string $sql The custom SQL SELECT query to execute.
+     * @param array|null $params Optional parameters for the SQL query.
+     * @return object|false The database record as an object, or false if no record is found.
      */
     public function get_record_sql($sql, ?array $params=null) {
         global $DB;
@@ -184,13 +184,13 @@ class mmogame_database_moodle extends mmogame_database {
     }
 
     /**
-     * Return a list of records as an array of objects using a custom SELECT query.
+     * Returns a list of records as an array of objects using a custom SELECT query.
      *
-     * @param string $sql
-     * @param array $params
-     * @param int $limitfrom
-     * @param int $limitnum
-     * @return array
+     * @param string $sql The custom SQL SELECT query to execute.
+     * @param array|null $params Optional parameters for the SQL query.
+     * @param int $limitfrom The starting point of records to return, default is 0.
+     * @param int $limitnum The number of records to return, default is 0 (no limit).
+     * @return array An array of database records as objects.
      */
     public function get_records_sql($sql, ?array $params=null, $limitfrom=0, $limitnum=0) {
         global $DB;
@@ -216,11 +216,12 @@ class mmogame_database_moodle extends mmogame_database {
     }
 
     /**
-     * Delete records from the table where the given conditions are used in the WHERE clause.
+     * Deletes records from the specified table where the given conditions are used in the WHERE clause.
      *
-     * @param string $table
-     * @param string $select
-     * @param array $params
+     * @param string $table The name of the database table.
+     * @param string $select The SQL condition for the WHERE clause.
+     * @param array|null $params Optional parameters for the SQL condition.
+     * @return void
      */
     public function delete_records_select($table, $select, ?array $params=null) {
         global $DB;

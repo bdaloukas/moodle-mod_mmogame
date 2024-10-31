@@ -318,22 +318,18 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
 
         $ret['timestart'] = $attempt != null ? $attempt->timestart : 0;
         $ret['timeclose'] = $attempt != null ? $attempt->timeclose : 0;
-        $ret['aduel_attempts'] = $attempt != null ?
-            $this->db->count_records_select( 'mmogame_quiz_attempts',
-            'mmogameid = ? AND numteam=? AND auserid=?',
-            [$attempt->mmogameid, $attempt->numteam, $attempt->auserid]) : 0;
-        $ret['aduel_attempt'] = $attempt != null ? $attempt->numattempt : 0;
+        $ret['aduelAttempt'] = $attempt != null ? $attempt->numattempt : 0;
 
         $player = ( $this->aduel->auserid1 == $auserid ? 1 : 2);
-        $ret['aduel_player'] = $player;
+        $ret['aduelPlayer'] = $player;
 
         if ($player == 2) {
             $info = $this->get_avatar_info( $this->aduel->auserid1);
-            $ret['aduel_score'] = $info->sumscore;
-            $ret['aduel_avatar'] = $info->avatar;
-            $ret['aduel_nickname'] = $info->nickname;
-            $ret['aduel_rank'] = $this->get_rank_alone( $this->aduel->auserid1, 'sumscore');
-            $ret['aduel_percent'] = $info->percentcompleted;
+            $ret['aduelScore'] = $info->sumscore;
+            $ret['aduelAvatar'] = $info->avatar;
+            $ret['aduelNickname'] = $info->nickname;
+            $ret['aduelRank'] = $this->get_rank_alone( $this->aduel->auserid1, 'sumscore');
+            $ret['aduelPercent'] = $info->percentcompleted;  // TOCHECK if used.
             $ret['colors'] = implode( ',', $info->colors);     // Get the colors of oposite.
             $ret['tool1numattempt'] = $this->aduel->tool1numattempt2;
             $ret['tool2numattempt'] = $this->aduel->tool2numattempt2;
@@ -543,7 +539,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         $aduel = $this->aduel;
 
         $player = ( $aduel->auserid1 == $this->auserid ? 1 : 2);
-        $ret['aduel_player'] = $player;
+        $ret['aduelPlayer'] = $player;
 
         if (isset( $data->subcommand) && $data->subcommand === 'tool2') {
             $field = 'tool2numattempt'.$player;
@@ -577,8 +573,8 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
             $ret['endofgame'] = 1;
         }
         $info = $this->get_avatar_info( $aduel->auserid1);
-        $ret['aduel_score'] = $info->sumscore;
-        $ret['aduel_rank'] = $this->get_rank_alone( $aduel->auserid1, 'sumscore');
+        $ret['aduelScore'] = $info->sumscore;
+        $ret['aduelRank'] = $this->get_rank_alone( $aduel->auserid1, 'sumscore');
 
         return $attempt;
     }

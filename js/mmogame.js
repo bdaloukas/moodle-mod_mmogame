@@ -460,17 +460,19 @@ class mmogame {
         }
         return s;
     }
-
+    
     uuid4() {
-        // Return the hexadecimal text representation of number `n`, padded with zeroes to be of length `p`
-        const ho = (n, p) => this.pad(n.toString(16), p, 0);
-        const view = new DataView(new ArrayBuffer(16)); // Create a view backed by a 16-byte buffer
-        crypto.getRandomValues(new Uint8Array(view.buffer)); // Fill the buffer with random data
-        view.setUint8(6, (view.getUint8(6) & 0xf) | 0x40); // Patch the 6th byte to reflect a version 4 UUID
-        view.setUint8(8, (view.getUint8(8) & 0x3f) | 0x80); // Patch the 8th byte to reflect a variant 1 UUID (version 4 UUIDs are)
-        // Compile the canonical textual form from the array data
-        return `${ho(view.getUint32(0), 8)}-${ho(view.getUint16(4), 4)}-${ho(view.getUint16(6), 4)}-${ho(view.getUint16(8), 4)}-
-        ${ho(view.getUint32(10), 8)}${ho(view.getUint16(14), 4)}`;
+        const uuid = new Array(36);
+
+        for (let i = 0; i < 36; i++) {
+            uuid[i] = Math.floor(Math.random() * 16);
+        }
+        uuid[14] = 4; // set bits 12-15 of time-high-and-version to 0100
+        uuid[19] = uuid[19] &= ~(1 << 2); // set bit 6 of clock-seq-and-reserved to zero
+        uuid[19] = uuid[19] |= (1 << 3); // set bit 7 of clock-seq-and-reserved to one
+        uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+        
+        return uuid.map((x) => x.toString(16)).join('');
     }
 
     computeSizes() {

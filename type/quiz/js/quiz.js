@@ -40,13 +40,13 @@ class mmogameQuiz extends mmogame {
         let d = {"command": "getattempt", "mmogameid": this.mmogameid, "pin": this.pin, "kinduser": this.kinduser,
             "user": this.auserid, "maxwidth": this.maxImageWidth, "maxheight": this.maxImageHeight, "subcommand": subcommand};
         if (this.helpurl == undefined) {
-            d['helpurl'] = 1;
+            d.helpurl = 1;
         }
         let data = JSON.stringify(d);
         xmlhttp.send(data);
     }
 
-    onServerGetAttempt(json, param) {
+    onServerGetAttempt(json) {
         this.computeDifClock(json);
 
         if (this.colors == undefined) {
@@ -198,9 +198,9 @@ class mmogameQuiz extends mmogame {
                 "", 'assets/submit.svg', false, 'submit');
             this.btnSubmit.addEventListener("click",
                 function() {
-                    if (this.btnSubmit != undefined) {
-                        instance.area.removeChild(this.btnSubmit);
-                        this.btnSubmit = undefined;
+                    if (instance.btnSubmit != undefined) {
+                        instance.area.removeChild(instance.btnSubmit);
+                        instance.btnSubmit = undefined;
                     }
                     instance.sendAnswer(true);
                 }
@@ -405,7 +405,7 @@ class mmogameQuiz extends mmogame {
         }
     }
 
-    getMultichoiceSpace(fontSize) {
+    getMultichoiceSpace() {
         return 0;
     }
 
@@ -432,7 +432,7 @@ class mmogameQuiz extends mmogame {
         let a = {"command": "answer", "mmogameid": this.mmogameid, "pin": this.pin, 'kinduser': this.kinduser,
             "user": this.auserid, "attempt": this.attempt, "answer": this.answer, 'submit': submit ? 1 : 0};
         if (subcommand != undefined) {
-            a['subcommand'] = subcommand;
+            a.subcommand = subcommand;
         }
         let data = JSON.stringify(a);
         xmlhttp.send(data);
@@ -610,7 +610,7 @@ class mmogameQuizAlone extends mmogameQuiz {
         if (this.hasHelp()) {
             this.createButtonHelp(this.padding + (i++) * (this.iconSize + this.padding), this.padding);
             this.buttonHelp.addEventListener("click", function() {
-                instance.onClickHelp(this);
+                instance.onClickHelp( instance.buttonHelp);
             });
         }
 

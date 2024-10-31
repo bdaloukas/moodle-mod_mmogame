@@ -14,7 +14,7 @@
       };
     } else {
       // See: http://stackoverflow.com/questions/5198845/javascript-this-losing-context-in-ie
-      var handler = function(e) {
+      var handler = function() {
           listener.handleEvent(window.event, listener);
       };
       el.attachEvent('on' + type, handler);
@@ -65,7 +65,11 @@
    touchend events. Calling stopPropagation guarantees that other behaviors don’t get a
    chance to handle the same click event. This is executed at the beginning of touch. */
   this.FastButton.prototype.onTouchStart = function(event) {
-    event.stopPropagation ? event.stopPropagation() : (event.cancelBubble = true);
+    if (event.stopPropagation) {
+        event.stopPropagation();
+    } else {
+        event.cancelBubble = true;
+    }
     this.touchEvents.push(addListener(this.element, 'touchend', this, this.useCapture));
     this.touchEvents.push(addListener(document.body, 'touchmove', this, this.useCapture));
     this.startX = event.touches[0].clientX;
@@ -81,7 +85,11 @@
 
   /* Invoke the actual click handler and prevent ghost clicks if this was a touchend event. */
   this.FastButton.prototype.onClick = function(event) {
-    event.stopPropagation ? event.stopPropagation() : (event.cancelBubble = true);
+    if (event.stopPropagation) {
+        event.stopPropagation();
+    } else {
+        event.cancelBubble = true;
+    }
     this.reset();
     // Use .call to call the method so that we have the correct "this":
     // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/call
@@ -120,8 +128,16 @@
       var x = clickbuster.coordinates[i];
       var y = clickbuster.coordinates[i + 1];
       if (Math.abs(event.clientX - x) < 25 && Math.abs(event.clientY - y) < 25) {
-        event.stopPropagation ? event.stopPropagation() : (event.cancelBubble = true);
-        event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+          if( event.stopPropagation) {
+              event.stopPropagation();
+          } else {
+              event.cancelBubble = true;
+          }
+          if( event.preventDefault) {
+              event.preventDefault();
+          } else {
+            event.returnValue = false;
+          }
       }
     }
   };
