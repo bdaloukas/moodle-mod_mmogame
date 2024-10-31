@@ -128,12 +128,12 @@
       var x = clickbuster.coordinates[i];
       var y = clickbuster.coordinates[i + 1];
       if (Math.abs(event.clientX - x) < 25 && Math.abs(event.clientY - y) < 25) {
-          if( event.stopPropagation) {
+          if (event.stopPropagation) {
               event.stopPropagation();
           } else {
               event.cancelBubble = true;
           }
-          if( event.preventDefault) {
+          if (event.preventDefault) {
               event.preventDefault();
           } else {
             event.returnValue = false;
