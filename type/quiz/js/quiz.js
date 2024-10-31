@@ -610,7 +610,7 @@ class mmogameQuizAlone extends mmogameQuiz {
         if (this.hasHelp()) {
             this.createButtonHelp(this.padding + (i++) * (this.iconSize + this.padding), this.padding);
             this.buttonHelp.addEventListener("click", function() {
-                instance.onClickHelp( instance.buttonHelp);
+                instance.onClickHelp(instance.buttonHelp);
             });
         }
 

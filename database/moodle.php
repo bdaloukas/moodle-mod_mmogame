@@ -158,11 +158,11 @@ class mmogame_database_moodle extends mmogame_database {
     /**
      * Count the records in a table where the given conditions are used in the WHERE clause.
      *
-     * @param string $table
-     * @param string $select
-     * @param array $params
-     * @param string $countitem
-     * @return int.
+     * @param string $table The name of the table to count records from.
+     * @param string $select The SQL SELECT statement used for counting records.
+     * @param array|null $params Optional parameters for the SELECT statement.
+     * @param string $countitem The COUNT item to be used, defaults to "COUNT('*')".
+     * @return int The number of records that match the given conditions.
      */
     public function count_records_select($table, $select, ?array $params=null, $countitem="COUNT('*')") {
         global $DB;

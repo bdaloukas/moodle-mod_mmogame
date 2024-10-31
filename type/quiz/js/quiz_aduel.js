@@ -115,7 +115,7 @@ class mmogameQuizAduel extends mmogameQuiz {
                 this.createButtonHelp(this.padding + 3 * (this.iconSize + this.padding), this.areaTop + this.areaHeight);
             }
             this.buttonHelp.addEventListener("click", function() {
-                instance.onClickHelp( instance.buttonHelp);
+                instance.onClickHelp(instance.buttonHelp);
              });
         }
 
@@ -396,7 +396,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             this.aItemLabel[i].style.width = width + "px";
             this.autoResizeText(this.aItemLabel[i], width, height, true, this.minFontSize, this.maxFontSize, 0.5);
 
-            this.onServerAnswerMultichoiceShowCorrect( i, iscorrect1, iscorrect2);
+            this.onServerAnswerMultichoiceShowCorrect(i, iscorrect1, iscorrect2);
         }
 
         this.playAudio(foundCorrect ? this.audioYes : this.audioNo);

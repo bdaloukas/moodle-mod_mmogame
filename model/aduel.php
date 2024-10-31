@@ -182,19 +182,19 @@ class mmogameModel_aduel {
     }
 
     /**
-     * Finishes attempt
+     * Finishes the attempt for a duel game.
      *
-     * @param object $mmogame
-     * @param object $aduel
-     * @param boolean $iscorrect1
-     * @param boolean $iscorrect2
-     * @param boolean $isclosed1
-     * @param boolean $isclosed2
-     * @param int $scorewin (score if first player wins)
-     * @param int $scoreloss (score if first player loses)
-     * @param int $scoredraw (score if it a draw)
-     * @param int $adueladdscore
-     * @return int (the score)
+     * @param object $mmogame The game instance that contains methods for updating grades and records.
+     * @param object $aduel The duel object containing user IDs and other related information.
+     * @param boolean $iscorrect1 Indicates if the first player's attempt is correct.
+     * @param boolean $iscorrect2 Indicates if the second player's attempt is correct.
+     * @param boolean $isclosed1 Indicates if the first player's duel is closed.
+     * @param boolean $isclosed2 Indicates if the second player's duel is closed.
+     * @param int $scorewin The score awarded if the first player wins.
+     * @param int $scoreloss The score awarded if the first player loses.
+     * @param int $scoredraw The score awarded if the duel ends in a draw.
+     * @param int $adueladdscore The score to be added for the duel, passed by reference.
+     * @return int The score of the current user based on the outcome of the attempt.
      */
     public static function finish_attempt($mmogame, $aduel, $iscorrect1, $iscorrect2,
     $isclosed1, $isclosed2, $scorewin, $scorelose, $scoredraw, &$adueladdscore) {

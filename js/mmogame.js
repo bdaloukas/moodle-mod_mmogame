@@ -467,11 +467,11 @@ class mmogame {
         for (let i = 0; i < 36; i++) {
             uuid[i] = Math.floor(Math.random() * 16);
         }
-        uuid[14] = 4; // set bits 12-15 of time-high-and-version to 0100
-        uuid[19] = uuid[19] &= ~(1 << 2); // set bit 6 of clock-seq-and-reserved to zero
-        uuid[19] = uuid[19] |= (1 << 3); // set bit 7 of clock-seq-and-reserved to one
+        uuid[14] = 4; // Set bits 12-15 of time-high-and-version to 0100
+        uuid[19] = uuid[19] & ~4; // Set bit 6 of clock-seq-and-reserved to zero
+        uuid[19] = uuid[19] | 8; // Set bit 7 of clock-seq-and-reserved to one
         uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
-        
+
         return uuid.map((x) => x.toString(16)).join('');
     }
 
@@ -504,22 +504,22 @@ class mmogame {
     }
 
     getContrast(x) {
-        var r = (x & 0xFF0000) >> 16,
-            g = (x & 0x00FF00) >> 8,
-            b = x & 0x0000FF;
+        var r = Math.floor(x / 0x1000000) % 256,  // Red.
+            g = Math.floor(x / 0x10000) % 256,    // Green.
+            b = Math.floor(x / 0x100) % 256;      // Blue.
 
         return ((r * 299) + (g * 587) + (b * 114)) / 1000;
     }
 
     getColorGray(x) {
-        var r = (x & 0xFF0000) >> 16,
-            g = (x & 0x00FF00) >> 8,
-            b = x & 0x0000FF,
+        var r = Math.floor(x / 0x1000000) % 256,  // Red.
+            g = Math.floor(x / 0x10000) % 256,    // Green.
+            b = Math.floor(x / 0x100) % 256,      // Blue.
             yiq = (r * 299) + g * 587 + b * 114,
             m = 255 * 299 + 255 * 587 + 255 * 114,
             gray = Math.round(yiq * 255 / m);
 
-        return (gray << 16) + (gray << 8) + gray;
+         return (gray * 0x10000) + (gray * 0x100) + gray;
     }
 
     getColorMul(x, mul) {
@@ -916,7 +916,7 @@ class mmogame {
         this.buttonSound.alt = '[LANGM_SOUND]';
         var instance = this;
         this.buttonSound.addEventListener("click", function() {
-            instance.onClickSound(this);
+            instance.onClickSound( instance.buttonSound);
         });
 
         this.buttonSound.title = '[LANGM_SOUND]';

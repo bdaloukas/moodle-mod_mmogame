@@ -29,7 +29,7 @@ require_once(dirname(__FILE__) . '/../../model/aduel.php');
  * Fill the array $ret with info about the current attempt.
  *
  * @param object $data
- * @param object $game
+ * @param object $mmogame
  * @param array $ret
  */
 function mmogame_json_quiz_getattempt($data, $mmogame, &$ret) {
@@ -79,7 +79,7 @@ function mmogame_json_quiz_answer($data, $game, &$ret) {
  * Fills the variable $ret with information about highscore.
  *
  * @param object $data
- * @param object $game
+ * @param object $mmogame
  * @param array $ret
  */
 function mmogame_json_quiz_gethighscore($data, $mmogame, &$ret) {
