@@ -1,4 +1,5 @@
-// eslint-disable-next-line no-unused-vars no-undef
+// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-undef
 class mmogameQuizAduel extends mmogameQuiz {
     constructor() {
         super();
