@@ -333,7 +333,7 @@ class mmogameQuiz extends mmogame {
                 }
             });
 
-            label.addEventListener( 'click', () => {
+            label.addEventListener('click', () => {
                 instance.onClickRadio(i, instance.colorDefinition, instance.colorScore, true);
             });
 
