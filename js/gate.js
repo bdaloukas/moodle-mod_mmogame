@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-// eslint-disable-next-line no-undef
+// eslint-disable-next-line no-unused-vars, no-undef
 class mmogameGate extends mmogame {
     open(url, mmogameid, pin, auserid, kinduser) {
         this.minFontSize *= 2;
