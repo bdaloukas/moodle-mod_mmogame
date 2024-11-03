@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 class mmogameQuiz extends mmogame {
     constructor() {
         super();
@@ -581,6 +582,7 @@ class mmogameQuiz extends mmogame {
     }
 }
 
+// eslint-disable-next-line no-unused-vars
 class mmogameQuizAlone extends mmogameQuiz {
     constructor() {
         super();

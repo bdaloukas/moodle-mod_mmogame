@@ -521,17 +521,17 @@ class mmogame {
     }
 
     getColorMul(x, mul) {
-        // Do eslint-disable-next-line no-bitwise.
+        // eslint-disable-next-line no-bitwise
         var r = (x & 0xFF0000) >> 16,
-            // Do eslint-disable-next-line no-bitwise.
+            // eslint-disable-next-line no-bitwise
             g = (x & 0x00FF00) >> 8,
-            // Do eslint-disable-next-line no-bitwise.
+            // eslint-disable-next-line no-bitwise
             b = x & 0x0000FF;
         r = Math.round(r * mul);
         g = Math.round(g * mul);
         b = Math.round(b * mul);
 
-        // Do eslint-disable-next-line no-bitwise.
+        // eslint-disable-next-line no-bitwise
         return (r << 16) + (g << 8) + b;
     }
 

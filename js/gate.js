@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars no-undef
 class mmogameGate extends mmogame {
     open(url, mmogameid, pin, auserid, kinduser) {
         this.minFontSize *= 2;
@@ -625,6 +626,7 @@ class mmogameGate extends mmogame {
         if (json.errorcode != undefined) {
             return;
         }
+        // eslint-disable-next-line no-undef
         let game = new [CLASS]();
         game.openGame(this.url, this.mmogameid, this.pin, auserid, this.kinduser, false);
         game.onServerGetAttempt(json);
