@@ -63,8 +63,6 @@ $colors = "[$color->color1, $color->color2, $color->color3, $color->color4, $col
 
 $usercode = $rgame->kinduser == 'moodle' ? $USER->id : '0';
 
-echo "<script src=\"js/google.fastbutton.js\" async> </script>";
-
 echo "<script>\n";
 mmogame_change_javascript( $rgame->type, 'js/mmogame.js');
 $class = 'mmogame'.ucfirst($rgame->type).ucfirst($rgame->model);
