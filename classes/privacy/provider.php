@@ -65,7 +65,11 @@ class provider implements
                 'numgame' => 'privacy:metadata:mmogame_grades:numgame',
                 'avatar' => 'privacy:metadata:mmogame_grades:avatar',
                 'nickname' => 'privacy:metadata:mmogame_grades:nickaname',
-                'colorpalette' => 'privacy:metadata:mmogame_grades:colorpalette',
+                'color1' => 'privacy:metadata:mmogame_grades:color1',
+                'color2' => 'privacy:metadata:mmogame_grades:color2',
+                'color3' => 'privacy:metadata:mmogame_grades:color3',
+                'color4' => 'privacy:metadata:mmogame_grades:color4',
+                'color5' => 'privacy:metadata:mmogame_grades:color5',
                 'usercode' => 'privacy:metadata:mmogame_grades:usercode',
                 'sumscore' => 'privacy:metadata:mmogame_grades:sumscore',
                 'score' => 'privacy:metadata:mmogame_grades:score',
@@ -92,14 +96,14 @@ class provider implements
                 FROM {context} c
             INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
             INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-            INNER JOIN {mmogame} game ON game.id = cm.instance
-            INNER JOIN {mmogame_aa_grades} mg ON mg.mmogameid = game.id
-            INNER JOIN {mmogame_aa_users} mu ON mu.kind=:kinduser AND mu.instance=:userid
-            WHERE mg.userid=mu.id";
+            INNER JOIN {mmogame_aa_users} mu ON mu.kind=:kinduser AND mu.instanceid=:userid
+            INNER JOIN {mmogame_aa_grades} mg ON mg.mmogameid = cm.instance
+            WHERE mg.auserid=mu.id";
         $params = [
             'modname'           => 'mmogame',
             'contextlevel'      => CONTEXT_MODULE,
             'userid'  => $userid,
+            'kinduser' => 'moodle',
         ];
 
         $resultset->add_from_sql($sql, $params);
@@ -124,30 +128,32 @@ class provider implements
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT
-                    g.*,
-                    gg.id AS hasgrade,
-                    gg.score AS bestscore,
-                    gg.timemodified AS grademodified,
-                    c.id AS contextid,
-                    cm.id AS cmid
+                    g.id, g.numgame, gg.nickname, gg.usercode, gg.sumscore, gg.score, cm.id as cmid,
+                    gg.sumscore2, gg.numteam, gg.timemodified,
+                    gg.id AS hasgrade, CONCAT( a.directory, '/', a.filename) as avatar,
+                    mc.color1, mc.color2, mc.color3, mc.color4, mc.color5
                   FROM {context} c
             INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
             INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
             INNER JOIN {mmogame} g ON g.id = cm.instance
-             LEFT JOIN {mmogame_aa_grades} gg ON gg.mmogameid = g.id AND gg.userid = :userid
-                 WHERE c.id {$contextsql}";
+            INNER JOIN {mmogame_aa_users} gu ON gu.kind = :kind AND gu.instanceid = :userid
+            LEFT JOIN {mmogame_aa_grades} gg ON gg.mmogameid = g.id AND gg.auserid = gu.id
+            LEFT JOIN {mmogame_aa_avatars} a ON gg.avatarid = a.id
+            LEFT JOIN {mmogame_aa_colorpalettes} mc ON gg.colorpaletteid = mc.id
+            WHERE c.id {$contextsql}";
 
         $params = [
             'contextlevel' => CONTEXT_MODULE,
             'modname' => 'mmogame',
             'userid' => $userid,
+            'kind' => 'moodle',
         ];
         $params += $contextparams;
 
         // Fetch the individual games.
         $games = $DB->get_recordset_sql($sql, $params);
         foreach ($games as $game) {
-            list($course, $cm) = get_course_and_cm_from_cmid($game->cmid, 'game');
+            list($course, $cm) = get_course_and_cm_from_cmid($game->cmid, 'mmogame');
             $context = mmogame_get_context_module_instance( $cm->id);
 
             $gamedata = \core_privacy\local\request\helper::get_context_data($context, $contextlist->get_user());

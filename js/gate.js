@@ -10,7 +10,6 @@ class mmogameGate extends mmogame {
         this.auserid = auserid;
         this.kinduser = kinduser;
         this.computeSizes();
-
         this.areaTop = this.padding;
         this.copyrightHeight = 0;
 

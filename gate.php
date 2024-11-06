@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('NO_MOODLE_COOKIES', true);
 require( "../../config.php");
 
 require_once( 'database/moodle.php');
@@ -60,8 +59,15 @@ $game = mmogame::getgame( $db, $rgame->id, $pin);
 $type = $game->get_type();
 $color = $DB->get_record_select( 'mmogame_aa_colorpalettes', 'id=?', [2]);
 $colors = "[$color->color1, $color->color2, $color->color3, $color->color4, $color->color5]";
-
-$usercode = $rgame->kinduser == 'moodle' ? $USER->id : '0';
+if ($rgame->kinduser == 'moodle') {
+    $sql = "SELECT cm.* FROM {$CFG->prefix}course_modules cm, {$CFG->prefix}modules m ".
+        " WHERE cm.module=m.id AND cm.course=? AND cm.instance=? AND m.name=? ";
+    $cm = $DB->get_record_sql( $sql, [$rgame->course, $rgame->id, 'mmogame']);
+    require_login($rgame->course, false, $cm);
+    $usercode = $USER->id;
+} else {
+    $usercode = '0';
+}
 
 echo "<script>\n";
 mmogame_change_javascript( $rgame->type, 'js/mmogame.js');

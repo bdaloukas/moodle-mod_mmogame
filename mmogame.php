@@ -221,17 +221,6 @@ class mmogame {
     }
 
     /**
-     * Return coresponding auserid from a Moodle user.
-     * @param object $db
-     * @param int $userid
-     * @param boolean $create
-     */
-    public static function get_auserid_from_moodle($db, $userid, $create) {
-
-        return self::get_auserid_from_db($db, 'moodle', $userid, $create);
-    }
-
-    /**
      * Return coresponding auserid from a users in the table mmogame_aa_users_code.
      * @param object $db
      * @param string $code
@@ -271,7 +260,7 @@ class mmogame {
      * Return coresponding auserid from a user (details are in object variable $data).
      * @param object $db
      * @param object $data
-     * @return int
+     * @return int (the id of table mmogame_aa_users)
      */
     public static function get_asuerid_from_object($db, $data) {
         if (isset( $data->kinduser)) {
@@ -279,14 +268,12 @@ class mmogame {
                 return self::get_auserid_from_usercode($db, $data->user);
             } else if ($data->kinduser == 'guid') {
                 return self::get_auserid_from_guid( $db, $data->user);
-            } else if ($data->kinduser == 'moodle') {
-                return self::get_auserid_from_db( $db, 'moodle', $data->user, true);
+            } else {
+                return self::get_auserid_from_db( $db, $data->kinduser, $data->user, true);
             }
         } else {
             return self::get_auserid_from_guid( $db, $data->user, true);
         }
-
-        return false;
     }
 
     /**
@@ -639,23 +626,16 @@ class mmogame {
      *
      * @param int $state
      * @param string $filecontents
+     * @return string (the directory where the data is saved)
      */
     public function save_state_file($state, $filecontents) {
         global $CFG;
 
-        // Creates a random upload directory in temp.
-        $newdir = $CFG->dataroot."/temp/mmogame";
-        if (!file_exists( $newdir)) {
-            mkdir( $newdir);
-        }
-        $newdir .= '/states';
-        if (!file_exists( $newdir)) {
-            mkdir( $newdir);
-        }
-        $file = $this->rgame->fastjson === null ? 0 : $this->rgame->fastjson;
-        $newdir .= '/'.substr( $file, -2);
-        if (!file_exists( $newdir)) {
-            mkdir( $newdir);
+        // Creates an upload directory in temp.
+        $file = $this->rgame->fastjson === null ? '00' : $this->rgame->fastjson;
+        $newdir = $CFG->dataroot.'/temp/mmogame/states/'.substr( $file, -2);
+        if (!is_dir( $newdir)) {
+            mkdir( $newdir, 0777, true);
         }
 
         if ($filecontents != false) {
