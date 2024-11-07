@@ -34,6 +34,11 @@ use core_privacy\local\request\deletion_criteria;
 use core_privacy\local\metadata\collection;
 use core_privacy\manager;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/mod/mmogame/database/moodle.php');
+require_once($CFG->dirroot . '/mod/mmogame/mmogame.php');
+
 /**
  * Privacy Subsystem implementation for mod_mmogame.
  *
@@ -64,7 +69,7 @@ class provider implements
                 'mmogame' => 'privacy:metadata:mmogame_grades:mmogame',
                 'numgame' => 'privacy:metadata:mmogame_grades:numgame',
                 'avatar' => 'privacy:metadata:mmogame_grades:avatar',
-                'nickname' => 'privacy:metadata:mmogame_grades:nickaname',
+                'nickname' => 'privacy:metadata:mmogame_grades:nickname',
                 'color1' => 'privacy:metadata:mmogame_grades:color1',
                 'color2' => 'privacy:metadata:mmogame_grades:color2',
                 'color3' => 'privacy:metadata:mmogame_grades:color3',
@@ -100,9 +105,9 @@ class provider implements
             INNER JOIN {mmogame_aa_grades} mg ON mg.mmogameid = cm.instance
             WHERE mg.auserid=mu.id";
         $params = [
-            'modname'           => 'mmogame',
-            'contextlevel'      => CONTEXT_MODULE,
-            'userid'  => $userid,
+            'modname' => 'mmogame',
+            'contextlevel' => CONTEXT_MODULE,
+            'userid' => $userid,
             'kinduser' => 'moodle',
         ];
 
@@ -160,13 +165,14 @@ class provider implements
 
             \core_privacy\local\request\helper::export_context_files($context, $contextlist->get_user());
 
-            $gamedata->accessdata = (object) [];
-
-            if (empty((array) $gamedata->accessdata)) {
-                unset($gamedata->accessdata);
-            }
+            unset($gamedata->accessdata);
 
             writer::with_context($context)->export_data([], $gamedata);
+
+            unset( $game->id);
+            unset( $game->cmid);
+            writer::with_context($context)->export_data(
+                [get_string('privacy:metadata:mmogame_aa_grades', 'mod_mmogame')], $game);
         }
         $games->close();
     }
@@ -190,7 +196,7 @@ class provider implements
         }
 
         // This will delete all attempts and mmogame grades for this game.
-        mmogame_delete_instance( $cm->instance);
+        mmogame::delete_auser( $db, cm->instance, $auserid);
     }
 
     /**
@@ -199,7 +205,8 @@ class provider implements
      * @param   approved_contextlist    $contextlist    The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        global $DB;
+        $db = new mmogame_database_moodle();
+
         foreach ($contextlist as $context) {
             if ($context->contextlevel != CONTEXT_MODULE) {
                 // Only mmogame module will be handled.
@@ -214,9 +221,11 @@ class provider implements
 
             // Fetch the details of the data to be removed.
             $user = $contextlist->get_user();
-
-            // This will delete all attempts and mmogame grades for this mmogame.
-            mmogame_delete_user_attempts( $cm->instance, $user);
+            $auserid = mmogame::get_auserid_from_db( $db, 'moodle', $userid, false);
+            if ($auserid != 0) {
+                // This will delete all attempts and mmogame grades for this mmogame.
+                mmogame::delete_auser( $db, $cm->instance, $auserid);
+            }
         }
     }
 
@@ -258,6 +267,18 @@ class provider implements
      * @param   approved_userlist    $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
+        $context = $userlist->get_context();
+        if ($context->contextlevel != CONTEXT_MODULE) {
+            return;
+        }
+        $cm = get_coursemodule_from_id('mmogame', $context->instanceid);
 
+        $userids = $userlist->get_userids();
+        foreach ($userids as $userid) {
+            $auserid = mmogame::get_auserid_from_db( $db, 'moodle', $userid, false);
+            if ($auserid != 0) {
+                mmogame::delete_auser( $db, $cm->instance, $auserid);
+            }
+        }
     }
 }
