@@ -205,7 +205,7 @@ class provider implements
      * @param   approved_contextlist    $contextlist    The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        $db = new mmogame_database_moodle();
+        $db = new \mmogame_database_moodle();
 
         foreach ($contextlist as $context) {
             if ($context->contextlevel != CONTEXT_MODULE) {
@@ -221,10 +221,10 @@ class provider implements
 
             // Fetch the details of the data to be removed.
             $user = $contextlist->get_user();
-            $auserid = mmogame::get_auserid_from_db( $db, 'moodle', $userid, false);
+            $auserid = \mmogame::get_auserid_from_db( $db, 'moodle', $user->id, false);
             if ($auserid != 0) {
                 // This will delete all attempts and mmogame grades for this mmogame.
-                mmogame::delete_auser( $db, $cm->instance, $auserid);
+                \mmogame::delete_auser( $db, $cm->instance, $auserid);
             }
         }
     }

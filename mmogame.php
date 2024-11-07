@@ -837,9 +837,10 @@ class mmogame {
      * @param int auserid
      */
     public static function delete_auser($db, $mmogameid, $auserid) {
-        $db->delete_records( 'mmogame_aa_grades', 'mmogameid=? AND auserid=?', [$mmogameid, $auserid]);
-        $db->delete_records( 'mmogame_aa_stats', 'mmogameid=? AND auserid=?', [$mmogameid, $auserid]);
-        $db->delete_records( 'mmogame_aa_users', 'id=?', [$auserid]);
-        $db->delete_records( 'mdl_mmogame_am_aduel_pairs', 'auserid1=? OR auserid2=?', [$auserid, $auserid]);
+        $db->delete_records_select( 'mmogame_aa_grades', 'mmogameid=? AND auserid=?', [$mmogameid, $auserid]);
+        $db->delete_records_select( 'mmogame_aa_stats', 'mmogameid=? AND auserid=?', [$mmogameid, $auserid]);
+        $db->delete_records_select( 'mmogame_aa_users', 'id=?', [$auserid]);
+        $db->delete_records_select( 'mmogame_am_aduel_pairs',
+            'mmogameid = ? AND (auserid1=? OR auserid2=?)', [$mmogameid, $auserid, $auserid]);
     }
 }
