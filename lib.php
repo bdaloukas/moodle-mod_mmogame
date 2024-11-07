@@ -135,6 +135,9 @@ function mmogame_delete_instance( $mmogameid) {
     $function( $mmogameid);
 
     $DB->delete_records_select( 'mmogame', 'id=?', [$mmogameid]);
+    $DB->delete_records_select( 'mmogame_aa_grades', 'mmogameid=?', [$mmogameid]);
+    $DB->delete_records_select( 'mmogame_aa_stats', 'mmogameid=?', [$mmogameid]);
+    $DB->delete_records_select( 'mmogame_am_aduel_pairs', 'mmogameid=?', [$mmogameid]);
 
     return true;
 }
