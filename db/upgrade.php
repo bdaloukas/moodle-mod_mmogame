@@ -381,5 +381,116 @@ function xmldb_mmogame_upgrade( $oldversion) {
 
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
+
+    if ($oldversion < ($ver = 2024110905)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('grade');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024110908)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('decimalpoints');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024110909)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('completionpass');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024110910)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('casesensitive');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024110911)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('modelparams');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024110912)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('enablejson');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024110913)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('timeopen');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024110914)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('timeclose');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024110915)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('timelimit');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024110916)) {
+        $table = new xmldb_table('mmogame_am_aduel_pairs');
+        $field = new xmldb_field('intro');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }

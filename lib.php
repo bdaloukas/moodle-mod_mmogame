@@ -289,3 +289,18 @@ function mmogame_get_types() {
 
     return $types;
 }
+
+/**
+ * Return the list if Moodle features this module supports
+ *
+ * @param string $feature FEATURE_xx constant for requested feature
+ * @return mixed True if module supports feature, false if not, null if doesn't know or string for the module purpose.
+ */
+function mmogame_supports($feature) {
+    switch($feature) {
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        default:
+            return null;
+    }
+}
