@@ -255,10 +255,11 @@ class provider implements
 
             // Fetch the details of the data to be removed.
             $user = $contextlist->get_user();
-            $auserid = \mmogame::get_auserid_from_db( $db, 'moodle', $user->id, false);
+            $auserid = \mmogame::get_auserid_from_db( $db, 'moodle', $user->id, false);            
             if ($auserid != 0) {
+                $rgame = $db->get_record_select( 'mmogame', 'id=?', [$cm->instance]);
                 // This will delete all attempts and mmogame grades for this mmogame.
-                \mmogame::delete_auser( $db, $cm->instance, $auserid);
+                \mmogame::delete_auser( $db, $rgame, $auserid);
             }
         }
     }
@@ -301,17 +302,21 @@ class provider implements
      * @param   approved_userlist    $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+
         $context = $userlist->get_context();
         if ($context->contextlevel != CONTEXT_MODULE) {
             return;
         }
         $cm = get_coursemodule_from_id('mmogame', $context->instanceid);
+        
+        $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$cm->instance]);
 
         $userids = $userlist->get_userids();
         foreach ($userids as $userid) {
             $auserid = mmogame::get_auserid_from_db( $db, 'moodle', $userid, false);
             if ($auserid != 0) {
-                mmogame::delete_auser( $db, $cm->instance, $auserid);
+                mmogame::delete_auser( $db, $rgame, $auserid);
             }
         }
     }

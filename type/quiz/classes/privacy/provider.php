@@ -49,22 +49,21 @@ class provider implements
     public static function get_metadata(collection $collection): collection {
 
         $collection->add_database_table('mmogame_quiz_attempts', [
-                'numgame' => 'privacy:metadata:mmogame_grades:numgame',
-                'numteam' => 'privacy:metadata:mmogame_grades:numteam',
-                'numattempt' => 'privacy:metadata:mmogame_grades:numattempt',
-                'queryid' => 'privacy:metadata:mmogame_grades:queryid',
-                'useranswerid' => 'privacy:metadata:mmogame_grades:useranswerid',
-                'useranswer' => 'privacy:metadata:mmogame_grades:useranswer',
-                'iscorrect' => 'privacy:metadata:mmogame_grades:iscorrect',
-                'layout' => 'privacy:metadata:mmogame_grades:layout',
-                'timestart' => 'privacy:metadata:mmogame_grades:timestart',
-                'timeclose' => 'privacy:metadata:mmogame_grades:timeclose',
-                'timeanswer' => 'privacy:metadata:mmogame_grades:timeanswer',
-                'fraction' => 'privacy:metadata:mmogame_grades:fraction',
-                'score' => 'privacy:metadata:mmogame_grades:score',
-                'score2' => 'privacy:metadata:mmogame_grades:score2',
-                'iscorrect2' => 'privacy:metadata:mmogame_grades:iscorrect2',
-            ], 'privacy:metadata:quiz_attempts');
+                'numteam' => 'privacy:metadata:mmogame_quiz_attempt:numteam',
+                'numattempt' => 'privacy:metadata:mmogame_quiz_attempt:numattempt',
+                'queryid' => 'privacy:metadata:mmogame_quiz_attempt:queryid',
+                'useranswerid' => 'privacy:metadata:mmogame_quiz_attempt:useranswerid',
+                'useranswer' => 'privacy:metadata:mmogame_quiz_attempt:useranswer',
+                'iscorrect' => 'privacy:metadata:mmogame_quiz_attempt:iscorrect',
+                'layout' => 'privacy:metadata:mmogame_quiz_attempt:layout',
+                'timestart' => 'privacy:metadata:mmogame_quiz_attempt:timestart',
+                'timeclose' => 'privacy:metadata:mmogame_quiz_attempt:timeclose',
+                'timeanswer' => 'privacy:metadata:mmogame_quiz_attempt:timeanswer',
+                'fraction' => 'privacy:metadata:mmogame_quiz_attempt:fraction',
+                'score' => 'privacy:metadata:mmogame_quiz_attempt:score',
+                'score2' => 'privacy:metadata:mmogame_quiz_attempt:score2',
+                'iscorrect2' => 'privacy:metadata:mmogame_quiz_attempt:iscorrect2',
+            ], 'privacy:metadata:mmogame_quiz_attempts');
 
         return $collection;
     }
@@ -89,23 +88,5 @@ class provider implements
             unset( $rec->id);
             writer::with_context($context)->export_data( $newpath, $rec);
         }
-    }
-
-    /**
-     * Delete all the comments made for this context.
-     *
-     * @param  mmogame_plugin_request_data $requestdata Data to fulfill the deletion request.
-     */
-    public static function delete_type_for_context(mmogame_plugin_request_data $requestdata) {
-
-    }
-
-    /**
-     * A call to this method should delete user data (where practical) using the userid and submission.
-     *
-     * @param  mmogame_plugin_request_data $exportdata Details about the user and context to focus the deletion.
-     */
-    public static function delete_type_for_userid(mmogame_plugin_request_data $exportdata) {
-
     }
 }

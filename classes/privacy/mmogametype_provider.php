@@ -35,39 +35,16 @@ use core_privacy\local\request\contextlist;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface mmogametype_provider extends \core_privacy\local\request\plugin\subplugin_provider {
-
     /**
      * This method is used to export any user data this sub-plugin has using the mmogame_plugin_request_data object to get the
      * context and userid.
-     * mmogame_plugin_request_data contains:
-     * - context
-     * - type object
-     * - current path (subcontext)
-     * - user object
      *
-     * @param  mmogame_plugin_request_data $exportdata Information to use to export user data for this sub-plugin.
+     * @param  object $context
+     * @param int $mmogameid
+     * @param string $model
+     * @param int $auserid
+     * @param int $numgame
+     * @param array $path
      */
     public static function export_type_user_data($context, $mmogameid, $model, $auserid, $numgame, $path);
-
-    /**
-     * Any call to this method should delete all user data for the context defined in the deletion_criteria.
-     * mmogame_plugin_request_data contains:
-     * - context
-     * - mmogame object
-     *
-     * @param mmogame_plugin_request_data $requestdata Information to use to delete user data for this type.
-     */
-    public static function delete_type_for_context(mmogame_plugin_request_data $requestdata);
-
-    /**
-     * A call to this method should delete user data (where practicle) from the userid and context.
-     * mmogame_plugin_request_data contains:
-     * - context
-     * - type object
-     * - user object
-     * - mmogame object
-     *
-     * @param  mmogame_plugin_request_data $exportdata Details about the user and context to focus the deletion.
-     */
-    public static function delete_type_for_userid(mmogame_plugin_request_data $exportdata);
 }

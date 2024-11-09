@@ -833,14 +833,19 @@ class mmogame {
      * Deletes info for a given mmogame and auser
      *
      * @param object $db
-     * @param int $mmogameid
+     * @param object $rgame
      * @param int auserid
      */
-    public static function delete_auser($db, $mmogameid, $auserid) {
-        $db->delete_records_select( 'mmogame_aa_grades', 'mmogameid=? AND auserid=?', [$mmogameid, $auserid]);
-        $db->delete_records_select( 'mmogame_aa_stats', 'mmogameid=? AND auserid=?', [$mmogameid, $auserid]);
-        $db->delete_records_select( 'mmogame_aa_users', 'id=?', [$auserid]);
+    public static function delete_auser($db, $rgame, $auserid) {
+        $db->delete_records_select( 'mmogame_aa_grades', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
+        $db->delete_records_select( 'mmogame_aa_stats', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
         $db->delete_records_select( 'mmogame_am_aduel_pairs',
-            'mmogameid = ? AND (auserid1=? OR auserid2=?)', [$mmogameid, $auserid, $auserid]);
+            'mmogameid = ? AND (auserid1=? OR auserid2=?)', [$rgame->id, $auserid, $auserid]);
+        
+        require_once( 'type/'.$rgame->type.'/'.$rgame->type.'.php');
+        $class = 'mmogame_'.$rgame->type;
+        $class::delete_auser( $db, $rgame, $auserid);
+
+        $db->delete_records_select( 'mmogame_aa_users', 'id=?', [$auserid]);
     }
 }
