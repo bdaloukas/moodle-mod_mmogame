@@ -182,9 +182,9 @@ class provider implements
     /**
      * Export each numgame.
      *
-     * @param   approved_contextlist    $contextlist    The approved contexts to export information for.
+     * @param approved_contextlist $context    The approved contexts to export information for.
      * @param int $mmogameid
-     * @param inti $auserid
+     * @param int $auserid
      * @param string $type
      * @param string $model
      * @param array $path

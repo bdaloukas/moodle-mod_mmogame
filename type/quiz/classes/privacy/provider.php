@@ -71,7 +71,12 @@ class provider implements
     /**
      * Export all user data for this plugin.
      *
-     * @param  mmogame_plugin_request_data $exportdata Data used to determine which context and user to export and other useful
+     * @param object $context
+     * @param int $mmogameid
+     * @param string $model
+     * @param int $auserid
+     * @param int $numgame
+     * @param array $path
      * information to help with exporting.
      */
     public static function export_type_user_data($context, $mmogameid, $model, $auserid, $numgame, $path) {
