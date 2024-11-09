@@ -255,7 +255,7 @@ class provider implements
 
             // Fetch the details of the data to be removed.
             $user = $contextlist->get_user();
-            $auserid = \mmogame::get_auserid_from_db( $db, 'moodle', $user->id, false);            
+            $auserid = \mmogame::get_auserid_from_db( $db, 'moodle', $user->id, false);
             if ($auserid != 0) {
                 $rgame = $db->get_record_select( 'mmogame', 'id=?', [$cm->instance]);
                 // This will delete all attempts and mmogame grades for this mmogame.
@@ -309,7 +309,7 @@ class provider implements
             return;
         }
         $cm = get_coursemodule_from_id('mmogame', $context->instanceid);
-        
+
         $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$cm->instance]);
 
         $userids = $userlist->get_userids();

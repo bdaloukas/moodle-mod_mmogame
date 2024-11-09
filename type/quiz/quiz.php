@@ -163,7 +163,14 @@ class mmogame_quiz extends mmogame {
 
         return $iscorrect ? count( $query->answers) - 1 : -1;
     }
-    
+
+    /**
+     * Deletes info for a given mmogame and auser
+     *
+     * @param object $db
+     * @param object $rgame
+     * @param int auserid
+     */
     public static function delete_auser($db, $rgame, $auserid) {
         $db->delete_records_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
     }

@@ -841,7 +841,7 @@ class mmogame {
         $db->delete_records_select( 'mmogame_aa_stats', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
         $db->delete_records_select( 'mmogame_am_aduel_pairs',
             'mmogameid = ? AND (auserid1=? OR auserid2=?)', [$rgame->id, $auserid, $auserid]);
-        
+
         require_once( 'type/'.$rgame->type.'/'.$rgame->type.'.php');
         $class = 'mmogame_'.$rgame->type;
         $class::delete_auser( $db, $rgame, $auserid);
