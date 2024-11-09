@@ -54,6 +54,9 @@ class provider implements
     // This plugin currently implements the original plugin_provider interface.
     \core_privacy\local\request\plugin\provider {
 
+    /** Interface for all assign submission sub-plugins. */
+    const MMOGAMETYPE_INTERFACE = 'mod_mmogame\privacy\mmogametype_provider';
+
     /**
      * Get the list of contexts that contain user information for the specified user.
      *
@@ -64,9 +67,13 @@ class provider implements
         // The table 'mmogame' stores a record for each mmogame.
         // It does not contain user personal data, but data is returned from it for contextual requirements.
 
+        $items->add_database_table('mmogame', [
+                'type' => 'privacy:metadata:mmogame:type',
+                'model' => 'privacy:metadata:mmogame:model',
+            ], 'privacy:metadata:mmogame');
+
         // The table 'mmogame_aa_grades' contains the current grade for each game/user combination.
         $items->add_database_table('mmogame_aa_grades', [
-                'mmogame' => 'privacy:metadata:mmogame_grades:mmogame',
                 'numgame' => 'privacy:metadata:mmogame_grades:numgame',
                 'avatar' => 'privacy:metadata:mmogame_grades:avatar',
                 'nickname' => 'privacy:metadata:mmogame_grades:nickname',
@@ -129,52 +136,79 @@ class provider implements
         }
 
         $user = $contextlist->get_user();
-        $userid = $user->id;
+        $rec = $DB->get_record('mmogame_aa_users', ['kind' => 'moodle', 'instanceid' => $user->id], 'id');
+        if ($rec === false) {
+            return;
+        }
+        $auserid = $rec->id;
+
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
-        $sql = "SELECT
-                    g.id, g.numgame, gg.nickname, gg.usercode, gg.sumscore, gg.score, cm.id as cmid,
-                    gg.sumscore2, gg.numteam, gg.timemodified,
-                    gg.id AS hasgrade, CONCAT( a.directory, '/', a.filename) as avatar,
-                    mc.color1, mc.color2, mc.color3, mc.color4, mc.color5
-                  FROM {context} c
+        $sql = "SELECT DISTINCT cm.id, cm.instance, g.type, g.model
+            FROM {context} c
             INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
             INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-            INNER JOIN {mmogame} g ON g.id = cm.instance
-            INNER JOIN {mmogame_aa_users} gu ON gu.kind = :kind AND gu.instanceid = :userid
-            LEFT JOIN {mmogame_aa_grades} gg ON gg.mmogameid = g.id AND gg.auserid = gu.id
-            LEFT JOIN {mmogame_aa_avatars} a ON gg.avatarid = a.id
-            LEFT JOIN {mmogame_aa_colorpalettes} mc ON gg.colorpaletteid = mc.id
+            INNER JOIN {mmogame_aa_grades} gg ON gg.mmogameid = cm.instance AND gg.auserid = :auserid
+            INNER JOIN {mmogame} g ON gg.mmogameid=g.id
             WHERE c.id {$contextsql}";
 
         $params = [
             'contextlevel' => CONTEXT_MODULE,
             'modname' => 'mmogame',
-            'userid' => $userid,
+            'auserid' => $auserid,
             'kind' => 'moodle',
         ];
         $params += $contextparams;
 
         // Fetch the individual games.
-        $games = $DB->get_recordset_sql($sql, $params);
-        foreach ($games as $game) {
-            list($course, $cm) = get_course_and_cm_from_cmid($game->cmid, 'mmogame');
+        $cms = $DB->get_recordset_sql($sql, $params);
+        foreach ($cms as $cm) {
             $context = mmogame_get_context_module_instance( $cm->id);
 
-            $gamedata = \core_privacy\local\request\helper::get_context_data($context, $contextlist->get_user());
+            $data = \core_privacy\local\request\helper::get_context_data($context, $contextlist->get_user());
 
             \core_privacy\local\request\helper::export_context_files($context, $contextlist->get_user());
 
-            unset($gamedata->accessdata);
+            unset($data->accessdata);
+            $data->type = $cm->type;
+            $data->model = $cm->model;
+            writer::with_context($context)->export_data([], $data);
 
-            writer::with_context($context)->export_data([], $gamedata);
-
-            unset( $game->id);
-            unset( $game->cmid);
-            writer::with_context($context)->export_data(
-                [get_string('privacy:metadata:mmogame_aa_grades', 'mod_mmogame')], $game);
+            $path = [get_string('privacy:metadata:mmogame:numgame', 'mod_mmogame')];
+            static::export_numgames( $context, $cm->instance, $auserid, $cm->type, $cm->model, $path);
         }
-        $games->close();
+    }
+
+    /**
+     * Export each numgame.
+     *
+     * @param   approved_contextlist    $contextlist    The approved contexts to export information for.
+     * @param int $mmogameid
+     * @param inti $auserid
+     * @param string $type
+     * @param string $model
+     * @param array $path
+     */
+    protected static function export_numgames($context, $mmogameid, $auserid, $type, $model, $path) {
+        global $DB;
+
+        $sql = "SELECT gg.id, gg.numgame, gg.nickname, gg.usercode, gg.sumscore, gg.score,
+            gg.sumscore2, gg.numteam, gg.timemodified, CONCAT( a.directory, '/', a.filename) as avatar,
+            mc.color1, mc.color2, mc.color3, mc.color4, mc.color5
+            FROM {mmogame_aa_grades} gg
+            LEFT JOIN {mmogame_aa_avatars} a ON gg.avatarid = a.id
+            LEFT JOIN {mmogame_aa_colorpalettes} mc ON gg.colorpaletteid = mc.id
+            WHERE gg.mmogameid=? AND gg.auserid=?";
+        $recs = $DB->get_records_sql( $sql, [$mmogameid, $auserid]);
+        foreach ($recs as $rec) {
+            $newpath = array_merge( $path, [$rec->numgame]);
+            unset( $rec->id);
+            writer::with_context($context)->export_data( $newpath, $rec);
+
+            manager::component_class_callback('mmogametype_'.$type, self::MMOGAMETYPE_INTERFACE,
+                'export_type_user_data',
+                [$context, $mmogameid, $model, $auserid, $rec->numgame, $newpath], $newpath);
+        }
     }
 
     /**

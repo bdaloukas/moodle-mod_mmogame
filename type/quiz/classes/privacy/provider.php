@@ -22,9 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_mmogametype_quiz\privacy;
+namespace mmogametype_quiz\privacy;
 use mod_mmogame\privacy\mmogame_plugin_request_data;
 use core_privacy\local\metadata\collection;
+use core_privacy\local\request\writer;
 
 /**
  * Privacy class for requesting user data.
@@ -47,8 +48,7 @@ class provider implements
      */
     public static function get_metadata(collection $collection): collection {
 
-        $items->add_database_table('mmogame_quiz_attempts', [
-                'mmogame' => 'privacy:metadata:mmogame_grades:mmogame',
+        $collection->add_database_table('mmogame_quiz_attempts', [
                 'numgame' => 'privacy:metadata:mmogame_grades:numgame',
                 'numteam' => 'privacy:metadata:mmogame_grades:numteam',
                 'numattempt' => 'privacy:metadata:mmogame_grades:numattempt',
@@ -64,7 +64,7 @@ class provider implements
                 'score' => 'privacy:metadata:mmogame_grades:score',
                 'score2' => 'privacy:metadata:mmogame_grades:score2',
                 'iscorrect2' => 'privacy:metadata:mmogame_grades:iscorrect2',
-            ], 'privacy:metadata:mmogame_aa_grades');
+            ], 'privacy:metadata:quiz_attempts');
 
         return $collection;
     }
@@ -75,8 +75,20 @@ class provider implements
      * @param  mmogame_plugin_request_data $exportdata Data used to determine which context and user to export and other useful
      * information to help with exporting.
      */
-    public static function export_type_user_data(mmogame_plugin_request_data $exportdata) {
+    public static function export_type_user_data($context, $mmogameid, $model, $auserid, $numgame, $path) {
+        global $DB;
 
+        $recs = $DB->get_records_select( 'mmogame_quiz_attempts',
+            'mmogameid=? AND auserid=? AND numgame=?', [$mmogameid, $auserid, $numgame], 'id',
+            'id,numattempt,queryid,useranswerid,useranswer,iscorrect,layout,timestart,timeclose,timeanswer,'.
+            'fraction,score, score2,iscorrect2');
+        $i = 0;
+        foreach ($recs as $rec) {
+            $newpath = array_merge( $path,
+                [get_string('privacy:metadata:mmogame_quiz_attempts', 'mmogametype_quiz').(++$i)]);
+            unset( $rec->id);
+            writer::with_context($context)->export_data( $newpath, $rec);
+        }
     }
 
     /**
@@ -94,7 +106,6 @@ class provider implements
      * @param  mmogame_plugin_request_data $exportdata Details about the user and context to focus the deletion.
      */
     public static function delete_type_for_userid(mmogame_plugin_request_data $exportdata) {
-        // Create an approved context list to delete the comments.
 
     }
 }

@@ -21,10 +21,5 @@
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die;
 
-    // General settings.
-
-    // Time limit.
-    $settings->add(new admin_setting_configtext('mmogametype_quiz/timelimit', get_string('timelimit', 'mmogame'),
-            get_string('timelimit', 'mmogame'), 15, PARAM_INT));
+// General settings.
