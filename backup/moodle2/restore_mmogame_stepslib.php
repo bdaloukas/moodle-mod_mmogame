@@ -15,13 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Structure step to restore one choice activity
+ * Structure step to restore one mmogame activity
+ *
+ * @package    mod_mmogame
+ * @copyright  2024 Vasilis Daloukas
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_mmogame_activity_structure_step extends restore_activity_structure_step {
-
+    /**
+     * Define the structure of the restore workflow.
+     *
+     * @return restore_path_element $structure
+     */
     protected function define_structure() {
-
-        $paths = array();
+        $paths = [];
         $userinfo = $this->get_setting_value('userinfo');
         $paths[] = new restore_path_element('mmogame_state', '/activity/mmogame/states/state');
 
@@ -32,13 +39,19 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
             $paths[] = new restore_path_element('mmogame_palette', '/activity/mmogame/palettes/palette');
             $paths[] = new restore_path_element('mmogame_grade', '/activity/mmogame/grades/grade');
             $paths[] = new restore_path_element('mmogame_stat', '/activity/mmogame/stats/stat');
-            $paths[] = new restore_path_element('mmogame_pair', '/activity/mmogame/pairs/pair');
+            $paths[] = new restore_path_element('mmogame_aduel_pair', '/activity/mmogame/pairs/pair');
         }
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
 
+    /**
+     * Process an mmogame restore.
+     *
+     * @param object $data The data in object form
+     * @return void
+     */
     protected function process_mmogame($data) {
         global $DB;
 
@@ -46,15 +59,18 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $oldid = $data->id;
         $data->course = $this->get_courseid();
 
-        //$data->timeopen = $this->apply_date_offset($data->timeopen);
-        //$data->timeclose = $this->apply_date_offset($data->timeclose);
-
-        // insert the choice record
+        // Insert the mmogame record.
         $newitemid = $DB->insert_record('mmogame', $data);
-        // immediately after inserting "activity" record, call this
+
+        // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
     }
 
+    /**
+     * Process a auser restore
+     * @param object $data The data in object form
+     * @return void
+     */
     protected function process_mmogame_auser($data) {
         global $DB;
 
@@ -64,15 +80,20 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $data->instanceid = $this->get_mappingid('user', $data->instanceid);
         $rec = $DB->get_record_select( 'mmogame_aa_users',
             'kind=? AND instanceid=?', [$data->kind, $data->instanceid]);
-        if( $rec === false) {
+        if ($rec === false) {
             $newitemid = $DB->insert_record('mmogame_aa_users', $data);
         } else {
             $newitemid = $rec->id;
         }
 
-        $this->set_mapping('mmogame_aa_users', $oldid, $newitemid);
+        $this->set_mapping('mmogame_auser', $oldid, $newitemid);
     }
 
+    /**
+     * Process an avatar restore
+     * @param object $data The data in object form
+     * @return void
+     */
     protected function process_mmogame_avatar($data) {
         global $DB;
 
@@ -80,16 +101,44 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $oldid = $data->id;
 
         $rec = $DB->get_record_select( 'mmogame_aa_avatars',
-            'id=?', [$data->kind, $data->id]);
-        if( $rec === false) {
+            'directory=? AND filename=?', [$data->directory, $data->filename]);
+        if ($rec === false) {
             $newitemid = $DB->insert_record('mmogame_aa_avatars', $data);
         } else {
             $newitemid = $rec->id;
         }
 
-        $this->set_mapping('mmogame_aa_avatars', $oldid, $newitemid);
+        $this->set_mapping('mmogame_avatar', $oldid, $newitemid);
     }
-    
+
+    /**
+     * Process a palettte restore
+     * @param object $data The data in object form
+     * @return void
+     */
+    protected function process_mmogame_palette($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $rec = $DB->get_record_select( 'mmogame_aa_palettes',
+            'color1=? AND color2=? AND color3=? AND color4=? AND color5=?',
+            [$data->color1, $data->color2, $data->color3, $data->color4, $data->color5]);
+        if ($rec === false) {
+            $newitemid = $DB->insert_record('mmogame_aa_palettes', $data);
+        } else {
+            $newitemid = $rec->id;
+        }
+
+        $this->set_mapping('mmogame_palette', $oldid, $newitemid);
+    }
+
+    /**
+     * Process a grade restore
+     * @param object $data The data in object form
+     * @return void
+     */
     protected function process_mmogame_grade($data) {
         global $DB;
 
@@ -97,14 +146,19 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $oldid = $data->id;
 
         $data->mmogameid = $this->get_new_parentid('mmogame');
-        $data->auserid = $this->get_mappingid('auser', $data->auserid);
-        //$data->avatarid
-        //$data->colorpaletteid
+        $data->auserid = $this->get_mappingid('mmogame_auser', $data->auserid);
+        $data->avatarid = $this->get_mappingid('mmogame_avatar', $data->avatarid);
+        $data->colorpaletteid = $this->get_mappingid('mmogame_colorpalette', $data->colorpaletteid);
 
         $newitemid = $DB->insert_record('mmogame_aa_grades', $data);
         $this->set_mapping('mmogame_grade', $oldid, $newitemid);
     }
 
+    /**
+     * Process a stat restore
+     * @param object $data The data in object form
+     * @return void
+     */
     protected function process_mmogame_stat($data) {
         global $DB;
 
@@ -112,24 +166,34 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
 
         $data->mmogameid = $this->get_new_parentid('mmogame');
         //$data->queryid
-        //$data->auserid
+        $data->auserid = $this->get_mappingid('mmogame_auser', $data->auserid);
         //$data->teamid
 
         $newitemid = $DB->insert_record('mmogame_aa_stats', $data);
     }
 
+    /**
+     * Process a aduel_pair restore
+     * @param object $data The data in object form
+     * @return void
+     */
     protected function process_mmogame_aduel_pair($data) {
         global $DB;
 
         $data = (object)$data;
 
         $data->mmogameid = $this->get_new_parentid('mmogame');
-        //$data->auserid1
-        //$data->auserid2
+        $data->auserid1 = $this->get_mappingid('mmogame_auser', $data->auserid1);
+        $data->auserid2 = $this->get_mappingid('mmogame_auser', $data->auserid2);
 
         $newitemid = $DB->insert_record('mmogame_aa_aduel_pairs', $data);
     }
 
+    /**
+     * Process a state restore
+     * @param object $data The data in object form
+     * @return void
+     */
     protected function process_mmogame_state($data) {
         global $DB;
 
@@ -140,8 +204,11 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $newitemid = $DB->insert_record('mmogame_aa_states', $data);
     }
 
+    /**
+     * Once the database tables have been fully restored, restore the files
+     */
     protected function after_execute() {
-        // Add choice related files, no need to match by itemname (just internally handled context)
+        // Add mmogame related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_mmogame', 'intro', null);
     }
 }

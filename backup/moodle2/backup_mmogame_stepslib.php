@@ -61,16 +61,16 @@ class backup_mmogame_activity_structure_step extends backup_activity_structure_s
 
         $types = new backup_nested_element( 'types');
         $type = new backup_nested_element( 'type');
-        
+
         $ausers = new backup_nested_element( 'ausers');
-        $auser = new backup_nested_element( 'auser');        
+        $auser = new backup_nested_element( 'auser');
 
         $avatars = new backup_nested_element( 'avatars');
         $avatar = new backup_nested_element( 'avatar');
 
         $palettes = new backup_nested_element( 'palettes');
         $palette = new backup_nested_element( 'palette');
-        
+
         // Build the tree.
         $mmogame->add_child($ausers);
         $ausers->add_child($auser);
@@ -82,7 +82,7 @@ class backup_mmogame_activity_structure_step extends backup_activity_structure_s
 
         $mmogame->add_child($palettes);
         $palettes->add_child($palette);
-        
+
         $mmogame->add_child($stats);
         $stats->add_child($stat);
         $mmogame->add_child($states);
@@ -111,7 +111,7 @@ class backup_mmogame_activity_structure_step extends backup_activity_structure_s
                 WHERE id IN
                 (SELECT DISTINCT colorpaletteid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
             $palette->set_source_sql( $sql, $params);
-            
+
             $grade->set_source_table('mmogame_aa_grades', $params);
             $stat->set_source_table('mmogame_aa_stats', $params);
             $state->set_source_table('mmogame_aa_states', $params);
