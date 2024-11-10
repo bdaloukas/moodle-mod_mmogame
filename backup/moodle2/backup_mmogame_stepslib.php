@@ -27,7 +27,7 @@ class backup_mmogame_activity_structure_step extends backup_activity_structure_s
      * @return backup_nested_element
      */
     protected function define_structure() {
-        global $DB;
+        global $CFG, $DB;
 
         // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
@@ -61,10 +61,28 @@ class backup_mmogame_activity_structure_step extends backup_activity_structure_s
 
         $types = new backup_nested_element( 'types');
         $type = new backup_nested_element( 'type');
+        
+        $ausers = new backup_nested_element( 'ausers');
+        $auser = new backup_nested_element( 'auser');        
 
+        $avatars = new backup_nested_element( 'avatars');
+        $avatar = new backup_nested_element( 'avatar');
+
+        $palettes = new backup_nested_element( 'palettes');
+        $palette = new backup_nested_element( 'palette');
+        
         // Build the tree.
+        $mmogame->add_child($ausers);
+        $ausers->add_child($auser);
+        $mmogame->add_child($avatars);
+        $avatars->add_child($avatar);
+
         $mmogame->add_child($grades);
         $grades->add_child($grade);
+
+        $mmogame->add_child($palettes);
+        $palettes->add_child($palette);
+        
         $mmogame->add_child($stats);
         $stats->add_child($stat);
         $mmogame->add_child($states);
@@ -80,6 +98,20 @@ class backup_mmogame_activity_structure_step extends backup_activity_structure_s
         // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
             $params = ['mmogameid' => backup::VAR_ACTIVITYID];
+
+            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_users u ".
+                " WHERE id IN (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+            $auser->set_source_sql( $sql, $params);
+
+            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_avatars ".
+                " WHERE id IN (SELECT DISTINCT avatarid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+            $avatar->set_source_sql( $sql, $params);
+
+            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_colorpalettes
+                WHERE id IN
+                (SELECT DISTINCT colorpaletteid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+            $palette->set_source_sql( $sql, $params);
+            
             $grade->set_source_table('mmogame_aa_grades', $params);
             $stat->set_source_table('mmogame_aa_stats', $params);
             $state->set_source_table('mmogame_aa_states', $params);
