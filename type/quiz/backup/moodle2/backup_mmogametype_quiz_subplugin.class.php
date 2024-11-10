@@ -15,19 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the class for backup of this submission plugin
+ * This file contains the class for backup of this type plugin
  *
- * @package assignsubmission_onlinetext
- * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mmogametype_quiz
+ * @copyright  2024 Vasilis Daloukas
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Provides the information to backup mmogame quiz
+ * Provides the information to backup quiz type
  *
- * @package    mmogametype_quiz
+ * This just adds quiz info
+ *
+ * @package mmogametype_quiz
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -39,23 +39,20 @@ class backup_mmogametype_quiz_subplugin extends backup_subplugin {
      * @return backup_subplugin_element
      */
     protected function define_type_subplugin_structure() {
-echo "*******************\n";
         // Create XML elements.
         $subplugin = $this->get_subplugin_element();
         $subpluginwrapper = new backup_nested_element($this->get_recommended_name());
         $subpluginelement = new backup_nested_element('mmogametype_quiz', null,
             ['auserid', 'numgame', 'numteam', 'numattempt', 'queryid', 'useranswerid', 'useranswer', 'iscorrect',
-            'layout', 'timestart', 'timeclose', 'timeanswer', 'fraction', 'score', 'score2', 'iscorrect2',]);
+            'layout', 'timestart', 'timeclose', 'timeanswer', 'fraction', 'score', 'score2', 'iscorrect2', ]);
 
         // Connect XML elements into the tree.
         $subplugin->add_child($subpluginwrapper);
         $subpluginwrapper->add_child($subpluginelement);
 
         // Set source to populate the data.
-        $subpluginelement->set_source_table('mmogame_quiz_attempts',
-                                          array('mmogameid' => backup::VAR_PARENTID));
+        $subpluginelement->set_source_table('mmogame_quiz_attempts', ['mmogameid' => backup::VAR_PARENTID]);
 
         return $subplugin;
     }
-
 }
