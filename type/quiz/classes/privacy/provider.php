@@ -26,6 +26,8 @@ namespace mmogametype_quiz\privacy;
 use mod_mmogame\privacy\mmogame_plugin_request_data;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\writer;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\userlist;
 
 /**
  * Privacy class for requesting user data.
@@ -39,7 +41,8 @@ class provider implements
     \core_privacy\local\metadata\provider,
 
     // This plugin is a subplugin of mmogame and must meet that contract.
-    \mod_mmogame\privacy\mmogametype_provider {
+    \mod_mmogame\privacy\mmogametype_provider,
+    \core_privacy\local\request\core_userlist_provider {
     /**
      * Return meta data about this plugin.
      *
@@ -69,6 +72,15 @@ class provider implements
     }
 
     /**
+     * Get the list of users who have data within a context.
+     *
+     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+    }
+
+
+    /**
      * Export all user data for this plugin.
      *
      * @param object $context
@@ -93,5 +105,14 @@ class provider implements
             unset( $rec->id);
             writer::with_context($context)->export_data( $newpath, $rec);
         }
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param   approved_userlist    $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+
     }
 }
