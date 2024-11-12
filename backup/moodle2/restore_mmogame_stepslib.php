@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+define( 'MMOGAME_RESTORE_QBANK_MOODLEQUESTION', 1);
+
 /**
  * Structure step to restore one mmogame activity
  *
@@ -35,6 +37,7 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $paths[] = new restore_path_element('mmogame', '/activity/mmogame');
         $paths[] = new restore_path_element('mmogame_auser', '/activity/mmogame/auser/');
         if ($userinfo) {
+            $paths[] = new restore_path_element('mmogame_uguid', '/activity/mmogame/uquids/uguid');
             $paths[] = new restore_path_element('mmogame_avatar', '/activity/mmogame/avatars/avatar');
             $paths[] = new restore_path_element('mmogame_palette', '/activity/mmogame/palettes/palette');
             $paths[] = new restore_path_element('mmogame_grade', '/activity/mmogame/grades/grade');
@@ -62,6 +65,9 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         // Insert the mmogame record.
         $newitemid = $DB->insert_record('mmogame', $data);
 
+        $this->set_mapping('mmogame_qbank', $newitemid,
+            $data->qbank == MMOGAME_QBANK_MOODLEQUESTION ? MMOGAME_RESTORE_QBANK_MOODLEQUESTION : 0);
+
         // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
     }
@@ -77,6 +83,10 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $data = (object)$data;
         $oldid = $data->id;
 
+        if ($data->kind == 'guid') {
+            $data->instanceid = get_mapping( 'mmogame_uguid', $data->instanceid, $data->instanceid);
+        }
+
         $data->instanceid = $this->get_mappingid('user', $data->instanceid);
         $rec = $DB->get_record_select( 'mmogame_aa_users',
             'kind=? AND instanceid=?', [$data->kind, $data->instanceid]);
@@ -87,6 +97,27 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         }
 
         $this->set_mapping('mmogame_auser', $oldid, $newitemid);
+    }
+
+    /**
+     * Process an uguid restore
+     * @param object $data The data in object form
+     * @return void
+     */
+    protected function process_mmogame_uguid($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $rec = $DB->get_record_select( 'mmogame_aa_users_guid', 'guid=?', [$data->guid]);
+        if ($rec === false) {
+            $newitemid = $DB->insert_record('mmogame_aa_users_guid', $data);
+        } else {
+            $newitemid = $rec->id;
+        }
+
+        $this->set_mapping('mmogame_uguid', $oldid, $newitemid);
     }
 
     /**
@@ -122,11 +153,11 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $data = (object)$data;
         $oldid = $data->id;
 
-        $rec = $DB->get_record_select( 'mmogame_aa_palettes',
-            'color1=? AND color2=? AND color3=? AND color4=? AND color5=?',
-            [$data->color1, $data->color2, $data->color3, $data->color4, $data->color5]);
+        $rec = $DB->get_record_select( 'mmogame_aa_colorpalettes',
+            'colorsort1=? AND colorsort2=? AND colorsort3=? AND colorsort4=? AND colorsort5=?',
+            [$data->colorsort1, $data->colorsort2, $data->colorsort3, $data->colorsort4, $data->colorsort5]);
         if ($rec === false) {
-            $newitemid = $DB->insert_record('mmogame_aa_palettes', $data);
+            $newitemid = $DB->insert_record('mmogame_aa_colorpalettes', $data);
         } else {
             $newitemid = $rec->id;
         }
@@ -165,6 +196,8 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $data = (object)$data;
 
         $data->mmogameid = $this->get_new_parentid('mmogame');
+        $qbank = $this->get_mappingid('mmogame_qbank', $data->mmogameid);
+
         //$data->queryid
         $data->auserid = $this->get_mappingid('mmogame_auser', $data->auserid);
         //$data->teamid

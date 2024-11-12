@@ -21,13 +21,13 @@
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_mmogame_activity_structure_step extends backup_activity_structure_step {
+class backup_mmogame_activity_structure_step extends backup_questions_activity_structure_step {
     /**
      * Define the structure for the assign activity
      * @return backup_nested_element
      */
     protected function define_structure() {
-        global $CFG, $DB;
+        global $CFG;
 
         // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
@@ -63,32 +63,58 @@ class backup_mmogame_activity_structure_step extends backup_activity_structure_s
         $type = new backup_nested_element( 'type');
 
         $ausers = new backup_nested_element( 'ausers');
-        $auser = new backup_nested_element( 'auser');
+        $auser = new backup_nested_element('auser', ['id'], ['kind', 'instanceid', 'lastlogin', 'lastip']);
 
         $avatars = new backup_nested_element( 'avatars');
-        $avatar = new backup_nested_element( 'avatar');
+        $avatar = new backup_nested_element('avatar', ['id'],
+            ['directory', 'filename', 'numused', 'randomkey', 'ishidden']);
 
         $palettes = new backup_nested_element( 'palettes');
-        $palette = new backup_nested_element( 'palette');
+        $palette = new backup_nested_element('palette', ['id'],
+            ['category', 'name', 'color1', 'color2', 'color3', 'color4', 'color5',
+            'colorsort1', 'colorsort2', 'colorsort3', 'colorsort4', 'colorsort5', 'hue']);
+
+        $uguids = new backup_nested_element( 'uguids');
+        $uguid = new backup_nested_element('uguid', ['id'],
+            ['guid']);
+
+        $qinstances = new backup_nested_element('question_instances');
+
+        $qinstance = new backup_nested_element('question_instance', ['id'],
+                ['quizid', 'slot', 'page', 'displaynumber', 'requireprevious', 'maxmark', 'quizgradeitemid']);
+
+        $this->add_question_references($qinstance, 'mod_mmogame', 'queryid');
+        $this->add_question_set_references($qinstance, 'mod_mmogame', 'queryid');
+
+        // This module is using questions, so produce the related question states and sessions
+        // attaching them to the $attempt element based in 'uniqueid' matching.
+        $this->add_question_usages($stat, 'queryid');
 
         // Build the tree.
+        $mmogame->add_child($uguids);
+        $uguids->add_child($uguid);
+
         $mmogame->add_child($ausers);
         $ausers->add_child($auser);
+
         $mmogame->add_child($avatars);
         $avatars->add_child($avatar);
-
-        $mmogame->add_child($grades);
-        $grades->add_child($grade);
 
         $mmogame->add_child($palettes);
         $palettes->add_child($palette);
 
+        $mmogame->add_child($grades);
+        $grades->add_child($grade);
+
         $mmogame->add_child($stats);
         $stats->add_child($stat);
+
         $mmogame->add_child($states);
         $states->add_child($state);
+
         $mmogame->add_child($pairs);
         $pairs->add_child($pair);
+
         $mmogame->add_child($types);
         $types->add_child($type);
 
@@ -97,21 +123,26 @@ class backup_mmogame_activity_structure_step extends backup_activity_structure_s
 
         // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
-            $params = ['mmogameid' => backup::VAR_ACTIVITYID];
+            $params = [backup::VAR_PARENTID];
 
-            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_users u ".
-                " WHERE id IN (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_users u
+                WHERE id IN (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
             $auser->set_source_sql( $sql, $params);
 
-            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_avatars ".
-                " WHERE id IN (SELECT DISTINCT avatarid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+            $sql = "SELECT uq.* FROM {$CFG->prefix}mmogame_aa_users_guid uq, {$CFG->prefix}mmogame_aa_users u
+                WHERE uq.id = u.instanceid AND u.id IN
+                (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+            $uguid->set_source_sql( $sql, $params);
+
+            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_avatars
+                WHERE id IN (SELECT DISTINCT avatarid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
             $avatar->set_source_sql( $sql, $params);
 
             $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_colorpalettes
-                WHERE id IN
-                (SELECT DISTINCT colorpaletteid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+                WHERE id IN (SELECT DISTINCT colorpaletteid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
             $palette->set_source_sql( $sql, $params);
 
+            $params = ['mmogameid' => backup::VAR_PARENTID];
             $grade->set_source_table('mmogame_aa_grades', $params);
             $stat->set_source_table('mmogame_aa_stats', $params);
             $state->set_source_table('mmogame_aa_states', $params);

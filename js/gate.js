@@ -176,8 +176,8 @@ class mmogameGate extends mmogame {
             this.iconSize, "", 'assets/submit.svg', false, 'submit');
         this.btnSubmit.style.visibility = 'hidden';
         this.btnSubmit.addEventListener("click", function() {
-            instance.playgame(instance.edtCode == undefined ? 0 : instance.edtCode.value, instance.edtNickname.value,
-                instance.paletteid, instance.avatarid);
+            instance.playgame(instance.edtCode == undefined ? instance.auserid : instance.edtCode.value,
+            instance.edtNickname.value, instance.paletteid, instance.avatarid);
         });
     }
 
@@ -302,8 +302,8 @@ class mmogameGate extends mmogame {
         this.btnSubmit.style.visibility = 'hidden';
         this.btnSubmit.addEventListener("click",
             function() {
-                instance.playgame(instance.edtCode == undefined ? 0 : instance.edtCode.value, instance.edtNickname.value,
-                    instance.paletteid, instance.avatarid);
+                instance.playgame(instance.edtCode == undefined ? instance.auserid : instance.edtCode.value,
+                instance.edtNickname.value, instance.paletteid, instance.avatarid);
             });
     }
 
