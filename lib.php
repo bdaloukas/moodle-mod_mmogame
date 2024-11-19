@@ -44,15 +44,6 @@ function mmogame_get_context_module_instance( $moduleid) {
 }
 
 /**
- * use events?
- */
-function mmogame_use_events() {
-    $version = mmogame_get_moodle_version();
-
-    return( $version >= '02.07');
-}
-
-/**
  * Returns the version of Moodle.
  *
  * @return string version

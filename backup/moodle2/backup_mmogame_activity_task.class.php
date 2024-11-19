@@ -91,20 +91,46 @@ class mmogame_backup_calculate_question_categories extends backup_calculate_ques
 
     /**
      * Calculates question categories based on table mmogame_aa_stats
-     */    
-    static protected function calculate_question_categories($backupid, $contextid) {
+     */
+    protected static function calculate_question_categories($backupid, $contextid) {
         global $DB;
 
         $context = $DB->get_record_select( 'context', 'id=?', [$contextid]);
         $cm = $DB->get_record_select( 'course_modules', 'id=?', [$context->instanceid]);
 
-        $sql = "INSERT INTO {backup_ids_temp} (backupid, itemname, itemid)
-            SELECT DISTINCT ?, 'question_category', qbe.questioncategoryid
+        $sql = "SELECT g.*, m.name as modulename
+          FROM {context} c, {course_modules} cm, {mmogame} g, {modules} m
+          WHERE c.id=? AND cm.id=c.instanceid AND g.id=cm.instance AND cm.module=m.id AND m.name=?";
+        $game = $DB->get_record_sql( $sql, [$contextid, 'mmogame']);
+        if ($game === false) {
+            return;
+        }
+
+        $sql = "SELECT DISTINCT qbe.questioncategoryid as id
             FROM {mmogame_aa_stats} stats,{question_versions} qv, {question_bank_entries} qbe
             WHERE stats.mmogameid=?
             AND qv.questionid=stats.queryid
             AND qbe.id=qv.questionbankentryid AND qbe.id=qv.questionbankentryid";
-        echo $sql." [$backupid, $cm->instance]\n";
-        $DB->execute( $sql, [$backupid, $cm->instance]);
+        $recs = $DB->get_records_sql( $sql, [$cm->instance]);
+        $ids = [];
+        foreach ($recs as $rec) {
+            $ids[$rec->id] = $rec->id;
+        }
+
+        if ($game->qbank == 'moodlequestion') {
+            $a = explode( ',', $game->qbankparams);
+            foreach ($a as $id) {
+                $id = intval( $id);
+                $ids[$id] = $id;
+            }
+        }
+
+        foreach ($ids as $id) {
+            $rec = new stdClass();
+            $rec->backupid = $backupid;
+            $rec->itemname = 'question_category';
+            $rec->itemid = $id;
+            $DB->insert_record( 'backup_ids_temp', $rec);
+        }
     }
 }
