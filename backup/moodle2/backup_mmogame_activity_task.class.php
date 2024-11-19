@@ -45,6 +45,16 @@ class backup_mmogame_activity_task extends backup_activity_task {
     protected function define_my_steps() {
         // The mmogame only has one structure step.
         $this->add_step(new backup_mmogame_activity_structure_step('mmogame_structure', 'mmogame.xml'));
+
+        // Process all the annotated questions to calculate the question
+        // categories needing to be included in backup for this activity
+        // plus the categories belonging to the activity context itself.
+        $this->add_step( new mmogame_backup_calculate_question_categories('activity_question_categories'));
+
+        // Clean backup_temp_ids table from questions. We already
+        // have used them to detect question_categories and aren't
+        // needed anymore.
+        $this->add_step(new backup_delete_temp_questions('clean_temp_questions'));
     }
 
     /**
@@ -65,5 +75,36 @@ class backup_mmogame_activity_task extends backup_activity_task {
         $content = preg_replace($search, '$@MMOGAMEVIEWBYID*$2@$', $content);
 
         return $content;
+    }
+}
+
+/**
+ * mmogame backup class that computes all question categories that are used in the game
+ */
+class mmogame_backup_calculate_question_categories extends backup_calculate_question_categories {
+    /**
+     * Define execution
+     */
+    protected function define_execution() {
+        static::calculate_question_categories($this->get_backupid(), $this->task->get_contextid());
+    }
+
+    /**
+     * Calculates question categories based on table mmogame_aa_stats
+     */    
+    static protected function calculate_question_categories($backupid, $contextid) {
+        global $DB;
+
+        $context = $DB->get_record_select( 'context', 'id=?', [$contextid]);
+        $cm = $DB->get_record_select( 'course_modules', 'id=?', [$context->instanceid]);
+
+        $sql = "INSERT INTO {backup_ids_temp} (backupid, itemname, itemid)
+            SELECT DISTINCT ?, 'question_category', qbe.questioncategoryid
+            FROM {mmogame_aa_stats} stats,{question_versions} qv, {question_bank_entries} qbe
+            WHERE stats.mmogameid=?
+            AND qv.questionid=stats.queryid
+            AND qbe.id=qv.questionbankentryid AND qbe.id=qv.questionbankentryid";
+        echo $sql." [$backupid, $cm->instance]\n";
+        $DB->execute( $sql, [$backupid, $cm->instance]);
     }
 }

@@ -78,14 +78,6 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
         $uguid = new backup_nested_element('uguid', ['id'],
             ['guid']);
 
-        $qinstances = new backup_nested_element('question_instances');
-
-        $qinstance = new backup_nested_element('question_instance', ['id'],
-                ['quizid', 'slot', 'page', 'displaynumber', 'requireprevious', 'maxmark', 'quizgradeitemid']);
-
-        $this->add_question_references($qinstance, 'mod_mmogame', 'queryid');
-        $this->add_question_set_references($qinstance, 'mod_mmogame', 'queryid');
-
         // This module is using questions, so produce the related question states and sessions
         // attaching them to the $attempt element based in 'uniqueid' matching.
         $this->add_question_usages($stat, 'queryid');
