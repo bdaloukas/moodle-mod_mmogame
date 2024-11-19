@@ -108,7 +108,7 @@ class mmogameModel_aduel {
         $sql = "SELECT a.*, s.percent".
             " FROM {$db->prefix}mmogame_am_aduel_pairs a ".
             " LEFT JOIN {$db->prefix}mmogame_aa_stats s ON ".
-            "a.mmogameid=s.mmogameid AND a.numgame=s.numgame AND a.auserid1=s.auserid AND s.queryid IS NULL AND teamid IS NULL".
+            "a.mmogameid=s.mmogameid AND a.numgame=s.numgame AND a.auserid1=s.auserid AND s.queryid IS NULL AND numteam IS NULL".
             " WHERE a.auserid2 IS NULL AND a.mmogameid=? AND a.numgame=? AND a.auserid1<>? AND a.isclosed1 = 1";
         $recs = $db->get_records_sql( $sql, [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
 

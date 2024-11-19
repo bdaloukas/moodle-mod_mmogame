@@ -97,12 +97,12 @@ class mmogameqbank {
      * Returns the id of selected queries.
      *
      * @param int $auserid
-     * @param int $teamid
+     * @param int $numteam
      * @param int $count (how many queries they want)
      *
      * @return array of int or false if no queries found.
      */
-    protected function get_queries($auserid, $teamid, $count) {
+    protected function get_queries($auserid, $numteam, $count) {
         $ids = $this->get_queries_ids();
         if ($ids === false) {
             return false;
@@ -111,12 +111,12 @@ class mmogameqbank {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
 
-        if ($teamid == null) {
+        if ($numteam == null || $numteam == 0) {
             $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=?',
                 [$rgame->id, $rgame->numgame, $auserid], '', 'queryid,countused,countcorrect,counterror');
         } else {
-            $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND teamid=?',
-                [$rgame->id, $rgame->numgame, $teamid], '', 'queryid,countused,countcorrect,counterror');
+            $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND numteam=?',
+                [$rgame->id, $rgame->numgame, $numteam], '', 'queryid,countused,countcorrect,counterror');
         }
 
         $map = [];
@@ -144,8 +144,8 @@ class mmogameqbank {
         shuffle( $ret);
 
         foreach ($ret as $q) {
-            if ($teamid != null) {
-                $this->update_stats( null, $teamid, $q->id, true, false, false);
+            if ($numteam != null && $numteam != 0) {
+                $this->update_stats( null, $numteam, $q->id, true, false, false);
             } else {
                 $this->update_stats( $auserid, null, $q->id, true, false, false);
             }
@@ -205,14 +205,14 @@ class mmogameqbank {
      * The score2 is a temporary score e.g. chat phase of arguegraph.
      *
      * @param int $auserid
-     * @param int $teamid
+     * @param int $numteam
      * @param int $queryid
      * @param boolean $isused
      * @param boolean $iscorrect
      * @param boolean $iserror
      * @param array $values
      */
-    public function update_stats($auserid, $teamid, $queryid, $isused, $iscorrect, $iserror, $values = false) {
+    public function update_stats($auserid, $numteam, $queryid, $isused, $iscorrect, $iserror, $values = false) {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
 
@@ -225,12 +225,12 @@ class mmogameqbank {
             $select .= ' AND auserid IS NULL';
             $auserid = null;
         }
-        if ($teamid != null && $teamid != 0 && $teamid !== false) {
-            $select .= ' AND teamid=?';
-            $a[] = $teamid;
+        if ($numteam != null && $numteam != 0 && $numteam !== false) {
+            $select .= ' AND numteam=?';
+            $a[] = $numteam;
         } else {
-            $select .= ' AND teamid IS NULL';
-            $teamid = null;
+            $select .= ' AND numteam IS NULL';
+            $numteam = null;
         }
         if ($queryid !== null && $queryid != 0 && $queryid !== false) {
             $select .= ' AND queryid=?';
@@ -278,7 +278,7 @@ class mmogameqbank {
             $count = $iscorrect + $iserror;
             $percent = $count == 0 ? null : $iscorrect / $count;
             $a = ['mmogameid' => $rgame->id,
-                'numgame' => $rgame->numgame, 'queryid' => $queryid, 'auserid' => $auserid, 'teamid' => $teamid,
+                'numgame' => $rgame->numgame, 'queryid' => $queryid, 'auserid' => $auserid, 'numteam' => $numteam,
                 'percent' => $percent, 'countused' => $isused, 'countcorrect' => $iscorrect,
                 'counterror' => $iserror, ];
             if ($values !== false) {

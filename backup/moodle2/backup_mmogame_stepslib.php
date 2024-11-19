@@ -46,7 +46,7 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
         $stats = new backup_nested_element('stats');
 
         $stat = new backup_nested_element('stat', ['id'],
-            ['numgame', 'queryid', 'auserid', 'teamid', 'counterror', 'timeerror', 'countcorrect',
+            ['numgame', 'queryid', 'auserid', 'numteam', 'counterror', 'timeerror', 'countcorrect',
             'countused', 'position', 'count1', 'count2', 'percent', 'countanswers', 'countcompleted', ]);
 
         $states = new backup_nested_element('states');

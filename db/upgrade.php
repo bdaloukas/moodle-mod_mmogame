@@ -492,5 +492,48 @@ function xmldb_mmogame_upgrade( $oldversion) {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
+    if ($oldversion < ($ver = 2024119003)) {
+        $table = new xmldb_table('mmogame_aa_stats');
+        $index = new xmldb_index('index_unique', XMLDB_INDEX_UNIQUE,
+            ['mmogameid', 'numgame', 'queryid', 'auserid', 'teamid']);
+
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024119004)) {
+        $table = new xmldb_table('mmogame_aa_stats');
+        $field = new xmldb_field('teamid');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024119015)) {
+        $table = new xmldb_table( 'mmogame_aa_stats');
+        $field = new xmldb_field( 'teamid', XMLDB_TYPE_INTEGER, 10, null, null, null, '0');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'numteam');
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024119016)) {
+        $table = new xmldb_table('mmogame_aa_stats');
+        $index = new xmldb_index('index_unique', XMLDB_INDEX_UNIQUE,
+            ['mmogameid', 'numgame', 'queryid', 'auserid', 'numteam']);
+
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }
