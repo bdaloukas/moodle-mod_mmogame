@@ -61,12 +61,12 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data = (object)$data;
         $oldid = $data->id;
         $data->course = $this->get_courseid();
-        
+
         if ($data->qbank == MMOGAME_QBANK_MOODLEQUESTION) {
             $a = explode( ',', $data->qbankparams);
             $new = '';
-            foreach( $a as $id) {
-                if( intval( $id) != 0) {
+            foreach ($a as $id) {
+                if (intval( $id) != 0) {
                     $new .= ($new != '' ? ',' : '').$this->get_mappingid( 'question_category', $id);
                 }
             }
@@ -257,6 +257,9 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $this->add_related_files('mod_mmogame', 'intro', null);
     }
 
+    /**
+     * Not used
+     */
     protected function inform_new_usage_id($newusageid) {
 
     }
