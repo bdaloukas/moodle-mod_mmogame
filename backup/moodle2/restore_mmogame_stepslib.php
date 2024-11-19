@@ -61,6 +61,17 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data = (object)$data;
         $oldid = $data->id;
         $data->course = $this->get_courseid();
+        
+        if ($data->qbank == MMOGAME_QBANK_MOODLEQUESTION) {
+            $a = explode( ',', $data->qbankparams);
+            $new = '';
+            foreach( $a as $id) {
+                if( intval( $id) != 0) {
+                    $new .= ($new != '' ? ',' : '').$this->get_mappingid( 'question_category', $id);
+                }
+            }
+            $data->qbankparams = $new;
+        }
 
         // Insert the mmogame record.
         $newitemid = $DB->insert_record('mmogame', $data);
