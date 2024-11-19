@@ -84,7 +84,7 @@ class restore_mmogame_activity_task extends restore_activity_task {
     public static function define_restore_log_rules() {
         $rules = [];
 
-        $rules[] = new restore_log_rule('mmogmae', 'add', 'view.php?id={course_module}', '{mmogame}');
+        $rules[] = new restore_log_rule('mmogame', 'add', 'view.php?id={course_module}', '{mmogame}');
         $rules[] = new restore_log_rule('mmogame', 'update', 'view.php?id={course_module}', '{mmogame}');
         $rules[] = new restore_log_rule('mmogame', 'view', 'view.php?id={course_module}', '{mmogame}');
         $rules[] = new restore_log_rule('mmogame', 'choose', 'view.php?id={course_module}', '{mmogame}');

@@ -23,7 +23,7 @@ define( 'MMOGAME_RESTORE_QBANK_MOODLEQUESTION', 1);
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_mmogame_activity_structure_step extends restore_activity_structure_step {
+class restore_mmogame_activity_structure_step extends restore_questions_activity_structure_step {
     /**
      * Define the structure of the restore workflow.
      *
@@ -198,9 +198,10 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
         $data->mmogameid = $this->get_new_parentid('mmogame');
         $qbank = $this->get_mappingid('mmogame_qbank', $data->mmogameid);
 
-        //$data->queryid
+        if ($data->queryid != null) {
+            $data->queryid = $this->get_mappingid('question', $data->queryid);
+        }
         $data->auserid = $this->get_mappingid('mmogame_auser', $data->auserid);
-        //$data->teamid
 
         $newitemid = $DB->insert_record('mmogame_aa_stats', $data);
     }
@@ -243,5 +244,9 @@ class restore_mmogame_activity_structure_step extends restore_activity_structure
     protected function after_execute() {
         // Add mmogame related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_mmogame', 'intro', null);
+    }
+
+    protected function inform_new_usage_id($newusageid) {
+
     }
 }
