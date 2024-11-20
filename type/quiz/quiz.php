@@ -169,7 +169,7 @@ class mmogame_quiz extends mmogame {
      *
      * @param object $db
      * @param object $rgame
-     * @param int auserid
+     * @param int $auserid
      */
     public static function delete_auser($db, $rgame, $auserid) {
         $db->delete_records_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);

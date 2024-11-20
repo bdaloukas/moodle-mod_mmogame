@@ -60,6 +60,8 @@ class backup_mmogame_activity_task extends backup_activity_task {
     /**
      * Code the transformations to perform in the activity in
      * order to get transportable (encoded) links
+     *
+     * @param object $content
      */
     public static function encode_content_links($content) {
         global $CFG;
@@ -91,6 +93,9 @@ class mmogame_backup_calculate_question_categories extends backup_calculate_ques
 
     /**
      * Calculates question categories based on table mmogame_aa_stats
+     *
+     * @param int $backupid
+     * @param int $contextid
      */
     protected static function calculate_question_categories($backupid, $contextid) {
         global $DB;

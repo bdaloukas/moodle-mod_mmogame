@@ -259,6 +259,8 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
 
     /**
      * Not used
+     *
+     * @param int $newusageid
      */
     protected function inform_new_usage_id($newusageid) {
 
