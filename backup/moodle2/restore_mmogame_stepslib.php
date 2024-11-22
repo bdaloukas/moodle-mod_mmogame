@@ -35,16 +35,22 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $paths[] = new restore_path_element('mmogame_state', '/activity/mmogame/states/state');
 
         $paths[] = new restore_path_element('mmogame', '/activity/mmogame');
-        $paths[] = new restore_path_element('mmogame_auser', '/activity/mmogame/auser/');
         if ($userinfo) {
             $type = new restore_path_element('mmogame_type',
                                                    '/activity/mmogame/types/type');
             $paths[] = $type;
             $this->add_subplugin_structure('mmogametype', $type);
-            
-            $paths[] = new restore_path_element('mmogame_uguid', '/activity/mmogame/uquids/uguid');
+
+            // Common tables.
             $paths[] = new restore_path_element('mmogame_avatar', '/activity/mmogame/avatars/avatar');
             $paths[] = new restore_path_element('mmogame_palette', '/activity/mmogame/palettes/palette');
+
+            // Users.
+            $paths[] = new restore_path_element('mmogame_uguid', '/activity/mmogame/uquids/uguid');
+            $paths[] = new restore_path_element('mmogame_auser', '/activity/mmogame/ausers/auser');
+            $paths[] = new restore_path_element('mmogame_auser_moodle', '/activity/mmogame/ausers/auser_moodle');
+
+            // Users tables.
             $paths[] = new restore_path_element('mmogame_grade', '/activity/mmogame/grades/grade');
             $paths[] = new restore_path_element('mmogame_stat', '/activity/mmogame/stats/stat');
             $paths[] = new restore_path_element('mmogame_aduel_pair', '/activity/mmogame/pairs/pair');
@@ -95,39 +101,7 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
      */
     protected function process_mmogame_type($data) {
         global $DB;
-/*
-        if (!$this->includesubmission) {
-            return;
-        }
 
-        $data = (object)$data;
-        $oldid = $data->id;
-
-        $data->assignment = $this->get_new_parentid('assign');
-
-        if ($data->userid > 0) {
-            $data->userid = $this->get_mappingid('user', $data->userid);
-        }
-        if (!empty($data->groupid)) {
-            $data->groupid = $this->get_mappingid('group', $data->groupid);
-            if (!$data->groupid) {
-                // If the group does not exist, then the submission cannot be viewed and restoring can
-                // violate the unique index on the submission table.
-                return;
-            }
-        } else {
-            $data->groupid = 0;
-        }
-
-        // We will correct this in set_latest_submission_field() once all submissions are restored.
-        $data->latest = 0;
-
-        $newitemid = $DB->insert_record('assign_submission', $data);
-
-        // Note - the old contextid is required in order to be able to restore files stored in
-        // sub plugin file areas attached to the submissionid.
-        $this->set_mapping('submission', $oldid, $newitemid, false, null, $this->task->get_old_contextid());
-*/        
     }
 
     /**
@@ -143,9 +117,10 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
 
         if ($data->kind == 'guid') {
             $data->instanceid = get_mapping( 'mmogame_uguid', $data->instanceid, $data->instanceid);
+        } else if ($data->kind == 'moodle') {
+            $data->instanceid = $this->get_mappingid('user', $data->instanceid);
         }
 
-        $data->instanceid = $this->get_mappingid('user', $data->instanceid);
         $rec = $DB->get_record_select( 'mmogame_aa_users',
             'kind=? AND instanceid=?', [$data->kind, $data->instanceid]);
         if ($rec === false) {
@@ -155,6 +130,18 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         }
 
         $this->set_mapping('mmogame_auser', $oldid, $newitemid);
+    }
+
+    /**
+     * Process a auser_moodle restore
+     * @param object $data The data in object form
+     * @return void
+     */
+    protected function process_mmogame_auser_moodle($data) {
+        $data = (object)$data;
+        $data->kind = 'moodle';
+
+        $this->process_mmogame_auser($data);
     }
 
     /**

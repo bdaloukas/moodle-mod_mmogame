@@ -62,8 +62,11 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
         $types = new backup_nested_element( 'types');
         $type = new backup_nested_element( 'type');
 
-        $ausers = new backup_nested_element( 'ausers');
-        $auser = new backup_nested_element('auser', ['id'], ['kind', 'instanceid', 'lastlogin', 'lastip']);
+        $ausers = new backup_nested_element('ausers');
+        $ausermoodle = new backup_nested_element('auser_moodle', ['id'],
+            ['instanceid', 'lastlogin', 'lastip']);
+        $auser = new backup_nested_element('auser', ['id'],
+            ['kind', 'instanceid', 'lastlogin', 'lastip']);
 
         $avatars = new backup_nested_element( 'avatars');
         $avatar = new backup_nested_element('avatar', ['id'],
@@ -82,11 +85,15 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
         // attaching them to the $attempt element based in 'uniqueid' matching.
         $this->add_question_usages($stat, 'queryid');
 
+        // Define id annotations.
+        $ausermoodle->annotate_ids('user', 'instanceid');
+
         // Build the tree.
         $mmogame->add_child($uguids);
         $uguids->add_child($uguid);
 
         $mmogame->add_child($ausers);
+        $ausers->add_child($ausermoodle);
         $ausers->add_child($auser);
 
         $mmogame->add_child($avatars);
@@ -118,7 +125,13 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
             $params = [backup::VAR_PARENTID];
 
             $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_users u
-                WHERE id IN (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+                WHERE kind='moodle'
+                AND id IN (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+            $ausermoodle->set_source_sql( $sql, $params);
+
+            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_users u
+                WHERE kind<>'moodle'
+                AND id IN (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
             $auser->set_source_sql( $sql, $params);
 
             $sql = "SELECT uq.* FROM {$CFG->prefix}mmogame_aa_users_guid uq, {$CFG->prefix}mmogame_aa_users u
