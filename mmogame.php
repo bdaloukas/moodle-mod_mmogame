@@ -442,8 +442,7 @@ class mmogame {
             $avatarid = $this->get_avatar_default( $auserid);
         }
         if ($colorpaletteid == null || $colorpaletteid == 0) {
-            $rec = $this->db->get_record_select( 'mmogame_aa_colorpalettes',
-                'category="Game Design" AND name="Valheim / UI Redesign"', null, 'id as minid');
+            $rec = $this->db->get_record_select( 'mmogame_aa_colorpalettes', 'category=? AND name=?', ['Game Design', 'Valheim / UI Redesign'], 'id as minid');
             if ($rec === false) {
                 $rec = $this->db->get_record_select( 'mmogame_aa_colorpalettes', '', null, 'min(id) as minid');
             }

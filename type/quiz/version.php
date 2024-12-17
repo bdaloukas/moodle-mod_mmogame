@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024112201;
+$plugin->version   = 2024121700;
 $plugin->requires  = 2010112400;
 $plugin->component = 'mmogametype_quiz';

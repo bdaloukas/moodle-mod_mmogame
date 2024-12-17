@@ -505,8 +505,10 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         }
         // Deleted 2 * count so to remain count.
         for ($i = 1; $i <= 2 * $count; $i++) {
-            $key = array_rand( $map2, 1);
-            unset( $map2[$key]);
+			if (count( $map2) > 0) {
+				$key = array_rand( $map2, 1);
+				unset( $map2[$key]);
+			}
         }
         ksort( $map2);
         $ret = [];
