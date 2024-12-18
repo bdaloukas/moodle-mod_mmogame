@@ -196,7 +196,7 @@ class mmogame {
     /**
      * Return the an empty string. It is overwring.
      */
-    public function get_table_attempts() {
+    public static function get_table_attempts() {
         return '';
     }
 
