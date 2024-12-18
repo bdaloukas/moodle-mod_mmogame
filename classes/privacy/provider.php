@@ -230,7 +230,7 @@ class provider implements
         }
 
         // This will delete all attempts and mmogame grades for this game.
-        mmogame::delete_auser( $db, cm->instance, $auserid);
+        mmogame::delete_auser( $db, $cm->instance, $auserid);
     }
 
     /**

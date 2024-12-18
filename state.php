@@ -30,8 +30,8 @@ define('NO_OUTPUT_BUFFERING', true);
 define('NO_CONFIG_CHECK', true);
 require('../../config.php');
 
-$fastjson = \core\param::from_type( \core\param::INT->value)->required_param( 'fastjson');
-$type = \core\param::from_type( \core\param::ALPHA->value)->required_param( 'type');
+$fastjson = filter_input(INPUT_POST, 'fastjson', FILTER_SANITIZE_NUMBER_INT);
+$type = filter_input(INPUT_POST, 'type', FILTER_SANITIZE_STRING);
 
 $ret = '';
 $filemain = $CFG->dataroot. '/temp/mmogame/states/'.substr( $fastjson, -2) ."/{$fastjson}";
