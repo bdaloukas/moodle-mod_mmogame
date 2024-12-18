@@ -196,7 +196,7 @@ function dogetcolorpalettes( $mmogame, $data, &$ret) {
  * @param array $ret (the value of key "colors" containg the 5 colors of palette)
  */
 function dosetcolorpalette( $mmogame, $data, &$ret) {
-    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data);
+    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
     $mmogame->set_colorpalette( $auserid, $data->id);
 

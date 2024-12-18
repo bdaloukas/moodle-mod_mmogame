@@ -230,7 +230,7 @@ class provider implements
         }
 
         // This will delete all attempts and mmogame grades for this game.
-        mmogame::delete_auser( $db, $cm->instance, $auserid);
+        mmogame::delete_auser( new \mmogame_database_moodle(), $cm->instance, $auserid);
     }
 
     /**
@@ -302,7 +302,7 @@ class provider implements
      * @param   approved_userlist    $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        global $DB;
+        $db = new \mmogame_database_moodle();
 
         $context = $userlist->get_context();
         if ($context->contextlevel != CONTEXT_MODULE) {

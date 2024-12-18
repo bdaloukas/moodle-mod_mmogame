@@ -418,7 +418,7 @@ class mmogame {
         foreach ($grades as $grade) {
             $colorpaletteid = $grade->colorpaletteid;
             $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND avatarid=?',
-                [$instance->id, $this->rgame->numgame, $grade->avatarid]);
+                [$this->rgame->id, $this->rgame->numgame, $grade->avatarid]);
             if ($rec === false) {
                 $avatarid = $grade->avatarid;
             }

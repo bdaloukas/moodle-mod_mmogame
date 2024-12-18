@@ -89,7 +89,6 @@ class mod_mmogame_mod_form extends moodleform_mod {
 
         $mform->addElement('select', 'qbank', get_string('sourcemodule', 'mmogame'), $qbankoptions);
 
-        $this->definition_glossary( $mform);
         $this->definition_question( $mform);
 
         $usersoptions = [];
@@ -174,11 +173,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
 
         $errors = parent::validation($data, $files);
 
-        if ($data['qbank'] == 'glossary') {
-            if (!array_key_exists( 'glossaryid', $data) || $data['glossaryid'] == 0) {
-                $errors['glossaryid'] = get_string( 'sourcemodule_glossary', 'mmogame');
-            }
-        } else if ($data['qbank'] == 'question') {
+        if ($data['qbank'] == 'question') {
             if (!array_key_exists( 'questioncategoryid', $data) || $data['questioncategoryid'] == 0) {
                 $errors['questioncategoryid'] = get_string( 'sourcemodule_questioncategory', 'game');
             }
@@ -187,21 +182,6 @@ class mod_mmogame_mod_form extends moodleform_mod {
         if ($data['kinduser'] == MMOGAME_KINDUSER_GUID) {
             if (intval( $data['pin']) == 0) {
                 $errors['pin'] = get_string( 'missing_pin', 'mmogame');
-            }
-        }
-
-        if (array_key_exists( 'glossarycategoryid', $data)) {
-            if ($data['glossarycategoryid'] != 0) {
-                $sql = "SELECT glossaryid FROM {$CFG->prefix}glossary_categories ".
-                " WHERE id=".$data['glossarycategoryid'];
-                $rec = $DB->get_record_sql( $sql);
-                if ($rec != false) {
-                    if ($data['glossaryid'] != $rec->glossaryid) {
-                        $s = get_string( 'different_glossary_category', 'game');
-                        $errors['glossaryid'] = $s;
-                        $errors['glossarycategoryid'] = $s;
-                    }
-                }
             }
         }
 
@@ -304,16 +284,6 @@ class mod_mmogame_mod_form extends moodleform_mod {
             $defaultvalues->instance = 0;
         }
 
-        foreach ($defaultvalues as $key => $name) {
-            if (substr( $key, 0, 10) != 'categoryid') {
-                continue;
-            }
-            $name = 'categoryid'.$i;
-            $defaultvalues->$name = 0;
-            $name = 'numquestions'.$i;
-            $defaultvalues->$name = 0;
-        }
-
         if (isset( $defaultvalues->qbankparams)) {
             $a = explode( ',', $defaultvalues->qbankparams);
             if ($defaultvalues->qbank == MMOGAME_QBANK_MOODLEQUESTION) {
@@ -322,66 +292,11 @@ class mod_mmogame_mod_form extends moodleform_mod {
                     $n++;
                     $name = 'categoryid'.$n;
                     $defaultvalues->$name = $s;
-                    $name = 'numquestions'.$n;
-                    $defaultvalues->$name = 1;
-                }
-            } else if ($defaultvalues->qbank == MMOGAME_QBANK_MOODLEGLOSSARY) {
-                if (count( $a) >= 1) {
-                    $defaultvalues->glossaryid = $a[0];
-                }
-                if (count( $a) >= 2) {
-                    $defaultvalues->glossaryid = $a[0];
-                    $defaultvalues->glossarycategoryid = $a[1];
                 }
             }
         }
     }
 
-    /**
-     * Computes the categories of all glossaries of the current course;
-     *
-     * @param array $a array of id of glossaries to each name
-     *
-     * @return array of glossary categories
-     */
-    public function get_array_glossary_categories($a) {
-        global $CFG, $DB;
-
-        if (count( $a) == 0) {
-            $select = 'gc.glossaryid = -1';
-        } else if (count($a) == 1) {
-            foreach ($a as $id => $name) {
-                $select = 'gc.glossaryid = '.$id;
-                break;
-            }
-        } else {
-            $select = '';
-            foreach ($a as $id => $name) {
-                $select .= ','.$id;
-            }
-            $select = 'gc.glossaryid IN ('.substr( $select, 1).')';
-        }
-
-        $a = [];
-
-        // Fills with the count of entries in each glossary.
-        $a[0] = '';
-        // Fills with the count of entries in each category.
-        $sql2 = "SELECT COUNT(*) ".
-        " FROM {$CFG->prefix}glossary_entries ge, {$CFG->prefix}glossary_entries_categories gec".
-        " WHERE gec.categoryid=gc.id AND gec.entryid=ge.id";
-        $sql = "SELECT gc.id,gc.name,g.name as name2,g.globalglossary,g.course, ($sql2) as c ".
-        " FROM {$CFG->prefix}glossary_categories gc, {$CFG->prefix}glossary g".
-        " WHERE $select AND gc.glossaryid=g.id".
-        " ORDER BY g.name, gc.name";
-        if ($recs = $DB->get_records_sql( $sql)) {
-            foreach ($recs as $rec) {
-                $a[$rec->id] = $rec->name2.' -> '.$rec->name.' ('.$rec->c.')';
-            }
-        }
-
-        return $a;
-    }
 
     /**
      * Computes the categories of all question of the current course
@@ -398,37 +313,5 @@ class mod_mmogame_mod_form extends moodleform_mod {
             $mform->setType($name1, PARAM_INT);
             $mform->hideIf($name1, 'qbank', 'neq', MMOGAME_QBANK_MOODLEQUESTION);
         }
-    }
-
-    /**
-     * Show fields about selecting glossaries
-     *
-     * @param object $mform
-     * @return array of question categories
-     */
-    public function definition_glossary(&$mform) {
-        global $DB, $COURSE, $CFG;
-
-        $a = [];
-        $sql = "SELECT id,name,globalglossary,course FROM {$CFG->prefix}glossary ".
-            "WHERE course={$COURSE->id} OR globalglossary=1 ORDER BY globalglossary DESC,name";
-        if ($recs = $DB->get_records_sql($sql)) {
-            foreach ($recs as $rec) {
-                if (($rec->globalglossary != 0) && ($rec->course != $COURSE->id)) {
-                    $rec->name = '*'.$rec->name;
-                }
-                $a[$rec->id] = $rec->name;
-            }
-        }
-        $mform->addElement('select', 'glossaryid', get_string('sourcemodule_glossary', 'mmogame'), $a);
-        $mform->hideIf('glossaryid', 'qbank', 'neq', 'moodleglossary');
-
-        $a = $this->get_array_glossary_categories( $a);
-        $mform->addElement('select', 'glossarycategoryid', get_string('sourcemodule_glossarycategory', 'mmogame'), $a);
-        $mform->hideIf('glossarycategoryid', 'qbank', 'neq', 'moodleglossary');
-
-        // Only approved.
-        $mform->addElement('selectyesno', 'glossaryonlyapproved', get_string('glossary_only_approved', 'mmogame'));
-        $mform->hideIf('glossaryonlyapproved', 'qbank', 'neq', 'moodleglossary');
     }
 }

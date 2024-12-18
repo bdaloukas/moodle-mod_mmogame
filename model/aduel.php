@@ -40,11 +40,11 @@ class mmogameModel_aduel {
      * @param array $ret
      */
     public static function json_getadmin($data, $mmogame, &$ret) {
-        $state = $ret['state'] = $game->get_rstate()->state;
+        $state = $ret['state'] = $mmogame->get_rstate()->state;
 
         $params = [$mmogame->get_id(), $mmogame->get_numgame];
-        $ret['stats_users'] = $game->get_db()->count_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=?', $params);
-        $ret['stats_answers'] = $game->get_db()->count_records_select( 'mmogame_quiz_attempts',
+        $ret['stats_users'] = $mmogame->get_db()->count_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=?', $params);
+        $ret['stats_answers'] = $mmogame->get_db()->count_records_select( 'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND timeanswer <> 0', $params);
     }
 
@@ -52,19 +52,19 @@ class mmogameModel_aduel {
      * Administrator can change numgame or state
      *
      * @param object $data
-     * @param object $game
+     * @param object $mmogame
      */
-    public static function json_setadmin($data, $game) {
+    public static function json_setadmin($data, $mmogame) {
         $ret = [];
         if (isset( $data->numgame) && $data->numgame > 0) {
-            $game->get_rstate()->state = 0;
-            $game->get_db()->update_record( 'mmogame', ['id' => $game->get_id(), 'numgame' => $data->numgame]);
-            $game->update_state( $game->get_rstate()->state);
-            $game->set_state_json( $game->get_rstate()->state, $ret);
+            $mmogame->get_rstate()->state = 0;
+            $mmogame->get_db()->update_record( 'mmogame', ['id' => $mmogame->get_id(), 'numgame' => $data->numgame]);
+            $mmogame->update_state( $mmogame->get_rstate()->state);
+            $mmogame->set_state_json( $mmogame->get_rstate()->state, $ret);
         } else if (isset( $data->state)) {
             if ($data->state >= 0 && $data->state <= MMOGAME_ADUEL_STATE_LAST) {
-                $game->update_state( $data->state);
-                $game->set_state_json( $data->state, $ret);
+                $mmogame->update_state( $data->state);
+                $mmogame->set_state_json( $data->state, $ret);
             }
         }
     }
@@ -262,6 +262,6 @@ class mmogameModel_aduel {
      * @param object $mmogame
      */
     public static function delete($mmogame) {
-        $game->get_db()->delete_records_select( 'mmogame_am_aduel_pairs', 'id=?', [$mmogame->get_aduel()->id]);
+        $mmogame->get_db()->delete_records_select( 'mmogame_am_aduel_pairs', 'id=?', [$mmogame->get_aduel()->id]);
     }
 }

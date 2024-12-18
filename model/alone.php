@@ -62,9 +62,9 @@ class mmogameModel_alone {
      * @param array $ret
      */
     public static function json_getadmin($data, $mmogame, &$ret) {
-        $state = $ret['state'] = $game->get_rstate()->state;
+        $state = $ret['state'] = $mmogame->get_rstate()->state;
 
-        $ret['stats_users'] = $game->get_db()->count_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=?',
+        $ret['stats_users'] = $mmogame->get_db()->count_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=?',
             [$mmogame->get_id(), $mmogame->get_numgame()]);
         $ret['stats_answers'] = $mmogame->get_db()->count_records_select( 'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=?',

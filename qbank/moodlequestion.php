@@ -173,9 +173,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
         $filekeys = $targetwidth = $targetheight = [];
 
         $ret['qtype'.$num] = $rec->qtype;
-        $definition = self::checkforimages( $courseid, $db, $rec->definition, $rec->id,
-            $courseid, 'course', 'question', 'questiontext', $maxwidth, $maxheight, true,
-            $files, $filekeys, $filewidth, $fileheight);
+        $definition = $rec->definition;
 
         $ret['definition'.$num] = $definition;
         if ($this->is_shortanswer( $rec)) {
@@ -200,9 +198,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
             foreach ($rec->answers as $info) {
                 $info = $d[$l[$n] - 1];
                 $n++;
-                $ret['answer'.$num.'_'.$n] = self::checkforimages( $courseid, $db,
-                    $info->answer, $info->id, $courseid, 'course', 'question', 'answer',
-                    $maxwidth, $maxheight, true, $files, $filekeys, $filewidth, $fileheight);
+                $ret['answer'.$num.'_'.$n] = $info->answer;
                 $ret['answerid'.$num.'_'.$n] = $info->id;
             }
             $ret['answers'.$num] = $n;
@@ -226,7 +222,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
         }
 
         foreach ($recs as $rec) {
-            $this->get_record2( $rec);
+            $this->load2( $rec);
         }
 
         return $recs;
@@ -291,7 +287,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
             $ret = '';
             foreach ($query->answers as $answer) {
                 if ($answer->fraction > 0) {
-                    $ret .= ($ret != '' ? ',' : '').$intval( $answer->id);
+                    $ret .= ($ret != '' ? ',' : '').intval( $answer->id);
                 }
             }
             return $ret;
@@ -543,78 +539,5 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
         }
 
         return $ret;
-    }
-
-    /**
-     * Return info for images included in questions
-     *
-     * @param int $courseid
-     * @param object $db
-     * @param string $s
-     * @param int $itemid
-     * @param int $instanceid
-     * @param string $module
-     * @param string $component
-     * @param string $filearea
-     * @param int $maxwidth
-     * @param int $maxheight
-     * @param boolean $exportimages
-     * @param array $files
-     * @param array $filekeys
-     * @param int $filewidth
-     * @param int $fileheight
-     * @return string
-     */
-    public static function checkforimages($courseid, $db, $s, $itemid, $instanceid, $module, $component,
-    $filearea, $maxwidth, $maxheight, $exportimages, &$files, &$filekeys, &$filewidth, &$fileheight) {
-        $fs = false;
-
-        $contextid = 0;
-        for (;;) {
-            $find = '@@PLUGINFILE@@/';
-            $pos = strpos( $s, $find);
-            if ($pos != false) {
-                $pos2 = strpos( $s, '"', $pos);
-                if ($pos2 != false) {
-                    if ($contextid == 0) {
-                        if ($module == 'course') {
-                            $contextid = context_course::instance( $instanceid)->id;
-                        } else {
-                            $sql = "SELECT cm.id FROM {$db->prefix}course_modules cm, {$db->prefix}modules m".
-                               " WHERE cm.module = m.id AND cm.course=? AND cm.instance=? AND m.name='{$module}'";
-                            $cm = $db->get_record_sql( $sql, [$courseid, $instanceid]);
-                            $contextid = context_module::instance( $cm->id)->id;
-                        }
-                    }
-
-                    $filename = urldecode( substr( $s, $pos + strlen( $find), $pos2 - $pos - strlen( $find)));
-                    $pos3 = strpos( $filename, '?');
-                    if ($pos3 != false) {
-                        $filename = substr( $filename, 0, $pos3);
-                    }
-
-                    if ($fs === false) {
-                        $fs = get_file_storage();
-                    }
-                    $filepath = '/';
-                    $file = $fs->get_file($contextid, $component, $filearea, $itemid, $filepath, $filename);
-                    if (!$file) {
-                        return $s; // The file does not exist.
-                    }
-
-                    $guid = $file->get_contenthash();
-                    $files[$guid] = mmogame_CheckForImages_base64( $db, $file, $maxwidth, $maxheight, $instanceid,
-                        $targetwidth, $targetheight);
-                    $filekeys[] = $guid;
-                    $filewidth[$guid] = $targetwidth;
-                    $fileheight[$guid] = $targetheight;
-                    $s = substr( $s, 0, $pos).'@@GUID@@'.$guid.substr( $s, $pos2);
-                    continue;
-                }
-            }
-            break;
-        }
-
-        return $s;
     }
 }
