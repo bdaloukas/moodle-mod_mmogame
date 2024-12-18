@@ -22,30 +22,6 @@
     opacity: 0.5;
 }
 
-.mmogame_buttons {
-    position: absolute;
-    border: solid .125em transparent;
-    padding: 0;
-    width: $button-w;
-    height: $button-h;
-    border-radius: .5*$button-h;
-    color: #fff;
-    text-shadow: 1px 1px var(--c-sh-txt, #{rgba(#000, .5)});
-    filter: contrast(.65);
-    transition: .2s ease-out;
-    cursor: pointer;
-
-    &:hover,
-    &:focus {
-        outline: none;
-        filter: none;
-    }
-
-    &:active {
-        transform: translateY($move-act);
-    }
-}
-
 .mmogame_button {
     position: absolute;
     border: solid 0.125em transparent;
