@@ -63,17 +63,6 @@ $capabilities = [
         ],
     ],
 
-    // Ability for a 'Student' to review their previous attempts. Review by
-    // 'Teachers' is controlled by mod/mmogame:viewreports.
-    'mod/mmogame:reviewmyattempts' => [
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'student' => CAP_ALLOW,
-        ],
-        'clonepermissionsfrom' => 'moodle/mmogame:attempt',
-    ],
-
     // Edit the mmogame settings, add and remove questions.
     'mod/mmogame:manage' => [
         'riskbitmask' => RISK_SPAM,
@@ -86,18 +75,6 @@ $capabilities = [
     ],
 
 
-    // View the mmogame reports.
-    'mod/mmogame:viewreports' => [
-        'riskbitmask' => RISK_PERSONAL,
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-    ],
-
     // Delete attempts using the overview report.
     'mod/mmogame:deleteattempts' => [
         'riskbitmask' => RISK_DATALOSS,
@@ -107,12 +84,5 @@ $capabilities = [
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
         ],
-    ],
-
-    // Do not have the time limit imposed. Used for accessibility legislation compliance.
-    'mod/mmogame:ignoretimelimits' => [
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [],
     ],
 ];
