@@ -30,7 +30,7 @@ require_login($course->id, false, $cm);
 $model = $mmogame->get_model();
 require( "admin_{$model}.php");
 
-$context = mmogame_get_context_module_instance( $cm->id);
+$context = context_module::instance( $cm->id);
 require_capability('mod/mmogame:view', $context);
 
 // Initialize $PAGE, compute blocks.

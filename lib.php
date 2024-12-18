@@ -27,21 +27,6 @@ define( 'MMOGAME_QBANK_MOODLEGLOSSARY', 'moodleglossary');
 define( 'MMOGAME_QBANK_NONE', 'none');
 define( 'MMOGAME_QBANK_NUM_CATEGORIES', 3);
 
-/**
- * Returns the context instance of a Module. Is the same for all version of Moodle.
- *
- * This is used to find out if scale used anywhere
- *
- * @param int $moduleid
- * @return stdClass context
- */
-function mmogame_get_context_module_instance( $moduleid) {
-    if (class_exists( 'context_module')) {
-        return context_module::instance( $moduleid);
-    }
-
-    return get_context_instance( CONTEXT_MODULE, $moduleid);
-}
 
 /**
  * Returns the version of Moodle.

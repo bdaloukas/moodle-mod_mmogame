@@ -163,7 +163,7 @@ class provider implements
         // Fetch the individual games.
         $cms = $DB->get_recordset_sql($sql, $params);
         foreach ($cms as $cm) {
-            $context = mmogame_get_context_module_instance( $cm->id);
+            $context = context_module::instance( $cm->id);
 
             $data = \core_privacy\local\request\helper::get_context_data($context, $contextlist->get_user());
 
