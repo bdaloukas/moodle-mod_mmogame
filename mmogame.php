@@ -640,7 +640,7 @@ class mmogame {
 
         // Creates an upload directory in temp.
         $file = $this->rgame->fastjson === null ? '00' : $this->rgame->fastjson;
-        $newdir = $CFG->dataroot.'/temp/mmogame/states/'.substr( $file, -2);
+        $newdir = $CFG->dataroot.'/local/mmogame/states/'.substr( $file, -2);
         if (!is_dir( $newdir)) {
             mkdir( $newdir, 0777, true);
         }

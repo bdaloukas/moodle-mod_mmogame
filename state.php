@@ -34,7 +34,7 @@ $fastjson = filter_input(INPUT_POST, 'fastjson', FILTER_SANITIZE_NUMBER_INT);
 $type = filter_input(INPUT_POST, 'type', FILTER_UNSAFE_RAW);
 
 $ret = '';
-$filemain = $CFG->dataroot. '/temp/mmogame/states/'.substr( $fastjson, -2) ."/{$fastjson}";
+$filemain = $CFG->dataroot. '/local/mmogame/states/'.substr( $fastjson, -2) ."/{$fastjson}";
 if (!file_exists( $filemain.'.txt')) {
     return;
 }
