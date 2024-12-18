@@ -194,6 +194,13 @@ class mmogame {
     }
 
     /**
+     * Return the an empty string. It is overwring.
+     */
+    public function get_table_attempts() {
+        return '';
+    }
+
+    /**
      * Return the coresponding record of variable auserid.
      */
     public function get_ruser() {
@@ -316,7 +323,7 @@ class mmogame {
     public function json_items_table($table, $mainid, $data, &$ret) {
         $recs = $this->db->get_records_select( $table, 'mainid=?', [$mainid]);
 
-        $ret = [];
+        $ret = $files = [];
         $num = 1;
         foreach ($recs as $rec) {
             $squestion = $this->qbank->load_json( $this->rgame->course, $this->db, $ret, $num++, $rec->squestionid,

@@ -140,6 +140,8 @@ class mmogame_quiz extends mmogame {
         $recquery = false;
 
         if ($attempt->queryid != 0) {
+            $filewidth = $fileheight = 0;
+            $files = [];
             $recquery = $this->get_qbank()->load_json( $this, $ret, '', $attempt->queryid, $attempt->layout,
             $files, false, $filewidth, $fileheight, $maxwidth, $maxheight);
         }
