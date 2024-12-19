@@ -313,28 +313,6 @@ class mmogame {
     }
 
     /**
-     * Fills the array $ret with info values`
-     *
-     * @param string $table
-     * @param int $mainid
-     * @param object $data
-     * @param array $ret
-     */
-    public function json_items_table($table, $mainid, $data, &$ret) {
-        $recs = $this->db->get_records_select( $table, 'mainid=?', [$mainid]);
-
-        $ret = $files = [];
-        $num = 1;
-        foreach ($recs as $rec) {
-            $squestion = $this->qbank->load_json( $this->rgame->course, $this->db, $ret, $num++, $rec->squestionid,
-                $files, false, $data->maxwidth, $data->maxheight);
-        }
-        $ret['items'] = $num - 1;
-
-        return $recs;
-    }
-
-    /**
      * Returns the next numattempt of the current game.
      */
     public function compute_next_numattempt() {

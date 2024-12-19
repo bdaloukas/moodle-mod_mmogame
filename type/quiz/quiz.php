@@ -141,9 +141,7 @@ class mmogame_quiz extends mmogame {
 
         if ($attempt->queryid != 0) {
             $filewidth = $fileheight = 0;
-            $files = [];
-            $recquery = $this->get_qbank()->load_json( $this, $ret, '', $attempt->queryid, $attempt->layout,
-            $files, false, $filewidth, $fileheight, $maxwidth, $maxheight);
+            $recquery = $this->get_qbank()->load_json( $this, $ret, '', $attempt->queryid, $attempt->layout);
         }
         $ret['timestart'] = $attempt->timestart;
         $ret['timeclose'] = $attempt->timeclose;

@@ -149,28 +149,18 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
     /**
      * Copy data from questions to $ret that is used to json call.
      *
-     * @param object $game
+     * @param object $mmogame
      * @param string $ret
      * @param int $num
      * @param id $id
      * @param int $layout
-     * @param array $files
      * @param string $fillconcept
-     * @param int $filewidth
-     * @param int $fileheight
-     * @param int $maxwidth
-     * @param int $maxheight
      */
-    public function load_json($game, &$ret, $num, $id, $layout, &$files, $fillconcept,
-    &$filewidth, &$fileheight, $maxwidth = 0, $maxheight = 0) {
-        $courseid = $game->get_rgame()->course;
-        $db = $game->get_db();
-        $files = $filewidth = $fileheight = [];
+    public function load_json($mmogame, &$ret, $num, $id, $layout, $fillconcept) {
+        $courseid = $mmogame->get_rgame()->course;
 
         $rec = $this->load( $id, true);
         $contextid = 0;
-
-        $filekeys = $targetwidth = $targetheight = [];
 
         $ret['qtype'.$num] = $rec->qtype;
         $definition = $rec->definition;
