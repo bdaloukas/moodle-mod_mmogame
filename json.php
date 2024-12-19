@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+global $DB;
 
 /**
  * This file contains the JSON protocol
@@ -37,7 +38,7 @@ if (!isset( $data->command)) {
 }
 $ret = [];
 
-$game = mmogame::getgame( $db, $data->mmogameid, $data->pin);
+$game = mmogame::getgame( $db, $data->mmogameid);
 
 switch( $data->command) {
     case 'getavatars':
@@ -82,7 +83,7 @@ die( json_encode( $ret));
  *
  * @return object.
  */
-function get_data() {
+function get_data(): object {
     $s = urldecode( file_get_contents("php://input"));
 
     return json_decode($s, false);
@@ -152,7 +153,7 @@ function dosetavatar( $mmogame, $data, &$ret) {
  * @return int (-1, 0 or 1)
  */
 function usort_mmogame_palettes( $a, $b) {
-    return calcualteHue( $a[0]) <=> calcualteHue( $b[0]);
+    return mmogame::calcualteHue( $a[0]) <=> mmogame::calcualteHue( $b[0]);
 }
 
 /**
@@ -170,10 +171,7 @@ function dogetcolorpalettes( $mmogame, $data, &$ret) {
 
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
-    $info = $mmogame->get_avatar_info( $auserid);
     $pals = $mmogame->get_palettes( $auserid);
-
-    $pals2 = [];
 
     while (count( $pals) > $data->countcolors) {
         $pos = array_rand( $pals);
