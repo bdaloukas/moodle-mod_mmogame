@@ -57,8 +57,6 @@ class mmogame {
     protected int $timelimit = 0;
     /** @var $rstate: the record of table mmogame_aa_states. */
     protected $rstate;
-    /** @var $params: parameters. */
-    protected $params;
 
     /**
      * Constructor.
@@ -66,7 +64,7 @@ class mmogame {
      * @param object $db (the database)
      * @param object $rgame (a record from table mmogame)
      */
-    public function __construct($db, $rgame) {
+    public function __construct(object $db, object $rgame) {
         $this->db = $db;
 
         if ($rgame->numgame == 0) {
@@ -104,14 +102,14 @@ class mmogame {
      * Sets the variable code.
      @param string $code
      */
-    public function set_errorcode($code) {
+    public function set_errorcode($code): void {
         $this->error = $code;
     }
 
     /**
      * Returns the variable error.
      */
-    public function get_errorcode() {
+    public function get_errorcode(): string {
         return $this->error;
     }
 
@@ -125,7 +123,8 @@ class mmogame {
     /**
      * Return the variable db.
      */
-    public function get_db() {
+    public function get_db(): object
+    {
         return $this->db;
     }
 
@@ -188,7 +187,7 @@ class mmogame {
     /**
      * Return the variable auserid.
      */
-    public function get_auserid() {
+    public function get_auserid(): int {
         return $this->auserid;
     }
 
@@ -208,7 +207,7 @@ class mmogame {
     public static function get_auserid_from_guid($db, $guid, $create = true) {
         $rec = $db->get_record_select( 'mmogame_aa_users_guid', 'guid=?', [$guid]);
         if ($rec === false) {
-            if ($create == false) {
+            if (!$create) {
                 return false;
             }
             $userid = $db->insert_record( 'mmogame_aa_users_guid', ['guid' => $guid, 'lastlogin' => time()]);
@@ -224,7 +223,7 @@ class mmogame {
      * @param object $db
      * @param string $code
      */
-    public static function get_auserid_from_usercode($db, $code) {
+    public static function get_auserid_from_usercode(object $db, $code) {
         $rec = $db->get_record_select( 'mmogame_aa_users_code', 'code=?', [$code]);
         if ($rec === false) {
             return false;
@@ -291,14 +290,14 @@ class mmogame {
      *
      * @param object $db
      * @param int $id
-     * @return object
+     * @return false|object
      */
     public static function getgame($db, $id) {
         $rgame = $db->get_record_select('mmogame', "id=?", [$id]);
         if ($rgame === false) {
             return false;
         }
-        require_once( "type/{$rgame->type}/{$rgame->type}_{$rgame->model}.php");
+        require_once( 'type/'.$rgame->type.'/'.$rgame->type.'_'.$rgame->model.'.php');
 
         $class = 'mmogame_'.$rgame->type;
         return $class::get_new($db, $rgame);
@@ -349,6 +348,7 @@ class mmogame {
             $sql = "SELECT id, numuser FROM {$db->prefix}mmogame_aa_avatars ORDER BY numused, randomkey";
             $recs = $db->get_records_sql( $sql, 0, 1);
         }
+        $avatarid = 0;
         if (count( $recs) != 0) {
             foreach ($recs as $rec) {
                 $avatarid = $rec->id;
