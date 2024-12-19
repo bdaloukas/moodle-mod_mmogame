@@ -22,9 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/** Identifier the Moodle Questions as source of question bank. */
 const MMOGAME_QBANK_MOODLEQUESTION = 'moodlequestion';
+/** Identifier the Moodle Glossary as source of question bank. */
 const MMOGAME_QBANK_MOODLEGLOSSARY = 'moodleglossary';
-const MMOGAME_QBANK_NUM_CATEGORIES = 3;
 
 /**
  * Given an object containing all the necessary data, will create a new instance and return the id number of the new instance.
@@ -146,13 +147,14 @@ function mmogame_before_add_or_update_question( $mmogame) {
 
     $a = [];
 
-    for ($i = 1; $i <= MMOGAME_QBANK_NUM_CATEGORIES; $i++) {
-        $name = 'categoryid'.$i;
-
-        if (isset( $mmogame->$name) && ($mmogame->$name != 0)) {
-            $a[] = $mmogame->$name;
+    // Iterate over all properties of the $mmogame object.
+    foreach (get_object_vars($mmogame) as $name => $value) {
+        // Check if the property name starts with 'categoryid' and has a non-zero value.
+        if (str_starts_with($name, 'categoryid') && $value != 0) {
+            $a[] = $value;
         }
     }
+
     $mmogame->qbankparams = implode( ',', $a);
 }
 
@@ -245,10 +247,8 @@ function mmogame_get_types(): array {
  * @return mixed True if module supports feature, false if not, null if doesn't know or string for the module purpose.
  */
 function mmogame_supports(string $feature) {
-    switch($feature) {
-        case FEATURE_BACKUP_MOODLE2:
-            return true;
-        default:
-            return null;
-    }
+    return match ($feature) {
+        FEATURE_BACKUP_MOODLE2 => true,
+        default => null,
+    };
 }

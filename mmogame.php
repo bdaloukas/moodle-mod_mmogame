@@ -26,14 +26,14 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once( dirname(__FILE__).'/qbank/qbank.php');
 
-const MMOGAME_ALONE_STATE_PLAY = 1;
+/** Identifier the last state of model Alone */
 const MMOGAME_ALONE_STATE_LAST = 1;
 
-const MMOGAME_ADUEL_STATE_NONE = 0;
+/** Identifier the state for "play" of model Aduel */
 const MMOGAME_ADUEL_STATE_PLAY = 1;
-const MMOGAME_ADUEL_STATE_LAST = 1;
 
-const MMOGAME_ERRORCODE_NOQUERIES = 'noqueries';
+/** Identifier the last state of model Aduel */
+const MMOGAME_ADUEL_STATE_LAST = 1;
 
 /**
  * The class mmogame is the base class for all games
@@ -43,18 +43,18 @@ const MMOGAME_ERRORCODE_NOQUERIES = 'noqueries';
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogame {
-    /** @var $db: database to be used. */
-    protected $db;
-    /** @var $rgame: the record of table mmogame. */
-    protected $rgame;
-    /** @var $auserid: the user (table mmogame_aa_users). */
-    protected $auserid = 0;
+    /** @var object $db: database to be used. */
+    protected object $db;
+    /** @var object $rgame: the record of table mmogame. */
+    protected object $rgame;
+    /** @var int $auserid: the user (table mmogame_aa_users). */
+    protected int $auserid = 0;
     /** @var $qbank: question bank to be used. */
-    protected $qbank = false;
-    /** @var $error: saves the error code. */
-    protected $error = '';
-    /** @var $timelimit: maximum time in seconds for answer. */
-    protected $timelimit = 0;
+    protected mixed $qbank = false;
+    /** @var string $error: saves the error code. */
+    protected string $error = '';
+    /** @var int $timelimit: maximum time in seconds for answer. */
+    protected int $timelimit = 0;
     /** @var $rstate: the record of table mmogame_aa_states. */
     protected $rstate;
     /** @var $params: parameters. */
