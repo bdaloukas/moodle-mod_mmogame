@@ -15,12 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is the entry point to the mmogame module. All pages are rendered from here
+ * Form for creating and modifying a game
  *
- * @package    mod_mmogame
+ * @package    mmogametype_quiz
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('NO_MOODLE_COOKIES', true);
-require( "../../config.php");
+// General settings.

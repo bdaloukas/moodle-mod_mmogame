@@ -200,6 +200,6 @@ function dosetcolorpalette( $mmogame, $data, &$ret) {
 
     $mmogame->set_colorpalette( $auserid, $data->id);
 
-    $info = $game->get_avatar_info( $auserid);
+    $info = $mmogame->get_avatar_info( $auserid);
     $ret['colors'] = implode( ',', $info->colors);
 }

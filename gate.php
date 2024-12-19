@@ -33,7 +33,7 @@ $pin = required_param('pin', PARAM_INT);
 $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid, $pin]);
 if ($rgame === false) {
     $data = new stdClass();
-    $data->mmogameid = $id;
+    $data->mmogameid = $mmogameid;
     $data->pin = $pin;
     echo get_string( 'ivalid_mmogame_or_pin', 'mmogame', $data);
     die;
@@ -47,7 +47,7 @@ if ($rgame === false) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="MMOGAME Gate.">
 <title><?php echo $rgame->name; ?></title>
-<style type="text/css">
+<style>
 <?php echo file_get_contents( dirname(__FILE__)."/styles.css"); ?>
 </style>
 <body onload="runmmogame()">
@@ -70,23 +70,23 @@ echo "<script>\n";
 mmogame_change_javascript( $rgame->type, 'js/mmogame.js');
 $class = 'mmogame'.ucfirst($rgame->type).ucfirst($rgame->model);
 mmogame_change_javascript( $rgame->type, 'js/gate.js', '[CLASS]', $class);
-mmogame_change_javascript( $rgame->type, "type/{$rgame->type}/js/{$rgame->type}.js");
-mmogame_change_javascript( $rgame->type, "type/{$rgame->type}/js/{$rgame->type}_{$rgame->model}.js");
+mmogame_change_javascript( $rgame->type, "type/$rgame->type/js/$rgame->type.js");
+mmogame_change_javascript( $rgame->type, 'type/'.$rgame->type.'/js/'.$rgame->type.'_'.$rgame->model.'.js');
 
 ?>
     function runmmogame() {
         let game = new mmogameGate();
         game.repairColors( <?php echo $colors;?>)
-        game.open(<?php echo "\"{$CFG->wwwroot}/mod/mmogame/json.php\",{$rgame->id},
-            {$rgame->pin},{$usercode},\"{$rgame->kinduser}\"" ?>);
+        game.open(<?php echo "\"$CFG->wwwroot/mod/mmogame/json.php\",$rgame->id,
+            $rgame->pin,$usercode,\"$rgame->kinduser\"" ?>);
     }
-</script>
+</body>
 
 <?php
 /**
  * Reads a javascript file and changes some string for translation replacing [LANG_...], [LANGM_...], [CLASS].
  *
- * @param string $type (type is a sub-plugin name e.g. quiz).'
+ * @param string $type (type is a sub-plugin name e.g. quiz).
  * @param string $file
  * @param string $search
  * @param string $replace
@@ -95,7 +95,7 @@ mmogame_change_javascript( $rgame->type, "type/{$rgame->type}/js/{$rgame->type}_
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
-function mmogame_change_javascript( $type, $file, $search = '', $replace = '') {
+function mmogame_change_javascript(string $type, string $file, string $search = '', string $replace = '') {
     if (!file_exists( dirname(__FILE__).'/'.$file)) {
         return;
     }

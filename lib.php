@@ -22,34 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define( 'MMOGAME_QBANK_MOODLEQUESTION', 'moodlequestion');
-define( 'MMOGAME_QBANK_MOODLEGLOSSARY', 'moodleglossary');
-define( 'MMOGAME_QBANK_NONE', 'none');
-define( 'MMOGAME_QBANK_NUM_CATEGORIES', 3);
-
-
-/**
- * Returns the version of Moodle.
- *
- * @return string version
- */
-function mmogame_get_moodle_version() {
-    global $DB;
-
-    static $smoodleversion = null;
-
-    if ($smoodleversion != null) {
-        return $smoodleversion;
-    }
-
-    $rec = $DB->get_record_select( 'config', "name='release'");
-    if ($rec == false) {
-        return $smoodleversion = '';
-    } else {
-        $a = explode( '.', $rec->value);
-        return $smoodleversion = sprintf( '%02u.%02u', $a[0], $a[1]);
-    }
-}
+const MMOGAME_QBANK_MOODLEQUESTION = 'moodlequestion';
+const MMOGAME_QBANK_MOODLEGLOSSARY = 'moodleglossary';
+const MMOGAME_QBANK_NUM_CATEGORIES = 3;
 
 /**
  * Given an object containing all the necessary data, will create a new instance and return the id number of the new instance.
@@ -57,8 +32,8 @@ function mmogame_get_moodle_version() {
  * @param object $mform An object from the form in mod.html
  *
  * @return int The id of the newly inserted game record
- **/
-function mmogame_add_instance( $mform) {
+ */
+function mmogame_add_instance( $mform): int {
     global $DB;
 
     mmogame_before_add_or_update( $mform);
@@ -98,7 +73,7 @@ function mmogame_add_instance( $mform) {
  * @param int $mmogameid Id of the module instance
  * @return boolean Success/Failure
  **/
-function mmogame_delete_instance( $mmogameid) {
+function mmogame_delete_instance(int $mmogameid): bool {
     global $CFG, $DB;
 
     $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid]);
@@ -123,9 +98,7 @@ function mmogame_delete_instance( $mmogameid) {
  *
  * @param stdClass $mform
  */
-function mmogame_before_add_or_update( &$mform) {
-    global $DB;
-
+function mmogame_before_add_or_update(stdClass $mform) {
     if (!isset( $mform->qbank)) {
         return;
     }
@@ -153,7 +126,7 @@ function mmogame_before_add_or_update( &$mform) {
  *
  * @param stdClass $mmogame
  */
-function mmogame_before_add_or_update_glossary( &$mmogame) {
+function mmogame_before_add_or_update_glossary( $mmogame) {
     if (!isset( $mmogame->glossaryid)) {
         $mmogame->glossaryid = 0;
     }
@@ -161,7 +134,7 @@ function mmogame_before_add_or_update_glossary( &$mmogame) {
         $mmogame->glossarycategoryid = 0;
     }
 
-    $mmogame->qbankparams = "{$mmogame->glossaryid},{$mmogame->glossarycategoryid}";
+    $mmogame->qbankparams = $mmogame->glossaryid.','.$mmogame->glossarycategoryid;
 }
 
 /**
@@ -169,7 +142,7 @@ function mmogame_before_add_or_update_glossary( &$mmogame) {
  *
  * @param stdClass $mmogame
  */
-function mmogame_before_add_or_update_question( &$mmogame) {
+function mmogame_before_add_or_update_question( $mmogame) {
 
     $a = [];
 
@@ -189,7 +162,7 @@ function mmogame_before_add_or_update_question( &$mmogame) {
  * @param object $mmogame An object from the form in mod.html
  * @return boolean Success/Fail
  **/
-function mmogame_update_instance( $mmogame) {
+function mmogame_update_instance( $mmogame): bool {
     global $DB;
 
     $mmogame->id = $mmogame->instance;
@@ -209,7 +182,7 @@ function mmogame_update_instance( $mmogame) {
  * @param boolean $trim
  * @return string (the guid)
  */
-function mmogame_guidv4($trim = true) {
+function mmogame_guidv4(bool $trim = true): string {
     // Windows.
     if (function_exists('com_create_guid') === true) {
         if ($trim) {
@@ -233,14 +206,13 @@ function mmogame_guidv4($trim = true) {
     $hyphen = chr(45);                  // Is "-".
     $lbrace = $trim ? "" : chr(123);    // Is "{".
     $rbrace = $trim ? "" : chr(125);    // Is "}".
-    $guidv4 = $lbrace.
+    return $lbrace.
               substr($charid,  0,  8).$hyphen.
               substr($charid,  8,  4).$hyphen.
               substr($charid, 12,  4).$hyphen.
               substr($charid, 16,  4).$hyphen.
               substr($charid, 20, 12).
               $rbrace;
-    return $guidv4;
 }
 
 /**
@@ -248,7 +220,7 @@ function mmogame_guidv4($trim = true) {
  *
  * @return array of strings
  */
-function mmogame_get_types() {
+function mmogame_get_types(): array {
     $dir = __DIR__.'/type';
     $types = [];
     if (is_dir($dir)) {
@@ -272,7 +244,7 @@ function mmogame_get_types() {
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed True if module supports feature, false if not, null if doesn't know or string for the module purpose.
  */
-function mmogame_supports($feature) {
+function mmogame_supports(string $feature) {
     switch($feature) {
         case FEATURE_BACKUP_MOODLE2:
             return true;

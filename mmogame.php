@@ -26,15 +26,14 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once( dirname(__FILE__).'/qbank/qbank.php');
 
-define( 'MMOGAME_ALONE_STATE_NONE', 0);
-define( 'MMOGAME_ALONE_STATE_PLAY', 1);
-define( 'MMOGAME_ALONE_STATE_LAST', 1);
+const MMOGAME_ALONE_STATE_PLAY = 1;
+const MMOGAME_ALONE_STATE_LAST = 1;
 
-define( 'MMOGAME_ADUEL_STATE_NONE', 0);
-define( 'MMOGAME_ADUEL_STATE_PLAY', 1);
-define( 'MMOGAME_ADUEL_STATE_LAST', 1);
+const MMOGAME_ADUEL_STATE_NONE = 0;
+const MMOGAME_ADUEL_STATE_PLAY = 1;
+const MMOGAME_ADUEL_STATE_LAST = 1;
 
-define( 'MMOGAME_ERRORCODE_NOQUERIES', 'noqueries');
+const MMOGAME_ERRORCODE_NOQUERIES = 'noqueries';
 
 /**
  * The class mmogame is the base class for all games
@@ -44,21 +43,21 @@ define( 'MMOGAME_ERRORCODE_NOQUERIES', 'noqueries');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogame {
-    /** @var db: database to be used. */
+    /** @var $db: database to be used. */
     protected $db;
-    /** @var rgame: the record of table mmogame. */
+    /** @var $rgame: the record of table mmogame. */
     protected $rgame;
-    /** @var auserid: the user (table mmogame_aa_users). */
+    /** @var $auserid: the user (table mmogame_aa_users). */
     protected $auserid = 0;
-    /** @var qbank: question bank to be used. */
+    /** @var $qbank: question bank to be used. */
     protected $qbank = false;
-    /** @var error: saves the error code. */
+    /** @var $error: saves the error code. */
     protected $error = '';
-    /** @var timelimit: maximum time in seconds for answer. */
+    /** @var $timelimit: maximum time in seconds for answer. */
     protected $timelimit = 0;
-    /** @var rstate: the record of table mmogame_aa_states. */
+    /** @var $rstate: the record of table mmogame_aa_states. */
     protected $rstate;
-    /** @var params: parameters. */
+    /** @var $params: parameters. */
     protected $params;
 
     /**
@@ -79,7 +78,7 @@ class mmogame {
 
         $this->rstate = $this->db->get_record_select( 'mmogame_aa_states', 'mmogameid=? AND numgame=?',
             [$this->rgame->id, $this->rgame->numgame]);
-        if ($this->rstate == false) {
+        if ($this->rstate == 0) {
             $id = $this->db->insert_record( 'mmogame_aa_states',
                 ['mmogameid' => $this->rgame->id,
                 'numgame' => $this->rgame->numgame, 'state' => 0,
@@ -196,15 +195,8 @@ class mmogame {
     /**
      * Return the an empty string. It is overwring.
      */
-    public static function get_table_attempts() {
+    public static function get_table_attempts(): string {
         return '';
-    }
-
-    /**
-     * Return the coresponding record of variable auserid.
-     */
-    public function get_ruser() {
-        return $this->db->get_record_select( 'mmogame_aa_users', 'id=?', [$this->auserid]);
     }
 
     /**
@@ -251,7 +243,7 @@ class mmogame {
     public static function get_auserid_from_db($db, $kind, $userid, $create) {
         $rec = $db->get_record_select( 'mmogame_aa_users', 'kind = ? AND instanceid=?', [$kind, $userid]);
 
-        if ($rec != false) {
+        if ($rec !== false) {
             return $rec->id;
         }
 
@@ -279,7 +271,7 @@ class mmogame {
                 return self::get_auserid_from_db( $db, $data->kinduser, $data->user, true);
             }
         } else {
-            return self::get_auserid_from_guid( $db, $data->user, true);
+            return self::get_auserid_from_guid( $db, $data->user);
         }
     }
 
@@ -287,7 +279,7 @@ class mmogame {
      * Marks user as loged in.
      * @param int $auserid
      */
-    public function login_user($auserid) {
+    public function login_user(int $auserid) {
         $this->db->update_record( 'mmogame_aa_users',
             ['id' => $auserid, 'lastlogin' => time(), 'lastip' => self::get_ip()]);
 
@@ -335,7 +327,7 @@ class mmogame {
             " WHERE g.mmogameid=? AND g.numgame<>? AND auserid=? ".
             " AND NOT EXISTS( ".
                 "SELECT * FROM {$db->prefix}mmogame_aa_grades g2 WHERE g2.numgame=g.numgame AND ".
-                " g2.mmogameid=g.mmogameid AND g2.avatarid=g.avatarid AND g2.id<>g.id)";
+                " g2.mmogameid=g.mmogameid AND g2.avatarid=g.avatarid AND g2.id<>g.id)".
             " ORDER BY g.id DESC, a.numused, a.randomkey";
         $recs = $db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
         if (count( $recs) != 0) {
