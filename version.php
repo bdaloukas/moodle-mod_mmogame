@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_mmogame';  // Full name of the plugin (used for diagnostics).
-$plugin->version   = 2024121808;  // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2024121900;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2022030300;  // Requires Moodle 4.0.
 $plugin->cron      = 0;           // Period for cron to check this module (secs).
-$plugin->release   = '2024-12-18';
+$plugin->release   = '2024-12-19';
 $plugin->maturity = MATURITY_STABLE;
