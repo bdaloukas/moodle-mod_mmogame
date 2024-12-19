@@ -27,14 +27,13 @@ require( "../../config.php");
 require_once( 'database/moodle.php');
 require_once(dirname(__FILE__) . '/mmogame.php');
 
-$db = new mmogame_database_moodle();
 $mmogameid = required_param('id', PARAM_INT);
 $pin = required_param('pin', PARAM_INT);
 
 $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid, $pin]);
 if ($rgame === false) {
     $data = new stdClass();
-    $data->mmogameid = $mmogameid;
+    $data->mmogameid = #id;
     $data->pin = $pin;
     echo get_string( 'ivalid_mmogame_or_pin', 'mmogame', $data);
     die;
@@ -55,10 +54,8 @@ if ($rgame === false) {
 
 <?php
 
-$game = mmogame::getgame( $db, $rgame->id, $pin);
-$type = $game->get_type();
 $color = $DB->get_record_select( 'mmogame_aa_colorpalettes', 'id=?', [2]);
-$colors = "[$color->color1, $color->color2, $color->color3, $color->color4, $color->color5]";
+$colors = '['.$color->color1.', '.$color->color2.', '.$color->color3.', '.$color->color4.', '.$color->color5.']';
 if ($rgame->kinduser == 'moodle') {
     $sql = "SELECT cm.* FROM {$CFG->prefix}course_modules cm, {$CFG->prefix}modules m ".
         " WHERE cm.module=m.id AND cm.course=? AND cm.instance=? AND m.name=? ";

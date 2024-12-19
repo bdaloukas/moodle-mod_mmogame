@@ -31,7 +31,6 @@ define('NO_CONFIG_CHECK', true);
 require('../../config.php');
 
 $fastjson = filter_input(INPUT_POST, 'fastjson', FILTER_SANITIZE_NUMBER_INT);
-$type = filter_input(INPUT_POST, 'type', FILTER_UNSAFE_RAW);
 
 $ret = '';
 $filemain = $CFG->dataroot. '/local/mmogame/states/'.substr( $fastjson, -2) ."/{$fastjson}";
