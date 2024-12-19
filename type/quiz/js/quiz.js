@@ -39,7 +39,7 @@ class mmogameQuiz extends mmogame {
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         let d = {"command": "getattempt", "mmogameid": this.mmogameid, "pin": this.pin, "kinduser": this.kinduser,
-            "user": this.auserid, "maxwidth": this.maxImageWidth, "maxheight": this.maxImageHeight, "subcommand": subcommand};
+            "user": this.auserid, "subcommand": subcommand};
         if (this.helpurl == undefined) {
             d.helpurl = 1;
         }

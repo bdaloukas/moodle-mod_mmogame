@@ -612,8 +612,7 @@ class mmogameGate extends mmogame {
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         let d = {"command": "getattempt", "mmogameid": this.mmogameid, "pin": this.pin, "kinduser": this.kinduser,
-            "user": auserid, "nickname": nickname, "paletteid": paletteid, "avatarid": avatarid,
-            "maxwidth": this.maxImageWidth, "maxheight": this.maxImageHeight};
+            "user": auserid, "nickname": nickname, "paletteid": paletteid, "avatarid": avatarid};
         if (this.helpurl == undefined) {
             d.helpurl = 1;
         }

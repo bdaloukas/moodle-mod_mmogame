@@ -125,8 +125,6 @@ class mmogame_quiz extends mmogame {
         $ret['percentcompleted'] = $info->percentcompleted;
         $ret['completedrank'] = $this->get_rank_alone( $auserid, 'percentcompleted');
 
-        $maxwidth = isset( $data->maxwidth) ? $data->maxwidth : 0;
-        $maxheight = isset( $data->maxheight) ? $data->maxheight : 0;
         if ($attempt === false) {
             $attempt = new stdClass();
             $attempt->id = 0;
@@ -140,7 +138,6 @@ class mmogame_quiz extends mmogame {
         $recquery = false;
 
         if ($attempt->queryid != 0) {
-            $filewidth = $fileheight = 0;
             $recquery = $this->get_qbank()->load_json( $this, $ret, '', $attempt->queryid, $attempt->layout);
         }
         $ret['timestart'] = $attempt->timestart;
