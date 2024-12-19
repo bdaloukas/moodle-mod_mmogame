@@ -123,8 +123,7 @@ class mmogame {
     /**
      * Return the variable db.
      */
-    public function get_db(): object
-    {
+    public function get_db(): object {
         return $this->db;
     }
 
