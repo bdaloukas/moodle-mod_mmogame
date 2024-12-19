@@ -181,7 +181,7 @@ function mmogame_update_instance( $mmogame): bool {
 /**
  * Returns a unique guid string version 4.
  *
- * @param boolean $trim
+ * @param bool $trim
  * @return string (the guid)
  */
 function mmogame_guidv4(bool $trim = true): string {
@@ -247,8 +247,10 @@ function mmogame_get_types(): array {
  * @return mixed True if module supports feature, false if not, null if doesn't know or string for the module purpose.
  */
 function mmogame_supports(string $feature) {
-    return match ($feature) {
-        FEATURE_BACKUP_MOODLE2 => true,
-        default => null,
-    };
+    switch ($feature) {
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        default:
+            return null;
+    }
 }

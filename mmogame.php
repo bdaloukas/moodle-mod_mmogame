@@ -50,7 +50,7 @@ class mmogame {
     /** @var int $auserid: the user (table mmogame_aa_users). */
     protected int $auserid = 0;
     /** @var $qbank: question bank to be used. */
-    protected mixed $qbank = false;
+    protected mixed $qbank;
     /** @var string $error: saves the error code. */
     protected string $error = '';
     /** @var int $timelimit: maximum time in seconds for answer. */
