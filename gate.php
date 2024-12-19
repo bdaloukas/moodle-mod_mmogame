@@ -33,7 +33,7 @@ $pin = required_param('pin', PARAM_INT);
 $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid, $pin]);
 if ($rgame === false) {
     $data = new stdClass();
-    $data->mmogameid = #id;
+    $data->mmogameid = $id;
     $data->pin = $pin;
     echo get_string( 'ivalid_mmogame_or_pin', 'mmogame', $data);
     die;
