@@ -138,7 +138,7 @@ class mmogame_quiz extends mmogame {
         $recquery = false;
 
         if ($attempt->queryid != 0) {
-            $recquery = $this->get_qbank()->load_json( $this, $ret, '', $attempt->queryid, $attempt->layout);
+            $recquery = $this->get_qbank()->load_json( $this, $ret, '', $attempt->queryid, $attempt->layout, false);
         }
         $ret['timestart'] = $attempt->timestart;
         $ret['timeclose'] = $attempt->timeclose;
