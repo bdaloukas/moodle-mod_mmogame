@@ -174,9 +174,9 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @param string $ids
      * @param bool $loadextra
      * @param string $fields
-     * @return array
+     * @return bool|array
      */
-    protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition'): array {
+    protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition') {
 
         $recs = $this->mmogame->get_db()->get_records_select( 'question', "id IN ($ids)", null, '', $fields);
 
@@ -337,7 +337,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      *
      * @return array|false
      */
-    public function get_queries_ids(): bool|array {
+    public function get_queries_ids() {
         $rgame = $this->mmogame->get_rgame();
         $qtypes = "'shortanswer'";
         $qtypes .= ($qtypes != '' ? ',' : '')."'multichoice'";
