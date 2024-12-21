@@ -127,7 +127,7 @@ function mmogame_before_add_or_update(stdClass $mform): void {
  *
  * @param stdClass $mmogame
  */
-function mmogame_before_add_or_update_glossary( $mmogame) {
+function mmogame_before_add_or_update_glossary(stdClass $mmogame): void {
     if (!isset( $mmogame->glossaryid)) {
         $mmogame->glossaryid = 0;
     }
@@ -163,7 +163,7 @@ function mmogame_before_add_or_update_question( $mmogame): void {
  * @param object $mmogame An object from the form in mod.html
  * @return boolean Success/Fail
  **/
-function mmogame_update_instance( $mmogame): bool {
+function mmogame_update_instance(object $mmogame): bool {
     global $DB;
 
     $mmogame->id = $mmogame->instance;
@@ -243,9 +243,9 @@ function mmogame_get_types(): array {
  * Return the list if Moodle features this module supports
  *
  * @param string $feature FEATURE_xx constant for requested feature
- * @return mixed True if module supports feature, false if not, null if doesn't know or string for the module purpose.
+ * @return ?bool True if module supports feature, false if not, null if doesn't know or string for the module purpose.
  */
-function mmogame_supports(string $feature) {
+function mmogame_supports(string $feature): ?bool {
     switch ($feature) {
         case FEATURE_BACKUP_MOODLE2:
             return true;

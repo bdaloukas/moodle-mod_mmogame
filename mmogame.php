@@ -202,8 +202,9 @@ class mmogame {
      * @param object $db
      * @param string $guid
      * @param boolean $create
+     * @return bool|int
      */
-    public static function get_auserid_from_guid($db, $guid, $create = true) {
+    public static function get_auserid_from_guid(object $db, string $guid, bool $create = true) {
         $rec = $db->get_record_select( 'mmogame_aa_users_guid', 'guid=?', [$guid]);
         if ($rec === false) {
             if (!$create) {
