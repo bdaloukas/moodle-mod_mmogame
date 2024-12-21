@@ -195,7 +195,7 @@ class mmogame {
      * Return coresponding auserid from guid (login without password).
      * @param object $db
      * @param string $guid
-     * @param boolean $create
+     * @param bool $create
      * @return bool|int
      */
     public static function get_auserid_from_guid(object $db, string $guid, bool $create = true) {
