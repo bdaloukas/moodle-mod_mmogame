@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Json file
+ * JSON file
  *
  * @package    mmogametype_quiz
  * @copyright  2024 Vasilis Daloukas

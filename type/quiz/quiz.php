@@ -53,7 +53,7 @@ class mmogame_quiz extends mmogame {
     }
 
     /**
-     * return the name of attempts table.
+     * return the name of tabler attempts.
      */
     public static function get_table_attempts(): string {
         return 'mmogame_quiz_attempts';
@@ -66,11 +66,11 @@ class mmogame_quiz extends mmogame {
      * @param int $timelimit
      * @param int $numattempt
      * @param int $timeclose
-     * @return object (the new attempt or false if no attempt)
+     * @return false|object (the new attempt or false if no attempt)
      */
     protected function get_attempt_new_internal(int $queryid, int $timelimit, int $numattempt, int $timeclose) {
         $table = 'mmogame_quiz_attempts';
-        if ($queryid === null || $queryid === false) {
+        if ($queryid === 0) {
             $query = false;
         } else {
             $query = $this->qbank->load( $queryid, true);
@@ -145,7 +145,7 @@ class mmogame_quiz extends mmogame {
     }
 
     /**
-     * Return the score with negative values. If "n" is the number of answer, if it corrects returns (n-1) else returns (-1)
+     * Return the score with negative values. If "n" is the number of answers, if it corrects returns (n-1) else returns (-1)
      *
      * @param boolean $iscorrect
      * @param object $query

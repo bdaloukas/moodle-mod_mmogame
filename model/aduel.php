@@ -21,7 +21,6 @@
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define( 'ERROR_ADUEL_USER2_NULL', 'aduel_user2_null');
 
 /**
  * The class mmogameModel_aduel has the code for model ADuel
@@ -33,50 +32,14 @@ define( 'ERROR_ADUEL_USER2_NULL', 'aduel_user2_null');
 class mmogameModel_aduel {
 
     /**
-     * Return info for administrator
-     *
-     * @param object $data (not used)
-     * @param object $mmogame
-     * @param array $ret
-     */
-    public static function json_getadmin($data, $mmogame, &$ret) {
-        $state = $ret['state'] = $mmogame->get_rstate()->state;
-
-        $params = [$mmogame->get_id(), $mmogame->get_numgame];
-        $ret['stats_users'] = $mmogame->get_db()->count_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=?', $params);
-        $ret['stats_answers'] = $mmogame->get_db()->count_records_select( 'mmogame_quiz_attempts',
-            'mmogameid=? AND numgame=? AND timeanswer <> 0', $params);
-    }
-
-    /**
-     * Administrator can change numgame or state
-     *
-     * @param object $data
-     * @param object $mmogame
-     */
-    public static function json_setadmin($data, $mmogame) {
-        $ret = [];
-        if (isset( $data->numgame) && $data->numgame > 0) {
-            $mmogame->get_rstate()->state = 0;
-            $mmogame->get_db()->update_record( 'mmogame', ['id' => $mmogame->get_id(), 'numgame' => $data->numgame]);
-            $mmogame->update_state( $mmogame->get_rstate()->state);
-            $mmogame->set_state_json( $mmogame->get_rstate()->state, $ret);
-        } else if (isset( $data->state)) {
-            if ($data->state >= 0 && $data->state <= MMOGAME_ADUEL_STATE_LAST) {
-                $mmogame->update_state( $data->state);
-                $mmogame->set_state_json( $data->state, $ret);
-            }
-        }
-    }
-
-    /**
      * Return the aduel record for current $mmogame record
      *
      * @param object $mmogame
      * @param int $newplayer1
      * @param int $newplayer2
+     * @return false|mixed
      */
-    public static function get_aduel($mmogame, &$newplayer1, &$newplayer2) {
+    public static function get_aduel(object $mmogame, int &$newplayer1, int &$newplayer2) {
         $newplayer1 = $newplayer2 = false;
         $auserid = $mmogame->get_auserid();
         $db = $mmogame->get_db();
@@ -86,13 +49,14 @@ class mmogameModel_aduel {
         if ($stat === false) {
             $stat = new stdClass();
             $stat->percent = $stat->id = $stat->count1 = $stat->count2 = 0;
-        };
+        }
 
         // Returns one that is started and not finished.
         $recs = $db->get_records_select( 'mmogame_am_aduel_pairs',
             'mmogameid=? AND numgame=? AND '.
             '(auserid1=? AND timestart1 <> 0 AND isclosed1 = 0 OR auserid2=? AND timestart2 <> 0 AND isclosed2 = 0)',
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid, $auserid], 'id', '*', 0, 1);
+        $rec = false;
         foreach ($recs as $rec) {
             return $rec;
         }
@@ -133,8 +97,8 @@ class mmogameModel_aduel {
         // Find a game with percent near my percent.
         $map = [];    // The map1 contains games with lower grade and map2 with upper grade.
         foreach ($recs as $rec) {
-            $step = $rec->percent <= $stat->percent ? 1 : 2; // 1 means lower than my percent.
-            // Try to find the bigger of smaller or small of biggers percent.
+            $step = $rec->percent <= $stat->percent ? 1 : 2; // 1 mean lower than my percent.
+            // Try to find the bigger of smaller or small of bigger percent.
             $key = $step.sprintf( '%10.6f %10d', abs( $rec->percent - $stat->percent), $rec->id);
             $map[$key] = $rec;
         }
@@ -144,7 +108,7 @@ class mmogameModel_aduel {
             break;
         }
 
-        // Check if it has a game without oponent.
+        // Check if it has a game without opponent.
         $rec->auserid2 = $auserid;
         $rec->timestart2 = time();
         $db->update_record( 'mmogame_am_aduel_pairs', ['id' => $rec->id, 'auserid2' => $auserid, 'timestart2' => time()]);
@@ -163,8 +127,9 @@ class mmogameModel_aduel {
      * @param object $mmogame
      * @param int $newplayer1
      * @param object $stat (the record of table mmogame_aa_stats)
+     * @return mixed
      */
-    public static function get_aduel_new($mmogame, &$newplayer1, $stat) {
+    public static function get_aduel_new(object $mmogame, int &$newplayer1, object $stat) {
         $db = $mmogame->get_db();
 
         $a = ['mmogameid' => $mmogame->get_id(), 'numgame' => $mmogame->get_numgame(), 'auserid1' => $mmogame->get_auserid(),
@@ -182,44 +147,13 @@ class mmogameModel_aduel {
     }
 
     /**
-     * Finishes the attempt for a duel game.
-     *
-     * @param object $mmogame The game instance that contains methods for updating grades and records.
-     * @param object $aduel The duel object containing user IDs and other related information.
-     * @param boolean $iscorrect1 Indicates if the first player's attempt is correct.
-     * @param boolean $iscorrect2 Indicates if the second player's attempt is correct.
-     * @param boolean $isclosed1 Indicates if the first player's duel is closed.
-     * @param boolean $isclosed2 Indicates if the second player's duel is closed.
-     * @param int $scorewin The score awarded if the first player wins.
-     * @param int $scorelose The score awarded if the first player loses.
-     * @param int $scoredraw The score awarded if the duel ends in a draw.
-     * @param int $adueladdscore The score to be added for the duel, passed by reference.
-     * @return int The score of the current user based on the outcome of the attempt.
-     */
-    public static function finish_attempt($mmogame, $aduel, $iscorrect1, $iscorrect2,
-    $isclosed1, $isclosed2, $scorewin, $scorelose, $scoredraw, &$adueladdscore) {
-        $score1 = $iscorrect1 == $iscorrect2 ? ($iscorrect1 ? $scoredraw : $scorelose) : ($iscorrect1 ? $scorewin : $scorelose);
-        $mmogame->get_qbank()->update_grades( $aduel->auserid1, $score1, 0, 1);
-
-        $score2 = $iscorrect1 == $iscorrect2 ? ($iscorrect1 ? $scoredraw : $scorelose) : ($iscorrect2 ? $scorewin : $scorelose);
-        $mmogame->get_qbank()->update_grades( $aduel->auserid2, $score2, 0, 1);
-
-        $mmogame->get_db()->update_record( 'mmogame_am_aduel_pairs',
-            ['id' => $aduel->id, 'isclosed1' => $isclosed1, 'isclosed2' => $isclosed2]);
-
-        $adueladdscore = $mmogame->get_auserid() == $aduel->auserid1 ? $score2 : $score1;
-
-        return $mmogame->get_auserid() == $aduel->auserid1 ? $score1 : $score2;
-    }
-
-    /**
      * Return an attempt record of the game
      *
      * @param object $mmogame
      * @param object $aduel
-     * @return object (the attempt record)
+     * @return false|object (the attempt record)
      */
-    public static function get_attempt($mmogame, $aduel) {
+    public static function get_attempt(object $mmogame, object $aduel) {
 
         $table = $mmogame->get_table_attempts();
         $db = $mmogame->get_db();
@@ -261,7 +195,7 @@ class mmogameModel_aduel {
      *
      * @param object $mmogame
      */
-    public static function delete($mmogame) {
+    public static function delete(object $mmogame) {
         $mmogame->get_db()->delete_records_select( 'mmogame_am_aduel_pairs', 'id=?', [$mmogame->get_aduel()->id]);
     }
 }

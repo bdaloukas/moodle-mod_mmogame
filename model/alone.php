@@ -30,44 +30,4 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogameModel_alone {
-    /**
-     * Administrator can change numgame or state
-     *
-     * @param object $data
-     * @param object $mmogame
-     */
-    public static function json_setadmin($data, $mmogame) {
-        $rgame = $mmogame->get_rgame();
-
-        $ret = [];
-        if (isset( $data->numgame) && $data->numgame > 0) {
-            $rgame->numgame = $data->numgame;
-            $mmogame->get_db()->update_record( 'mmogame',
-                ['id' => $rgame->id, 'numgame' => $rgame->numgame]);
-            $mmogame->update_state( $mmogame->get_rstate()->state);
-            $mmogame->set_state_json( $mmogame->get_rstate()->state, $ret);
-        } else if (isset( $data->state)) {
-            if ($data->state >= 0 && $data->state <= MMOGAME_ALONE_STATE_LAST) {
-                $mmogame->update_state( $data->state);
-                $mmogame->set_state_json( $data->state, $ret);
-            }
-        }
-    }
-
-    /**
-     * Return info for administrator
-     *
-     * @param object $data (not used)
-     * @param object $mmogame
-     * @param array $ret
-     */
-    public static function json_getadmin($data, $mmogame, &$ret) {
-        $state = $ret['state'] = $mmogame->get_rstate()->state;
-
-        $ret['stats_users'] = $mmogame->get_db()->count_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=?',
-            [$mmogame->get_id(), $mmogame->get_numgame()]);
-        $ret['stats_answers'] = $mmogame->get_db()->count_records_select( 'mmogame_quiz_attempts',
-            'mmogameid=? AND numgame=?',
-            [$mmogame->get_id(), $mmogame->get_numgame()]);
-    }
 }

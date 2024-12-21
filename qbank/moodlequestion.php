@@ -60,9 +60,6 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
         if ($this->mmogame->get_rgame()->striptags) {
             $ret->definition = strip_tags( $ret->definition);
         }
-        if ($needname) {
-            $ret->definition = $ret->definition.' ['.$ret->name.']';
-        }
 
         if (!$loadextra) {
             return $ret;
@@ -197,7 +194,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
         if ($query->qtype == 'shortanswer') {
             return $this->is_correct_shortanswer( $query, $useranswer, $mmogame);
         } else {
-            return $this->is_correct_multichoice( $query, $useranswer, $mmogame, $fraction);
+            return $this->is_correct_multichoice( $query, $useranswer, $fraction);
         }
     }
 
@@ -223,14 +220,13 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      *
      * @param object $query
      * @param string $useranswer
-     * @param object $mmogame
      * @param float $fraction
      *
      * @return true or false
      */
-    protected function is_correct_multichoice(object $query, string $useranswer, object $mmogame, float &$fraction): bool {
+    protected function is_correct_multichoice(object $query, string $useranswer, float &$fraction): bool {
         if ($query->multichoice->single) {
-            return $this->is_correct_multichoice_single1( $query, $useranswer, $mmogame, $fraction);
+            return $this->is_correct_multichoice_single1( $query, $useranswer,$fraction);
         } else {
             return $this->is_correct_multichoice_single0( $query, $useranswer, $fraction);
         }
@@ -241,12 +237,11 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      *
      * @param object $query
      * @param string $useranswer
-     * @param object $mmogame
      * @param float $fraction
      *
      * @return true or false
      */
-    protected function is_correct_multichoice_single1(object $query, string $useranswer, object $mmogame, float &$fraction): bool {
+    protected function is_correct_multichoice_single1(object $query, string $useranswer, float &$fraction): bool {
         $fraction = null;
         foreach ($query->answers as $answer) {
             if (intval( $answer->id) == intval( $useranswer)) {
@@ -283,7 +278,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * Return the layout (a string that is needed to put the answers in the correct order)
      *
      * @param object $query
-     * @return string|null
+     * @return ?string
      */
     public function get_layout(object $query): ?string {
         if ($query->qtype != 'multichoice') {

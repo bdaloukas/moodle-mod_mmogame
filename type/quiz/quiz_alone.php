@@ -66,7 +66,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
             return $attempt;
         }
 
-        return $this->get_attempt_new_internal(null, 0, 0, 0);
+        return $this->get_attempt_new_internal(0, 0, 0, 0);
     }
 
     /**
@@ -74,7 +74,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
      *
      * @param int $state
      */
-    public function set_state_json(int $state) {
+    public function set_state_json(int $state): void {
         $timefastjson = round( 10 * microtime( true));
 
         $statecontents = $state . "-" . $timefastjson;
@@ -89,16 +89,17 @@ class mmogame_quiz_alone extends mmogame_quiz {
      * @param object $attempt
      * @param object $query
      * @param string $useranswer
-     * @param boolean $autograde
-     * @param boolean $submit
-     * @param array $ret (will contains all information)
+     * @param bool $autograde
+     * @param bool $submit
+     * @param array $ret (will contain all information)
      * @return boolean (is correct or not)
      */
     public function set_answer(object $attempt, object $query, string $useranswer, bool $autograde, bool $submit,
         array &$ret): bool {
 
         if ($autograde) {
-            $attempt->iscorrect = $this->qbank->is_correct( $query, $useranswer, $this, $a['fraction']);
+            $fraction = 0.0;
+            $attempt->iscorrect = $this->qbank->is_correct( $query, $useranswer, $this, $fraction);
         }
 
         $time = time();
@@ -111,7 +112,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
                 if ($useranswer == null) {
                     $useranswer = '';
                 }
-                if (strpos( $useranswer, ',') == false) {
+                if (strpos( $useranswer, ',') === false) {
                     $answerid = $useranswer;
                     $attempt->useranswerid = $answerid;
                     $a['useranswerid'] = $attempt->useranswerid;
@@ -202,7 +203,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
         }
         $recs = $this->db->get_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND percentcompleted > 0',
             [$this->rgame->id, $this->rgame->numgame], 'percentcompleted DESC', '*', 0, $count);
-        $prevscore = $prevrank = -1;
+        $prevscore = -1;
         $rank = 0;
         foreach ($recs as $rec) {
             if (array_key_exists( $rec->auserid, $map)) {
