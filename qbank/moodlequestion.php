@@ -36,9 +36,9 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @param int $id
      * @param bool $loadextra
      * @param string $fields
-     * @return false|mixed|object
+     * @return false|object
      */
-    public function load(int $id, bool $loadextra = true, string $fields = ''): mixed {
+    public function load(int $id, bool $loadextra = true, string $fields = '') {
         /** @var object $params */
         $params = $this->mmogame->get_params();
         $needname = $params != false && $params->debugname;
@@ -133,9 +133,9 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @param int $id
      * @param string $layout
      * @param bool $fillconcept
-     * @return false|mixed|object
+     * @return false|object
      */
-    public function load_json(object $mmogame, array &$ret, int $num, int $id, string $layout, bool $fillconcept): mixed {
+    public function load_json(object $mmogame, array &$ret, int $num, int $id, string $layout, bool $fillconcept) {
         $rec = $this->load( $id);
 
         $ret['qtype'.$num] = $rec->qtype;
@@ -351,7 +351,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
         $table = "{$db->prefix}question q";
 
         $table .= ",{$db->prefix}question_bank_entries qbe,{$db->prefix}question_versions qv  ";
-        if (!str_contains($categoryids, ',')) {
+        if (strpos($categoryids, ',') === false) {
             $where2 = ' qbe.questioncategoryid='.$categoryids;
         } else {
             $where2 = ' qbe.questioncategoryid IN ('.$categoryids.')';
