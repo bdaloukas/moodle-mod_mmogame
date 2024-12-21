@@ -35,10 +35,10 @@ require_once(dirname(__FILE__) . '/lib.php');
  * The class mmogame_quiz play the game Quiz.
  */
 class mmogame_quiz extends mmogame {
-    /** @var stopatend: stops at the end of this game. */
-    protected $stopatend = false;
-    /** @var callupdategrades: call updategrades. */
-    protected $callupdategrades = true;
+    /** @var bool $stopatend: stops at the end of this game. */
+    protected bool $stopatend = false;
+    /** @var bool $callupdategrades: call updategrades. */
+    protected bool $callupdategrades = true;
 
     /**
      * Constructor.
@@ -46,7 +46,7 @@ class mmogame_quiz extends mmogame {
      * @param object $db (the database)
      * @param object $rgame (a record from table mmogame)
      */
-    public static function get_new($db, $rgame) {
+    public static function get_new(object $db, object $rgame) {
         $function = 'mmogame_quiz_'.($rgame->model == '' ? 'alone' : $rgame->model);
 
         return new $function( $db, $rgame, false);
@@ -55,7 +55,7 @@ class mmogame_quiz extends mmogame {
     /**
      * return the name of attempts table.
      */
-    public static function get_table_attempts() {
+    public static function get_table_attempts(): string {
         return 'mmogame_quiz_attempts';
     }
 
@@ -68,7 +68,7 @@ class mmogame_quiz extends mmogame {
      * @param int $timeclose
      * @return object (the new attempt or false if no attempt)
      */
-    protected function get_attempt_new_internal($queryid, $timelimit, $numattempt, $timeclose) {
+    protected function get_attempt_new_internal(int $queryid, int $timelimit, int $numattempt, int $timeclose) {
         $table = 'mmogame_quiz_attempts';
         if ($queryid === null || $queryid === false) {
             $query = false;
@@ -92,9 +92,7 @@ class mmogame_quiz extends mmogame {
         }
         $id = $this->db->insert_record( $table, $a);
 
-        $attempt = $this->db->get_record_select( $table, 'id=?', [$id]);
-
-        return $attempt;
+        return $this->db->get_record_select( $table, 'id=?', [$id]);
     }
 
     /**
@@ -105,7 +103,7 @@ class mmogame_quiz extends mmogame {
      * @param object $data
      * @return object (the query of attempt)
      */
-    public function append_json(&$ret, $attempt, $data) {
+    public function append_json(array &$ret, object $attempt, object $data): object {
         $auserid = $this->get_auserid();
 
         $info = $this->get_avatar_info( $auserid);
@@ -147,13 +145,13 @@ class mmogame_quiz extends mmogame {
     }
 
     /**
-     * Return the score with negative values. If "n" is the number of answer, if it correct returns (n-1) else returns (-1)
+     * Return the score with negative values. If "n" is the number of answer, if it corrects returns (n-1) else returns (-1)
      *
      * @param boolean $iscorrect
      * @param object $query
      * @return int
      */
-    protected function get_score_query_negative($iscorrect, $query) {
+    protected function get_score_query_negative(bool $iscorrect, object $query): int {
         if (!$this->qbank->is_multichoice( $query)) {
             return $iscorrect ? 1 : 0;
         }

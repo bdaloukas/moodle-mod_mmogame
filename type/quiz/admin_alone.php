@@ -36,10 +36,11 @@ require_once("$CFG->libdir/formslib.php");
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogame_quiz_alone_admin extends moodleform {
-    /** @var _id: the course_module id. */
-    protected $_id;
-    /** @var _mmogame: the coresponding mmogame. */
-    protected $_mmogame;
+    /** @var int $_id: the course_module id. */
+    protected int $_id;
+
+    /** @var object _mmogame: the coresponding mmogame. */
+    protected object $_mmogame;
 
     /**
      * Constructor.

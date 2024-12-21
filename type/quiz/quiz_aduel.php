@@ -32,12 +32,12 @@ require_once(dirname(__FILE__) . '/quiz_alone.php');
  * The class mmogame_quiz_aduel play the game Quiz (Aduel).
  */
 class mmogame_quiz_aduel extends mmogame_quiz_alone {
-    /** @var numquestions: number of questions that contain one group of questions. */
-    protected $numquestions;
-    /** @var aduel: ADuel object or false if no object yet. */
-    protected $aduel = false;
-    /** @var maxalone: maximum number of questions that a user can play withoyt an oponent. */
-    protected $maxalone = 200;
+    /** @var int $numquestions: number of questions that contain one group of questions. */
+    protected int $numquestions;
+    /** @var false|object $aduel: ADuel object or false if no object yet. */
+    protected object $aduel;
+    /** @var int $maxalone: maximum number of questions that a user can play withoyt an oponent. */
+    protected int $maxalone = 200;
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * @param object $db (the database)
      * @param object $rgame (a record from table mmogame)
      */
-    public function __construct($db, $rgame) {
+    public function __construct(object $db, object $rgame) {
         $rgame->usemultichoice = true;
 
         parent::__construct( $db, $rgame);
@@ -60,9 +60,8 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * Loads the aduel record from table mmogame_am_aduel_pairs.
      *
      * @param object $attempt
-     * @return object (a record from table mmogame_am_aduel_pairs)
      */
-    public function set_attempt($attempt) {
+    public function set_attempt(object $attempt): void {
         $this->aduel = $this->db->get_record_select( 'mmogame_am_aduel_pairs', 'id=?', [$attempt->numteam]);
     }
 
@@ -78,16 +77,16 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Return the maxalone class variable.
      *
-     * @return object (a record from table mmogame_am_aduel_pairs)
+     * @return int (a record from table mmogame_am_aduel_pairs)
      */
-    public function get_maxalone() {
+    public function get_maxalone(): int {
         return $this->maxalone;
     }
 
     /**
      * Tries to find an attempt of open games, otherwise creates a new attempt.
      *
-     * @return object (a new attempt of false if no attempt)
+     * @return bool|object (a new attempt of false if no attempt)
      */
     public function get_attempt() {
         if ($this->rstate->state != MMOGAME_ADUEL_STATE_PLAY) {
@@ -103,7 +102,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
                 return false;
             }
 
-            if ($newplayer1 == false && $newplayer2 == false) {
+            if (!$newplayer1 && !$newplayer2) {
                 $rec = mmogameModel_aduel::get_attempt( $this, $this->aduel);
                 if ($rec !== false) {
                     if ($rec->timestart == 0) {
@@ -129,7 +128,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Creates a new attempt for the first player. Also selects which question will be contained in the attempt.
      *
-     * @return object (a new attempt of false if no attempt)
+     * @return false|object (a new attempt of false if no attempt)
      */
     protected function get_attempt_new1() {
         $queries = $this->get_queries_aduel( 4);
@@ -162,7 +161,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Creates a new attempt for the second player.
      *
-     * @return object (a new attempt of false if no attempt)
+     * @return false|object (a new attempt of false if no attempt)
      */
     protected function get_attempt_new2() {
         $table = 'mmogame_quiz_attempts';
@@ -190,17 +189,19 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     }
 
     /**
-     * Saves informations about the user's answer.
+     * Saves information about the user's answer.
      *
      * @param object $attempt
      * @param object $query
      * @param string $useranswer
      * @param boolean $autograde
      * @param boolean $submit
-     * @param array $ret (will contains all information)
-     * @return boolean (is correct or not)
+     * @param array $ret (will contain all information)
+     * @return bool (is correct or not)
      */
-    public function set_answer($attempt, $query, $useranswer, $autograde, $submit, &$ret) {
+    public function set_answer(object $attempt, object $query, string $useranswer, bool $autograde, bool $submit,
+        array &$ret): bool {
+
         $retvalue = parent::set_answer( $attempt, $query, $useranswer, $autograde, $submit, $ret);
         if (!$submit) {
             return $retvalue;
@@ -274,14 +275,15 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * @param array $ret (returns info about the current attempt)
      * @param object $attempt
      * @param object $data
+     * @return bool|object
      */
-    public function append_json(&$ret, $attempt, $data) {
+    public function append_json(array &$ret, object $attempt, object $data): bool {
         $query = parent::append_json( $ret, $attempt, $data);
 
         $auserid = $this->get_auserid();
 
         if ($this->aduel === false) {
-            return;
+            return false;
         }
 
         if (isset( $data->subcommand)) {
@@ -353,10 +355,12 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         if ($this->iswizard( $attempt->id)) {
             $ret['tool3'] = 1;
         }
+
+        return true;
     }
 
     /**
-     * Return true if this attempt will has the wizard tool.
+     * Return true if this attempt will have the wizard tool.
      *
      * @param int $attemptid
      * @return boolean (true or false)
@@ -401,7 +405,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * @param object $query
      * @param int $attemptid
      */
-    protected function append_json_only1(&$ret, $query, $attemptid) {
+    protected function append_json_only1(array &$ret, object $query, int $attemptid) {
         $correctid = $query->correctid;
 
         $count = $ret['answers'];
@@ -417,10 +421,10 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Return the queries for ADuel.
      *
-     * @param array $count (how many)
-     * @return array or false
+     * @param int $count (how many)
+     * @return false|array or false
      */
-    public function get_queries_aduel($count) {
+    public function get_queries_aduel(int $count) {
         // Get the ids of all the queries.
         $ids = $this->qbank->get_queries_ids();
         if ($ids === false) {
@@ -480,7 +484,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
                 $q->uscore < 0 ? -$min + $q->uscore : 999999999,
                 // If it has negative score more priority has the older question.
                 $q->uscore < 0 ? $q->utimeerror : 0,
-                // Less times used by user more priority has.
+                // Fewer times used by user more priority has.
                 $q->ucountused,
                 // If question is easier than user sorts by distance.
                 $q->qpercent < $stat->percent ? round( 100 * $stat->percent - 100 * $q->qpercent) : 0,
@@ -506,13 +510,13 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         // Deleted 2 * count so to remain count.
         for ($i = 1; $i <= 2 * $count; $i++) {
             if (count( $map2) > 0) {
-                $key = array_rand( $map2, 1);
+                $key = array_rand( $map2);
                 unset( $map2[$key]);
             }
         }
         ksort( $map2);
         $ret = [];
-        foreach ($map2 as $key => $q) {
+        foreach ($map2 as $q) {
             $q2 = $this->qbank->load( $q->id, true);
             $ret[] = $q2;
         }
@@ -533,9 +537,9 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      *
      * @param object $data
      * @param array $ret
-     * @return object: the attempt
+     * @return false|object: the attempt
      */
-    public function set_answer_model($data, &$ret) {
+    public function set_answer_model(object $data, array &$ret) {
         $attempt = parent::set_answer_model( $data, $ret);
 
         $aduel = $this->aduel;
@@ -556,13 +560,13 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         }
 
         if ($aduel->auserid1 == $this->auserid) {
-            return;
+            return false;
         }
 
         $attempt1 = $this->db->get_record_select( 'mmogame_quiz_attempts',
             'mmogameid=? AND auserid=? AND numteam=? AND numattempt=?',
             [$aduel->mmogameid, $aduel->auserid1, $aduel->id, $attempt->numattempt]);
-        if ($attempt1 != false) {
+        if ($attempt1 !== false) {
             if ($aduel->auserid2 == $this->auserid) {
                 $ret['aduel_iscorrect'] = $attempt1->iscorrect;
                 $ret['aduel_useranswer'] = $attempt1->useranswer;

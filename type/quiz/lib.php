@@ -17,7 +17,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Library of functions and constants for sub-module Quiz
+ * Library of functions and constants for submodule Quiz
  *
  * @package    mmogametype_quiz
  * @copyright  2024 Vasilis Daloukas
@@ -27,10 +27,9 @@
 /**
  * Given an ID of an instance of this module, this function will permanently delete the instance and any data that depends on it.
  *
- * @param int $mmogameid (Id of the module instance)
- * @return boolean Success/Failure
+ * @param int $mmogameid (id of the module instance)
  **/
-function mmogametype_quiz_delete_instance( $mmogameid) {
+function mmogametype_quiz_delete_instance(int $mmogameid): void {
     global $DB;
 
     $a = ['mmogame_quiz_attempts'];
@@ -45,8 +44,8 @@ function mmogametype_quiz_delete_instance( $mmogameid) {
  * @param object $data (the data submitted from the reset course).
  * @param string $ids (id of all mmogame that have to be deleted).
  */
-function mmogametype_quiz_reset_userdata( $data, $ids) {
-    global $CFG, $DB;
+function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
+    global $DB, $CFG;
 
     if (!empty($data->reset_mmogame_all)) {
         $DB->delete_records_select('mmogame_quiz_alone_attempts', "mmogameid IN ($ids)");
@@ -58,7 +57,7 @@ function mmogametype_quiz_reset_userdata( $data, $ids) {
         $field = 'mmogameid';
         foreach ($a as $table) {
             $DB->delete_records_select( $table,
-                "NOT EXISTS( SELECT * FROM {mmogame} g WHERE {$CFG->prefix}{$table}.{$field}=g.id)");
+                "NOT EXISTS( SELECT * FROM {mmogame} g WHERE ".$CFG->prefix.'.'.$table.'.'.$field.'=g.id)');
         }
     }
 }
@@ -68,7 +67,7 @@ function mmogametype_quiz_reset_userdata( $data, $ids) {
  *
  * @return array (model => name)
  */
-function mmogametype_quiz_get_models() {
+function mmogametype_quiz_get_models(): array {
     return [
         'alone' => get_string( 'model_alone', 'mmogametype_quiz'),
         'aduel' => get_string( 'model_aduel', 'mmogametype_quiz'),

@@ -32,8 +32,8 @@ require_once(dirname(__FILE__) . '/quiz.php');
  * The class mmogame_quiz_alone play the game Quiz (Alone).
  */
 class mmogame_quiz_alone extends mmogame_quiz {
-    /** @var callupdategrades: true if it can call function updategrades(). */
-    protected $callupdategrades;
+    /** @var bool $callupdategrades: true if it can call function updategrades(). */
+    protected bool $callupdategrades;
 
     /**
      * Constructor.
@@ -41,10 +41,10 @@ class mmogame_quiz_alone extends mmogame_quiz {
      * @param object $db (the database)
      * @param object $rgame (a record from table mmogame)
      */
-    public function __construct($db, $rgame) {
+    public function __construct(object $db, object $rgame) {
         $this->callupdategrades = true;
 
-        parent::__construct($db, $rgame, null);
+        parent::__construct($db, $rgame);
     }
 
     /**
@@ -52,12 +52,12 @@ class mmogame_quiz_alone extends mmogame_quiz {
      *
      * @return object (a new attempt of false if no attempt)
      */
-    public function get_attempt() {
+    public function get_attempt(): object {
         $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
             [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
 
-        if ($attempt != false) {
+        if ($attempt !== false) {
             if ($attempt->timestart == 0) {
                 $attempt->timestart = time();
                 $this->db->update_record( 'mmogame_quiz_attempts',
@@ -73,9 +73,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
      * Set the state of current game.
      *
      * @param int $state
-     * @param array $ret
      */
-    public function set_state_json($state, &$ret) {
+    public function set_state_json(int $state) {
         $timefastjson = round( 10 * microtime( true));
 
         $statecontents = $state . "-" . $timefastjson;
@@ -95,7 +94,9 @@ class mmogame_quiz_alone extends mmogame_quiz {
      * @param array $ret (will contains all information)
      * @return boolean (is correct or not)
      */
-    public function set_answer($attempt, $query, $useranswer, $autograde, $submit, &$ret) {
+    public function set_answer(object $attempt, object $query, string $useranswer, bool $autograde, bool $submit,
+        array &$ret): bool {
+
         if ($autograde) {
             $attempt->iscorrect = $this->qbank->is_correct( $query, $useranswer, $this, $a['fraction']);
         }
@@ -166,7 +167,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
      * @param object $query
      * @return int (now uses negative grading, in the future user will can change it)
      */
-    protected function get_score_query($iscorrect, $query) {
+    protected function get_score_query(bool $iscorrect, object $query): int {
         return $this->get_score_query_negative( $iscorrect, $query);
     }
 
@@ -175,9 +176,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
      *
      * @param int $count
      * @param array $ret
-     * @return int (now uses negative grading, in the future user will can change it)
      */
-    public function get_highscore($count, &$ret) {
+    public function get_highscore(int $count, array &$ret): void {
         $recs = $this->db->get_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND sumscore > 0',
             [$this->rgame->id, $this->rgame->numgame], 'sumscore DESC', '*', 0, $count);
         $map = [];
@@ -229,11 +229,11 @@ class mmogame_quiz_alone extends mmogame_quiz {
         }
         $map2 = [];
         foreach ($map as $auserid => $data) {
-            $key = sprintf( "%10d %10d", $data->rank1 < $data->rank2 ? $data->rank1 : $data->rank2, $auserid);
+            $key = sprintf( "%10d %10d", min($data->rank1, $data->rank2), $auserid);
             $map2[$key] = $data;
         }
 
-        $ranks = $names = $scores1 = $scores2 = $avatars = [];
+        $ranks = $names = $avatars = [];
         foreach ($map2 as $key => $data) {
             if ($data->rank1 != 0 && $data->rank1 < $data->rank2) {
                 $kinds[] = 1;
@@ -267,7 +267,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
      *
      * @param object $attempt
      */
-    public function set_attempt($attempt) {
+    public function set_attempt(object $attempt) {
 
     }
 
@@ -276,9 +276,9 @@ class mmogame_quiz_alone extends mmogame_quiz {
      *
      * @param object $data
      * @param array $ret
-     * @return object: the attempt
+     * @return false|object: the attempt
      */
-    public function set_answer_model($data, &$ret) {
+    public function set_answer_model(object $data, array &$ret) {
         if (!isset( $data->attempt) || $data->attempt == 0) {
             return false;
         }

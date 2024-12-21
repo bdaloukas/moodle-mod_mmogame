@@ -32,9 +32,7 @@ require_once(dirname(__FILE__) . '/../../model/aduel.php');
  * @param object $mmogame
  * @param array $ret
  */
-function mmogame_json_quiz_getattempt($data, $mmogame, &$ret) {
-    global $CFG;
-
+function mmogame_json_quiz_getattempt(object $data, object $mmogame, array &$ret) {
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
     if ($auserid === false) {
         $ret['errorcode'] = 'invalidauser';
@@ -62,17 +60,18 @@ function mmogame_json_quiz_getattempt($data, $mmogame, &$ret) {
 }
 
 /**
- * Update the database about the answer of user and returns to variable $ret informations.
+ * Update the database about the answer of user and returns to variable $ret information.
  *
  * @param object $data
- * @param object $game
+ * @param $mmogame
  * @param array $ret
+ * @return mixed
  */
-function mmogame_json_quiz_answer($data, $game, &$ret) {
-    $auserid = mmogame::get_asuerid_from_object( $game->get_db(), $data);
-    $game->login_user( $auserid);
+function mmogame_json_quiz_answer(object $data, $mmogame, array &$ret) {
+    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    $mmogame->login_user( $auserid);
 
-    return $game->set_answer_model( $data, $ret);
+    return $mmogame->set_answer_model( $data, $ret);
 }
 
 /**
@@ -82,9 +81,8 @@ function mmogame_json_quiz_answer($data, $game, &$ret) {
  * @param object $mmogame
  * @param array $ret
  */
-function mmogame_json_quiz_gethighscore($data, $mmogame, &$ret) {
+function mmogame_json_quiz_gethighscore(object $data, object $mmogame, array &$ret) {
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
     $mmogame->login_user( $auserid);
-    $instance = $mmogame->get_rinstance();
     $mmogame->get_highscore( $data->count, $ret);
 }
