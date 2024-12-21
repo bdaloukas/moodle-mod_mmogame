@@ -180,7 +180,8 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @param string $fields
      * @return false|object
      */
-    protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition'): object|bool {
+    protected function loads(string $ids, bool $loadextra = true,
+        string $fields='id,qtype,questiontext as definition'): object|bool {
 
         $recs = $this->mmogame->get_db()->get_records_select( 'question', "id IN ($ids)", null, '', $fields);
 
@@ -278,8 +279,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @param float $fraction
      * @return true or false
      */
-    protected function is_correct_multichoice_single0(object $query, string $useranswer, float &$fraction): bool
-    {
+    protected function is_correct_multichoice_single0(object $query, string $useranswer, float &$fraction): bool {
         $fraction = 0.0;
         $aids = explode( ',', $useranswer);
         foreach ($query->answers as $answer) {
