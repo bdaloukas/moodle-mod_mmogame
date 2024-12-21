@@ -194,8 +194,8 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * @param object $attempt
      * @param object $query
      * @param string $useranswer
-     * @param boolean $autograde
-     * @param boolean $submit
+     * @param bool $autograde
+     * @param bool $submit
      * @param array $ret (will contain all information)
      * @return bool (is correct or not)
      */
@@ -363,9 +363,9 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * Return true if this attempt will have the wizard tool.
      *
      * @param int $attemptid
-     * @return boolean (true or false)
+     * @return bool (true or false)
      */
-    public function iswizard($attemptid) {
+    public function iswizard(int $attemptid): bool {
         return $attemptid % (2 * $this->numquestions) == 0;
     }
 

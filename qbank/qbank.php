@@ -46,7 +46,7 @@ class mmogameqbank {
      * The base function for a new attempt.
      *
      * @param int $count
-     * @param boolean $usenumattempt
+     * @param bool $usenumattempt
      * @param array|null $queries
      * @return array|false
      */

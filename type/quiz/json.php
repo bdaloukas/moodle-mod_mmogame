@@ -67,7 +67,7 @@ function mmogame_json_quiz_getattempt(object $data, object $mmogame, array &$ret
  * @param array $ret
  * @return mixed
  */
-function mmogame_json_quiz_answer(object $data, $mmogame, array &$ret) {
+function mmogame_json_quiz_answer(object $data, object $mmogame, array &$ret) {
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
     $mmogame->login_user( $auserid);
 

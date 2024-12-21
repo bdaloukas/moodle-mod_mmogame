@@ -147,7 +147,7 @@ class mmogame_quiz extends mmogame {
     /**
      * Return the score with negative values. If "n" is the number of answers, if it corrects returns (n-1) else returns (-1)
      *
-     * @param boolean $iscorrect
+     * @param bool $iscorrect
      * @param object $query
      * @return int
      */
