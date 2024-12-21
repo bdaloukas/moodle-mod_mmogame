@@ -39,14 +39,8 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @return false|object
      */
     public function load(int $id, bool $loadextra = true, string $fields = '') {
-        /** @var object $params */
-        $params = $this->mmogame->get_params();
-        $needname = $params != false && $params->debugname;
         if ($fields == '') {
             $fields = 'qbe.id, q.id as questionid,q.qtype,q.name,q.questiontext as definition';
-            if ($needname) {
-                $fields .= ',q.name';
-            }
         }
         $db = $this->mmogame->get_db();
         $sql = "SELECT $fields ".

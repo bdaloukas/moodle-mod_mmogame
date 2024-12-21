@@ -170,7 +170,7 @@ function dogetcolorpalettes(object $mmogame, object $data, array &$ret): void {
 
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
-    $pals = $mmogame->get_palettes( $auserid);
+    $pals = $mmogame->get_palettes();
 
     while (count( $pals) > $data->countcolors) {
         $pos = array_rand( $pals);

@@ -43,7 +43,7 @@ require_once($CFG->dirroot . '/mod/mmogame/mmogame.php');
  */
 class mod_mmogame_mod_form extends moodleform_mod {
     /** @var array options to be used with date_time_selector fields in the mmogame. */
-    public static $datefieldoptions = ['optional' => true];
+    public static array $datefieldoptions = ['optional' => true];
 
     /** @var int the max number of attempts allowed in any user or group override on this mmogame. */
     protected $maxattemptsanyoverride = null;
@@ -108,9 +108,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      *
      * @param object $mform
      */
-    protected function definition_models($mform) {
-        global $CFG;
-
+    protected function definition_models(object $mform) {
         $types = mmogame_get_types();
         $dir = __DIR__.'/type';
         $models = [];
@@ -167,9 +165,9 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @param stdClass $data
      * @param array $files
      *
-     * @return moodle_url
+     * @return array
      */
-    public function validation($data, $files) {
+    public function validation($data, $files) : array {
 
         $errors = parent::validation($data, $files);
 
@@ -193,11 +191,8 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * Part of the API defined by moodleform_mod
      * @return array Array of string IDs of added items, empty array if none
      */
-    public function add_completion_rules() {
-        $mform = $this->_form;
-        $items = [];
-
-        return $items;
+    public function add_completion_rules(): array {
+        return [];
     }
 
     /**
@@ -206,14 +201,14 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @param array $data Input data (not yet validated)
      * @return bool True if one or more rules is enabled, false if none are.
      */
-    public function completion_rule_enabled($data) {
+    public function completion_rule_enabled($data): bool {
         return !empty($data['completionattemptsexhausted']) || !empty($data['completionpass']);
     }
 
     /**
      * Computes the categories of all question of the current course;
      *
-     * @return array of question categories
+     * @return bool|array of question categories
      */
     public function get_array_question_categories() {
         global $CFG, $DB, $COURSE;
@@ -226,7 +221,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $qtypes .= ($qtypes != '' ? ' OR ' : '').'qtype = "multichoice"';
 
         if ($qtypes == '') {
-            return;
+            return false;
         }
 
         $a = [];
@@ -275,11 +270,9 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * Set data about categories
      *
-     * @param array $defaultvalues
+     * @param object $defaultvalues
      */
-    public function set_data_categories(&$defaultvalues) {
-        global $CFG, $DB;
-
+    public function set_data_categories(object $defaultvalues) {
         if (!isset( $defaultvalues->instance)) {
             $defaultvalues->instance = 0;
         }
@@ -302,9 +295,8 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * Computes the categories of all question of the current course
      *
      * @param object $mform
-     * @return array of question categories
      */
-    public function definition_question(&$mform) {
+    public function definition_question(object $mform) : void {
         $numcategories = 3;
 
         for ($i = 1; $i <= $numcategories; $i++) {

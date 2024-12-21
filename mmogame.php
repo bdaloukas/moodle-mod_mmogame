@@ -49,8 +49,8 @@ class mmogame {
     protected object $rgame;
     /** @var int $auserid: the user (table mmogame_aa_users). */
     protected int $auserid = 0;
-    /** @var $qbank: question bank to be used. */
-    protected mixed $qbank;
+    /** @var object $qbank: question bank to be used. */
+    protected object $qbank;
     /** @var string $error: saves the error code. */
     protected string $error = '';
     /** @var int $timelimit: maximum time in seconds for answer. */
@@ -92,13 +92,6 @@ class mmogame {
     }
 
     /**
-     * Return the params variable.
-     */
-    public function get_params() {
-        return $this->params;
-    }
-
-    /**
      * Sets the variable code.
      @param string $code
      */
@@ -116,7 +109,8 @@ class mmogame {
     /**
      * Returns the variable timelimit.
      */
-    public function get_timelimit() {
+    public function get_timelimit(): int
+    {
         return $this->timelimit;
     }
 
@@ -191,7 +185,7 @@ class mmogame {
     }
 
     /**
-     * Return the an empty string. It is overwring.
+     * Return an empty string. It is overwring.
      */
     public static function get_table_attempts(): string {
         return '';
@@ -222,8 +216,9 @@ class mmogame {
      * Return coresponding auserid from a users in the table mmogame_aa_users_code.
      * @param object $db
      * @param string $code
+     * @return false|int
      */
-    public static function get_auserid_from_usercode(object $db, $code) {
+    public static function get_auserid_from_usercode(object $db, string $code) {
         $rec = $db->get_record_select( 'mmogame_aa_users_code', 'code=?', [$code]);
         if ($rec === false) {
             return false;
@@ -237,9 +232,10 @@ class mmogame {
      * @param object $db
      * @param string $kind (the kind of user e.g. Moodle, GUID)
      * @param string $userid
-     * @param boolean $create
+     * @param bool $create
+     * @return false|int
      */
-    public static function get_auserid_from_db($db, $kind, $userid, $create) {
+    public static function get_auserid_from_db(object $db, string $kind, string $userid, bool $create) {
         $rec = $db->get_record_select( 'mmogame_aa_users', 'kind = ? AND instanceid=?', [$kind, $userid]);
 
         if ($rec !== false) {
@@ -260,7 +256,7 @@ class mmogame {
      * @param object $data
      * @return int (the id of table mmogame_aa_users)
      */
-    public static function get_asuerid_from_object($db, $data) {
+    public static function get_asuerid_from_object(object $db, object $data) {
         if (isset( $data->kinduser)) {
             if ($data->kinduser == 'usercode') {
                 return self::get_auserid_from_usercode($db, $data->user);
@@ -292,7 +288,7 @@ class mmogame {
      * @param int $id
      * @return false|object
      */
-    public static function getgame($db, $id) {
+    public static function getgame(object $db, int $id) {
         $rgame = $db->get_record_select('mmogame', "id=?", [$id]);
         if ($rgame === false) {
             return false;
@@ -315,8 +311,9 @@ class mmogame {
     /**
      * Returns the default avatar for user auserid
      * @param int $auserid
+     * @return int
      */
-    protected function get_avatar_default($auserid) {
+    protected function get_avatar_default(int $auserid): int {
         // Compute default avatar.
         $db = $this->db;
 
@@ -337,7 +334,7 @@ class mmogame {
             }
         }
 
-        // Ones that is no used in this numgame.
+        // Ones that is not used in this numgame.
         $sql = "SELECT a.id, numused FROM {$db->prefix}mmogame_aa_avatars a ".
             " LEFT JOIN {$db->prefix}mmogame_aa_grades g ON g.avatarid=a.id AND g.mmogameid=? AND g.numgame=?".
             " WHERE g.id IS NULL ".
@@ -365,14 +362,15 @@ class mmogame {
      * Returns the grade for user auserid
      *
      * @param int $auserid
+     * @return mixed
      */
-    public function get_grade($auserid) {
+    public function get_grade(int $auserid) {
 
         $db = $this->db;
 
         $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
             [$this->rgame->id, $this->rgame->numgame, $auserid]);
-        if ($rec != false) {
+        if ($rec !== false) {
             return $rec;
         }
 
@@ -381,10 +379,10 @@ class mmogame {
         $colorpaletteid = null;
         $nickname = '';
         $recuser = $db->get_record_select( 'mmogame_aa_users', 'id=?', [$auserid]);
-        if ($recuser != false) {
+        if ($recuser !== false) {
             if ($recuser->kind == 'usercode') {
                 $reccode = $db->get_record_select( 'mmogame_aa_users_code', 'id=?', [$recuser->instanceid]);
-                if ($reccode != false && $reccode->code != 0) {
+                if ($reccode !== false && $reccode->code != 0) {
                     $usercode = $reccode->code;
                 }
             }
@@ -436,7 +434,7 @@ class mmogame {
                 $usercode = mt_rand( $max / 10, $max);
                 $rec = $this->get_db()->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
                     [$this->rgame->id, $this->rgame->numgame, $auserid]);
-                if ($rec == false) {
+                if ($rec === false) {
                     break;
                 }
                 $max *= 10;
@@ -459,8 +457,9 @@ class mmogame {
      * Returns info about avatar for the user auserid.
      *
      * @param int $auserid
+     * @return false|object
      */
-    public function get_avatar_info($auserid) {
+    public function get_avatar_info(int $auserid) {
         $sql = "SELECT g.*, a.directory, a.filename, a.id as aid, c.color1, c.color2, c.color3, c.color4, c.color5".
             " FROM {$this->db->prefix}mmogame_aa_grades g LEFT JOIN {$this->db->prefix}mmogame_aa_avatars a ON g.avatarid=a.id".
             " LEFT JOIN {$this->db->prefix}mmogame_aa_colorpalettes c ON c.id=g.colorpaletteid ".
@@ -490,8 +489,9 @@ class mmogame {
      *
      * @param int $auserid
      * @param string $field
+     * @return int
      */
-    public function get_rank_alone($auserid, $field) {
+    public function get_rank_alone(int $auserid, string $field): int {
         $grade = $this->get_grade( $auserid);
 
         $value = $grade->$field;
@@ -508,7 +508,7 @@ class mmogame {
      *
      * @return string
      */
-    public static function get_ip() {
+    public static function get_ip(): string {
         return $_SERVER['REMOTE_ADDR'];
     }
 
@@ -516,8 +516,9 @@ class mmogame {
      * Returns the available avatars for user auserid.
      *
      * @param int $auserid
+     * @return array
      */
-    public function get_avatars($auserid) {
+    public function get_avatars(int $auserid): array {
         $info = $this->get_avatar_info( $auserid);
 
         $where = 'ishidden = 0 AND '.
@@ -540,7 +541,7 @@ class mmogame {
      * @param string $nickname
      * @param int $avatarid
      */
-    public function set_avatar($auserid, $nickname, $avatarid) {
+    public function set_avatar(int $auserid, string $nickname, int $avatarid) {
         $info = $this->get_avatar_info( $auserid);
 
         $a = [];
@@ -572,12 +573,9 @@ class mmogame {
     /**
      * Returns the available color palettes for the user auserid.
      *
-     * @param int $auserid
      * @return array with id in key and 5 colors at value
      */
-    public function get_palettes($auserid) {
-        $info = $this->get_avatar_info( $auserid);
-
+    public function get_palettes(): array {
         $recs = $this->db->get_records_select( 'mmogame_aa_colorpalettes', '', null, 'hue');
         $ret = [];
         foreach ($recs as $rec) {
@@ -593,7 +591,7 @@ class mmogame {
      * @param int $auserid
      * @param int $colorpaletteid
      */
-    public function set_colorpalette($auserid, $colorpaletteid) {
+    public function set_colorpalette(int $auserid, int $colorpaletteid) {
         $info = $this->get_avatar_info( $auserid);
         $this->db->update_record( 'mmogame_aa_grades', ['id' => $info->id, 'colorpaletteid' => $colorpaletteid]);
     }
@@ -605,7 +603,7 @@ class mmogame {
      * @param string $filecontents
      * @return string (the directory where the data is saved)
      */
-    public function save_state_file($state, $filecontents) {
+    public function save_state_file(int $state, string $filecontents): string {
         global $CFG;
 
         // Creates an upload directory in temp.
@@ -615,14 +613,14 @@ class mmogame {
             mkdir( $newdir, 0777, true);
         }
 
-        if ($filecontents != false) {
+        if ($filecontents != '') {
             $file = "$newdir/$file-$state.txt";
             if (!file_exists( $file) || file_get_contents( $file) != $filecontents) {
                 file_put_contents( $file, $filecontents);
             }
         }
 
-        $file = "{$newdir}/{$this->rgame->fastjson}.txt";
+        $file = sprintf("%s/%s.txt", $newdir, $this->rgame->fastjson);
         if (!file_exists( $file)) {
             file_put_contents( $file, $this->rstate->state.'-'.$this->rgame->timefastjson);
         }
@@ -638,7 +636,7 @@ class mmogame {
      * @param string $filecontents
      * @param int $timefastjson
      */
-    public function save_state($state, $statecontents, $filecontents, $timefastjson) {
+    public function save_state(int $state, string $statecontents, string $filecontents, int $timefastjson) {
 
         $newdir = $this->save_state_file( $state, $filecontents);
 
@@ -662,43 +660,13 @@ class mmogame {
     }
 
     /**
-     * Sorts 5 colors in order of hue and returns the smaller hue.
-     *
-     * @param int $color1
-     * @param int $color2
-     * @param int $color3
-     * @param int $color4
-     * @param int $color5
-     * @param int $colorsort1
-     * @param int $colorsort2
-     * @param int $colorsort3
-     * @param int $colorsort4
-     * @param int $colorsort5
-     * @return float the smaller hue
-     */
-    public static function compute_hue($color1, $color2, $color3, $color4, $color5, &$colorsort1, &$colorsort2,
-        &$colorsort3, &$colorsort4, &$colorsort5) {
-
-        $colors = [$color1, $color2, $color3, $color4, $color5];
-        usort( $colors, "mmogame::usort_mmogame_palettes_contrast");
-        $colorsort1 = $colors[0];
-        $colorsort2 = $colors[1];
-        $colorsort3 = $colors[2];
-        $colorsort4 = $colors[3];
-        $colorsort5 = $colors[4];
-
-        return self::calcualtehue( $colorsort1);
-    }
-
-
-    /**
      * Compare the contrast of $a and $b and returns -1,0 or 1.
      *
      * @param int $a
      * @param int $b
      * @return int (the result of comparison)
      */
-    public static function usort_mmogame_palettes_contrast($a, $b) {
+    public static function usort_mmogame_palettes_contrast(int $a, int $b): int {
         return self::get_contrast( $a) <=> self::get_contrast( $b);
     }
 
@@ -708,7 +676,7 @@ class mmogame {
      * @param int $color
      * @return int (the contrast)
      */
-    public static function get_contrast($color) {
+    public static function get_contrast(int $color) {
         $red    = ( $color >> 16 ) & 0xFF;    // Red is the Left Most Byte.
         $green  = ( $color >> 8 ) & 0xFF;     // Green is the Middle Byte.
         $blue   = $color & 0xFF;
@@ -719,10 +687,10 @@ class mmogame {
     /**
      * Returns the hue of a color
      *
-     * @param string $color
+     * @param int $color
      * @return double
      */
-    public static function calcualtehue($color) {
+    public static function calcualtehue(int $color) {
         $red    = ( $color >> 16 ) & 0xFF;    // Red is the Left Most Byte.
         $green  = ( $color >> 8 ) & 0xFF;     // Green is the Middle Byte.
         $blue   = $color & 0xFF;
@@ -742,7 +710,7 @@ class mmogame {
             default:
                 $delta = $max - $min;
                 if ($red == $max) {
-                    $hue = 0 + ($green - $blue) / $delta;
+                    $hue = ($green - $blue) / $delta;
                 } else if ($green == $max) {
                     $hue = 2 + ($blue - $red) / $delta;
                 } else {
@@ -761,7 +729,7 @@ class mmogame {
      *
      * @param int $state
      */
-    public function update_state($state) {
+    public function update_state(int $state) {
         $this->rstate->state = $state;
         $this->db->update_record( 'mmogame_aa_states', ['id' => $this->rstate->id, 'state' => $state]);
     }
@@ -773,14 +741,14 @@ class mmogame {
      * @param string $filename
      * @return string (the repaired nickname)
      */
-    public static function repair_nickname($nickname, $filename) {
+    public static function repair_nickname(string $nickname, string $filename): string {
         if ($nickname != '' && $nickname != null) {
             return $nickname;
         }
 
         $pos = strrpos( $filename, '.');
 
-        return $pos != false ? substr( $filename, 0, $pos) : $filename;
+        return $pos !== false ? substr( $filename, 0, $pos) : $filename;
     }
 
     /**
@@ -791,7 +759,7 @@ class mmogame {
      * @param int $digits (number of digits for new pin)
      * @return int (the new pin)
      */
-    public static function get_newpin($mmogameid, $db, $digits) {
+    public static function get_newpin(int $mmogameid, object $db, int $digits): int {
         $min = pow( 10, $digits - 1) + 1;
         $max = pow( 10, $digits) - 1;
         for (;;) {
@@ -813,7 +781,7 @@ class mmogame {
      * @param object $rgame
      * @param int $auserid
      */
-    public static function delete_auser($db, $rgame, $auserid) {
+    public static function delete_auser(object $db, object $rgame, int $auserid) {
         $db->delete_records_select( 'mmogame_aa_grades', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
         $db->delete_records_select( 'mmogame_aa_stats', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
         $db->delete_records_select( 'mmogame_am_aduel_pairs',
