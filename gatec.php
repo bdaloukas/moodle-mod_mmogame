@@ -19,7 +19,7 @@
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('NO_MOODLE_COOKIES', true);
@@ -45,7 +45,7 @@ document.getElementById("message").innerHTML = 'Player is changed';
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
- * @license    https://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 if (array_key_exists( 'HTTPS', $_SERVER) && $_SERVER['HTTPS'] = 'On') {
     $url = 'https://';
