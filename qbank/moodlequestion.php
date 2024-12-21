@@ -178,11 +178,12 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @param string $ids
      * @param boolean $loadextra
      * @param string $fields
+     * @return false|object
      */
-    protected function loads($ids, bool $loadextra = true, $fields='id,qtype,questiontext as definition') {
+    protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition') {
         $recs = $this->mmogame->get_db()->get_records_select( 'question', "id IN ($ids)", null, '', $fields);
 
-        if ($recs === false || !$loadextra) {
+        if (($recs === false) || !$loadextra) {
             return $recs;
         }
 
@@ -198,6 +199,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      *
      * @param object $query
      * @param string $answer
+     * @return mixed|null
      */
     protected static function get_answerid(object $query, string $answer) {
         if ($query->qtype == 'shortanswer') {
