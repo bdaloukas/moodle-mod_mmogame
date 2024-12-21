@@ -63,7 +63,7 @@ function mmogame_json_quiz_getattempt(object $data, object $mmogame, array &$ret
  * Update the database about the answer of user and returns to variable $ret information.
  *
  * @param object $data
- * @param $mmogame
+ * @param object $mmogame
  * @param array $ret
  * @return mixed
  */

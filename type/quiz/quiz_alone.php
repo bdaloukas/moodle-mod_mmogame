@@ -92,7 +92,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
      * @param bool $autograde
      * @param bool $submit
      * @param array $ret (will contain all information)
-     * @return boolean (is correct or not)
+     * @return bool (is correct or not)
      */
     public function set_answer(object $attempt, object $query, string $useranswer, bool $autograde, bool $submit,
         array &$ret): bool {
@@ -164,7 +164,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
     /**
      * Return the score of user's answer.
      *
-     * @param boolean $iscorrect
+     * @param bool $iscorrect
      * @param object $query
      * @return int (now uses negative grading, in the future user will can change it)
      */
