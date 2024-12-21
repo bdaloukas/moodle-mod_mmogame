@@ -156,10 +156,6 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
                 }
             }
 
-            $d = [];
-            foreach ($rec->answers as $info) {
-                $d[] = $info;
-            }
             $n = 0;
             foreach ($rec->answers as $info) {
                 $n++;
@@ -178,19 +174,17 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      * @param string $ids
      * @param bool $loadextra
      * @param string $fields
-     * @return false|object
+     * @return bool|array
      */
     protected function loads(string $ids, bool $loadextra = true,
-        string $fields='id,qtype,questiontext as definition'): object|bool {
+        string $fields='id,qtype,questiontext as definition'): bool|array {
 
         $recs = $this->mmogame->get_db()->get_records_select( 'question', "id IN ($ids)", null, '', $fields);
 
-        if (($recs === false) || !$loadextra) {
-            return $recs;
-        }
-
-        foreach ($recs as $rec) {
-            $this->load2( $rec);
+        if ($recs !== false && $loadextra) {
+            foreach ($recs as $rec) {
+                $this->load2($rec);
+            }
         }
 
         return $recs;
