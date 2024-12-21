@@ -41,7 +41,7 @@ if ($rgame === false) {
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,7 +57,7 @@ if ($rgame === false) {
 $color = $DB->get_record_select( 'mmogame_aa_colorpalettes', 'id=?', [2]);
 $colors = '['.$color->color1.', '.$color->color2.', '.$color->color3.', '.$color->color4.', '.$color->color5.']';
 if ($rgame->kinduser == 'moodle') {
-    $sql = "SELECT cm.* FROM {$CFG->prefix}course_modules cm, {$CFG->prefix}modules m ".
+    $sql = "SELECT cm.* FROM {course_modules} cm, {modules} m ".
         " WHERE cm.module=m.id AND cm.course=? AND cm.instance=? AND m.name=? ";
     $cm = $DB->get_record_sql( $sql, [$rgame->course, $rgame->id, 'mmogame']);
     require_login($rgame->course, false, $cm);
@@ -95,7 +95,7 @@ mmogame_change_javascript( $rgame->type, 'type/'.$rgame->type.'/js/'.$rgame->typ
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
-function mmogame_change_javascript(string $type, string $file, string $search = '', string $replace = '') {
+function mmogame_change_javascript(string $type, string $file, string $search = '', string $replace = ''): void {
     if (!file_exists( dirname(__FILE__).'/'.$file)) {
         return;
     }

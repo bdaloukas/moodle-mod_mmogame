@@ -34,7 +34,7 @@ const MMOGAME_QBANK_MOODLEGLOSSARY = 'moodleglossary';
  *
  * @return int The id of the newly inserted game record
  */
-function mmogame_add_instance( $mform): int {
+function mmogame_add_instance(object $mform): int {
     global $DB;
 
     mmogame_before_add_or_update( $mform);
@@ -99,7 +99,7 @@ function mmogame_delete_instance(int $mmogameid): bool {
  *
  * @param stdClass $mform
  */
-function mmogame_before_add_or_update(stdClass $mform) {
+function mmogame_before_add_or_update(stdClass $mform): void {
     if (!isset( $mform->qbank)) {
         return;
     }
@@ -143,8 +143,7 @@ function mmogame_before_add_or_update_glossary( $mmogame) {
  *
  * @param stdClass $mmogame
  */
-function mmogame_before_add_or_update_question( $mmogame) {
-
+function mmogame_before_add_or_update_question( $mmogame): void {
     $a = [];
 
     // Iterate over all properties of the $mmogame object.

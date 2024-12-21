@@ -92,10 +92,10 @@ function get_data(): object {
  * Returns an array of existing avatars to select.
  *
  * @param object $mmogame
- * @param object $data
+ * @param stdClass $data
  * @param array $ret (an array of string with exists avatars)
  */
-function dogetavatars( $mmogame, $data, &$ret) {
+function dogetavatars(object $mmogame, stdClass $data, array &$ret): void {
     if ($data->countavatars == 0) {
         $ret['countavatars'] = 0;
         return;
@@ -134,7 +134,7 @@ function dogetavatars( $mmogame, $data, &$ret) {
  * @param object $data
  * @param array $ret (an array containing the avatar and nickname)
  */
-function dosetavatar( $mmogame, $data, &$ret) {
+function dosetavatar(object $mmogame, object $data, array &$ret): void {
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
     $mmogame->set_avatar( $auserid, $data->nickname, $data->avatarid);
@@ -151,7 +151,7 @@ function dosetavatar( $mmogame, $data, &$ret) {
  * @param array $b (the second color)
  * @return int (-1, 0 or 1)
  */
-function usort_mmogame_palettes( $a, $b) {
+function usort_mmogame_palettes(array $a, array $b): int {
     return mmogame::calcualteHue( $a[0]) <=> mmogame::calcualteHue( $b[0]);
 }
 
@@ -162,7 +162,7 @@ function usort_mmogame_palettes( $a, $b) {
  * @param object $data
  * @param array $ret (an array of string with exists color palettes)
  */
-function dogetcolorpalettes( $mmogame, $data, &$ret) {
+function dogetcolorpalettes(object $mmogame, object $data, array &$ret): void {
     if ($data->countcolors == 0) {
         $ret['countcolors'] = 0;
         return;
@@ -192,7 +192,7 @@ function dogetcolorpalettes( $mmogame, $data, &$ret) {
  * @param object $data
  * @param array $ret (the value of key "colors" containg the 5 colors of palette)
  */
-function dosetcolorpalette( $mmogame, $data, &$ret) {
+function dosetcolorpalette(object $mmogame, object $data, array &$ret): void {
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
     $mmogame->set_colorpalette( $auserid, $data->id);
