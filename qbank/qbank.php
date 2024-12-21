@@ -206,7 +206,9 @@ class mmogameqbank {
      * @param bool $iserror
      * @param array|null $values
      */
-    public function update_stats(int $auserid, int $numteam, int $queryid, bool $isused, bool $iscorrect, bool $iserror, ?array $values = null) {
+    public function update_stats(int $auserid, int $numteam, int $queryid, bool $isused, bool $iscorrect, bool $iserror,
+        ?array $values = null) {
+
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
 

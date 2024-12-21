@@ -226,7 +226,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      */
     protected function is_correct_multichoice(object $query, string $useranswer, float &$fraction): bool {
         if ($query->multichoice->single) {
-            return $this->is_correct_multichoice_single1( $query, $useranswer,$fraction);
+            return $this->is_correct_multichoice_single1( $query, $useranswer, $fraction);
         } else {
             return $this->is_correct_multichoice_single0( $query, $useranswer, $fraction);
         }
