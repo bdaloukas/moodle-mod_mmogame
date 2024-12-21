@@ -167,7 +167,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      *
      * @return array
      */
-    public function validation($data, $files) : array {
+    public function validation($data, $files): array {
 
         $errors = parent::validation($data, $files);
 
@@ -296,7 +296,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      *
      * @param object $mform
      */
-    public function definition_question(object $mform) : void {
+    public function definition_question(object $mform): void {
         $numcategories = 3;
 
         for ($i = 1; $i <= $numcategories; $i++) {

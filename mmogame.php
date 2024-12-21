@@ -109,8 +109,7 @@ class mmogame {
     /**
      * Returns the variable timelimit.
      */
-    public function get_timelimit(): int
-    {
+    public function get_timelimit(): int {
         return $this->timelimit;
     }
 
