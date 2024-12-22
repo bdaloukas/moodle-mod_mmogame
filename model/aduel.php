@@ -56,8 +56,8 @@ class mmogameModel_aduel {
      * Return the aduel record for current $mmogame record
      *
      * @param object $mmogame
-     * @param false $newplayer1
-     * @param false $newplayer2
+     * @param bool $newplayer1
+     * @param bool $newplayer2
      * @return false|mixed
      */
     public static function get_aduel(object $mmogame, bool &$newplayer1, bool &$newplayer2) {
