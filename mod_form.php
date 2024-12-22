@@ -160,7 +160,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      *
      * @return array
      */
-    public function validation( $data, $files): array {
+    public function validation($data, $files): array {
 
         $errors = parent::validation($data, $files);
 
@@ -241,7 +241,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
     public function set_data($defaultvalues) {
         $mmogameid = isset( $defaultvalues->id) ? intval($defaultvalues->id) : 0;
 
-        if (isset( $defaultvalues->type) && isset( $defaul_tvalues->model)) {
+        if (isset( $defaultvalues->type) && isset( $defaultvalues->model)) {
             $defaultvalues->typemodel = $defaultvalues->type.'-'.$defaultvalues->model;
         }
         if (!isset( $defaultvalues->pin) || $defaultvalues->pin == 0) {
