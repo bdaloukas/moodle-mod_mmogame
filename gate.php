@@ -80,6 +80,7 @@ mmogame_change_javascript( $rgame->type, 'type/'.$rgame->type.'/js/'.$rgame->typ
         game.open(<?php echo "\"$CFG->wwwroot/mod/mmogame/json.php\",$rgame->id,
             $rgame->pin,$usercode,\"$rgame->kinduser\"" ?>);
     }
+ </script>
 </body>
 
 <?php

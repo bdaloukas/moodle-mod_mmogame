@@ -71,12 +71,12 @@ class mmogame_quiz extends mmogame {
     protected function get_attempt_new_internal(int $queryid, int $timelimit, int $numattempt, int $timeclose) {
         $table = 'mmogame_quiz_attempts';
         if ($queryid === 0) {
-            $query = false;
+            $query = null;
         } else {
             $query = $this->qbank->load( $queryid, true);
         }
 
-        $a = $this->qbank->get_attempt_new( $this->get_auserid(), 1, $this->stopatend, true, $query);
+        $a = $this->qbank->get_attempt_new( 1, true, $query);
         if ($a === false) {
             $this->set_errorcode( ERRORCODE_NO_QUERIES);
             return false;

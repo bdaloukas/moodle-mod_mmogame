@@ -135,7 +135,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
                 $ret['addscore'] = $attempt->score >= 0 ? '+'.$attempt->score : $attempt->score;
 
                 // Update 3 statistics.
-                $this->qbank->update_stats( $attempt->auserid, null, $attempt->queryid, 0,
+                $this->qbank->update_stats( $attempt->auserid, 0, $attempt->queryid, 0,
                     $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0);
 
                 $sql = "SELECT COUNT(*) AS c ".
@@ -145,10 +145,10 @@ class mmogame_quiz_alone extends mmogame_quiz {
                 $stat = $this->get_db()->get_record_sql(
                     $sql, [$this->rgame->id, $this->rgame->numgame, $attempt->auserid]);
                 $values = ['countcompleted' => $stat->c];
-                $this->qbank->update_stats( $attempt->auserid, null, null, 0,
+                $this->qbank->update_stats( $attempt->auserid, 0, 0, 0,
                     $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0, $values);
 
-                $this->qbank->update_stats( null, null,  $attempt->queryid, 0,
+                $this->qbank->update_stats( 0, 0,  $attempt->queryid, 0,
                     $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0);
             }
         }

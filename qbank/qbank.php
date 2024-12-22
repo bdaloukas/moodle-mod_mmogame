@@ -254,7 +254,7 @@ class mmogameqbank {
 
             $count = $rec->countcorrect + $rec->counterror;
             $a['percent'] = $count == 0 ? null : $rec->countcorrect / $count;
-            if ($values !== false) {
+            if ($values !== null) {
                 foreach ($values as $key => $value) {
                     if ($value == 'percent2') {
                         $value /= $rec->countanswers;
@@ -274,10 +274,10 @@ class mmogameqbank {
             $count = $iscorrect + $iserror;
             $percent = $count == 0 ? null : $iscorrect / $count;
             $a = ['mmogameid' => $rgame->id,
-                'numgame' => $rgame->numgame, 'queryid' => $queryid, 'auserid' => $auserid, 'numteam' => $numteam,
+                'numgame' => $rgame->numgame, 'queryid' => $queryid != 0 ? $queryid : null, 'auserid' => $auserid, 'numteam' => $numteam != 0 ? $numteam : null,
                 'percent' => $percent, 'countused' => $isused, 'countcorrect' => $iscorrect,
                 'counterror' => $iserror, ];
-            if ($values !== false) {
+            if ($values !== null) {
                 foreach ($values as $key => $value) {
                     $a[$key] = $value;
                 }
