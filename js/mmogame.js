@@ -11,7 +11,7 @@ class mmogame {
         if (isNaN(this.kindSound)) {
             this.kindSound = 0;
         }
-        if (this.kindSound != 0 && this.kindSound != 1 && this.kindSound != 2) {
+        if (this.kindSound !== 0 && this.kindSound !== 1 && this.kindSound != 2) {
             this.kindSound = 0;
         }
 
@@ -44,19 +44,6 @@ class mmogame {
         return button;
     }
 
-    isquestionShortanswer() {
-        return this.qtype == 'shortanswer';
-    }
-
-    setKindUser(kinduser) {
-        this.kinduser = kinduser;
-    }
-
-    reopenGame() {
-        sessionStorage.removeItem("auserid");
-        this.openGame(this.url, this.mmogameid, this.pin, this.auserid, this.kinduser);
-    }
-
     removeBodyChilds() {
         this.removeDivMessage();
 
@@ -79,11 +66,11 @@ class mmogame {
         this.mmogameid = id;
         this.pin = pin;
         this.kinduser = kinduser;
-        if (this.kinduser == undefined || this.kinduser == "") {
+        if (this.kinduser === undefined || this.kinduser == "") {
             this.kinduser = "usercode";
         }
         this.auserid = auserid;
-        if (this.auserid == 0 && this.kinduser == 'guid') {
+        if (this.auserid === 0 && this.kinduser === 'guid') {
             this.auserid = this.getUserGUID();
         }
 
@@ -100,7 +87,7 @@ class mmogame {
 
     createImageButton(parent, left, top, width, height, classname, filename, wrap, alt) {
         var button = document.createElement("img");
-        if (alt != undefined && alt != '') {
+        if (alt !== undefined && alt !== '') {
             button.alt = alt;
         }
 
@@ -115,7 +102,7 @@ class mmogame {
         if (width !== 0) {
             button.style.width = width + "px";
         }
-        if (height != 0) {
+        if (height !== 0) {
             button.style.height = height + "px";
         }
         button.style.fontSize = height + "px";
@@ -181,7 +168,7 @@ class mmogame {
 
         const img = new Image();
         img.onload = function() {
-            if (this.width == 0 || this.height == 0) {
+            if (this.width === 0 || this.height === 0) {
                 this.width = this.height = 1;
             }
 
@@ -200,7 +187,7 @@ class mmogame {
                 button.style.fontSize = height + "px";
             }
         };
-        if (filename != undefined && filename != "") {
+        if (filename !== undefined && filename !== "") {
             img.style.left = left + "px";
             img.style.top = top + "px";
             img.style.visibility = 'hidden';
@@ -220,14 +207,14 @@ class mmogame {
 
         let img = new Image();
 
-        if (filename != undefined && filename != "") {
+        if (filename !== undefined && filename !== "") {
             img.style.left = left + "px";
             img.style.top = top + "px";
             img.style.visibility = 'hidden';
             img.src = filename;
         }
         img.onload = function() {
-            if (this.width == 0 || this.height == 0) {
+            if (this.width === 0 || this.height === 0) {
                 this.width = this.height = 1;
             }
 
@@ -273,11 +260,11 @@ class mmogame {
     }
 
     getMuteFile() {
-        if (this.kindSound == 0) {
+        if (this.kindSound === 0) {
             return 'assets/sound-on-flat.png';
-        } else if (this.kindSound == 1) {
+        } else if (this.kindSound === 1) {
             return 'assets/sound-off-flat.png';
-        } else if (this.kindSound == 2) {
+        } else if (this.kindSound === 2) {
             return 'assets/speak.svg';
         } else {
             return 'assets/sound-on-flat.png';
@@ -285,8 +272,8 @@ class mmogame {
     }
 
     playAudio(audio) {
-        if (this.kindSound != 0 && audio !== null) {
-            if (audio.networkState == 1) {
+        if (this.kindSound !== 0 && audio !== null) {
+            if (audio.networkState === 1) {
                 audio.play();
             }
         }
@@ -297,7 +284,7 @@ class mmogame {
         var low = Math.max(1, minFontSize);
         width = Math.round(width);
         height = Math.round(height);
-        var up = maxFontSize == 0 || maxFontSize == undefined ? Math.min(width, height) : maxFontSize;
+        var up = maxFontSize === 0 || maxFontSize === undefined ? Math.min(width, height) : maxFontSize;
 
         var fitSize = low;
         var fitHeight = 0;
@@ -370,7 +357,7 @@ class mmogame {
     autoResizeTextBr(item) {
         let s = item.innerHTML;
         let change = false;
-        while (s.substr(0, 4) == '<br>') {
+        while (s.substr(0, 4) === '<br>') {
             s = s.substr(4);
             change = true;
         }
@@ -381,7 +368,7 @@ class mmogame {
                 break;
             }
             let s2 = s.substr(pos1 + 4, pos - pos1 - 4);
-            if (s2.trim().length == 0) {
+            if (s2.trim().length === 0) {
                 s = s.substr(0, pos1 + 4) + s.substr(pos + 4);
                 change = true;
                 pos = pos1;
@@ -395,7 +382,7 @@ class mmogame {
     }
 
     autoResizeTextImage(item, subwidth, subheight, minRatio) {
-        if (subwidth == 0 && subheight == 0) {
+        if (subwidth === 0 && subheight === 0) {
             return;
         }
         let s = item.innerHTML;
@@ -446,7 +433,7 @@ class mmogame {
 
     getUserGUID() {
         var guid = window.localStorage.getItem('UserGUID');
-        if (guid === null || guid == '') {
+        if (guid === null || guid === '') {
             guid = this.uuid4();
             window.localStorage.setItem("UserGUID", guid);
         }

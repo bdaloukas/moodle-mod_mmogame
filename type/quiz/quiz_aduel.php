@@ -102,7 +102,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
                 $this->set_errorcode( ERRORCODE_ADUEL_NO_RIVALS);
                 return false;
             }
-error_log("newplayer1=$newplayer1 newplayer2=$newplayer2");
+
             if (!$newplayer1 && !$newplayer2) {
                 $rec = mmogameModel_aduel::get_attempt( $this, $this->aduel);
                 if ($rec !== false) {

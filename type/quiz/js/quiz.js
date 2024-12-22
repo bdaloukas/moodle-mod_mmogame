@@ -31,7 +31,7 @@ class mmogameQuiz extends mmogame {
         var xmlhttp = new XMLHttpRequest();
         var instance = this;
         xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
+            if (this.readyState === 4 && this.status == 200) {
                 instance.onServerGetAttempt(JSON.parse(this.responseText), param);
             }
         };
@@ -40,7 +40,7 @@ class mmogameQuiz extends mmogame {
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         let d = {"command": "getattempt", "mmogameid": this.mmogameid, "pin": this.pin, "kinduser": this.kinduser,
             "user": this.auserid, "subcommand": subcommand};
-        if (this.helpurl == undefined) {
+        if (this.helpurl === undefined) {
             d.helpurl = 1;
         }
         let data = JSON.stringify(d);
@@ -50,20 +50,20 @@ class mmogameQuiz extends mmogame {
     onServerGetAttempt(json) {
         this.computeDifClock(json);
 
-        if (this.colors == undefined) {
+        if (this.colors === undefined) {
             this.setColorsString(json.colors);
             this.createIconBar();
         }
 
-        if (json.name != undefined) {
+        if (json.name !== undefined) {
             window.document.title = json.name;
         }
 
-        if (json.helpurl != undefined) {
+        if (json.helpurl !== undefined) {
             this.helpUrl = json.helpurl;
         }
 
-        if (json.errorcode != undefined) {
+        if (json.errorcode !== undefined) {
             this.createDivMessage(json.errorcode);
             return;
         }
@@ -76,7 +76,7 @@ class mmogameQuiz extends mmogame {
         this.attempt = json.attempt;
 
         this.qtype = json.qtype;
-        if (json.qtype == 'multichoice') {
+        if (json.qtype === 'multichoice') {
             this.answers = [];
             this.answersID = [];
             for (let i = 1; i <= json.answers; i++) {
@@ -84,14 +84,14 @@ class mmogameQuiz extends mmogame {
                 this.answers.push(this.repairP(json["answer_" + i]));
             }
         }
-        this.answer = json.answer != undefined ? json.answer : null;
-        this.endofgame = json.endofgame != undefined && json.endofgame != 0;
+        this.answer = json.answer !== undefined ? json.answer : null;
+        this.endofgame = json.endofgame !== undefined && json.endofgame !== 0;
         this.definition = this.repairP(json.definition);
         this.single = json.single;
         this.errorcode = json.errorcode;
 
         this.readJsonFiles(json);
-        if (json.state != 0) {
+        if (json.state !== 0) {
             this.createScreen(json, false);
         }
 
@@ -101,7 +101,7 @@ class mmogameQuiz extends mmogame {
     }
 
     updateLabelTimer() {
-        if (this.labelTimer == undefined || this.timeclose == undefined) {
+        if (this.labelTimer === undefined || this.timeclose === undefined) {
             return;
         }
         if (this.timeclose == 0) {
@@ -122,7 +122,7 @@ class mmogameQuiz extends mmogame {
             this.labelTimer.innerHTML = (dif < 0 ? "-" : "") + Math.floor(dif / 60.0) + ":" + ("0" + (dif % 60)).substr(-2);
         }
 
-        if (dif <= 0 && this.timeclose != 0) {
+        if (dif <= 0 && this.timeclose !== 0) {
             return;
         }
 
@@ -139,7 +139,7 @@ class mmogameQuiz extends mmogame {
     }
 
     createScreen(json, disabled) {
-        if (this.area != undefined) {
+        if (this.area !== undefined) {
             this.body.removeChild(this.area);
             this.area = undefined;
         }
@@ -194,12 +194,12 @@ class mmogameQuiz extends mmogame {
             this.nextTop = this.areaHeight - this.padding;
         }
 
-        if (this.hideSubmit == false) {
+        if (this.hideSubmit === false) {
             this.btnSubmit = this.createImageButton(this.body, (this.areaWidth - this.iconSize) / 2, this.nextTop, 0, this.iconSize,
                 "", 'assets/submit.svg', false, 'submit');
             this.btnSubmit.addEventListener("click",
                 function() {
-                    if (instance.btnSubmit != undefined) {
+                    if (instance.btnSubmit !== undefined) {
                         instance.area.removeChild(instance.btnSubmit);
                         instance.btnSubmit = undefined;
                     }

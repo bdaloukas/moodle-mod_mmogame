@@ -85,7 +85,7 @@ mmogame_change_javascript( $rgame->type, 'type/'.$rgame->type.'/js/'.$rgame->typ
 
 <?php
 /**
- * Reads a javascript file and changes some string for translation replacing [LANG_...], [LANGM_...], [CLASS].
+ * Reads a JavaScript file and changes some string for translation replacing [LANG_...], [LANGM_...], [CLASS].
  *
  * @param string $type (type is a sub-plugin name e.g. quiz).
  * @param string $file

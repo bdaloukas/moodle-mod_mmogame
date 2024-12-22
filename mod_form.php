@@ -138,17 +138,17 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * data_preprocessing
      *
-     * @param stdClass $default_values
+     * @param stdClass $defaultvalues
      */
-    public function data_preprocessing(&$default_values) {
+    public function data_preprocessing(&$defaultvalues) {
         if (isset($toform['grade'])) {
             // Convert to a real number, so we don't get 0.0000.
-            $default_values['grade'] = $toform['grade'] + 0;
+            $defaultvalues['grade'] = $toform['grade'] + 0;
         }
 
         // Completion settings check.
-        if (empty($default_values['completionusegrade'])) {
-            $default_values['completionpass'] = 0; // Forced unchecked.
+        if (empty($defaultvalues['completionusegrade'])) {
+            $defaultvalues['completionpass'] = 0; // Forced unchecked.
         }
     }
 
@@ -236,26 +236,26 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * Set data
      *
-     * @param object $default_values
+     * @param object $defaultvalues
      */
-    public function set_data($default_values) {
-        $mmogameid = isset( $default_values->id) ? intval($default_values->id) : 0;
+    public function set_data($defaultvalues) {
+        $mmogameid = isset( $defaultvalues->id) ? intval($defaultvalues->id) : 0;
 
-        if (isset( $default_values->type) && isset( $defaul_tvalues->model)) {
-            $default_values->typemodel = $default_values->type.'-'.$default_values->model;
+        if (isset( $defaultvalues->type) && isset( $defaul_tvalues->model)) {
+            $defaultvalues->typemodel = $defaultvalues->type.'-'.$defaultvalues->model;
         }
-        if (!isset( $default_values->pin) || $default_values->pin == 0) {
+        if (!isset( $defaultvalues->pin) || $defaultvalues->pin == 0) {
             $db = new mmogame_database_moodle();
-            $default_values->pin = mmogame::get_newpin( $mmogameid, $db, MMOGAME_PIN_DIGITS);
+            $defaultvalues->pin = mmogame::get_newpin( $mmogameid, $db, MMOGAME_PIN_DIGITS);
         }
 
-        if (!isset( $default_values->enabled)) {
-            $default_values->enabled = 1;
+        if (!isset( $defaultvalues->enabled)) {
+            $defaultvalues->enabled = 1;
         }
 
-        $this->set_data_categories( $default_values);
+        $this->set_data_categories( $defaultvalues);
 
-        parent::set_data($default_values);
+        parent::set_data($defaultvalues);
     }
 
     /**
