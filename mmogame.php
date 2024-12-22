@@ -51,12 +51,15 @@ class mmogame {
     protected int $auserid = 0;
     /** @var object $qbank: question bank to be used. */
     protected object $qbank;
+
     /** @var string $error: saves the error code. */
     protected string $error = '';
+
     /** @var int $timelimit: maximum time in seconds for answer. */
     protected int $timelimit = 0;
-    /** @var $rstate: the record of table mmogame_aa_states. */
-    protected $rstate;
+
+    /** @var object $rstate: the record of table mmogame_aa_states. */
+    protected object $rstate;
 
     /**
      * Constructor.
@@ -76,7 +79,7 @@ class mmogame {
 
         $this->rstate = $this->db->get_record_select( 'mmogame_aa_states', 'mmogameid=? AND numgame=?',
             [$this->rgame->id, $this->rgame->numgame]);
-        if ($this->rstate == 0) {
+        if ($this->rstate === false) {
             $id = $this->db->insert_record( 'mmogame_aa_states',
                 ['mmogameid' => $this->rgame->id,
                 'numgame' => $this->rgame->numgame, 'state' => 0,
