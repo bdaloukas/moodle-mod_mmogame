@@ -32,14 +32,35 @@
 class mmogameModel_aduel {
 
     /**
+     * Administrator can change numgame or state
+     *
+     * @param object $data
+     * @param object $game
+     */
+    public static function json_setadmin($data, $game) {
+        $ret = [];
+        if (isset( $data->numgame) && $data->numgame > 0) {
+            $game->get_rstate()->state = 0;
+            $game->get_db()->update_record( 'mmogame', ['id' => $game->get_id(), 'numgame' => $data->numgame]);
+            $game->update_state( $game->get_rstate()->state);
+            $game->set_state_json( $game->get_rstate()->state, $ret);
+        } else if (isset( $data->state)) {
+            if ($data->state >= 0 && $data->state <= MMOGAME_ADUEL_STATE_LAST) {
+                $game->update_state( $data->state);
+                $game->set_state_json( $data->state, $ret);
+            }
+        }
+    }
+
+    /**
      * Return the aduel record for current $mmogame record
      *
      * @param object $mmogame
-     * @param int $newplayer1
-     * @param int $newplayer2
+     * @param false $newplayer1
+     * @param false $newplayer2
      * @return false|mixed
      */
-    public static function get_aduel(object $mmogame, int &$newplayer1, int &$newplayer2) {
+    public static function get_aduel(object $mmogame, bool &$newplayer1, bool &$newplayer2) {
         $newplayer1 = $newplayer2 = false;
         $auserid = $mmogame->get_auserid();
         $db = $mmogame->get_db();
@@ -125,11 +146,11 @@ class mmogameModel_aduel {
      * Return the new aduel record for current $mmogame
      *
      * @param object $mmogame
-     * @param int $newplayer1
+     * @param bool $newplayer1
      * @param object $stat (the record of table mmogame_aa_stats)
      * @return mixed
      */
-    public static function get_aduel_new(object $mmogame, int &$newplayer1, object $stat) {
+    public static function get_aduel_new(object $mmogame, bool &$newplayer1, object $stat) {
         $db = $mmogame->get_db();
 
         $a = ['mmogameid' => $mmogame->get_id(), 'numgame' => $mmogame->get_numgame(), 'auserid1' => $mmogame->get_auserid(),
@@ -138,7 +159,7 @@ class mmogameModel_aduel {
 
         $newplayer1 = true;
         if ($stat->id == 0) {
-            $mmogame->get_qbank()->update_stats( $mmogame->get_auserid(), null, null, 0, 0, 0, ['count1' => 1]);
+            $mmogame->get_qbank()->update_stats( $mmogame->get_auserid(), 0, 0, 0, 0, 0, ['count1' => 1]);
         } else {
             $db->update_record( 'mmogame_aa_stats', ['id' => $stat->id, 'count1' => $stat->count1 + 1]);
         }

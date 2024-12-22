@@ -42,11 +42,6 @@ require_once($CFG->dirroot . '/mod/mmogame/mmogame.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_mmogame_mod_form extends moodleform_mod {
-    /** @var array options to be used with date_time_selector fields in the mmogame. */
-    public static array $datefieldoptions = ['optional' => true];
-
-    /** @var int the max number of attempts allowed in any user or group override on this mmogame. */
-    protected $maxattemptsanyoverride = null;
 
     /**
      * Return the id.
@@ -59,10 +54,8 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * Definition of form.
      */
     protected function definition() {
-        global $COURSE, $CFG, $DB, $PAGE;
+        global $CFG;
         $mform = $this->_form;
-
-        $id = $this->_instance;
 
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -104,7 +97,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
     }
 
     /**
-     * Definition for params abouts models
+     * Definition for params about models
      *
      * @param object $mform
      */
@@ -145,29 +138,29 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * data_preprocessing
      *
-     * @param stdClass $toform
+     * @param stdClass $default_values
      */
-    public function data_preprocessing(&$toform) {
+    public function data_preprocessing(&$default_values) {
         if (isset($toform['grade'])) {
             // Convert to a real number, so we don't get 0.0000.
-            $toform['grade'] = $toform['grade'] + 0;
+            $default_values['grade'] = $toform['grade'] + 0;
         }
 
         // Completion settings check.
-        if (empty($toform['completionusegrade'])) {
-            $toform['completionpass'] = 0; // Forced unchecked.
+        if (empty($default_values['completionusegrade'])) {
+            $default_values['completionpass'] = 0; // Forced unchecked.
         }
     }
 
     /**
      * validation
      *
-     * @param stdClass $data
+     * @param array $data
      * @param array $files
      *
      * @return array
      */
-    public function validation($data, $files): array {
+    public function validation( $data, $files): array {
 
         $errors = parent::validation($data, $files);
 
@@ -243,28 +236,26 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * Set data
      *
-     * @param array $defaultvalues
+     * @param object $default_values
      */
-    public function set_data($defaultvalues) {
-        global $DB;
+    public function set_data($default_values) {
+        $mmogameid = isset( $default_values->id) ? intval($default_values->id) : 0;
 
-        $mmogameid = isset( $defaultvalues->id) ? $defaultvalues->id : 0;
-
-        if (isset( $defaultvalues->type) && isset( $defaultvalues->model)) {
-            $defaultvalues->typemodel = $defaultvalues->type.'-'.$defaultvalues->model;
+        if (isset( $default_values->type) && isset( $defaul_tvalues->model)) {
+            $default_values->typemodel = $default_values->type.'-'.$default_values->model;
         }
-        if (!isset( $defaultvalues->pin) || $defaultvalues->pin == 0) {
+        if (!isset( $default_values->pin) || $default_values->pin == 0) {
             $db = new mmogame_database_moodle();
-            $defaultvalues->pin = mmogame::get_newpin( $mmogameid, $db, MMOGAME_PIN_DIGITS);
+            $default_values->pin = mmogame::get_newpin( $mmogameid, $db, MMOGAME_PIN_DIGITS);
         }
 
-        if (!isset( $defaultvalues->enabled)) {
-            $defaultvalues->enabled = 1;
+        if (!isset( $default_values->enabled)) {
+            $default_values->enabled = 1;
         }
 
-        $this->set_data_categories( $defaultvalues);
+        $this->set_data_categories( $default_values);
 
-        parent::set_data($defaultvalues);
+        parent::set_data($default_values);
     }
 
     /**

@@ -35,7 +35,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /** @var int $numquestions: number of questions that contain one group of questions. */
     protected int $numquestions;
     /** @var false|object $aduel: ADuel object or false if no object yet. */
-    protected object $aduel;
+    protected $aduel = false;
     /** @var int $maxalone: maximum number of questions that a user can play withoyt an oponent. */
     protected int $maxalone = 200;
 
@@ -86,7 +86,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Tries to find an attempt of open games, otherwise creates a new attempt.
      *
-     * @return bool|object (a new attempt of false if no attempt)
+     * @return false|object (a new attempt of false if no attempt)
      */
     public function get_attempt() {
         if ($this->rstate->state != MMOGAME_ADUEL_STATE_PLAY) {
@@ -95,13 +95,14 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
 
         require_once( dirname(__FILE__).'/../../model/aduel.php');
 
+        $newplayer1 = $newplayer2 = false;
         for ($step = 1; $step <= 2; $step++) {
             $this->aduel = mmogameModel_aduel::get_aduel( $this, $newplayer1, $newplayer2);
             if ($this->aduel === false) {
                 $this->set_errorcode( ERRORCODE_ADUEL_NO_RIVALS);
                 return false;
             }
-
+error_log("newplayer1=$newplayer1 newplayer2=$newplayer2");
             if (!$newplayer1 && !$newplayer2) {
                 $rec = mmogameModel_aduel::get_attempt( $this, $this->aduel);
                 if ($rec !== false) {
@@ -273,16 +274,16 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * Saves to array $ret informations about the $attempt.
      *
      * @param array $ret (returns info about the current attempt)
-     * @param object $attempt
+     * @param false|object $attempt
      * @param object $data
      * @return bool|object
      */
-    public function append_json(array &$ret, object $attempt, object $data): bool {
+    public function append_json(array &$ret, $attempt, object $data): bool {
         $query = parent::append_json( $ret, $attempt, $data);
 
         $auserid = $this->get_auserid();
 
-        if ($this->aduel === false) {
+        if ($this->aduel === false || $query === false) {
             return false;
         }
 
@@ -523,10 +524,10 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
 
         // Update statistics.
         foreach ($ret as $q) {
-            $this->qbank->update_stats( $this->auserid, null, $q->id, 1, 0, 0);
-            $this->qbank->update_stats( null, null, $q->id, 1, 0, 0);
+            $this->qbank->update_stats( $this->auserid, 0, $q->id, 1, 0, 0);
+            $this->qbank->update_stats( 0, 0, $q->id, 1, 0, 0);
         }
-        $this->qbank->update_stats( $this->auserid, null, null, count( $ret), 0, 0,
+        $this->qbank->update_stats( $this->auserid, 0, 0, count( $ret), 0, 0,
             ['countanswers' => count( $ids)]);
 
         return count( $ret) ? $ret : false;

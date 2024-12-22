@@ -58,8 +58,8 @@ class mmogame {
     /** @var int $timelimit: maximum time in seconds for answer. */
     protected int $timelimit = 0;
 
-    /** @var object $rstate: the record of table mmogame_aa_states. */
-    protected object $rstate;
+    /** @var bool|object $rstate: the record of table mmogame_aa_states. */
+    protected $rstate;
 
     /**
      * Constructor.

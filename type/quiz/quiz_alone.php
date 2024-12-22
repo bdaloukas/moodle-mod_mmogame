@@ -50,9 +50,9 @@ class mmogame_quiz_alone extends mmogame_quiz {
     /**
      * Tries to find an attempt of open games, otherwise creates a new attempt.
      *
-     * @return object (a new attempt of false if no attempt)
+     * @return false|object (a new attempt of false if no attempt)
      */
-    public function get_attempt(): object {
+    public function get_attempt() {
         $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
             [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
@@ -84,7 +84,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
     }
 
     /**
-     * Saves informations about the user's answer.
+     * Saves information about the user's answer.
      *
      * @param object $attempt
      * @param object $query

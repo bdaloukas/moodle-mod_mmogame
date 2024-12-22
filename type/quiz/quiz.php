@@ -99,11 +99,12 @@ class mmogame_quiz extends mmogame {
      * Saves to array $ret informations about the $attempt.
      *
      * @param array $ret (returns info about the current attempt)
-     * @param object $attempt
+     * @param bool|object $attempt
      * @param object $data
-     * @return object (the query of attempt)
+     * @return false|object (the query of attempt)
+     *
      */
-    public function append_json(array &$ret, object $attempt, object $data): object {
+    public function append_json(array &$ret, $attempt, object $data) {
         $auserid = $this->get_auserid();
 
         $info = $this->get_avatar_info( $auserid);
