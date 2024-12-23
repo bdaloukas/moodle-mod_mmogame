@@ -64,9 +64,9 @@ class mmogameQuiz extends mmogame {
             return;
         }
 
-        this.state = json.state;
+        this.state = parseInt( json.state);
         this.fastjson = json.fastjson;
-        this.timefastjson = json.timefastjson;
+        this.timefastjson = parseInt( json.timefastjson);
         this.updateButtonsAvatar(1, json.avatar, json.nickname);
 
         this.attempt = json.attempt;
@@ -651,7 +651,7 @@ class mmogameQuizAlone extends mmogameQuiz {
         let pos = response.indexOf("-");
         if (pos >= 0) {
             let state = parseInt(response.substr(0, pos));
-            let timefastjson = response.substr(pos + 1);
+            let timefastjson = parseInt( response.substr(pos + 1));
             if (timefastjson !== this.timefastjson || state !== this.state) {
                 this.sendGetAttempt();
                 return;
