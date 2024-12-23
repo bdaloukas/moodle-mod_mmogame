@@ -36,8 +36,6 @@ require_once(dirname(__FILE__) . '/lib.php');
  */
 class mmogame_quiz extends mmogame {
     /** @var bool $stopatend: stops at the end of this game. */
-    protected bool $stopatend = false;
-    /** @var bool $callupdategrades: call updategrades. */
     protected bool $callupdategrades = true;
 
     /**

@@ -22,9 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/** Identifier the Moodle Questions as source of question bank. */
+/** Identifier the Moodle Questions as a source of question bank. */
 const MMOGAME_QBANK_MOODLEQUESTION = 'moodlequestion';
-/** Identifier the Moodle Glossary as source of question bank. */
+/** Identifier the Moodle Glossary as a source of question bank. */
 const MMOGAME_QBANK_MOODLEGLOSSARY = 'moodleglossary';
 
 /**
@@ -95,7 +95,7 @@ function mmogame_delete_instance(int $mmogameid): bool {
 }
 
 /**
- * Updates some fields before writing to database.
+ * Updates some fields before writing to the database.
  *
  * @param stdClass $mform
  */
@@ -141,15 +141,15 @@ function mmogame_before_add_or_update_glossary(stdClass $mmogame): void {
 /**
  * Called before add or update for repairing question params.
  *
- * @param stdClass $mmogame
+ * @param mmogame $mmogame
  */
-function mmogame_before_add_or_update_question( $mmogame): void {
+function mmogame_before_add_or_update_question( mmogame $mmogame): void {
     $a = [];
 
     // Iterate over all properties of the $mmogame object.
     foreach (get_object_vars($mmogame) as $name => $value) {
         // Check if the property name starts with 'categoryid' and has a non-zero value.
-        if (str_starts_with($name, 'categoryid') && $value != 0) {
+        if (strpos($name, 'categoryid') === 0 && $value != 0) {
             $a[] = $value;
         }
     }
@@ -243,7 +243,7 @@ function mmogame_get_types(): array {
  * Return the list if Moodle features this module supports
  *
  * @param string $feature FEATURE_xx constant for requested feature
- * @return ?bool True if module supports feature, false if not, null if doesn't know or string for the module purpose.
+ * @return ?bool True if module supports feature, false if not, null if it doesn't know or string for the module purpose.
  */
 function mmogame_supports(string $feature): ?bool {
     switch ($feature) {

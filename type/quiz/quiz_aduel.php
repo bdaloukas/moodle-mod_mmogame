@@ -66,15 +66,6 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     }
 
     /**
-     * Return the aduel class variable.
-     *
-     * @return object (a record from table mmogame_am_aduel_pairs)
-     */
-    public function get_aduel() {
-        return $this->aduel;
-    }
-
-    /**
      * Return the maxalone class variable.
      *
      * @return int (a record from table mmogame_am_aduel_pairs)
@@ -350,7 +341,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
             $this->append_json_only2( $ret, $query, $attemptid);
         } else if ($player == 1 && $this->aduel->tool3numattempt1 == $numattempt
         || $player == 2 && $this->aduel->tool3numattempt2 == $numattempt) {
-            $this->append_json_only1( $ret, $query, $attemptid);
+            $this->append_json_only1( $ret, $query);
         }
 
         if ($this->iswizard( $attempt->id)) {
@@ -377,7 +368,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * @param object $query
      * @param int $attemptid
      */
-    protected function append_json_only2(&$ret, $query, $attemptid) {
+    protected function append_json_only2(array &$ret, object $query, int $attemptid) {
         $correctid = $query->correctid;
         $ids = [];
         foreach ($query->answers as $answer) {
@@ -404,9 +395,8 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      *
      * @param array $ret (returns info about the current attempt)
      * @param object $query
-     * @param int $attemptid
      */
-    protected function append_json_only1(array &$ret, object $query, int $attemptid) {
+    protected function append_json_only1(array &$ret, object $query) {
         $correctid = $query->correctid;
 
         $count = $ret['answers'];
@@ -501,7 +491,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         ksort( $map);
         $map2 = [];
         // Selects 3 * count of needed.
-        foreach ($map as $key => $q) {
+        foreach ($map as $q) {
             if (count( $map2) >= 3 * $count) {
                 break;
             }

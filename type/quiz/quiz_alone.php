@@ -112,14 +112,9 @@ class mmogame_quiz_alone extends mmogame_quiz {
                 if ($useranswer == null) {
                     $useranswer = '';
                 }
-                if (strpos( $useranswer, ',') === false) {
-                    $answerid = $useranswer;
-                    $attempt->useranswerid = $answerid;
-                    $a['useranswerid'] = $attempt->useranswerid;
-                }
+                $a['useranswerid'] = $attempt->useranswerid = $useranswer;
             }
-            $attempt->useranswer = $useranswer;
-            $a['useranswer'] = $useranswer;
+            $a['useranswer'] = $attempt->useranswer = $useranswer;
         }
 
         if ($submit) {
@@ -166,7 +161,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
      *
      * @param bool $iscorrect
      * @param object $query
-     * @return int (now uses negative grading, in the future user will can change it)
+     * @return int (now uses negative grading, in the future user will change it)
      */
     protected function get_score_query(bool $iscorrect, object $query): int {
         return $this->get_score_query_negative( $iscorrect, $query);
@@ -235,7 +230,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
         }
 
         $ranks = $names = $avatars = [];
-        foreach ($map2 as $key => $data) {
+        foreach ($map2 as $data) {
             if ($data->rank1 != 0 && $data->rank1 < $data->rank2) {
                 $kinds[] = 1;
                 $ranks[] = $data->rank1;

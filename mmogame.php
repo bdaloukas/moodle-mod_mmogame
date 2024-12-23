@@ -194,7 +194,7 @@ class mmogame {
     }
 
     /**
-     * Return coresponding auserid from guid (login without password).
+     * Return coresponding auserid from guid (login without a password).
      * @param object $db
      * @param string $guid
      * @param bool $create
@@ -230,9 +230,9 @@ class mmogame {
     }
 
     /**
-     * Return coresponding auserid from a user.
+     * Return the corresponding auserid from a user.
      * @param object $db
-     * @param string $kind (the kind of user e.g. Moodle, GUID)
+     * @param string $kind (the kind of user e.g., Moodle, GUID)
      * @param string $userid
      * @param bool $create
      * @return false|int
@@ -336,14 +336,14 @@ class mmogame {
             }
         }
 
-        // Ones that is not used in this numgame.
+        // Ones that are not used in this numgame.
         $sql = "SELECT a.id, numused FROM {$db->prefix}mmogame_aa_avatars a ".
             " LEFT JOIN {$db->prefix}mmogame_aa_grades g ON g.avatarid=a.id AND g.mmogameid=? AND g.numgame=?".
             " WHERE g.id IS NULL ".
             " ORDER BY a.numused,a.randomkey";
         $recs = $db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame], 0, 1);
         if (count( $recs) == 0) {
-            // All avatar are used in this numgame (players > avatars).
+            // All avatars are used in this numgame (players > avatars).
             $sql = "SELECT id, numuser FROM {$db->prefix}mmogame_aa_avatars ORDER BY numused, randomkey";
             $recs = $db->get_records_sql( $sql, 0, 1);
         }
@@ -734,23 +734,6 @@ class mmogame {
     public function update_state(int $state) {
         $this->rstate->state = $state;
         $this->db->update_record( 'mmogame_aa_states', ['id' => $this->rstate->id, 'state' => $state]);
-    }
-
-    /**
-     * If nickname is empty creates a new one based on the $filename.
-     *
-     * @param string $nickname
-     * @param string $filename
-     * @return string (the repaired nickname)
-     */
-    public static function repair_nickname(string $nickname, string $filename): string {
-        if ($nickname != '' && $nickname != null) {
-            return $nickname;
-        }
-
-        $pos = strrpos( $filename, '.');
-
-        return $pos !== false ? substr( $filename, 0, $pos) : $filename;
     }
 
     /**

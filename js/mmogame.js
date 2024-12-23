@@ -3,7 +3,6 @@
 // eslint-disable-next-line no-unused-vars
 class mmogame {
     constructor() {
-        this.blockServer = 0;
         this.kindSound = 0;
         this.state = 0;
         this.body = document.getElementsByTagName("body")[0];
@@ -11,7 +10,7 @@ class mmogame {
         if (isNaN(this.kindSound)) {
             this.kindSound = 0;
         }
-        if (this.kindSound !== 0 && this.kindSound !== 1 && this.kindSound != 2) {
+        if (this.kindSound !== 0 && this.kindSound !== 1 && this.kindSound !== 2) {
             this.kindSound = 0;
         }
 
@@ -28,7 +27,7 @@ class mmogame {
     createTextButton(parent, left, top, width, height, classname) {
         var button = document.createElement("button");
         button.classList.add("mmogame_button");
-        if (classname != '') {
+        if (classname !== '') {
            button.classList.add(classname);
         }
         button.style.left = left + "px";
@@ -66,7 +65,7 @@ class mmogame {
         this.mmogameid = id;
         this.pin = pin;
         this.kinduser = kinduser;
-        if (this.kinduser === undefined || this.kinduser == "") {
+        if (this.kinduser === undefined || this.kinduser === "") {
             this.kinduser = "usercode";
         }
         this.auserid = auserid;
@@ -78,7 +77,7 @@ class mmogame {
         if (!callOnAfterOpenGame) {
             return;
         }
-        if (this.kinduser == undefined) {
+        if (this.kinduser === undefined) {
             this.onAfterOpenGame();
         } else {
             this.onAfterOpenGame();
@@ -138,28 +137,6 @@ class mmogame {
         return button;
     }
 
-    createSVG(parent, left, top, width, height, alt, filename) {
-        var button = document.createElement("img");
-        button.src = filename;
-        button.alt = alt;
-        button.style.position = "absolute";
-        button.style.left = left + "px";
-        button.style.top = top + "px";
-
-        if (width !== 0) {
-            button.style.width = width + "px";
-        }
-        if (height !== 0) {
-            button.style.height = height + "px";
-        }
-        button.innerHTML = filename;
-        button.style.fontSize = height + "px";
-
-        parent.appendChild(button);
-
-        return button;
-    }
-
     createCenterImageButton(parent, left, top, width, height, classname, filename) {
         var button = document.createElement("img");
         button.classList.add("mmogame_imgbutton");
@@ -201,42 +178,6 @@ class mmogame {
 
     updateImageButton(button, left, top, width, height, filename) {
         button.src = filename;
-    }
-
-    updateCenterImageButton(button, left, top, width, height, filename) {
-
-        let img = new Image();
-
-        if (filename !== undefined && filename !== "") {
-            img.style.left = left + "px";
-            img.style.top = top + "px";
-            img.style.visibility = 'hidden';
-            img.src = filename;
-        }
-        img.onload = function() {
-            if (this.width === 0 || this.height === 0) {
-                this.width = this.height = 1;
-            }
-
-            if (this.width > 0 && this.height > 0) {
-                let mul = Math.min(width / this.width, height / this.height);
-                let w = Math.round(this.width * mul);
-                let h = Math.round(this.height * mul);
-
-                // Converts to png for fast.
-                var canvas = document.createElement('canvas');
-                canvas.style.width = w;
-                canvas.style.height = h;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, w, h);
-                let image = canvas.toDataURL("image/png");
-
-                button.style.left = (left + width / 2 - w / 2) + "px";
-                button.style.top = (top + height / 2 - h / 2) + "px";
-
-                button.src = image;
-            }
-        };
     }
 
     createDiv(parent, left, top, width, height) {
@@ -461,7 +402,7 @@ class mmogame {
     }
 
     computeSizes() {
-        if (this.cIcons < 5 || this.cIcons == undefined) {
+        if (this.cIcons < 5 || this.cIcons === undefined) {
             this.cIcons = 5;
         }
         this.iconSize = Math.min(window.innerWidth / this.cIcons, window.innerHeight / 5);
@@ -507,31 +448,8 @@ class mmogame {
          return (gray * 0x10000) + (gray * 0x100) + gray;
     }
 
-    getColorMul(x, mul) {
-        // eslint-disable-next-line no-bitwise
-        var r = (x & 0xFF0000) >> 16,
-            // eslint-disable-next-line no-bitwise
-            g = (x & 0x00FF00) >> 8,
-            // eslint-disable-next-line no-bitwise
-            b = x & 0x0000FF;
-        r = Math.round(r * mul);
-        g = Math.round(g * mul);
-        b = Math.round(b * mul);
-
-        // eslint-disable-next-line no-bitwise
-        return (r << 16) + (g << 8) + b;
-    }
-
     getColorContrast(x) {
         return (this.getContrast(x) >= 128) ? '#000000' : '#ffffff';
-    }
-
-    isColorDark(x) {
-        return this.getColorContrast(x) == '#ffffff';
-    }
-
-    setMessages(a) {
-        this.messages = a;
     }
 
     repairColors(colors) {
@@ -580,7 +498,7 @@ class mmogame {
         if (hasSpeach) {
             if ("webkitSpeechRecognition" in window == false) {
                 hasSpeach = false;
-            } else if (letters.indexOf('#') == -1) {
+            } else if (letters.indexOf('#') === -1) {
                 letters += "#";
             }
         }
@@ -596,12 +514,12 @@ class mmogame {
         var fontSize;
 
         for (let i = 0; i < cButton; i++) {
-            if (i % numX == 0) {
+            if (i % numX === 0) {
                 ix = 0;
                 iy++;
             }
             var letter = letters[i];
-            if (letter == "-") {
+            if (letter === "-") {
                 aButton[i] = null;
                 ix++;
                 continue;
@@ -631,10 +549,10 @@ class mmogame {
     }
 
     repairHTML(s, mapFiles, mapFilesWidth, mapFilesHeight) {
-        if (s == undefined) {
+        if (s === undefined) {
             return '';
         }
-        while (s.substr(0, 4) == '<br>') {
+        while (s.substr(0, 4) === '<br>') {
             s = s.substr(4).trim();
         }
         for (;;) {
@@ -646,7 +564,7 @@ class mmogame {
             if (pos2 > 0) {
                 let s2 = s.substr(pos2 + 1);
                 let posw = s2.indexOf("width=");
-                if (posw != 0) {
+                if (posw !== 0) {
                     let posw2 = s2.substr(posw + 1, 1) == "\"" ? s2.indexOf("\"", posw + 2) : s2.indexOf(" ", posw + 2);
                     if (posw2 != 0) {
                         s2 = s2.substr(0, posw) + s2.substr(posw2 + 1);
@@ -655,7 +573,7 @@ class mmogame {
                 posw = s2.indexOf("height=");
                 if (posw != 0) {
                     let posw2 = s2.substr(posw + 1, 1) == "\"" ? s2.indexOf("\"", posw + 2) : s2.indexOf(" ", posw + 2);
-                    if (posw2 != 0) {
+                    if (posw2 !== 0) {
                         s2 = s2.substr(0, posw) + s2.substr(posw2 + 1);
                     }
                 }
@@ -698,13 +616,6 @@ class mmogame {
             s2 = s2.substr(0, pos) + s2.substr(pos + 13);
         }
 
-        if (s.substr(0, 5) == "<div>") {
-            s = s.substr(5);
-            if (s.substr(-6, 6) == '</div>') {
-                s = s.subtr(0, s.length - 6);
-            }
-        }
-
         return s2;
     }
 
@@ -730,7 +641,7 @@ class mmogame {
         button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
         button.title = "[LANGM_GRADE]";
         button.alt = "[LANGM_GRADE]";
-        if (num == 1) {
+        if (num === 1) {
             this.buttonScore = button;
             button.style.background = this.getColorHex(this.colorScore);
             button.style.color = this.getColorContrast(this.colorScore);
@@ -746,7 +657,7 @@ class mmogame {
         this.autoResizeText(button, this.iconSize, this.iconSize, false, 0, 0, 1);
         button.innerHTML = '';
 
-        let h = this.iconSize / 2;
+        //let h = this.iconSize / 2;
         let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
         div.style.lineHeight = (this.iconSize / 2) + "px";
         div.style.textAlign = "center";
@@ -758,7 +669,7 @@ class mmogame {
             this.labelScore2 = div;
         }
 
-        h = this.iconSize / 3;
+        let h = this.iconSize / 3;
         div = this.createDiv(this.body, left, top, this.iconSize, h);
         div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
@@ -809,12 +720,12 @@ class mmogame {
         button.innerHTML = '';
         button.disabled = true;
 
-        let h = this.iconSize / 2;
+        //let h = this.iconSize / 2;
         let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize / 2, this.iconSize / 2);
         div.style.lineHeight = (this.iconSize / 2) + "px";
         div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
-        if (num == 1) {
+        if (num === 1) {
             this.labelScore = div;
             div.title = '[LANGM_GRADE]';
         } else {
@@ -822,12 +733,12 @@ class mmogame {
             div.title = "[LANGM_GRADE_OPONENT]";
         }
 
-        h = this.iconSize / 3;
+        let h = this.iconSize / 3;
         div = this.createDiv(this.body, left, top, this.iconSize / 2, h);
         div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
         div.title = '[LANGM_RANKING_GRADE]';
-        if (num == 1) {
+        if (num === 1) {
             this.labelScoreRank = div;
         } else {
             this.labelScoreRank2 = div;
@@ -838,13 +749,13 @@ class mmogame {
         div.style.color = this.getColorContrast(this.colorScore);
         div.title = '[LANGM_GRADE_LAST_QUESTION]';
         button.disabled = true;
-        if (num == 1) {
+        if (num === 1) {
             this.labelAddScore = div;
         } else {
             this.labelAddScore2 = div;
         }
 
-        let label = num == 1 ? this.labelScoreRank : this.labelScoreRank2;
+        let label = num === 1 ? this.labelScoreRank : this.labelScoreRank2;
 
         div = this.createDiv(this.body, left + this.iconSize / 2, top, this.iconSize / 2, h);
         div.style.textAlign = "center";
@@ -853,7 +764,7 @@ class mmogame {
         div.style.lineHeight = h + "px";
         div.style.color = label.style.color;
         div.title = '[LANGM_RANKING_PERCENT].';
-        if (num == 1) {
+        if (num === 1) {
             this.labelScoreRankB = div;
         } else {
             this.labelAddScoreRankB2 = div;
@@ -1240,34 +1151,6 @@ class mmogame {
         }
     }
 
-    setBlockServer(block) {
-        if (block) {
-            this.blockServer = Date.now() + 1000 * 30;
-        } else {
-            this.blockServer = 0;
-        }
-    }
-
-    sendGetAvatars() {
-        var xmlhttp = new XMLHttpRequest();
-        var instance = this;
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                instance.OnServerGetAvatars(JSON.parse(this.responseText));
-            }
-        };
-
-        let countX = Math.floor(this.areaWidth / this.iconSize);
-        let countY = Math.floor((this.areaHeight - 2 * this.iconSize - 2 * this.padding) / this.iconSize);
-        let count = countX * countY;
-
-        xmlhttp.open("POST", this.url, true);
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        var data = JSON.stringify({"command": "getavatars", "mmogameid": this.mmogameid, "pin": this.pin,
-            "kinduser": this.kinduser, "user": this.auserid, 'count': count});
-        xmlhttp.send(data);
-    }
-
     createDivName(left, top, labelWidth, inpWidth, label, value) {
         let div = this.createDiv(this.area, left, top, labelWidth, this.iconSize);
         div.innerHTML = label + ": ";
@@ -1312,86 +1195,6 @@ class mmogame {
         parent.appendChild(checkbox);
 
         return checkbox;
-    }
-
-    OnServerGetAvatars(json) {
-        this.params = true;
-        if (this.area != undefined) {
-            this.body.removeChild(this.area);
-        }
-        if (this.divMessage != undefined) {
-            this.removeDivMessage();
-        }
-        this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
-
-        let w = this.areaWidth - this.iconSize - this.padding;
-        let s = this.buttonsAvatarSrc[1];
-        let pos = s.lastIndexOf("/");
-        if (pos >= 0) {
-            s = s.substr(pos + 1);
-        }
-        pos = s.lastIndexOf(".");
-        if (pos >= 0) {
-            s = s.substr(0, pos);
-        }
-        s = this.repairNickname(s);
-        let s2 = this.repairNickname(this.nickname);
-        if (s == s2) {
-            s2 = '';
-        }
-        let inpNickname = this.createDivName(0, 0, w / 3, 2 * w / 3, "Όνομα", s2);
-        inpNickname.value = json.nickname;
-        inpNickname.focus();
-
-        let instance = this;
-        let btn = this.createImageButton(this.area, w + 2 * this.padding, 0, 0, parseInt(inpNickname.style.fontSize), "",
-            'assets/submit.svg', false, 'submit');
-        btn.addEventListener("click",
-            function() {
-                instance.sendSetAvatar(inpNickname.value, -1);
-            }
-        );
-
-        // Colors
-        let div = this.createDiv(this.area, 0, this.iconSize, w / 3, this.iconSize);
-        div.innerHTML = "[LANGM_PALETTE]:";
-        div.style.textAlign = "right";
-        div.style.color = this.getColorContrast(this.colorBackground);
-        div.style.background = this.colorBackground;
-        this.autoResizeText(div, w / 3, this.iconSize, true, this.minFontSize, this.maxFontSize);
-
-        var canvas = document.createElement('canvas');
-        canvas.style.position = "absolute";
-        canvas.style.left = (w / 3 + this.padding) + "px";
-        canvas.style.top = this.iconSize + "px";
-        canvas.width = this.iconSize;
-        canvas.height = this.iconSize;
-        canvas.id = "avatarid";
-        this.area.appendChild(canvas);
-        this.showColorPalette(canvas, this.colors);
-        canvas.addEventListener("click", function() {
-            instance.sendGetColorPalettes();
-        });
-
-        let countX = Math.floor(this.areaWidth / this.iconSize);
-        let left = 0;
-        let top = 2 * (this.iconSize + this.padding);
-
-        for (let i = 0; i < json.count; i++) {
-            let btn = this.createCenterImageButton(this.area, left, top, this.iconSize, this.iconSize, "",
-                'assets/avatars/' + json['avatar' + (i + 1)]);
-            btn.addEventListener("click",
-                function() {
-                    instance.sendSetAvatar(inpNickname.value, json['id' + (i + 1)]);
-                }
-            );
-            left += this.iconSize;
-
-            if ((i + 1) % countX == 0) {
-                top += this.iconSize;
-                left = 0;
-            }
-        }
     }
 
     showColorPalette(canvas, colors) {
@@ -1681,47 +1484,5 @@ class mmogame {
 
         this.buttonsAvatar[num].style.visibility = 'visible';
         this.divNicknames[num].style.visibility = 'visible';
-    }
-
-    getSVGprev(size, color) {
-        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 667 667"><defs>
-            <clipPath id="a"><path clip-rule="evenodd" d="M500 0L500 500L500 500L0 500L0 500L0 0L0 0L500 0z"/></clipPath>
-            </defs><g clip-path="url(#a)" transform="scale(1.3333)"><path transform="matrix(1 0 0 -1 0 500)"
-            d="M256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L256.77502 468.5281L445.66214
-            468.5281L445.66214 468.5281L238.84933 261.7153L238.84933 261.7153L238.84933 261.7153C 235.60168 258.46765 234.11804
-            254.18806 234.24268 249.92534L234.24268 249.92534L234.24268 249.92534C 234.11804 245.67822 235.60168 241.39864
-            238.84933 238.15097L238.84933 238.15097L445.6933 31.290157L445.6933 31.290157L445.6933 31.290157L445.6933
-            31.290157L256.72833 31.290157L256.72833 31.290157L38.12555 249.89291L38.12555 249.89291L256.77502
-            468.5281zM4.5989075 238.15099L4.5989075 238.15099L4.5989075 238.15099L237.95758 4.791005L237.95758
-            4.791005L237.95758 4.791005C 241.11176 1.6368077 245.24988 0.09086167 249.3724 0.12201445L249.3724
-            0.12201445L249.3724 0.12201445C 249.49702 0.12201445 249.59048 0.05970932 249.71638 0.05970932L249.71638
-            0.05970932L249.71638 0.05970932L249.71638 0.05970932L483.95123 0.05970932L483.95123 0.05970932L483.95123
-            0.05970932C 492.5714 0.05970932 499.56647 7.0560565 499.56647 15.674933L499.56647 15.674933L499.56647 15.674933C
-            499.56647 15.799542 499.50415 15.893002 499.50415 16.01891L499.50415 16.01891L499.50415 16.01891C 499.51974
-            20.141432 497.9738 24.27953 494.83517 27.433727L494.83517 27.433727L272.3747 249.89421L272.3747 249.89421L495.30374
-            472.822L495.30374 472.822L495.30374 472.822C 501.56543 479.08368 501.56543 489.2342 495.30374 495.49588L495.30374
-            495.49588L495.30374 495.49588C 491.58752 499.21213 486.5434 500.44656 481.71863 499.7586L481.71863
-            499.7586L481.71863 499.7586L481.71863 499.7586L251.99702 499.7586L251.99702 499.7586L251.99702 499.7586C 247.17227
-            500.44528 242.12814 499.2122 238.4119 495.49588L238.4119 495.49588L4.614502 261.6985C 1.3668518 258.45084
-            -0.11682129 254.17125 0.0078125 249.90852L0.0078125 249.90852L0.0078125 249.90852C -0.11810303 245.67693 1.3655396
-            241.39864 4.5989075 238.15099z" stroke="#FFF" stroke-width="1.731" fill="` +
-            this.getColorHex(color) + '"/></g></svg>';
-    }
-
-    getSVGnext(size, color) {
-        return '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 385.201 385.201"><path fill="' +
-            this.getColorHex(color) +
-            `" d="M381.658,183.472L201.878,3.691c-2.43-2.43-5.618-3.621-8.794-3.597
-            c-0.096,0-0.168-0.048-0.265-0.048H12.364c-6.641,0-12.03,5.39-12.03,12.03c0,0.096,0.048,0.168,0.048,0.265
-            c-0.012,3.176,1.179,6.364,3.597,8.794l171.384,171.384L3.618,364.263c-4.824,4.824-4.824,12.644,0,17.468
-            c2.863,2.863,6.749,3.814,10.466,3.284h176.978c3.717,0.529,7.603-0.421,10.466-3.284l180.118-180.118
-            c2.502-2.502,3.645-5.799,3.549-9.083C385.292,189.27,384.149,185.974,381.658,183.472z
-            M187.381,360.955H41.862l159.329-159.329
-            c2.502-2.502,3.645-5.799,3.549-9.083c0.096-3.272-1.047-6.569-3.549-9.071L41.838,24.106h145.579l168.412,
-            168.412L187.381,360.955 z"/></svg>`;
-    }
-
-    setHelpURL(url) {
-        this.helpUrl = url;
     }
 }

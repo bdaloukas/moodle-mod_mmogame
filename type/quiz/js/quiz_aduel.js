@@ -21,8 +21,7 @@ class mmogameQuizAduel extends mmogameQuiz {
 
         this.removeBodyChilds();
 
-        let copyrightHeight = this.getCopyrightHeight();
-        copyrightHeight = 0;
+        let copyrightHeight = 0;
         this.nickNameHeight = Math.round(this.iconSize / 3);
 
         this.areaTop = 2 * this.padding + this.iconSize + this.nickNameHeight;
@@ -129,27 +128,27 @@ class mmogameQuizAduel extends mmogameQuiz {
     }
 
     updateButtonTool(btn, tool) {
-        btn.style.visibility = tool != undefined && tool != 0 ? "hidden" : "visible";
+        btn.style.visibility = tool !== undefined && tool !== 0 ? "hidden" : "visible";
     }
 
     onServerGetAttempt(json, param) {
-        if (this.buttonHighScore != undefined) {
+        if (this.buttonHighScore !== undefined) {
             this.buttonHighScore.style.visibility = 'hidden';
         }
         this.computeDifClock(json);
         this.timefastjson = json.timefastjson;
         this.fastjson = json.fastjson;
 
-        if (json.name != undefined) {
+        if (json.name !== undefined) {
             window.document.title = json.name;
         }
 
-        if (json.helpurl != undefined) {
+        if (json.helpurl !== undefined) {
             this.helpUrl = json.helpurl;
         }
 
         this.correct = undefined;
-        if (json.state == 0) {
+        if (json.state === 0) {
             json.qtype = '';
             super.onServerGetAttempt(json, param);
             this.showScore(json);
@@ -161,12 +160,12 @@ class mmogameQuizAduel extends mmogameQuiz {
         this.state = json.state;
 
         // Need for a change on colors.
-        if (this.savedColors == undefined || this.savedColors != json.colors) {
+        if (this.savedColors === undefined || this.savedColors !== json.colors) {
             this.savedColors = json.colors;
             this.colors = undefined;
         }
 
-        if (this.colors == undefined) {
+        if (this.colors === undefined) {
             this.setColorsString(json.colors);
             this.createIconBar();
         }
@@ -175,7 +174,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         this.updateButtonsAvatar(2, json.aduelAvatar, json.aduelNickname);
 
         this.updateButtonTool(this.button5050, json.tool1numattempt);
-        if (json.tool3 != undefined) {
+        if (json.tool3 !== undefined) {
             json.tool2numattempt = -1;
         } else {
             json.tool3numattempt = -1;
@@ -183,7 +182,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         this.updateButtonTool(this.buttonSkip, json.tool2numattempt);
         this.updateButtonTool(this.buttonWizard, json.tool3numattempt);
 
-        if (param == undefined) {
+        if (param === undefined) {
             param = false;
         }
 
@@ -192,8 +191,8 @@ class mmogameQuizAduel extends mmogameQuiz {
         this.aduelScore = json.aduelScore;
         this.aduelRank = json.aduelRank;
 
-        if (json.errorcode != undefined && json.errorcode == 'aduel_no_rivals' || json.attempt == 0) {
-            if (param == false) {
+        if (json.errorcode !== undefined && json.errorcode === 'aduel_no_rivals' || json.attempt === 0) {
+            if (param === false) {
                 this.waitOponent();
             }
             this.hideTools();
@@ -205,7 +204,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         this.isWaitOponent = false;
 
         this.qtype = json.qtype;
-        if (json.qtype == 'multichoice') {
+        if (json.qtype === 'multichoice') {
             this.answers = [];
             this.answersID = [];
             for (let i = 1; i <= json.answers; i++) {
@@ -213,18 +212,18 @@ class mmogameQuizAduel extends mmogameQuiz {
                 this.answers.push(this.repairP(json["answer_" + i]));
             }
         }
-        this.answer = json.answer != undefined ? json.answer : null;
+        this.answer = json.answer !== undefined ? json.answer : null;
         this.definition = this.repairP(json.definition);
-        if (json.aduelAttempt != undefined) {
+        if (json.aduelAttempt !== undefined) {
             this.definition = json.aduelAttempt + ". " + this.definition;
         }
         this.single = json.single;
-        this.autosave = json.autosave != 0;
+        this.autosave = json.autosave !== 0;
         this.errorcode = json.errorcode;
 
         this.readJsonFiles(json);
         this.createScreen(json, false);
-        if (this.btnSubmit != undefined) {
+        if (this.btnSubmit !== undefined) {
             this.btnSubmit.style.visibility = "hidden";
         }
 
@@ -242,7 +241,7 @@ class mmogameQuizAduel extends mmogameQuiz {
     onServerGetAttemptHideButtons() {
         this.button5050.style.visibility = 'hidden';
         this.buttonSkip.style.visibility = 'hidden';
-        if (this.btnSubmit != undefined) {
+        if (this.btnSubmit !== undefined) {
             this.btnSubmit.style.visibility = "hidden";
         }
         this.buttonsAvatar[2].style.visibility = 'hidden';
@@ -251,7 +250,7 @@ class mmogameQuizAduel extends mmogameQuiz {
     onTimeout() {
         this.labelTimer.innerHTML = '';
         this.disableInput();
-        if (this.btnSubmit != undefined) {
+        if (this.btnSubmit !== undefined) {
             this.btnSubmit.style.display = 'none';
         }
 
@@ -274,7 +273,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         }
         this.updateButtonsAvatar(2, "", "");
         this.createDivMessage('[LANG_WAIT_OPONENT]');
-        if (this.labelTimer != undefined) {
+        if (this.labelTimer !== undefined) {
             this.labelTimer.innerHTML = "";
         }
     }
@@ -286,14 +285,14 @@ class mmogameQuizAduel extends mmogameQuiz {
     }
 
     onServerAnswer(json) {
-        if (json.submit == 0) {
+        if (json.submit === 0) {
             return;
         }
 
         this.correct = json.correct;
 
-        if (json.correct != undefined) {
-            if (this.qtype == "multichoice") {
+        if (json.correct !== undefined) {
+            if (this.qtype === "multichoice") {
                 this.onServerAnswerMultichoice(json);
             }
         }
@@ -302,15 +301,15 @@ class mmogameQuizAduel extends mmogameQuiz {
         this.buttonHighScore.style.visibility = 'visible';
 
         this.isWaitOponent = false;
-        if (this.aItemAnswer != undefined && json.correct != undefined) {
+        if (this.aItemAnswer !== undefined && json.correct !== undefined) {
             for (let i = 0; i < this.aItemAnswer.length; i++) {
                 this.aItemAnswer[i].classList.add("disabled");
             }
         }
-        if (this.divShortAnswer != undefined) {
+        if (this.divShortAnswer !== undefined) {
             this.divShortAnswer.disabled = true;
         }
-        if (this.btnSubmit != undefined) {
+        if (this.btnSubmit !== undefined) {
             this.body.removeChild(this.btnSubmit);
             this.btnSubmit = undefined;
         }
@@ -330,8 +329,8 @@ class mmogameQuizAduel extends mmogameQuiz {
 
         this.timeclose = 0;
 
-        if (this.aduelPlayer == 1) {
-            if (json.attempt == 0) {
+        if (this.aduelPlayer === 1) {
+            if (json.attempt === 0) {
                 this.timeclose = 0;
                 this.waitOponent();
             }
@@ -339,14 +338,14 @@ class mmogameQuizAduel extends mmogameQuiz {
             this.showScore(json);
         }
 
-        if (this.button5050 != undefined) {
+        if (this.button5050 !== undefined) {
             this.button5050.style.visibility = 'hidden';
             this.buttonSkip.style.visibility = 'hidden';
         }
     }
 
     sendAnswer(submit, subcommand) {
-        if (this.correct == undefined) {
+        if (this.correct === undefined) {
             super.sendAnswer(submit, subcommand);
         }
     }
@@ -354,10 +353,10 @@ class mmogameQuizAduel extends mmogameQuiz {
     onServerAnswerMultichoice(json) {
         let foundCorrect = false;
 
-        let aduelAnswers = json.aduelPlayer == 2 && json.aduel_useranswer !== null ? json.aduel_useranswer.split(",") : '';
+        let aduelAnswers = json.aduelPlayer === 2 && json.aduel_useranswer !== null ? json.aduel_useranswer.split(",") : '';
         let aCorrect = json.correct.split(",");
         for (let i = 0; i < this.answersID.length; i++) {
-            if (this.answersID[i] == '') {
+            if (this.answersID[i] === '') {
                 continue;
             }
 
@@ -378,20 +377,20 @@ class mmogameQuizAduel extends mmogameQuiz {
                 iscorrect2 = aCorrect.includes(this.answersID[i]);
             }
 
-            if (iscorrect == false && iscorrect1 == undefined && iscorrect2 == undefined) {
+            if (iscorrect === false && iscorrect1 === undefined && iscorrect2 === undefined) {
                 continue;
             }
 
             let width = this.labelWidth;
             let height = this.aItemLabel[i].scrollHeight;
 
-            let move = (iscorrect2 != undefined ? 2 : 1) * this.radioSize;
-            if (iscorrect1 == undefined && iscorrect2 == undefined) {
+            let move = (iscorrect2 !== undefined ? 2 : 1) * this.radioSize;
+            if (iscorrect1 === undefined && iscorrect2 === undefined) {
                 move = 0;
             }
             width -= move;
 
-            if (move != 0) {
+            if (move !== 0) {
                 label.style.left = (parseInt(label.style.left) + move) + "px";
             }
             this.aItemLabel[i].style.width = width + "px";
@@ -408,14 +407,14 @@ class mmogameQuizAduel extends mmogameQuiz {
             this.aItemLabel[i].innerHTML = '<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>';
         }
 
-        if (iscorrect1 != undefined) {
+        if (iscorrect1 !== undefined) {
             let t = parseInt(this.aItemAnswer[i].style.top);
             let div = this.createDiv(this.area, this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
             div.title = iscorrect1 ? '[LANG_CORRECT_ANSWER]' : '[LANG_WRONG_ANSWER]';
             div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorScore, this.colorScore);
         }
 
-        if (iscorrect2 != undefined) {
+        if (iscorrect2 !== undefined) {
             let t = parseInt(this.aItemAnswer[i].style.top);
             let div = this.createDiv(this.area, this.aItemCorrectX[i] + this.radioSize, t, this.radioSize, this.radioSize);
             div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect2, this.colorScore2, this.colorScore2);
@@ -429,22 +428,22 @@ class mmogameQuizAduel extends mmogameQuiz {
 
         this.strip = this.createDiv(this.area, this.stripLeft, this.nextTop, this.stripWidth, this.stripHeight);
 
-        if (json.tool2 == undefined || this.aduelPlayer == 2) {
+        if (json.tool2 === undefined || this.aduelPlayer === 2) {
             this.createImage(this.area, this.stripLeft, this.nextTop, this.buttonsAvatar[1].width,
             this.buttonsAvatar[1].height, this.buttonsAvatar[1].src);
         }
-        if (this.aduelPlayer == 2 && json.tool2 == undefined) {
+        if (this.aduelPlayer === 2 && json.tool2 === undefined) {
             this.createImage(this.area, this.stripLeft + this.iconSize, this.nextTop, this.buttonsAvatar[2].width,
                 this.buttonsAvatar[2].height, this.buttonsAvatar[2].src);
         }
 
         this.strip.style.top = this.nextTop + "px";
-        let s = this.getSVGcorrect(this.iconSize, json.iscorrect != 0, this.colorScore, this.colorScore);
-        if (json.tool2 != undefined && this.aduelPlayer == 1) {
+        let s = this.getSVGcorrect(this.iconSize, json.iscorrect !== 0, this.colorScore, this.colorScore);
+        if (json.tool2 !== undefined && this.aduelPlayer === 1) {
             s = '';
         }
-        if (this.aduelPlayer == 2 && json.tool2 == undefined) {
-            s += this.getSVGcorrect(this.iconSize, json.aduel_iscorrect != 0, this.colorScore2, this.colorScore2);
+        if (this.aduelPlayer === 2 && json.tool2 === undefined) {
+            s += this.getSVGcorrect(this.iconSize, json.aduel_iscorrect !== 0, this.colorScore2, this.colorScore2);
         }
         this.strip.innerHTML = s;
 
@@ -454,7 +453,7 @@ class mmogameQuizAduel extends mmogameQuiz {
     showScore(json) {
         let rank = json.rank;
         let rankc = json.completedrank;
-        if (rank != undefined && rankc != undefined) {
+        if (rank !== undefined && rankc !== undefined) {
             if (parseInt(rank) < parseInt(rankc)) {
                 json.completedrank = '';
                 json.rank = '# ' + rank;
@@ -464,21 +463,21 @@ class mmogameQuizAduel extends mmogameQuiz {
             }
         }
 
-        if (json.aduelPlayer == 2) {
+        if (json.aduelPlayer === 2) {
             super.showScore(json);
         } else {
             let s = json.sumscore;
             json.sumscore = this.labelScore.innerHTML;
             super.showScore(json);
             json.sumscore = s;
-            s = json.sumscore == undefined ? '' : '<b>' + json.sumscore + '</b>';
-            if (this.labelScore.innerHTML != s) {
+            s = json.sumscore === undefined ? '' : '<b>' + json.sumscore + '</b>';
+            if (this.labelScore.innerHTML !== s) {
                 this.labelScore.innerHTML = s;
                 this.autoResizeText(this.labelScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0, 1);
             }
         }
 
-        if (json.aduelPlayer == 1 || json.aduelPlayer == undefined) {
+        if (json.aduelPlayer === 1 || json.aduelPlayer === undefined) {
             this.labelScore2.style.visibility = "hidden";
             this.labelScoreRank2.style.visibility = "hidden";
             this.buttonScore2.style.visibility = "hidden";
@@ -492,7 +491,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             let rank = json.aduelRank;
             let score = json.aduelScore;
 
-            if (json.aduelRank != undefined && json.aduel_completedrank != undefined) {
+            if (json.aduelRank !== undefined && json.aduel_completedrank !== undefined) {
                 let rank1 = parseInt(json.aduelRank);
                 let rank2 = parseInt(json.aduel_completedrank);
                 if (rank1 <= rank2) {
@@ -508,7 +507,7 @@ class mmogameQuizAduel extends mmogameQuiz {
                 }
             }
             let s = '<b>' + score + '</b>';
-            if (this.labelScore2.innerHTML != s) {
+            if (this.labelScore2.innerHTML !== s) {
                 this.labelScore2.innerHTML = s;
                 this.autoResizeText(this.labelScore2, this.iconSize - 2 * this.padding, this.iconSize / 2, false, 0, 0, 1);
             }
@@ -516,7 +515,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             this.labelScoreRank2.style.lineHeight = (this.iconSize / 3) + "px";
             this.autoResizeText(this.labelScoreRank2, 0.5 * this.iconSize, this.iconSize / 3, true, 0, 0, 1);
 
-            this.labelAddScore2.innerHTML = json.aduel_addscore == undefined ? '' : json.aduel_addscore;
+            this.labelAddScore2.innerHTML = json.aduel_addscore === undefined ? '' : json.aduel_addscore;
             this.autoResizeText(this.labelAddScore2, this.iconSize, this.iconSize / 3, true, 0, 0, 1);
         }
 
@@ -525,7 +524,7 @@ class mmogameQuizAduel extends mmogameQuiz {
     }
 
     onServerFastJson(response) {
-        if (response == '') {
+        if (response === '') {
             this.sendFastJSON();
             return;
         }
@@ -538,7 +537,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             this.timefastjson = 0;
         }
 
-        if (newstate != this.state || newTimeFastJSON != this.timefastjson) {
+        if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
             this.sendGetAttempt();
             return;
         }
@@ -550,7 +549,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         var xmlhttp = new XMLHttpRequest();
         var instance = this;
         xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
+            if (this.readyState === 4 && this.status === 200) {
                 let json = JSON.parse(this.responseText);
                 instance.createScreenHighScore(json);
             }
@@ -564,7 +563,7 @@ class mmogameQuizAduel extends mmogameQuiz {
     }
 
     createScreenHighScore(json) {
-        if (this.highScore != undefined) {
+        if (this.highScore !== undefined) {
             this.body.removeChild(this.highScore);
             this.highScore = undefined;
             this.strip.style.visibility = 'visible';
@@ -586,11 +585,11 @@ class mmogameQuizAduel extends mmogameQuiz {
     }
 
     createScreenVerticalHighScore(json) {
-        if (json.count == 0) {
+        if (json.count === 0) {
             return;
         }
 
-        if (this.strip != undefined) {
+        if (this.strip !== undefined) {
             this.strip.style.visibility = 'hidden';
         }
 

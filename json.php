@@ -78,7 +78,7 @@ unset( $ret2['filec1']);
 die( json_encode( $ret));
 
 /**
- * Convert php://input to Json.
+ * Convert php://input to JSON.
  *
  * @return object.
  */
@@ -93,7 +93,7 @@ function get_data(): object {
  *
  * @param object $mmogame
  * @param stdClass $data
- * @param array $ret (an array of string with exists avatars)
+ * @param array $ret (an array of string with existed avatars)
  */
 function dogetavatars(object $mmogame, stdClass $data, array &$ret): void {
     if ($data->countavatars == 0) {
@@ -160,7 +160,7 @@ function usort_mmogame_palettes(array $a, array $b): int {
  *
  * @param object $mmogame
  * @param object $data
- * @param array $ret (an array of string with exists color palettes)
+ * @param array $ret (an array of string with existed color palettes)
  */
 function dogetcolorpalettes(object $mmogame, object $data, array &$ret): void {
     if ($data->countcolors == 0) {

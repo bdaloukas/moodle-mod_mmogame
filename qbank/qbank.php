@@ -31,14 +31,14 @@
  */
 class mmogameqbank {
     /** @var mmogame: the object mmogame that is connected to the question bank. */
-    protected $mmogame;
+    protected mmogame $mmogame;
 
     /**
      * Constructor.
      *
-     * @param object $mmogame
+     * @param mmogame $mmogame
      */
-    public function __construct(object $mmogame) {
+    public function __construct(mmogame $mmogame) {
         $this->mmogame = $mmogame;
     }
 
