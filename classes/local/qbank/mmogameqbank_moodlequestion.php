@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_mmogame\local\qbank;
+
 /**
  * The class mmogameqbank_moodlequestion extends mmogameqbank and has the code for accessing questions of Moodle
  *
@@ -29,8 +31,6 @@
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace mod_mmogame\local\qbank;
 class mmogameqbank_moodlequestion extends mmogameqbank {
     /**
      * Loads data for question id.

@@ -41,7 +41,6 @@ require_once(dirname(__FILE__) . '/../../lib.php');
  * within the mmogame system, including handling attempts, scoring,
  * and maintaining related user data.
  */
-
 class mmogame_quiz extends mmogame {
     /** @var bool $stopatend: stops at the end of this game. */
     protected bool $callupdategrades = true;

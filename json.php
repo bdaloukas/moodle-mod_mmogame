@@ -24,8 +24,6 @@
 
 use mod_mmogame\local\mmogame;
 
-global $DB;
-
 define( 'AJAX_SCRIPT', 1);
 define('NO_MOODLE_COOKIES', true);
 

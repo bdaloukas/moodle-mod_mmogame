@@ -294,12 +294,8 @@ class mmogame {
         if ($rgame === false) {
             return false;
         }
-        //require_once( 'type/'.$rgame->type.'/'.$rgame->type.'_'.$rgame->model.'.php');
 
-        //$class = 'mmogame_'.$rgame->type;
-        //return $class::get_new($db, $rgame);
         $classname = 'mmogametype_' . $rgame->type.'\local\mmogame_' . $rgame->type;
-        //$classname = 'mmogametype_quiz\local\mmogame_quiz';
         if (!class_exists($classname)) {
             throw new \coding_exception("Class {$classname} does not exist for type: {$rgame->type}");
         }

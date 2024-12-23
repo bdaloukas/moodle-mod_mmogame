@@ -25,8 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 
 use mod_mmogame\local\mmogame;
 
-//require_once(dirname(__FILE__) . '/../../model/aduel.php');
-
 /**
  * Fill the array $ret with info about the current attempt.
  *

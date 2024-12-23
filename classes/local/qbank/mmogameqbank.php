@@ -22,6 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_mmogame\local\qbank;
+use mod_mmogame;
+
 /**
  * The class mmogameqbank is a based class for saved questions (e.g., glossary, question bank)
  *
@@ -29,10 +32,6 @@
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace mod_mmogame\local\qbank;
-use mod_mmogame;
-
 class mmogameqbank {
     /** @var mod_mmogame\local\mmogame: the object mmogame that is connected to the question bank. */
     protected mod_mmogame\local\mmogame $mmogame;

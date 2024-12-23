@@ -30,15 +30,12 @@ global $course, $cm, $id, $mmogame, $CFG, $PAGE;
 require_login($course->id, false, $cm);
 
 $model = $mmogame->get_model();
-//require( "admin_{$model}.php");
 
 $context = context_module::instance( $cm->id);
 require_capability('mod/mmogame:view', $context);
 
 // Initialize $PAGE, compute blocks.
 $PAGE->set_url('/mod/mmogame/view.php', ['id' => $cm->id]);
-
-//require_once($CFG->dirroot."/mod/mmogame/model/{$model}.php");
 
 $url = $CFG->wwwroot.'/mod/mmogame/gate.php?id='.$mmogame->get_id().'&pin='.$mmogame->get_rgame()->pin;
 
@@ -63,7 +60,6 @@ function mmogame_quiz_manage($id, $mmogame, $url) {
     }
 
     // Create form.
-    //$classname = 'mmogametype_quiz\local\mmogame_quiz_'.$mmogame->get_model()."_admin";
     $classname = 'mmogametype_quiz\local\mmogame_quiz_' . $mmogame->get_model().'_admin';
     $mform = new $classname( $id, $mmogame);
 
