@@ -22,12 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_mmogame\local;
+
 require_once(dirname(__FILE__) . '/../../config.php');
 
-require_once($CFG->libdir.'/gradelib.php');
-require_once($CFG->dirroot.'/mod/mmogame/database/moodle.php');
+global $CFG, $DB;
 
-require_once(dirname(__FILE__) . '/mmogame.php');
+require_once($CFG->libdir.'/gradelib.php');
+
 $id = required_param('id', PARAM_INT); // Is mmoGame Module ID.
 
 if (! $cm = get_coursemodule_from_id('mmogame', $id)) {
@@ -43,7 +45,7 @@ if (! $mmogame = $DB->get_record('mmogame', ['id' => $cm->instance])) {
 // Check login and get context.
 require_login($course->id, false, $cm);
 
-$mmogame = mmogame::getgame( new mmogame_database_moodle(), $cm->instance);
+$mmogame = local\mmogame::getgame( new local\database\mmogame_database_moodle(), $cm->instance);
 
 if ($mmogame !== false) {
     require_once($CFG->dirroot.'/mod/mmogame/type/'.$mmogame->get_type().'/view.php');

@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Regrade modal form is used to regrade or dryrun the attempts and questions.
+ * Basic class for games.
  *
  * @module mmogame
  * @copyright 2024 Vasilis Daloukas

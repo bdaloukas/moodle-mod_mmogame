@@ -23,16 +23,18 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../../model/aduel.php');
+use mod_mmogame\local\mmogame;
+
+//require_once(dirname(__FILE__) . '/../../model/aduel.php');
 
 /**
  * Fill the array $ret with info about the current attempt.
  *
  * @param object $data
- * @param object $mmogame
+ * @param mmogame $mmogame
  * @param array $ret
  */
-function mmogame_json_quiz_getattempt(object $data, object $mmogame, array &$ret) {
+function mmogame_json_quiz_getattempt(object $data, mmogame $mmogame, array &$ret) {
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
     if ($auserid === false) {
         $ret['errorcode'] = 'invalidauser';

@@ -22,14 +22,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_mmogame\local\mmogame;
+
+global $DB;
+
 define( 'AJAX_SCRIPT', 1);
 define('NO_MOODLE_COOKIES', true);
 
 require( "../../config.php");
-require_once( 'database/moodle.php');
-require_once(dirname(__FILE__) . '/mmogame.php');
 
-$db = new mmogame_database_moodle();
+$db = new mod_mmogame\local\database\mmogame_database_moodle();
 
 $data = get_data();
 if (!isset( $data->command)) {
@@ -37,7 +39,7 @@ if (!isset( $data->command)) {
 }
 $ret = [];
 
-$game = mmogame::getgame( $db, $data->mmogameid);
+$game = mod_mmogame\local\mmogame::getgame( $db, $data->mmogameid);
 
 switch( $data->command) {
     case 'getavatars':
@@ -168,7 +170,7 @@ function dogetcolorpalettes(object $mmogame, object $data, array &$ret): void {
         return;
     }
 
-    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
     $pals = $mmogame->get_palettes();
 
@@ -190,7 +192,7 @@ function dogetcolorpalettes(object $mmogame, object $data, array &$ret): void {
  *
  * @param object $mmogame
  * @param object $data
- * @param array $ret (the value of key "colors" containg the 5 colors of palette)
+ * @param array $ret (the value of key "colors" containg the five colors of palette)
  */
 function dosetcolorpalette(object $mmogame, object $data, array &$ret): void {
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);

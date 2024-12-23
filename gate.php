@@ -24,8 +24,7 @@
 
 require( "../../config.php");
 
-require_once( 'database/moodle.php');
-require_once(dirname(__FILE__) . '/mmogame.php');
+global $CFG, $DB, $USER;
 
 $mmogameid = required_param('id', PARAM_INT);
 $pin = required_param('pin', PARAM_INT);
