@@ -24,8 +24,6 @@
 
 namespace mod_mmogame\local\database;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This class extends the mmogame_database with code explicit with Moodle.
  */

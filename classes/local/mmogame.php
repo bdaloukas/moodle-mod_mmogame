@@ -24,8 +24,6 @@
 
 namespace mod_mmogame\local;
 
-defined('MOODLE_INTERNAL') || die;
-
 /** Identifier the last state of model Alone */
 const MMOGAME_ALONE_STATE_LAST = 1;
 
