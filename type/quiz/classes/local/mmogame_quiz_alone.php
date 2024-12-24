@@ -28,8 +28,6 @@ namespace mmogametype_quiz\local;
 
 use mod_mmogame\local\database\mmogame_database;
 
-defined('MOODLE_INTERNAL') || die();
-
 /** Identifier the last state of model Alone */
 const MMOGAME_ALONE_STATE_LAST = 1;
 

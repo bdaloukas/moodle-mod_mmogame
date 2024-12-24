@@ -26,8 +26,6 @@
 
 namespace mmogametype_quiz\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The class mmogame_quiz_alone_admin extentes the class moodleform
  *

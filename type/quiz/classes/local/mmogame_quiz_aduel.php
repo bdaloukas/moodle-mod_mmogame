@@ -29,8 +29,6 @@ namespace mmogametype_quiz\local;
 use mod_mmogame\local\model\mmogameModel_aduel;
 use mod_mmogame\local\database\mmogame_database;
 
-defined('MOODLE_INTERNAL') || die();
-
 /** Identifier the state for "play" of model Aduel */
 const STATE_PLAY = 1;
 
