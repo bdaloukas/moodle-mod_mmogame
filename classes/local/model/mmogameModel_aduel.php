@@ -59,7 +59,7 @@ class mmogameModel_aduel {
      * Return the aduel record for current $mmogame record
      *
      * @param mmogame $mmogame
-     * @param int maxalone
+     * @param int $maxalone
      * @param bool $newplayer1
      * @param bool $newplayer2
      * @return false|mixed
