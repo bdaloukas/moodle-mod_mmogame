@@ -139,6 +139,7 @@ class mmogameQuiz extends mmogame {
         }
         dif = Math.round(dif);
         if (dif <= 0) {
+            console.log("dif=" + dif);
             this.labelTimer.innerHTML = '';
             this.onTimeout();
         } else {

@@ -26,6 +26,10 @@
 
 namespace mmogametype_quiz\local;
 
+defined('MOODLE_INTERNAL') || die;
+
+require_once($CFG->libdir.'/formslib.php');
+
 /**
  * The class mmogame_quiz_alone_admin extentes the class moodleform
  *
@@ -56,7 +60,7 @@ class mmogame_quiz_alone_admin extends \moodleform {
     /**
      * Definition of form.
      */
-    public function definition() {
+    public function definition(): void {
         $mform = $this->_form;
         $rgame = $this->_mmogame->get_rgame();
 

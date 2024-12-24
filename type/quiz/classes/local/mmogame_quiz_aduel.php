@@ -40,6 +40,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     protected int $numquestions;
     /** @var false|object $aduel: ADuel object or false if no object yet. */
     protected $aduel = false;
+
     /** @var int $maxalone: maximum number of questions that a user can play withoyt an oponent. */
     protected int $maxalone = 200;
 
@@ -83,7 +84,6 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         for ($step = 1; $step <= 2; $step++) {
             $this->aduel = mmogameModel_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2);
             if ($this->aduel === false) {
-
                 $this->set_errorcode( ERRORCODE_ADUEL_NO_RIVALS);
                 return false;
             }
@@ -121,6 +121,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         if ($queries === false) {
             return false;
         }
+
         $num = 0;
         $ret = 0;
         $a = [];

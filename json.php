@@ -74,7 +74,6 @@ if ($errorcode != '') {
 
 $ret2 = $ret;
 unset( $ret2['filec1']);
-
 die( json_encode( $ret));
 
 /**

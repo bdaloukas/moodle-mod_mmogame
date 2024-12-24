@@ -276,7 +276,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         if (this.btnSubmit !== undefined) {
             this.btnSubmit.style.display = 'none';
         }
-
+console.log("onTimeout");
         this.answer = '';
         this.sendAnswer(true);
 
