@@ -28,8 +28,6 @@ namespace mmogametype_quiz\local;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->libdir/formslib.php");
-
 /**
  * The class mmogame_quiz_alone_admin extentes the class moodleform
  *
@@ -74,7 +72,7 @@ class mmogame_quiz_alone_admin extends \moodleform {
         $mform->addElement('hidden', 'id', $this->_id);
         $mform->setType( 'id', PARAM_INT);
 
-        // Name of game.
+        // Name of the game.
         $mform->addElement('static', 'gamename', '', get_string('js_name', 'mmogame') . ': '.$rgame->name);
         $mform->addElement('html', '<br>');
 
@@ -105,7 +103,7 @@ class mmogame_quiz_alone_admin extends \moodleform {
         }
         $mform->addElement('html', '</tr>');
 
-        // End of table.
+        // End of the table.
         $mform->addElement('html', '</table>');
 
         // Player and Answer Information.

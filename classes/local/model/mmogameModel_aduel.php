@@ -22,6 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_mmogame\local\model;
+
+use mod_mmogame\local\mmogame;
+
 /**
  * The class mmogameModel_aduel has the code for model ADuel
  *
@@ -35,19 +39,18 @@ class mmogameModel_aduel {
      * Administrator can change numgame or state
      *
      * @param object $data
-     * @param object $game
+     * @param mmogame $game
      */
-    public static function json_setadmin($data, $game) {
-        $ret = [];
+    public static function json_setadmin(object $data, mmogame $game) {
         if (isset( $data->numgame) && $data->numgame > 0) {
             $game->get_rstate()->state = 0;
             $game->get_db()->update_record( 'mmogame', ['id' => $game->get_id(), 'numgame' => $data->numgame]);
             $game->update_state( $game->get_rstate()->state);
-            $game->set_state_json( $game->get_rstate()->state, $ret);
+            $game->set_state( $game->get_rstate()->state);
         } else if (isset( $data->state)) {
-            if ($data->state >= 0 && $data->state <= MMOGAME_ADUEL_STATE_LAST) {
+            if ($data->state >= 0 && $data->state <= STATE_LAST) {
                 $game->update_state( $data->state);
-                $game->set_state_json( $data->state, $ret);
+                $game->set_state( $data->state);
             }
         }
     }
@@ -55,12 +58,13 @@ class mmogameModel_aduel {
     /**
      * Return the aduel record for current $mmogame record
      *
-     * @param object $mmogame
+     * @param mmogame $mmogame
+     * @param int maxalone
      * @param bool $newplayer1
      * @param bool $newplayer2
      * @return false|mixed
      */
-    public static function get_aduel(object $mmogame, bool &$newplayer1, bool &$newplayer2) {
+    public static function get_aduel(mmogame $mmogame, int $maxalone, bool &$newplayer1, bool &$newplayer2) {
         $newplayer1 = $newplayer2 = false;
         $auserid = $mmogame->get_auserid();
         $db = $mmogame->get_db();
@@ -68,7 +72,7 @@ class mmogameModel_aduel {
         $stat = $db->get_record_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=? AND queryid IS NULL',
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
         if ($stat === false) {
-            $stat = new stdClass();
+            $stat = new \stdClass();
             $stat->percent = $stat->id = $stat->count1 = $stat->count2 = 0;
         }
 
@@ -81,15 +85,14 @@ class mmogameModel_aduel {
         foreach ($recs as $rec) {
             return $rec;
         }
-
-        // Count1=count alone, Count2=count with oposite.
+        // Count1=count alone, Count2=count with an opposite.
         if ($stat->count1 <= $stat->count2) {
             return self::get_aduel_new( $mmogame, $newplayer1, $stat);
         }
 
         // Count1 is bigger than count2.
 
-        // Selects one of the games without oponent.
+        // Selects one of the games without opponent.
         $sql = "SELECT a.*, s.percent".
             " FROM {$db->prefix}mmogame_am_aduel_pairs a ".
             " LEFT JOIN {$db->prefix}mmogame_aa_stats s ON ".
@@ -107,14 +110,13 @@ class mmogameModel_aduel {
             $count = $db->count_records_select( 'mmogame_am_aduel_pairs',
                 'mmogameid=? AND numgame=? AND auserid1 = ? AND auserid2 IS NULL',
                 [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
-
-            if ($count > $mmogame->get_maxalone()) {
-                return false;   // Wait an oponent.
+            if ($count > $maxalone) {
+                return false;   // Wait an opponent.
             }
             return self::get_aduel_new( $mmogame, $newplayer1, $stat);
         }
 
-        // There are many alone games.
+        // There are many "alone" games.
         // Find a game with percent near my percent.
         $map = [];    // The map1 contains games with lower grade and map2 with upper grade.
         foreach ($recs as $rec) {
@@ -145,12 +147,12 @@ class mmogameModel_aduel {
     /**
      * Return the new aduel record for current $mmogame
      *
-     * @param object $mmogame
+     * @param mmogame $mmogame
      * @param bool $newplayer1
      * @param object $stat (the record of table mmogame_aa_stats)
      * @return mixed
      */
-    public static function get_aduel_new(object $mmogame, bool &$newplayer1, object $stat) {
+    public static function get_aduel_new(mmogame $mmogame, bool &$newplayer1, object $stat) {
         $db = $mmogame->get_db();
 
         $a = ['mmogameid' => $mmogame->get_id(), 'numgame' => $mmogame->get_numgame(), 'auserid1' => $mmogame->get_auserid(),
@@ -170,19 +172,19 @@ class mmogameModel_aduel {
     /**
      * Return an attempt record of the game
      *
-     * @param object $mmogame
+     * @param mmogame $mmogame
      * @param object $aduel
      * @return false|object (the attempt record)
      */
-    public static function get_attempt(object $mmogame, object $aduel) {
+    public static function get_attempt(mmogame $mmogame, object $aduel) {
 
         $table = $mmogame->get_table_attempts();
         $db = $mmogame->get_db();
-        $aduel = $mmogame->get_aduel();
 
         $recs = $mmogame->get_db()->get_records_select( $table, "auserid=? AND numgame=? AND numteam=? AND timeanswer=0",
             [$mmogame->get_auserid(), $mmogame->get_numgame(), $aduel->id], 'numattempt');
         $time = time();
+
         foreach ($recs as $rec) {
             if ($rec->timeclose > $time || $rec->timeclose == 0) {
                 if ($rec->timestart == 0) {
@@ -200,7 +202,7 @@ class mmogameModel_aduel {
             }
         }
 
-        $a = ['id' => $mmogame->get_aduel()->id];
+        $a = ['id' => $aduel->id];
         if ($mmogame->get_auserid() == $aduel->auserid1) {
             $a['isclosed1'] = 1;
         } else {
@@ -214,9 +216,9 @@ class mmogameModel_aduel {
     /**
      * Deletes all pairs (table mmogame_am_aduel_pairs)
      *
-     * @param object $mmogame
+     * @param mmogame $mmogame
      */
-    public static function delete(object $mmogame) {
-        $mmogame->get_db()->delete_records_select( 'mmogame_am_aduel_pairs', 'id=?', [$mmogame->get_aduel()->id]);
+    public static function delete(mmogame $mmogame) {
+        $mmogame->get_db()->delete_records_select( 'mmogame_am_aduel_pairs', 'mmogameid=?', [$mmogame->get_id()]);
     }
 }

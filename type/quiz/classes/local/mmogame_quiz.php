@@ -53,8 +53,7 @@ class mmogame_quiz extends mmogame {
      * @return mixed
      */
     public static function get_new(mmogame_database $db, object $rgame) {
-        $classname = 'mmogametype_' . $rgame->type.'\local\mmogame_' . $rgame->type;
-
+        $classname = 'mmogametype_' . $rgame->type.'\local\mmogame_' . $rgame->type.'_'.$rgame->model;
         return new $classname( $db, $rgame, false);
     }
 
@@ -131,7 +130,7 @@ class mmogame_quiz extends mmogame {
         $ret['completedrank'] = $this->get_rank_alone( $auserid, 'percentcompleted');
 
         if ($attempt === false) {
-            $attempt = new stdClass();
+            $attempt = new \stdClass();
             $attempt->id = 0;
             $attempt->timestart = 0;
             $attempt->timeclose = 0;

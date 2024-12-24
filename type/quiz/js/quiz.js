@@ -67,6 +67,7 @@ class mmogameQuiz extends mmogame {
     }
 
     onServerGetAttempt(json) {
+        console.log(json)
         this.computeDifClock(json);
 
         if (this.colors === undefined) {

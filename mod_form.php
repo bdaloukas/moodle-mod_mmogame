@@ -22,6 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_mmogame\local\database\mmogame_database_moodle;
+use mod_mmogame\local\mmogame;
+
 defined('MOODLE_INTERNAL') || die();
 
 define( 'MMOGAME_PIN_DIGITS', 6);
@@ -30,9 +33,6 @@ define( 'MMOGAME_KINDUSER_GUID', 'guid');
 define( 'MMOGAME_KINDUSER_MOODLE', 'moodle');
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
-
-require_once($CFG->dirroot . '/mod/mmogame/database/moodle.php');
-require_once($CFG->dirroot . '/mod/mmogame/mmogame.php');
 
 /**
  * class mod_mmogame_mod_form extends class moodleform_mod
@@ -119,7 +119,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
             $options[$model] = $title;
         }
 
-        $mform->addElement('select', 'typemodel', get_string('type', 'mmogame'), $options);
+        $mform->addElement('select', 'typemodel', get_string('type', 'mmogame'), $models);
 
         // Pin.
         $mform->addElement('text', 'pin', "PIN", ['size' => '10']);

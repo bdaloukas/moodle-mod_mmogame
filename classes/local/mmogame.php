@@ -24,14 +24,7 @@
 
 namespace mod_mmogame\local;
 
-/** Identifier the last state of model Alone */
-const MMOGAME_ALONE_STATE_LAST = 1;
-
-/** Identifier the state for "play" of model Aduel */
-const MMOGAME_ADUEL_STATE_PLAY = 1;
-
-/** Identifier the last state of model Aduel */
-const MMOGAME_ADUEL_STATE_LAST = 1;
+use mod_mmogame\local\database\mmogame_database;
 
 /**
  * The class mmogame is the base class for all games
@@ -283,17 +276,18 @@ class mmogame {
     /**
      * Returns a game object
      *
-     * @param object $db
+     * @param mmogame_database $db
      * @param int $id
      * @return false|object
+     * @throws \coding_exception
      */
-    public static function getgame(object $db, int $id) {
+    public static function getgame(mmogame_database $db, int $id) {
         $rgame = $db->get_record_select('mmogame', "id=?", [$id]);
         if ($rgame === false) {
             return false;
         }
 
-        $classname = 'mmogametype_' . $rgame->type.'\local\mmogame_' . $rgame->type;
+        $classname = 'mmogametype_' . $rgame->type.'\local\mmogame_' . $rgame->type.'_'.$rgame->model;
         if (!class_exists($classname)) {
             throw new \coding_exception("Class {$classname} does not exist for type: {$rgame->type}");
         }
@@ -776,5 +770,14 @@ class mmogame {
         $class::delete_auser( $db, $rgame, $auserid);
 
         $db->delete_records_select( 'mmogame_aa_users', 'id=?', [$auserid]);
+    }
+
+    /**
+     * Tries to find an attempt of open games, otherwise creates a new attempt.
+     *
+     * @return false|object (a new attempt of false if no attempt)
+     */
+    public function get_attempt() {
+        return false;
     }
 }

@@ -24,9 +24,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mmogametype_quiz\local;
+
+use mod_mmogame\local\database\mmogame_database;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/quiz.php');
+/** Identifier the last state of model Alone */
+const MMOGAME_ALONE_STATE_LAST = 1;
 
 /**
  * The class mmogame_quiz_alone play the game Quiz (Alone).
@@ -38,12 +43,11 @@ class mmogame_quiz_alone extends mmogame_quiz {
     /**
      * Constructor.
      *
-     * @param object $db (the database)
+     * @param mmogame_database $db (the database)
      * @param object $rgame (a record from table mmogame)
      */
-    public function __construct(object $db, object $rgame) {
+    public function __construct(mmogame_database $db, object $rgame) {
         $this->callupdategrades = true;
-
         parent::__construct($db, $rgame);
     }
 
@@ -56,7 +60,6 @@ class mmogame_quiz_alone extends mmogame_quiz {
         $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
             [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
-
         if ($attempt !== false) {
             if ($attempt->timestart == 0) {
                 $attempt->timestart = time();
@@ -70,11 +73,11 @@ class mmogame_quiz_alone extends mmogame_quiz {
     }
 
     /**
-     * Set the state of current game.
+     * Set the state of the current game.
      *
      * @param int $state
      */
-    public function set_state_json(int $state): void {
+    public function set_state(int $state): void {
         $timefastjson = round( 10 * microtime( true));
 
         $statecontents = $state . "-" . $timefastjson;
@@ -180,7 +183,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
         $rank = 0;
         $prevscore = $prevrank = -1;
         foreach ($recs as $rec) {
-            $data = new stdClass();
+            $data = new \stdClass();
             $data->auserid = $rec->auserid;
             $data->score1 = $rec->sumscore;
             $data->rank1 = ++$rank;
@@ -204,7 +207,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
             if (array_key_exists( $rec->auserid, $map)) {
                 $data = $map[$rec->auserid];
             } else {
-                $data = new stdClass();
+                $data = new \stdClass();
                 $data->auserid = $rec->auserid;
                 $data->rank1 = $data->score1 = 0;
                 $data->nickname = $rec->nickname;

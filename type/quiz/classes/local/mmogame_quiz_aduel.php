@@ -24,9 +24,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mmogametype_quiz\local;
+
+use mod_mmogame\local\model\mmogameModel_aduel;
+use mod_mmogame\local\database\mmogame_database;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/quiz_alone.php');
+/** Identifier the state for "play" of model Aduel */
+const STATE_PLAY = 1;
 
 /**
  * The class mmogame_quiz_aduel play the game Quiz (Aduel).
@@ -42,10 +48,10 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     /**
      * Constructor.
      *
-     * @param object $db (the database)
+     * @param mmogame_database $db (the database)
      * @param object $rgame (a record from table mmogame)
      */
-    public function __construct(object $db, object $rgame) {
+    public function __construct(mmogame_database $db, object $rgame) {
         $rgame->usemultichoice = true;
 
         parent::__construct( $db, $rgame);
@@ -66,30 +72,20 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     }
 
     /**
-     * Return the maxalone class variable.
-     *
-     * @return int (a record from table mmogame_am_aduel_pairs)
-     */
-    public function get_maxalone(): int {
-        return $this->maxalone;
-    }
-
-    /**
      * Tries to find an attempt of open games, otherwise creates a new attempt.
      *
      * @return false|object (a new attempt of false if no attempt)
      */
     public function get_attempt() {
-        if ($this->rstate->state != MMOGAME_ADUEL_STATE_PLAY) {
+        if ($this->rstate->state != STATE_PLAY) {
             return false;
         }
 
-        require_once( dirname(__FILE__).'/../../model/aduel.php');
-
         $newplayer1 = $newplayer2 = false;
         for ($step = 1; $step <= 2; $step++) {
-            $this->aduel = mmogameModel_aduel::get_aduel( $this, $newplayer1, $newplayer2);
+            $this->aduel = mmogameModel_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2);
             if ($this->aduel === false) {
+
                 $this->set_errorcode( ERRORCODE_ADUEL_NO_RIVALS);
                 return false;
             }
@@ -118,7 +114,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     }
 
     /**
-     * Creates a new attempt for the first player. Also selects which question will be contained in the attempt.
+     * Creates a new attempt for the first player. Also select which question will be contained in the attempt.
      *
      * @return false|object (a new attempt of false if no attempt)
      */
@@ -228,13 +224,13 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
                         // The wizard tool.
                         $attempt->score -= 2;
                     }
-                    $ret['addscore'] = $attempt->score >= 0 ? '+'.$attempt->score : $attempt->score;
+                    $ret['addscore'] = '+'.$attempt->score;
                     $this->db->update_record( 'mmogame_quiz_attempts',
                         ['id' => $attempt->id, 'score' => $attempt->score]);
                     $this->qbank->update_grades( $attempt->auserid, $attempt->score, 0, 0);
                 }
             } else if ($attempt->iscorrect == 0) {
-                // Check the answer of oposite. If is right duplicate other's points.
+                // Check the answer of oposite. If is right duplicate other points.
                 if ($oposite->iscorrect == 0) {
                     $this->db->update_record( 'mmogame_quiz_attempts',
                         ['id' => $oposite->id, 'score' => 2 * $oposite->score]);
@@ -425,7 +421,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         // Initializes data.
         $qs = [];
         foreach ($ids as $id) {
-            $q = new stdClass();
+            $q = new \stdClass();
             $q->id = $id;
             $q->qpercent = $q->qcountused = $q->ucountused  = $q->utimeerror = $q->uscore = $q->upercent = 0;
 
@@ -440,7 +436,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         $sids = implode( ',', $ids);
         $recs = $this->db->get_records_select( 'mmogame_aa_stats',
             "mmogameid=? AND numgame=? AND auserid IS NULL AND queryid IN ($sids)",
-            [$this->rgame->id, $this->rgame->numgame], null, 'id,queryid,percent,countused');
+            [$this->rgame->id, $this->rgame->numgame], '', 'id,queryid,percent,countused');
         foreach ($recs as $rec) {
             $q = $qs[$rec->queryid];
             $q->qpercent = $rec->percent;
@@ -451,7 +447,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         // Computes statistics per user.
         $recs = $this->db->get_records_select( 'mmogame_aa_stats',
             "mmogameid=? AND numgame=? AND auserid = ? AND queryid IN ($sids)",
-            [$this->rgame->id, $this->rgame->numgame, $this->auserid], null,
+            [$this->rgame->id, $this->rgame->numgame, $this->auserid], '',
             'queryid,countused,countcorrect,counterror,timeerror,percent');
         foreach ($recs as $rec) {
             $q = $qs[$rec->queryid];
@@ -475,7 +471,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
                 $q->uscore < 0 ? -$min + $q->uscore : 999999999,
                 // If it has negative score more priority has the older question.
                 $q->uscore < 0 ? $q->utimeerror : 0,
-                // Fewer times used by user more priority has.
+                // Fewer times used by user higher priority has.
                 $q->ucountused,
                 // If question is easier than user sorts by distance.
                 $q->qpercent < $stat->percent ? round( 100 * $stat->percent - 100 * $q->qpercent) : 0,
@@ -498,13 +494,12 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
             $key2 = sprintf( "%10.6f %10d", $q->qpercent, $q->id);
             $map2[$key2] = $q;
         }
-        // Deleted 2 * count so to remain count.
-        for ($i = 1; $i <= 2 * $count; $i++) {
-            if (count( $map2) > 0) {
-                $key = array_rand( $map2);
-                unset( $map2[$key]);
-            }
+        // Remove items so to remain $count.
+        while (count( $map2) > $count) {
+            $key = array_rand( $map2);
+            unset( $map2[$key]);
         }
+
         ksort( $map2);
         $ret = [];
         foreach ($map2 as $q) {

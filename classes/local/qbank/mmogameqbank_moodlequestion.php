@@ -98,7 +98,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
             if (!isset( $query->correctid)) {
                 $query->correctid = $rec->id;
             }
-            $info = new stdClass();
+            $info = new \stdClass();
             $info->id = $rec->id;
             $info->answer = $rec->answer;
             $info->fraction = $rec->fraction;
@@ -118,7 +118,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
     }
 
     /**
-     * Copy data from questions to $ret that is used to json call.
+     * Copy data from questions to $ret that is used to JSON call.
      *
      * @param object $mmogame
      * @param array $ret

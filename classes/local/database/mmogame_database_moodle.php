@@ -110,6 +110,26 @@ class mmogame_database_moodle extends mmogame_database {
     }
 
     /**
+     * Returns the first record that matches the given criteria.
+     *
+     * @param string $table The name of the database table.
+     * @param string $select The SQL condition for the WHERE clause.
+     * @param array|null $params Optional parameters for the SQL condition.
+     * @param string $sort Optional sorting order.
+     * @param string $fields The fields to return, default is '*'.
+     * @return object|false The first matching database record as an object, or false if no record is found.
+     */
+    public function get_record_select_first(string $table, string $select, ?array $params=null, $sort='', $fields='*') {
+        global $DB;
+
+        $recs = $DB->get_records_select( $table, $select, $params, $sort, $fields, 0, 1);
+        foreach ($recs as $rec) {
+            return $rec;
+        }
+        return false;
+    }
+
+    /**
      * Returns a list of records as an array of objects where the specified conditions are used in the WHERE clause.
      *
      * @param string $table The name of the database table.

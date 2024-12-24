@@ -22,6 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_mmogame\local\model;
+
+define('STATE_LAST', 1);
+
 /**
  * The class mmogameModel_alone has the code for model Alone
  *
@@ -45,11 +49,11 @@ class mmogameModel_alone {
             $mmogame->get_db()->update_record( 'mmogame',
                 ['id' => $rgame->id, 'numgame' => $rgame->numgame]);
             $mmogame->update_state( $mmogame->get_rstate()->state);
-            $mmogame->set_state_json( $mmogame->get_rstate()->state, $ret);
+            $mmogame->set_state( $mmogame->get_rstate()->state);
         } else if (isset( $data->state)) {
-            if ($data->state >= 0 && $data->state <= MMOGAME_ALONE_STATE_LAST) {
+            if ($data->state >= 0 && $data->state <= STATE_LAST) {
                 $mmogame->update_state( $data->state);
-                $mmogame->set_state_json( $data->state, $ret);
+                $mmogame->set_state( $data->state);
             }
         }
     }

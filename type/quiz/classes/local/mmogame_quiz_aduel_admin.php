@@ -24,9 +24,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mmogametype_quiz\local;
 
-require_once("admin_alone.php");
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * The class mmogame_quiz_aduel_admin extentes the class mmogame_quiz_alone_admin (for future customization)
