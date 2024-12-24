@@ -141,9 +141,9 @@ function mmogame_before_add_or_update_glossary(stdClass $mmogame): void {
 /**
  * Called before add or update for repairing question params.
  *
- * @param mmogame $mmogame
+ * @param stdClass $mmogame
  */
-function mmogame_before_add_or_update_question( mmogame $mmogame): void {
+function mmogame_before_add_or_update_question( stdClass $mmogame): void {
     $a = [];
 
     // Iterate over all properties of the $mmogame object.

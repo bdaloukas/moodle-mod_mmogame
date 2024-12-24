@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mod_mmogametype_quiz generator tests
+ * mmogametype_quiz generator tests
  *
  * @package    mmogametype_quiz
  * @category   test
@@ -27,14 +27,14 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 /**
- * Generator tests class for mod_mmogame.
+ * Generator tests class for mmogametype_quiz.
  *
- * @package    mod_mmogame
+ * @package    mmogametype_quiz
  * @category   test
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_mmogame_generator_testcase extends advanced_testcase {
+class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
     /**
      * Test for create instance.
@@ -51,8 +51,8 @@ class mod_mmogame_generator_testcase extends advanced_testcase {
         $this->assertFalse($DB->record_exists('mmogame', ['course' => $course->id]));
 
         $mmogame = $this->getDataGenerator()->create_module('mmogame',
-            ['course' => $course, 'qbank' => 'moodlequestion', 'qbankparams' => $categoryid,
-                'numgame' => 1, 'type' => 'quiz', 'model' => 'aduel', 'kinduser' => 'guid']);
+            ['course' => $course, 'qbank' => 'moodlequestion', 'qbankparams' => $categoryid, 'enabled' => 1,
+                'numgame' => 1, 'typemodel' => 'quiz,alone', 'kinduser' => 'guid', 'pin' => rand()]);
 
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
 
@@ -85,8 +85,8 @@ class mod_mmogame_generator_testcase extends advanced_testcase {
         $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN']);
 
         $game = $this->getDataGenerator()->create_module('mmogame',
-            ['course' => $course, 'qbank' => 'moodlequestion', 'qbankparams' => $categoryid,
-                'numgame' => 1, 'type' => 'quiz', 'model' => 'alone', 'kinduser' => 'guid']);
+            ['course' => $course, 'qbank' => 'moodlequestion', 'qbankparams' => $categoryid, 'pin' => rand(),
+                'numgame' => 1, 'typemodel' => 'quiz,alone', 'kinduser' => 'guid', 'enabled' => 1]);
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertEquals(1, count($records));
         $this->assertArrayHasKey($game->id, $records);
