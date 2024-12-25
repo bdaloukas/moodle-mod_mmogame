@@ -49,9 +49,11 @@ function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
 
     $a = ['mmogame_quiz_attempts', 'mmogame_aa_grades'];
 
+    [$insql, $inparams] = $DB->get_in_or_equal( explode(',', $ids));
+
     if (!empty($data->reset_mmogame_all)) {
         foreach ($a as $table) {
-            $DB->delete_records_select($table, "mmogameid IN ($ids)");
+            $DB->delete_records_select($table, "mmogameid $insql", $inparams);
         }
     }
 

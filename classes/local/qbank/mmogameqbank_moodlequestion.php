@@ -169,7 +169,8 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      */
     protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition') {
 
-        $recs = $this->mmogame->get_db()->get_records_select( 'question', "id IN ($ids)", null, '', $fields);
+        [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal( explode( ',', $ids));
+        $recs = $this->mmogame->get_db()->get_records_select( 'question', $insql, $inparams, '', $fields);
 
         if ($recs !== false && $loadextra) {
             foreach ($recs as $rec) {
@@ -328,28 +329,26 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
      */
     public function get_queries_ids() {
         $rgame = $this->mmogame->get_rgame();
-        $qtypes = "'shortanswer'";
-        $qtypes .= ($qtypes != '' ? ',' : '')."'multichoice'";
+        $qtypes = [];
+        $qtypes[] ='shortanswer';
+        $qtypes[] ='multichoice';
 
-        if ( $qtypes == '') {
+        if ( count($qtypes) === 0) {
             return false;
         }
-        $categoryids = $rgame->qbankparams != '' ? $rgame->qbankparams : '0';
-        $where = "qtype IN ($qtypes)";
         $db = $this->mmogame->get_db();
-        $table = "{question} q";
 
-        $table .= ",{question_bank_entries} qbe,{question_versions} qv  ";
-        if (strpos($categoryids, ',') === false) {
-            $where2 = ' qbe.questioncategoryid='.$categoryids;
-        } else {
-            $where2 = ' qbe.questioncategoryid IN ('.$categoryids.')';
-        }
-        $where .= ' AND qbe.id=qv.questionbankentryid AND qv.questionid=q.id AND '.$where2;
-        $sql = "SELECT q.id,qtype,qbe.id as qbeid FROM $table WHERE $where ORDER BY qv.version DESC";
-        $recs = $db->get_records_sql( $sql);
+        $categoryids = $rgame->qbankparams != '' ? $rgame->qbankparams : '0';
+        [$insql1, $inparams1] = $db->get_in_or_equal( $qtypes);
+        [$insql2, $inparams2] = $db->get_in_or_equal( explode( ',', $categoryids));
+        $sql = "SELECT q.id,qtype,qbe.id as qbeid
+            FROM {question} q,{question_bank_entries} qbe,{question_versions} qv
+            WHERE qtype $insql1 AND qbe.id=qv.questionbankentryid AND qv.questionid=q.id
+            AND qbe.questioncategoryid $insql2
+            ORDER BY qv.version DESC";
+        $recs = $db->get_records_sql( $sql, array_merge($inparams1, $inparams2));
 
-         $map = [];
+        $map = [];
         foreach ($recs as $rec) {
             if (array_key_exists( $rec->qbeid, $map)) {
                 continue;

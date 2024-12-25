@@ -433,10 +433,12 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
             [$this->rgame->id, $this->rgame->numgame, $this->auserid]);
 
         // Computes statistics per question.
-        $sids = implode( ',', $ids);
+        //$sids = implode( ',', $ids);
+        [$insql, $inparams] = $this->db->get_in_or_equal( $ids);
         $recs = $this->db->get_records_select( 'mmogame_aa_stats',
-            "mmogameid=? AND numgame=? AND auserid IS NULL AND queryid IN ($sids)",
-            [$this->rgame->id, $this->rgame->numgame], '', 'id,queryid,percent,countused');
+            "mmogameid=? AND numgame=? AND auserid IS NULL AND queryid $insql",
+            array_merge( [$this->rgame->id, $this->rgame->numgame], $inparams),
+            '', 'id,queryid,percent,countused');
         foreach ($recs as $rec) {
             $q = $qs[$rec->queryid];
             $q->qpercent = $rec->percent;
@@ -446,9 +448,9 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
 
         // Computes statistics per user.
         $recs = $this->db->get_records_select( 'mmogame_aa_stats',
-            "mmogameid=? AND numgame=? AND auserid = ? AND queryid IN ($sids)",
-            [$this->rgame->id, $this->rgame->numgame, $this->auserid], '',
-            'queryid,countused,countcorrect,counterror,timeerror,percent');
+            "mmogameid=? AND numgame=? AND auserid = ? AND queryid $insql",
+            array_merge([$this->rgame->id, $this->rgame->numgame, $this->auserid], $inparams),
+            '', 'queryid,countused,countcorrect,counterror,timeerror,percent');
         foreach ($recs as $rec) {
             $q = $qs[$rec->queryid];
             $q->utimeerror = $rec->timeerror;
@@ -509,10 +511,10 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
 
         // Update statistics.
         foreach ($ret as $q) {
-            $this->qbank->update_stats( $this->auserid, 0, $q->id, 1, 0, 0);
-            $this->qbank->update_stats( 0, 0, $q->id, 1, 0, 0);
+            $this->qbank->update_stats( $this->auserid, null, $q->id, 1, 0, 0);
+            $this->qbank->update_stats( null, null, $q->id, 1, 0, 0);
         }
-        $this->qbank->update_stats( $this->auserid, 0, 0, count( $ret), 0, 0,
+        $this->qbank->update_stats( $this->auserid, null, null, count( $ret), 0, 0,
             ['countanswers' => count( $ids)]);
         return count( $ret) ? $ret : false;
     }

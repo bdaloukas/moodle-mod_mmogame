@@ -230,4 +230,23 @@ class mmogame_database_moodle extends mmogame_database {
     public function iif(string $condition, string $iftrue, string $iffalse): string {
         return "IF($condition,$iftrue,$iffalse)";
     }
+
+    /**
+     * Return the query fragment to check if a value is IN the given list of items
+     * (with a fallback to plain equal comparison if there is just one item)
+     *
+     * @param mixed $items
+     * @param int $type
+     * @param string $prefix
+     * @param bool $equal
+     * @param bool $onemptyitems
+     * @return array
+     */
+    public function get_in_or_equal($items, int $type = SQL_PARAMS_QM, string $prefix = 'param',
+        bool $equal = true, bool $onemptyitems = false): array {
+
+        global $DB;
+
+        return $DB->get_in_or_equal( $items, $type,  $prefix,  $equal, $onemptyitems);
+    }
 }
