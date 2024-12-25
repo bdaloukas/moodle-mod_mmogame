@@ -24,6 +24,8 @@
 
 namespace mod_mmogame\local\database;
 
+use stdClass;
+
 /**
  * This class extends the mmogame_database with code explicit with Moodle.
  */
@@ -115,7 +117,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $fields The fields to return, default is '*'.
      * @return object|false The first matching database record as an object, or false if no record is found.
      */
-    public function get_record_select_first(string $table, string $select, ?array $params=null, $sort='', $fields='*') {
+    public function get_record_select_first(string $table, string $select, ?array $params=null, string $sort='', $fields='*') {
         global $DB;
 
         $recs = $DB->get_records_select( $table, $select, $params, $sort, $fields, 0, 1);
@@ -154,7 +156,8 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $countitem The COUNT item to be used, defaults to "COUNT('*')".
      * @return int The number of records that match the given conditions.
      */
-    public function count_records_select(string $table, string $select, ?array $params=null, string $countitem="COUNT('*')") {
+    public function count_records_select(string $table, string $select, ?array $params=null,
+                                         string $countitem="COUNT('*')") : int {
         global $DB;
 
         return $DB->count_records_select( $table, $select, $params, $countitem);
@@ -217,18 +220,6 @@ class mmogame_database_moodle extends mmogame_database {
         global $DB;
 
         $DB->delete_records_select($table, $select, $params);
-    }
-
-    /**
-     * Returns the equivalent of if in a database.
-     *
-     * @param string $condition
-     * @param string $iftrue
-     * @param string $iffalse
-     * @return string
-     */
-    public function iif(string $condition, string $iftrue, string $iffalse): string {
-        return "IF($condition,$iftrue,$iffalse)";
     }
 
     /**
