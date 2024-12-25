@@ -1373,7 +1373,6 @@ class mmogame {
             this.timestart = 0;
             this.timeclose = 0;
         }
-        console.log( "computeTimeStartClose timestart=" + this.timestart + " timeclose=" + this.timeclose)
     }
 
     drawRadio(canvas, color1, color2) {

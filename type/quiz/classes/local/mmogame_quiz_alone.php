@@ -167,94 +167,118 @@ class mmogame_quiz_alone extends mmogame_quiz {
     }
 
     /**
-     * Fill the array $ret wirh information about high scores.
+     * Fill the array $ret with information about high scores.
      *
      * @param int $count
      * @param array $ret
      */
     public function get_highscore(int $count, array &$ret): void {
-        $recs = $this->db->get_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND sumscore > 0',
-            [$this->rgame->id, $this->rgame->numgame], 'sumscore DESC', '*', 0, $count);
+
+        // Ensure the count is positive.
+        if ($count <= 0) {
+            $count = 1;
+        }
+
+        // Initialize the map for processing results.
         $map = [];
-        $rank = 0;
-        $prevscore = $prevrank = -1;
-        foreach ($recs as $rec) {
-            $data = new stdClass();
-            $data->auserid = $rec->auserid;
-            $data->score1 = $rec->sumscore;
-            $data->rank1 = ++$rank;
-            $data->nickname = $rec->nickname;
-            $data->avatarid = $rec->avatarid;
-            if ($data->score1 == $prevscore && $prevrank >= 0) {
-                $data->rank1 = $prevrank;
+
+        // Analyzes data for users with the highest sumscore.
+        $this->get_highscore_analyze('sumscore', 'rank1', $count, $map);
+
+        // Analyzes data for users with the highest percentcompleted.
+        $this->get_highscore_analyze('percentcompleted', 'rank2', $count, $map);
+
+        // Merge the two rankings into a unified map.
+        $map2 = [];
+        foreach ($map as $auserid => $data) {
+            $key = sprintf("%10d %10d", min($data->rank1, $data->rank2), $auserid);
+            $map2[$key] = $data;
+        }
+        ksort($map2);
+
+        // Prepare the final output.
+        $output = [];
+        foreach ($map2 as $data) {
+            if ($data->rank1 != 0 && $data->rank1 < $data->rank2) {
+                $kind = 1;
+                $rank = $data->rank1;
+                $score = $data->score1;
+            } else if ($data->rank2 != 0 && $data->rank2 < $data->rank1) {
+                $kind = 2;
+                $rank = $data->rank2;
+                $score = $data->score2 . ' %';
+            } else if ($data->rank1 != 0 && $data->rank2 != 0 && $data->rank1 == $data->rank2) {
+                $kind = 12;
+                $rank = $data->rank1;
+                $score = $data->sumscore . ' - ' . round($data->percentcompleted / 100) . ' %';
             } else {
-                $prevscore = $data->score1;
+                continue;
             }
 
-            $data->rank2 = $data->score2 = 0;
-
-            $map[$rec->auserid] = $data;
+            $output[] = [
+                'kind' => $kind,
+                'rank' => $rank,
+                'score' => $score,
+                'name' => $data->nickname,
+                'avatar' => $data->avatar,
+            ];
         }
-        $recs = $this->db->get_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND percentcompleted > 0',
-            [$this->rgame->id, $this->rgame->numgame], 'percentcompleted DESC', '*', 0, $count);
-        $prevscore = -1;
+
+        // Return results.
+        $ret['count'] = count($output);
+        $ret['results'] = json_encode($output);
+    }
+
+    /**
+     * Analyzes data based on $score_key and $rank_key
+     * *
+     * @param string $score_key
+     * @param string $rank_key
+     * @param int $count
+     * @param array $map
+     * @return void
+     */
+    private function get_highscore_analyze(string $scorekey, string $rankkey, int $count, array &$map): void {
+        // Fetch records from the database based on the given order criteria.
+        $sql = "SELECT ag.*, av.directory, av.filename
+            FROM {mmogame_aa_grades} ag
+            LEFT JOIN {mmogame_aa_avatars} av ON av.id=ag.avatarid
+            WHERE mmogameid=? AND numgame=? AND sumscore > 0
+            ORDER BY {$scorekey} DESC";
+        $recs = $this->db->get_records_sql($sql, [$this->rgame->id, $this->rgame->numgame], 0, $count);
+
+        // Process rankings for the given records and update the map.
+        $score = -1;
         $rank = 0;
+
         foreach ($recs as $rec) {
-            if (array_key_exists( $rec->auserid, $map)) {
+            // Check if the user already exists in the map.
+            if (array_key_exists($rec->auserid, $map)) {
                 $data = $map[$rec->auserid];
             } else {
                 $data = new stdClass();
                 $data->auserid = $rec->auserid;
-                $data->rank1 = $data->score1 = 0;
                 $data->nickname = $rec->nickname;
-                $data->avatarid = $rec->avatarid;
-            }
-            $data->score2 = round( 100 * $rec->percentcompleted);
-            if ($data->score2 > 100) {
-                $data->score2 = 100;
-            }
-            $data->rank2 = ++$rank;
-            if ($data->score2 == $prevscore && $prevrank >= 0) {
-                $data->rank2 = $prevrank;
-            } else {
-                $prevscore = $data->score2;
+                $data->avatar = $rec->directory . '/' . $rec->filename;
+                $data->rank1 = $data->rank2 = 0;
+                $data->sumscore = $data->percentcopleted = 0;
             }
 
+            // Calculate the score and cap it to the maximum score if necessary.
+            $data->$scorekey = $rec->$scorekey;
+            $data->$rankkey = ++$rank;
+
+            // Handle tied scores by reusing the previous rank.
+            if ($data->$scorekey == $score) {
+                $data->$rankkey = $rank;
+            } else {
+                $score = $data->$rankkey;
+                $rank = $data->$rankkey;
+            }
+
+            // Update the map with the new data.
             $map[$rec->auserid] = $data;
         }
-        $map2 = [];
-        foreach ($map as $auserid => $data) {
-            $key = sprintf( "%10d %10d", min($data->rank1, $data->rank2), $auserid);
-            $map2[$key] = $data;
-        }
-
-        $ranks = $names = $avatars = [];
-        foreach ($map2 as $data) {
-            if ($data->rank1 != 0 && $data->rank1 < $data->rank2) {
-                $kinds[] = 1;
-                $ranks[] = $data->rank1;
-                $scores[] = $data->score1;
-            } else if ($data->rank2 != 0 && $data->rank2 < $data->rank1) {
-                $kinds[] = 2;
-                $ranks[] = $data->rank2;
-                $scores[] = $data->score2.' %';
-            } else if ($data->rank1 != 0 && $data->rank2 != 0 && $data->rank1 == $data->rank2) {
-                $kinds[] = 12;
-                $ranks[] = $data->rank1;
-                $scores[] = $data->score1.' - '.$data->score2.' %';
-            } else {
-                continue;
-            }
-            $names[] = $data->nickname;
-            $rec = $this->db->get_record_select( 'mmogame_aa_avatars', 'id=?', [$data->avatarid]);
-            $avatars[] = $rec !== false ? $rec->directory.'/'.$rec->filename : '';
-        }
-        $ret['count'] = count( $ranks);
-        $ret['ranks'] = implode( '#', $ranks);
-        $ret['names'] = implode( '#', $names);
-        $ret['scores'] = implode( '#', $scores);
-        $ret['kinds'] = implode( '#', $kinds);
-        $ret['avatars'] = implode( '#', $avatars);
     }
 
     /**

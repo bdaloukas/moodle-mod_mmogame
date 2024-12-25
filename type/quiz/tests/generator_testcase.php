@@ -164,10 +164,13 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
         $data = (object)['mmogameid' => $rgame->id, 'command' => 'answer', 'answer' => $answerid,
             'kinduser' => 'moodle', 'user' => $USER->id, 'attempt' => $ret['attempt'], 'submit' => 1, ];
+        $ret = [];
         mmogame_json_quiz_answer($data, $mmogame, $ret);
 
         $data = (object)['mmogameid' => $rgame->id, 'command' => 'answer', 'answer' => $answerid,
             'kinduser' => 'moodle', 'user' => $USER->id, 'attempt' => $ret['attempt'], 'submit' => 1, ];
         mmogame_json_quiz_answer($data, $mmogame, $ret);
+        $ret = [];
+        $mmogame->get_highscore(3, $ret);
     }
 }

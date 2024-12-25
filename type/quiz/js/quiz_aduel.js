@@ -180,7 +180,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             return;
         }
 
-        this.state = json.state;
+        this.state = parseInt( json.state);
 
         // Need for a change on colors.
         if (this.savedColors === undefined || this.savedColors !== json.colors) {
@@ -276,7 +276,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         if (this.btnSubmit !== undefined) {
             this.btnSubmit.style.display = 'none';
         }
-console.log("onTimeout");
+
         this.answer = '';
         this.sendAnswer(true);
 
@@ -571,12 +571,12 @@ console.log("onTimeout");
     sendGetHighScore() {
         var xmlhttp = new XMLHttpRequest();
         var instance = this;
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState === 4 && this.status === 200) {
-                let json = JSON.parse(this.responseText);
-                instance.createScreenHighScore(json);
-            }
-        };
+        xmlhttp.onreadystatechange = () => {
+                    if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                        let json = JSON.parse(xmlhttp.responseText);
+                        instance.createScreenHighScore(json);
+                    }
+                };
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
@@ -626,7 +626,7 @@ console.log("onTimeout");
         canvas.height = this.areaHeight;
         canvas.style.zIndex = 8;
         canvas.style.position = "absolute";
-        this.canvasHighScore = canvas;
+        //this.canvasHighScore = canvas;
 
         this.highScore.appendChild(canvas);
 
@@ -649,76 +649,35 @@ console.log("onTimeout");
         let col3 = col2 + width2 + this.padding;
         let row = Math.round(3 * fontSize * 1.2);
 
-        let scores = json.scores.split('#');
-        let ranks = json.ranks.split('#');
-        let names = json.names.split('#');
-        let avatars = json.avatars.split('#');
+        let results = JSON.parse(json.results);
 
         ctx.fillStyle = this.getColorContrast(this.colorBackground);
 
         let y = Math.round(fontSize * 1.2);
+        ctx.textAlign = "center";
         ctx.fillText("[LANG_RANKING_ORDER]", col1 + width1 / 2, y);
+
         ctx.fillText("[LANG_GRADE]", col2 + width2 / 2, y);
+
         ctx.textAlign = "left";
         ctx.fillText("[LANGM_NAME]", col3, y);
-        for (let i = 1; i <= json.count; i++) {
+
+        results.forEach(player => {
             y += row / 2 + this.padding;
 
             ctx.textAlign = "center";
-            ctx.fillText(ranks[i - 1], col1 + width1 / 2, y);
+            ctx.fillText(player.rank, col1 + width1 / 2, y);
 
-            ctx.textAlign = "center";
-            ctx.fillText(scores[i - 1], col2 + width2 / 2, y);
+            ctx.fillText(player.score, col2 + width2 / 2, y);
 
             ctx.textAlign = "left";
-            ctx.fillText(names[i - 1], col3 + row, y);
+            ctx.fillText(player.name, col3 + row - this.padding, y);
 
             this.createImage(this.highScore, col3, y - row / 2, row - this.padding, row - this.padding,
-                'assets/avatars/' + avatars[i - 1]);
+                'assets/avatars/' + player.avatar);
 
             y += row / 2 - this.padding;
-        }
-
-        return top;
-    }
-
-    drawHighScore2(json, ctx, fontSize, left, top) {
-        ctx.textAlign = "center";
-        let text = ctx.measureText("[LANGM_DATE]");
-        let width1 = text.width;
-        text = ctx.measureText("[LANG_GRADE]");
-        let width2 = text.width;
-
-        let col1 = 0;
-        let col2 = col1 + width1 + this.padding;
-        let col3 = col2 + width2 + this.padding;
-        let row = Math.round(3 * fontSize * 1.2);
-
-        let scores = json.scores.split('#');
-        let ranks = json.ranks.split('#');
-        let names = json.names.split('#');
-        let avatars = json.avatars.split('#');
-
-        ctx.fillStyle = this.getColorContrast(this.colorBackground);
-        ctx.fillText("[LANGM_DATE]", col1 + width1 / 2, top + row);
-        ctx.fillText("[LANGM_GRADE]", col2 + width2 / 2, top + row);
-        ctx.textAlign = "left";
-        ctx.fillText("[LANGM_NAME]", col3, top + row);
-
-        for (let i = 1; i <= json.count; i++) {
-            let y = top + (i + 1) * row;
-            ctx.textAlign = "center";
-            ctx.fillText(ranks[i - 1], col1 + width1 / 2, y);
-
-            ctx.textAlign = "center";
-            ctx.fillText(scores[i - 1], col2 + width2 / 2, y);
-
-            ctx.textAlign = "left";
-            ctx.fillText(names[i - 1], col3 + row, y);
-
-            this.createImage(this.body, col3 + this.padding, this.areaTop + y - row, row - this.padding, row - this.padding,
-                'assets/avatars/' + avatars[i - 1]);
-        }
+        });
     }
 
     showHelpScreen(div) {
