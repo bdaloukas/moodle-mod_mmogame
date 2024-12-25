@@ -59,13 +59,15 @@ class mod_mmogame_generator extends testing_module_generator {
      * @throws dml_exception
      */
     public function create_multichoice_question(int $categoryid, string $name, string $questiontext, array $answers): int {
-        global $DB;
+        global $DB, $USER;
 
+        // Insert a record in the question table.
         $new = new stdClass();
         $new->category = $categoryid;
         $new->name = $name;
         $new->questiontext = $questiontext;
         $new->questiontextformat = FORMAT_MOODLE;
+        $new->qtype = 'multichoice';
         $new->defaultmark = 1;
         $new->penalty = 0.333333;
         $new->single = 0;
@@ -86,6 +88,38 @@ class mod_mmogame_generator extends testing_module_generator {
 
             $first = false;
         }
+
+        // Add multiple-choice-specific options.
+        $qtypeoptions = new stdClass();
+        $qtypeoptions->questionid = $questionid;
+        $qtypeoptions->layout = 0; // 0 = Vertical layout
+        $qtypeoptions->single = 1; // Only one choice allowed.
+        $qtypeoptions->shuffleanswers = 1; // Shuffle answer order.
+        $qtypeoptions->correctfeedback = ''; // Feedback for correct answers.
+        $qtypeoptions->correctfeedbackformat = FORMAT_HTML;
+        $qtypeoptions->partiallycorrectfeedback = '';
+        $qtypeoptions->partiallycorrectfeedbackformat = FORMAT_HTML;
+        $qtypeoptions->incorrectfeedback = '';
+        $qtypeoptions->incorrectfeedbackformat = FORMAT_HTML;
+        $qtypeoptions->answernumbering = 'abc'; // Answer numbering.
+        $DB->insert_record('qtype_multichoice_options', $qtypeoptions);
+
+        // Insert a new record in the question_bank_entries table.
+        $qbe = new stdClass();
+        $qbe->questioncategoryid = $categoryid;
+        $qbe->ownerid = $USER->id;
+        $qbe->timecreated = time();
+        $qbe->timemodified = time();
+        $qbe->status = 0;
+        $qbeid = $DB->insert_record('question_bank_entries', $qbe);
+
+        // Insert a record in the question_versions table.
+        $qv = new stdClass();
+        $qv->version = 1;
+        $qv->questionbankentryid = $qbeid;
+        $qv->questionid = $questionid;
+        $qv->status = 'ready';
+        $qvid = $DB->insert_record('question_versions', $qv);
 
         return $questionid;
     }

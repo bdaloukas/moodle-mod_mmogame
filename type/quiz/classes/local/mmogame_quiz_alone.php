@@ -27,9 +27,7 @@
 namespace mmogametype_quiz\local;
 
 use mod_mmogame\local\database\mmogame_database;
-
-/** Identifier the last state of model Alone */
-const MMOGAME_ALONE_STATE_LAST = 1;
+use stdClass;
 
 /**
  * The class mmogame_quiz_alone play the game Quiz (Alone).
@@ -181,7 +179,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
         $rank = 0;
         $prevscore = $prevrank = -1;
         foreach ($recs as $rec) {
-            $data = new \stdClass();
+            $data = new stdClass();
             $data->auserid = $rec->auserid;
             $data->score1 = $rec->sumscore;
             $data->rank1 = ++$rank;
@@ -205,7 +203,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
             if (array_key_exists( $rec->auserid, $map)) {
                 $data = $map[$rec->auserid];
             } else {
-                $data = new \stdClass();
+                $data = new stdClass();
                 $data->auserid = $rec->auserid;
                 $data->rank1 = $data->score1 = 0;
                 $data->nickname = $rec->nickname;

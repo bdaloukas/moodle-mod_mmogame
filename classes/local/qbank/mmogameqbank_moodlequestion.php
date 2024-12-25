@@ -24,6 +24,8 @@
 
 namespace mod_mmogame\local\qbank;
 
+use stdClass;
+
 /**
  * The class mmogameqbank_moodlequestion extends mmogameqbank and has the code for accessing questions of Moodle
  *
@@ -46,18 +48,14 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
         }
         $db = $this->mmogame->get_db();
         $sql = "SELECT $fields ".
-            " FROM {$db->prefix}question q, {$db->prefix}question_bank_entries qbe,{$db->prefix}question_versions qv ".
+            " FROM {question} q, {question_bank_entries} qbe,{question_versions} qv ".
             " WHERE qbe.id=qv.questionbankentryid AND qv.questionid=q.id AND qbe.id=? ".
             " ORDER BY qv.version DESC";
         $recs = $db->get_records_sql( $sql, [$id], 0, 1);
-        $ret = false;
-        foreach ($recs as $rec) {
-            $ret = $rec;
-        }
-
-        if ($ret === false) {
+        if ($recs === false || count( $recs) == 0) {
             return false;
         }
+        $ret = reset( $recs);
 
         if ($this->mmogame->get_rgame()->striptags) {
             $ret->definition = strip_tags( $ret->definition);
@@ -98,7 +96,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
             if (!isset( $query->correctid)) {
                 $query->correctid = $rec->id;
             }
-            $info = new \stdClass();
+            $info = new stdClass();
             $info->id = $rec->id;
             $info->answer = $rec->answer;
             $info->fraction = $rec->fraction;
@@ -110,7 +108,7 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
         }
         if ($query->qtype == 'multichoice') {
             $rec = $this->mmogame->get_db()->get_record_select( 'qtype_multichoice_options', 'questionid=?',
-                [$query->id]);
+                [$query->questionid]);
             $query->multichoice = $rec;
         }
 
@@ -339,17 +337,17 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
         $categoryids = $rgame->qbankparams != '' ? $rgame->qbankparams : '0';
         $where = "qtype IN ($qtypes)";
         $db = $this->mmogame->get_db();
-        $table = "{$db->prefix}question q";
+        $table = "{question} q";
 
-        $table .= ",{$db->prefix}question_bank_entries qbe,{$db->prefix}question_versions qv  ";
+        $table .= ",{question_bank_entries} qbe,{question_versions} qv  ";
         if (strpos($categoryids, ',') === false) {
             $where2 = ' qbe.questioncategoryid='.$categoryids;
         } else {
             $where2 = ' qbe.questioncategoryid IN ('.$categoryids.')';
         }
         $where .= ' AND qbe.id=qv.questionbankentryid AND qv.questionid=q.id AND '.$where2;
-
-        $recs = $db->get_records_sql( "SELECT q.id,qtype,qbe.id as qbeid FROM $table WHERE $where ORDER BY qv.version DESC");
+        $sql = "SELECT q.id,qtype,qbe.id as qbeid FROM $table WHERE $where ORDER BY qv.version DESC";
+        $recs = $db->get_records_sql( $sql);
 
          $map = [];
         foreach ($recs as $rec) {

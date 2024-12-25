@@ -24,6 +24,7 @@
 
 namespace mod_mmogame\local\qbank;
 use mod_mmogame;
+use mod_mmogame\local\mmogame;
 
 /**
  * The class mmogameqbank is a based class for saved questions (e.g., glossary, question bank)
@@ -41,7 +42,7 @@ class mmogameqbank {
      *
      * @param mmogame $mmogame
      */
-    public function __construct(mod_mmogame\local\mmogame $mmogame) {
+    public function __construct(mmogame $mmogame) {
         $this->mmogame = $mmogame;
     }
 
@@ -201,15 +202,15 @@ class mmogameqbank {
      *
      * The score2 is a temporary score e.g. chat phase of arguegraph.
      *
-     * @param int $auserid
-     * @param int $numteam
-     * @param int $queryid
+     * @param ?int $auserid
+     * @param ?int $numteam
+     * @param ?int $queryid
      * @param bool $isused
      * @param bool $iscorrect
      * @param bool $iserror
      * @param array|null $values
      */
-    public function update_stats(int $auserid, int $numteam, int $queryid, bool $isused, bool $iscorrect, bool $iserror,
+    public function update_stats(?int $auserid, ?int $numteam, ?int $queryid, bool $isused, bool $iscorrect, bool $iserror,
         ?array $values = null) {
 
         $db = $this->mmogame->get_db();

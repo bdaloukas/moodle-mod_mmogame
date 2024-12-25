@@ -24,7 +24,7 @@
  */
 
 use mod_mmogame\local\database\mmogame_database_moodle;
-use mod_mmogame\local\mmogame;
+//use mod_mmogame\local\mmogame;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -105,6 +105,72 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $ret = [];
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
 
+        $mmogame->update_state( 1);
+
         mmogame_json_quiz_getattempt($data, $mmogame, $ret);
+    }
+
+    /**
+     * Test for playing a quiz aduel.
+     */
+    public function test_aduel() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $this->assertFalse($DB->record_exists('mmogame', ['course' => $course->id]));
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_mmogame');
+
+        $new = new stdClass();
+        $new->name = 'Test category';
+        $new->context = 1;
+        $new->info = 'Info';
+        $new->stamp = rand();
+        $categoryid = $DB->insert_record( 'question_categories', $new);
+
+        $questionid = $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN']);
+        $recs = $DB->get_records('question_answers', ['question' => $questionid], 'fraction DESC','*',0,1);
+        $this->assertEquals( count($recs),1);
+        $answerid = reset( $recs)->id;
+
+        $rgame = $this->getDataGenerator()->create_module('mmogame',
+            ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
+                'numgame' => 1, 'type' => 'quiz', 'model' => 'aduel', 'typemodel' => 'quiz,aduel',
+                'kinduser' => 'guid', 'enabled' => 1]);
+        $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
+        $this->assertEquals(1, count($records));
+        $this->assertArrayHasKey($rgame->id, $records);
+        $rgame = reset( $records);
+        $this->assertEquals($rgame->qbankparams, $categoryid);
+
+        global $USER;
+        $data = (object)['mmogameid' => $rgame->id, 'command' => 'getattempt',
+            'kinduser' => 'moodle', 'user' => $USER->id,
+            'nickname' => 'Nickname', 'avatarid' => 1, 'paletteid' => 1];
+
+        require_once(__DIR__ .  '/../../../type/quiz/json.php');
+        $ret = [];
+        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
+
+        // Set state to playing.
+        $mmogame->update_state( 1);
+
+        // Gets the first question.
+        mmogame_json_quiz_getattempt($data, $mmogame, $ret);
+        //print_r( $ret);
+        $this->assertTrue( $ret['attempt'] != 0);
+
+        $data = (object)['mmogameid' => $rgame->id, 'command' => 'answer', 'answer' => $answerid,
+            'kinduser' => 'moodle', 'user' => $USER->id, 'attempt' => $ret['attempt'], 'submit' => 1,];
+        mmogame_json_quiz_answer($data, $mmogame, $ret);
+        //print_r( $ret);
+
+        $data = (object)['mmogameid' => $rgame->id, 'command' => 'answer', 'answer' => $answerid,
+            'kinduser' => 'moodle', 'user' => $USER->id, 'attempt' => $ret['attempt'], 'submit' => 1,];
+        mmogame_json_quiz_answer($data, $mmogame, $ret);
+        //print_r( $ret);
     }
 }
