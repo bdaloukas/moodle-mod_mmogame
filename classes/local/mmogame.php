@@ -417,7 +417,7 @@ class mmogame {
      * @param string $field
      * @return int
      */
-    public function get_rank_alone(int $auserid, string $field): int {
+    public function get_rank(int $auserid, string $field): int {
         $grade = $this->get_grade( $auserid);
 
         $value = $grade->$field;
@@ -425,8 +425,9 @@ class mmogame {
             $value = 0;
         }
 
-        return $this->db->count_records_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND '.$field.' > ?',
-            [$this->rgame->id, $this->rgame->numgame, $value]) + 1;
+        return $this->db->count_records_select( 'mmogame_aa_grades',
+                "mmogameid=? AND numgame=? AND $field > ?",
+                [$this->rgame->id, $this->rgame->numgame, $value]) + 1;
     }
 
     /**

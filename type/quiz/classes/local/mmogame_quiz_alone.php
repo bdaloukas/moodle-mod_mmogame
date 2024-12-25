@@ -330,10 +330,10 @@ class mmogame_quiz_alone extends mmogame_quiz {
         $info = $this->get_avatar_info( $this->auserid);
         $ret['sumscore'] = $info->sumscore;
         $ret['nickname'] = $info->nickname;
-        $ret['rank'] = $this->get_rank_alone( $this->auserid, 'sumscore');
+        $ret['rank'] = $this->get_rank( $this->auserid, 'sumscore');
 
         $ret['percentcompleted'] = $info->percentcompleted;
-        $ret['completedrank'] = $this->get_rank_alone( $this->auserid, 'percentcompleted');
+        $ret['completedrank'] = $this->get_rank( $this->auserid, 'percentcompleted');
 
         return $attempt;
     }

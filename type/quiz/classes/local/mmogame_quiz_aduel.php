@@ -317,7 +317,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
             $ret['aduelScore'] = $info->sumscore;
             $ret['aduelAvatar'] = $info->avatar;
             $ret['aduelNickname'] = $info->nickname;
-            $ret['aduelRank'] = $this->get_rank_alone( $this->aduel->auserid1, 'sumscore');
+            $ret['aduelRank'] = $this->get_rank( $this->aduel->auserid1, 'sumscore');
             $ret['aduelPercent'] = $info->percentcompleted;  // TOCHECK if used.
             $ret['colors'] = implode( ',', $info->colors);     // Get the colors of oposite.
             $ret['tool1numattempt'] = $this->aduel->tool1numattempt2;
@@ -566,7 +566,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         }
         $info = $this->get_avatar_info( $aduel->auserid1);
         $ret['aduelScore'] = $info->sumscore;
-        $ret['aduelRank'] = $this->get_rank_alone( $aduel->auserid1, 'sumscore');
+        $ret['aduelRank'] = $this->get_rank( $aduel->auserid1, 'sumscore');
 
         return $attempt;
     }

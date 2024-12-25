@@ -122,12 +122,12 @@ class mmogame_quiz extends mmogame {
         $ret['fastjson'] = $this->rgame->fastjson;
         $ret['name'] = $this->rgame->name;
         $ret['state'] = $this->rstate->state;
-        $ret['rank'] = $this->get_rank_alone( $auserid, 'sumscore');
+        $ret['rank'] = $this->get_rank( $auserid, 'sumscore');
         $ret['sumscore'] = $info->sumscore;
         $ret['timefastjson'] = $this->rgame->timefastjson;
 
         $ret['percentcompleted'] = $info->percentcompleted;
-        $ret['completedrank'] = $this->get_rank_alone( $auserid, 'percentcompleted');
+        $ret['completedrank'] = $this->get_rank( $auserid, 'percentcompleted');
 
         if ($attempt === false) {
             $attempt = new \stdClass();
