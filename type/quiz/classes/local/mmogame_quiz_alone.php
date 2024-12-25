@@ -232,8 +232,8 @@ class mmogame_quiz_alone extends mmogame_quiz {
     /**
      * Analyzes data based on $score_key and $rank_key
      * *
-     * @param string $score_key
-     * @param string $rank_key
+     * @param string $scorekey
+     * @param string $rankkey
      * @param int $count
      * @param array $map
      * @return void
