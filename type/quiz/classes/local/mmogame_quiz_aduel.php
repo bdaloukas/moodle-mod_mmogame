@@ -413,7 +413,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
     public function get_queries_aduel(int $count) {
         // Get the ids of all the queries.
         $ids = $this->qbank->get_queries_ids();
-echo "get_queries_aduel=";print_r( $ids);
+
         if ($ids === false) {
             return false;
         }
@@ -514,7 +514,6 @@ echo "get_queries_aduel=";print_r( $ids);
         }
         $this->qbank->update_stats( $this->auserid, 0, 0, count( $ret), 0, 0,
             ['countanswers' => count( $ids)]);
-echo "get_queries_aduel=";print_r( $ret);
         return count( $ret) ? $ret : false;
     }
 

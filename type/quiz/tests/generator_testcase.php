@@ -24,7 +24,6 @@
  */
 
 use mod_mmogame\local\database\mmogame_database_moodle;
-//use mod_mmogame\local\mmogame;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -131,9 +130,10 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $new->stamp = rand();
         $categoryid = $DB->insert_record( 'question_categories', $new);
 
-        $questionid = $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN']);
-        $recs = $DB->get_records('question_answers', ['question' => $questionid], 'fraction DESC','*',0,1);
-        $this->assertEquals( count($recs),1);
+        $questionid = $generator->create_multichoice_question($categoryid, '1', '1',
+            ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN']);
+        $recs = $DB->get_records('question_answers', ['question' => $questionid], 'fraction DESC', '*', 0, 1);
+        $this->assertEquals( count($recs), 1);
         $answerid = reset( $recs)->id;
 
         $rgame = $this->getDataGenerator()->create_module('mmogame',
@@ -160,17 +160,14 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
         // Gets the first question.
         mmogame_json_quiz_getattempt($data, $mmogame, $ret);
-        //print_r( $ret);
         $this->assertTrue( $ret['attempt'] != 0);
 
         $data = (object)['mmogameid' => $rgame->id, 'command' => 'answer', 'answer' => $answerid,
-            'kinduser' => 'moodle', 'user' => $USER->id, 'attempt' => $ret['attempt'], 'submit' => 1,];
+            'kinduser' => 'moodle', 'user' => $USER->id, 'attempt' => $ret['attempt'], 'submit' => 1, ];
         mmogame_json_quiz_answer($data, $mmogame, $ret);
-        //print_r( $ret);
 
         $data = (object)['mmogameid' => $rgame->id, 'command' => 'answer', 'answer' => $answerid,
-            'kinduser' => 'moodle', 'user' => $USER->id, 'attempt' => $ret['attempt'], 'submit' => 1,];
+            'kinduser' => 'moodle', 'user' => $USER->id, 'attempt' => $ret['attempt'], 'submit' => 1, ];
         mmogame_json_quiz_answer($data, $mmogame, $ret);
-        //print_r( $ret);
     }
 }
