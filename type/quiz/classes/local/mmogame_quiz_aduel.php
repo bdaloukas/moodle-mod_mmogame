@@ -26,7 +26,7 @@
 
 namespace mmogametype_quiz\local;
 
-use mod_mmogame\local\model\mmogameModel_aduel;
+use mod_mmogame\local\model\mmogame_model_aduel;
 use mod_mmogame\local\database\mmogame_database;
 
 /** Identifier the state for "play" of model Aduel */
@@ -82,14 +82,14 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
 
         $newplayer1 = $newplayer2 = false;
         for ($step = 1; $step <= 2; $step++) {
-            $this->aduel = mmogameModel_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2);
+            $this->aduel = mmogame_model_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2);
             if ($this->aduel === false) {
                 $this->set_errorcode( ERRORCODE_ADUEL_NO_RIVALS);
                 return false;
             }
 
             if (!$newplayer1 && !$newplayer2) {
-                $rec = mmogameModel_aduel::get_attempt( $this, $this->aduel);
+                $rec = mmogame_model_aduel::get_attempt( $this, $this->aduel);
                 if ($rec !== false) {
                     if ($rec->timestart == 0) {
                         $rec->timestart = time();

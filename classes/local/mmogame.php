@@ -25,7 +25,7 @@
 namespace mod_mmogame\local;
 
 use mod_mmogame\local\database\mmogame_database;
-use mod_mmogame\local\qbank\mmogameqbank;
+use mod_mmogame\local\qbank\mmogame_qbank;
 
 /**
  * The class mmogame is the base class for all games
@@ -41,8 +41,8 @@ class mmogame {
     protected object $rgame;
     /** @var int $auserid: the user (table mmogame_aa_users). */
     protected int $auserid = 0;
-    /** @var mmogameqbank $qbank: question bank to be used. */
-    protected mmogameqbank $qbank;
+    /** @var mmogame_qbank $qbank: question bank to be used. */
+    protected mmogame_qbank $qbank;
 
     /** @var string $error: saves the error code. */
     protected string $error = '';
@@ -80,7 +80,7 @@ class mmogame {
         }
 
         if ($rgame->qbank != '') {
-            $classname = 'mod_mmogame\local\qbank\mmogameqbank_'.$rgame->qbank;
+            $classname = 'mod_mmogame\local\qbank\mmogame_qbank_'.$rgame->qbank;
             $this->qbank = new $classname( $this);
         }
     }
