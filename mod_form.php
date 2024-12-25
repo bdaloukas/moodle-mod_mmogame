@@ -32,7 +32,7 @@ define( 'MMOGAME_PIN_DIGITS', 6);
 define( 'MMOGAME_KINDUSER_GUID', 'guid');
 define( 'MMOGAME_KINDUSER_MOODLE', 'moodle');
 
-require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once(__DIR__ . '/../../course/moodleform_mod.php');
 
 /**
  * class mod_mmogame_mod_form extends class moodleform_mod
@@ -218,12 +218,12 @@ class mod_mmogame_mod_form extends moodleform_mod {
         }
 
         $a = [];
-        $table = "{$CFG->prefix}question q, {$CFG->prefix}qtype_multichoice_options qmo";
+        $table = "{question} q, {qtype_multichoice_options} qmo";
         $select = " AND q.qtype='multichoice' AND qmo.single = 1 AND qmo.questionid=q.id";
-        $sql2 = "SELECT COUNT(DISTINCT questionbankentryid) FROM $table,{$CFG->prefix}question_bank_entries qbe,".
-            " {$CFG->prefix}question_versions qv ".
+        $sql2 = "SELECT COUNT(DISTINCT questionbankentryid) FROM $table,{question_bank_entries} qbe,".
+            " {question_versions} qv ".
             " WHERE qbe.questioncategoryid = qc.id AND qbe.id=qv.questionbankentryid AND q.id=qv.questionid $select";
-        $sql = "SELECT id,name,($sql2) as c FROM {$CFG->prefix}question_categories qc WHERE contextid = $context->id";
+        $sql = "SELECT id,name,($sql2) as c FROM {question_categories} qc WHERE contextid = $context->id";
         if ($recs = $DB->get_records_sql( $sql)) {
             foreach ($recs as $rec) {
                 $a[$rec->id] = $rec->name.' ('.$rec->c.')';

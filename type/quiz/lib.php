@@ -47,17 +47,18 @@ function mmogametype_quiz_delete_instance(int $mmogameid): void {
 function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
     global $DB, $CFG;
 
+    $a = ['mmogame_quiz_attempts', 'mmogame_aa_grades'];
+
     if (!empty($data->reset_mmogame_all)) {
-        $DB->delete_records_select('mmogame_quiz_alone_attempts', "mmogameid IN ($ids)");
-        $DB->delete_records_select('mmogame_aa_grades', "mmogameid IN ($ids)");
+        foreach ($a as $table) {
+            $DB->delete_records_select($table, "mmogameid IN ($ids)");
+        }
     }
 
     if (!empty($data->reset_mmogame_deleted_course)) {
-        $a = ['mmogame_quiz_attempts'];
-        $field = 'mmogameid';
         foreach ($a as $table) {
-            $DB->delete_records_select( $table,
-                "NOT EXISTS( SELECT * FROM {mmogame} g WHERE ".$CFG->prefix.'.'.$table.'.'.$field.'=g.id)');
+            $sql = "DELETE FROM {".$table."} t WHERE NOT EXISTS ( SELECT * FROM {mmogame} g WHERE t.mmogameid=g.id)";
+            $DB->execute($sql);
         }
     }
 }

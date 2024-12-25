@@ -133,7 +133,7 @@ class mmogame_quiz_alone extends mmogame_quiz {
                     $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0);
 
                 $sql = "SELECT COUNT(*) AS c ".
-                    " FROM ".$this->get_db()->prefix."mmogame_aa_stats ".
+                    " FROM {mmogame_aa_stats} ".
                     " WHERE mmogameid=? AND numgame=? AND auserid=? AND NOT queryid IS NULL ".
                     " AND countcorrect >= 2 * counterror AND countcorrect > 0";
                 $stat = $this->get_db()->get_record_sql(

@@ -124,27 +124,27 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
         if ($userinfo) {
             $params = [backup::VAR_PARENTID];
 
-            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_users u
+            $sql = "SELECT * FROM {mmogame_aa_users} u
                 WHERE kind='moodle'
-                AND id IN (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+                AND id IN (SELECT DISTINCT auserid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
             $ausermoodle->set_source_sql( $sql, $params);
 
-            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_users u
+            $sql = "SELECT * FROM {mmogame_aa_users} u
                 WHERE kind<>'moodle'
-                AND id IN (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+                AND id IN (SELECT DISTINCT auserid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
             $auser->set_source_sql( $sql, $params);
 
-            $sql = "SELECT uq.* FROM {$CFG->prefix}mmogame_aa_users_guid uq, {$CFG->prefix}mmogame_aa_users u
+            $sql = "SELECT uq.* FROM {mmogame_aa_users_guid} uq, {mmogame_aa_users} u
                 WHERE uq.id = u.instanceid AND u.id IN
-                (SELECT DISTINCT auserid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+                (SELECT DISTINCT auserid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
             $uguid->set_source_sql( $sql, $params);
 
-            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_avatars
-                WHERE id IN (SELECT DISTINCT avatarid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+            $sql = "SELECT * FROM {mmogame_aa_avatars}
+                WHERE id IN (SELECT DISTINCT avatarid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
             $avatar->set_source_sql( $sql, $params);
 
-            $sql = "SELECT * FROM {$CFG->prefix}mmogame_aa_colorpalettes
-                WHERE id IN (SELECT DISTINCT colorpaletteid FROM {$CFG->prefix}mmogame_aa_grades g WHERE mmogameid=?)";
+            $sql = "SELECT * FROM {mmogame_aa_colorpalettes}
+                WHERE id IN (SELECT DISTINCT colorpaletteid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
             $palette->set_source_sql( $sql, $params);
 
             $params = ['mmogameid' => backup::VAR_PARENTID];

@@ -172,5 +172,10 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         mmogame_json_quiz_answer($data, $mmogame, $ret);
         $ret = [];
         $mmogame->get_highscore(3, $ret);
+
+        $data = new stdClass();
+        $data->reset_mmogame_all = 1;
+        $data->reset_mmogame_deleted_course = 1;
+        mmogametype_quiz_reset_userdata( $data, $mmogame->get_id());
     }
 }

@@ -387,8 +387,8 @@ class mmogame {
      */
     public function get_avatar_info(int $auserid) {
         $sql = "SELECT g.*, a.directory, a.filename, a.id as aid, c.color1, c.color2, c.color3, c.color4, c.color5".
-            " FROM {$this->db->prefix}mmogame_aa_grades g LEFT JOIN {$this->db->prefix}mmogame_aa_avatars a ON g.avatarid=a.id".
-            " LEFT JOIN {$this->db->prefix}mmogame_aa_colorpalettes c ON c.id=g.colorpaletteid ".
+            " FROM {mmogame_aa_grades} g LEFT JOIN {mmogame_aa_avatars} a ON g.avatarid=a.id".
+            " LEFT JOIN {mmogame_aa_colorpalettes} c ON c.id=g.colorpaletteid ".
             " WHERE g.mmogameid=? AND g.numgame=? AND g.auserid=?";
         $grades = $this->db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
         if ($grades === false || count($grades) == 0) {
@@ -449,7 +449,7 @@ class mmogame {
 
         $where = 'ishidden = 0 AND '.
             "id NOT IN (SELECT avatarid ".
-            "FROM {$this->db->prefix}mmogame_aa_grades WHERE mmogameid=? AND numgame=? AND auserid<>?)";
+            "FROM {mmogame_aa_grades} WHERE mmogameid=? AND numgame=? AND auserid<>?)";
         $grades = $this->db->get_records_select( 'mmogame_aa_avatars', $where,
             [$this->rgame->id, $info->numgame, $info->auserid]);
         $ret = [];

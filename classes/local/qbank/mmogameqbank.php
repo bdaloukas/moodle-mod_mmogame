@@ -268,7 +268,7 @@ class mmogameqbank {
                 if ($queryid == null && array_key_exists( 'countcompleted', $values)) {
                     $n = $rec->countanswers;
                     $percentcompleted = $n != 0 ? $values['countcompleted'] / $n : 0;
-                    $sql = "UPDATE {$db->prefix}mmogame_aa_grades ".
+                    $sql = "UPDATE {mmogame_aa_grades} ".
                         "SET percentcompleted=? WHERE mmogameid=? AND numgame=? AND auserid=?";
                     $db->execute( $sql, [$percentcompleted, $rgame->id, $rgame->numgame, $auserid]);
                 }
