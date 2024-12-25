@@ -31,7 +31,7 @@ require(__DIR__ . "/../../config.php");
 
 $db = new mod_mmogame\local\database\mmogame_database_moodle();
 
-$data = get_data();
+$data = mmogame_get_data();
 
 if (!isset( $data->command)) {
     die("NO data->command");
@@ -42,20 +42,20 @@ $game = mod_mmogame\local\mmogame::create( $db, $data->mmogameid);
 
 switch( $data->command) {
     case 'getavatars':
-        dogetavatars( $game, $data, $ret);
+        mmogame_dogetavatars( $game, $data, $ret);
         die( json_encode( $ret));
     case 'setavatar':
-        dosetavatar( $game, $data, $ret);
+        mmogame_dosetavatar( $game, $data, $ret);
         die( json_encode( $ret));
     case 'getcolorpalettes':
-        dogetcolorpalettes( $game, $data, $ret);
+        mmogame_dogetcolorpalettes( $game, $data, $ret);
         die( json_encode( $ret));
     case 'getcolorsavatars':
-        dogetcolorpalettes( $game, $data, $ret);
-        dogetavatars( $game, $data, $ret);
+        mmogame_dogetcolorpalettes( $game, $data, $ret);
+        mmogame_dogetavatars( $game, $data, $ret);
         die( json_encode( $ret));
     case 'setcolorpalette':
-        dosetcolorpalette( $game, $data, $ret);
+        mmogame_dosetcolorpalette( $game, $data, $ret);
         die( json_encode( $ret));
 }
 
@@ -80,7 +80,7 @@ die( json_encode( $ret));
  *
  * @return object.
  */
-function get_data(): object {
+function mmogame_get_data(): object {
     $s = urldecode( file_get_contents("php://input"));
 
     return json_decode($s, false);
@@ -93,7 +93,7 @@ function get_data(): object {
  * @param stdClass $data
  * @param array $ret (an array of string with existed avatars)
  */
-function dogetavatars(object $mmogame, stdClass $data, array &$ret): void {
+function mmogame_dogetavatars(object $mmogame, stdClass $data, array &$ret): void {
     if ($data->countavatars == 0) {
         $ret['countavatars'] = 0;
         return;
@@ -132,7 +132,7 @@ function dogetavatars(object $mmogame, stdClass $data, array &$ret): void {
  * @param object $data
  * @param array $ret (an array containing the avatar and nickname)
  */
-function dosetavatar(object $mmogame, object $data, array &$ret): void {
+function mmogame_dosetavatar(object $mmogame, object $data, array &$ret): void {
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
     $mmogame->set_avatar( $auserid, $data->nickname, $data->avatarid);
@@ -143,24 +143,13 @@ function dosetavatar(object $mmogame, object $data, array &$ret): void {
 }
 
 /**
- * Compares the Hue of two colors.
- *
- * @param array $a (the first color)
- * @param array $b (the second color)
- * @return int (-1, 0 or 1)
- */
-function usort_mmogame_palettes(array $a, array $b): int {
-    return mmogame::calcualteHue( $a[0]) <=> mmogame::calcualteHue( $b[0]);
-}
-
-/**
  * Returns an array of existing color palettes to select.
  *
  * @param object $mmogame
  * @param object $data
  * @param array $ret (an array of string with existed color palettes)
  */
-function dogetcolorpalettes(object $mmogame, object $data, array &$ret): void {
+function mmogame_dogetcolorpalettes(object $mmogame, object $data, array &$ret): void {
     if ($data->countcolors == 0) {
         $ret['countcolors'] = 0;
         return;
@@ -190,7 +179,7 @@ function dogetcolorpalettes(object $mmogame, object $data, array &$ret): void {
  * @param object $data
  * @param array $ret (the value of key "colors" containg the five colors of palette)
  */
-function dosetcolorpalette(object $mmogame, object $data, array &$ret): void {
+function mmogame_dosetcolorpalette(object $mmogame, object $data, array &$ret): void {
     $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
 
     $mmogame->set_colorpalette( $auserid, $data->id);

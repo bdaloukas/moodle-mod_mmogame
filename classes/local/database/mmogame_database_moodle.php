@@ -157,7 +157,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @return int The number of records that match the given conditions.
      */
     public function count_records_select(string $table, string $select, ?array $params=null,
-                                         string $countitem="COUNT('*')") : int {
+                                         string $countitem="COUNT('*')"): int {
         global $DB;
 
         return $DB->count_records_select( $table, $select, $params, $countitem);
