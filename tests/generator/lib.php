@@ -36,19 +36,29 @@ class mod_mmogame_generator extends testing_module_generator {
     /**
      * Creates instance of game record with default values.
      *
-     * @param stdClass $record
-     * @param array $options
-     *
+     * @param null $record
+     * @param array|null $options
      * @return object mmogame instance
+     * @throws coding_exception
      */
-    public function create_instance($record = null, array $options = null) {
+    public function create_instance($record = null, ?array $options = null): object {
         global $CFG;
         require_once($CFG->libdir.'/resourcelib.php');
 
         return parent::create_instance($record, (array)$options);
     }
 
-    public function create_multichoice_question($categoryid, $name, $questiontext, $answers) {
+    /**
+     * Creates a question in the database.
+     *
+     * @param int $categoryid
+     * @param string $name
+     * @param string $questiontext
+     * @param array $answers
+     * @return int question id
+     * @throws dml_exception
+     */
+    public function create_multichoice_question(int $categoryid, string $name, string $questiontext, array $answers): int {
         global $DB;
 
         $new = new stdClass();
@@ -69,10 +79,12 @@ class mod_mmogame_generator extends testing_module_generator {
             $new = new stdClass();
             $new->question = $questionid;
             $new->answer = $answer;
-            $new->fraction = $first == true;
+            $new->fraction = $first ? 1 : 0;
             $new->feedback = '';
             $new->feedbackformat = FORMAT_MOODLE;
             $DB->insert_record('question_answers', $new);
+
+            $first = false;
         }
 
         return $questionid;

@@ -22,6 +22,10 @@
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_mmogame\local\database\mmogame_database_moodle;
+use mod_mmogame\local\mmogame;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -84,11 +88,23 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $categoryid = $DB->insert_record( 'question_categories', $new);
         $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN']);
 
-        $game = $this->getDataGenerator()->create_module('mmogame',
+        $rgame = $this->getDataGenerator()->create_module('mmogame',
             ['course' => $course, 'qbank' => 'moodlequestion', 'qbankparams' => $categoryid, 'pin' => rand(),
-                'numgame' => 1, 'typemodel' => 'quiz,alone', 'kinduser' => 'guid', 'enabled' => 1]);
+                'numgame' => 1, 'type' => 'quiz', 'model' => 'alone', 'typemodel' => 'quiz,alone',
+                'kinduser' => 'guid', 'enabled' => 1]);
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertEquals(1, count($records));
-        $this->assertArrayHasKey($game->id, $records);
+        $this->assertArrayHasKey($rgame->id, $records);
+
+        global $USER;
+        $data = (object)['mmogameid' => $rgame->id, 'command' => 'getattempt',
+            'kinduser' => 'moodle', 'user' => $USER->id,
+            'nickname' => 'Nickname', 'avatarid' => 1, 'paletteid' => 1];
+
+        require_once(__DIR__ .  '/../../../type/quiz/json.php');
+        $ret = [];
+        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
+
+        mmogame_json_quiz_getattempt($data, $mmogame, $ret);
     }
 }

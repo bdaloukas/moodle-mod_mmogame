@@ -50,16 +50,12 @@ class mmogame_database_moodle extends mmogame_database {
      *
      * @param string $table
      * @param array $a
-     * @return true if the insertions are ok, otherwise false.
+     * @return bool|int if the insertions are ok, otherwise false.
      */
-    public function insert_record(string $table, array $a): bool {
+    public function insert_record(string $table, array $a) {
         global $DB;
 
-        $rec = new \stdClass;
-        foreach ($a as $name => $value) {
-            $rec->$name = $value;
-        }
-        return $DB->insert_record( $table, $rec);
+        return $DB->insert_record( $table, (object )$a);
     }
 
     /**

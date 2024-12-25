@@ -24,20 +24,21 @@
 
 use mod_mmogame\local\mmogame;
 
-define( 'AJAX_SCRIPT', 1);
+define('AJAX_SCRIPT', true);
 define('NO_MOODLE_COOKIES', true);
 
-require( "../../config.php");
+require(__DIR__ . "/../../config.php");
 
 $db = new mod_mmogame\local\database\mmogame_database_moodle();
 
 $data = get_data();
+
 if (!isset( $data->command)) {
     die("NO data->command");
 }
 $ret = [];
 
-$game = mod_mmogame\local\mmogame::getgame( $db, $data->mmogameid);
+$game = mod_mmogame\local\mmogame::create( $db, $data->mmogameid);
 
 switch( $data->command) {
     case 'getavatars':
@@ -62,8 +63,6 @@ $function = 'mmogame_json_'.$game->get_type().'_'.$data->command;
 
 require_once( "type/".$game->get_type()."/json.php");
 $function( $data, $game, $ret);
-
-$rec = $DB->get_record_select( 'question', 'id=12');
 
 $ret['time'] = round( 1000 * microtime( true));
 

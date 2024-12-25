@@ -50,7 +50,7 @@ class mmogame_quiz extends mmogame {
      *
      * @param mmogame_database $db (the database)
      * @param object $rgame (a record from table mmogame)
-     * @return mixed
+     * @return mmogame_quiz
      */
     public static function get_new(mmogame_database $db, object $rgame) {
         $classname = 'mmogametype_' . $rgame->type.'\local\mmogame_' . $rgame->type.'_'.$rgame->model;
