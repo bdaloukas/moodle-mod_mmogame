@@ -433,7 +433,6 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
             [$this->rgame->id, $this->rgame->numgame, $this->auserid]);
 
         // Computes statistics per question.
-        //$sids = implode( ',', $ids);
         [$insql, $inparams] = $this->db->get_in_or_equal( $ids);
         $recs = $this->db->get_records_select( 'mmogame_aa_stats',
             "mmogameid=? AND numgame=? AND auserid IS NULL AND queryid $insql",

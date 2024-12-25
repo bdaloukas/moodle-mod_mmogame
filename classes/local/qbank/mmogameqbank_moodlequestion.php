@@ -330,8 +330,8 @@ class mmogameqbank_moodlequestion extends mmogameqbank {
     public function get_queries_ids() {
         $rgame = $this->mmogame->get_rgame();
         $qtypes = [];
-        $qtypes[] ='shortanswer';
-        $qtypes[] ='multichoice';
+        $qtypes[] = 'shortanswer';
+        $qtypes[] = 'multichoice';
 
         if ( count($qtypes) === 0) {
             return false;
