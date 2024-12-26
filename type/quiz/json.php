@@ -32,7 +32,7 @@ use mod_mmogame\local\mmogame;
  * @param array $ret
  */
 function mmogame_json_quiz_getattempt(object $data, mmogame $mmogame, array &$ret) {
-    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    $auserid = mmogame::get_asuerid( $mmogame->get_db(), $data->kinduser, $data->user);
     if ($auserid === false) {
         $ret['errorcode'] = 'invalidauser';
         return;
@@ -67,7 +67,7 @@ function mmogame_json_quiz_getattempt(object $data, mmogame $mmogame, array &$re
  * @return mixed
  */
 function mmogame_json_quiz_answer(object $data, object $mmogame, array &$ret) {
-    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    $auserid = mmogame::get_asuerid( $mmogame->get_db(), $data->kinduser, $data->user);
     $mmogame->login_user( $auserid);
 
     return $mmogame->set_answer_model( $data, $ret);
@@ -81,7 +81,7 @@ function mmogame_json_quiz_answer(object $data, object $mmogame, array &$ret) {
  * @param array $ret
  */
 function mmogame_json_quiz_gethighscore(object $data, object $mmogame, array &$ret) {
-    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    $auserid = mmogame::get_asuerid( $mmogame->get_db(), $data->kinduser, $data->user);
     $mmogame->login_user( $auserid);
     $mmogame->get_highscore( $data->count, $ret);
 }

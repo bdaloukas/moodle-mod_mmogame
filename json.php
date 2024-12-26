@@ -98,7 +98,7 @@ function mmogame_get_avatars(object $mmogame, stdClass $data, array &$ret): void
         $ret['countavatars'] = 0;
         return;
     }
-    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    $auserid = mmogame::get_asuerid( $mmogame->get_db(), $data->kinduser, $data->user);
 
     $info = $mmogame->get_avatar_info( $auserid);
     $ret['nickname'] = $info->nickname;
@@ -133,7 +133,7 @@ function mmogame_get_avatars(object $mmogame, stdClass $data, array &$ret): void
  * @param array $ret (an array containing the avatar and nickname)
  */
 function mmogame_set_avatar(object $mmogame, object $data, array &$ret): void {
-    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    $auserid = mmogame::get_asuerid( $mmogame->get_db(), $data->kinduser, $data->user);
 
     $mmogame->set_avatar( $auserid, $data->nickname, $data->avatarid);
 
@@ -155,7 +155,7 @@ function mmogame_get_colorpalettes(object $mmogame, object $data, array &$ret): 
         return;
     }
 
-    mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    mmogame::get_asuerid( $mmogame->get_db(), $data->kinduser, $data->user);
 
     $pals = $mmogame->get_palettes();
 
@@ -180,7 +180,7 @@ function mmogame_get_colorpalettes(object $mmogame, object $data, array &$ret): 
  * @param array $ret (the value of key "colors" containg the five colors of palette)
  */
 function mmogame_set_colorpalette(object $mmogame, object $data, array &$ret): void {
-    $auserid = mmogame::get_asuerid_from_object( $mmogame->get_db(), $data);
+    $auserid = mmogame::get_asuerid( $mmogame->get_db(), $data->kinduser, $data->user);
 
     $mmogame->set_colorpalette( $auserid, $data->id);
 

@@ -244,22 +244,19 @@ class mmogame {
     }
 
     /**
-     * Return coresponding auserid from a user (details are in object variable $data).
-     * @param object $db
-     * @param object $data
+     * Return coresponding auserid from input parameters).
+     * @param mmogame_database $db
+     * @param string $kinduser
+     * @param string $user
      * @return int (the id of table mmogame_aa_users)
      */
-    public static function get_asuerid_from_object(object $db, object $data) {
-        if (isset( $data->kinduser)) {
-            if ($data->kinduser == 'usercode') {
-                return self::get_auserid_from_usercode($db, $data->user);
-            } else if ($data->kinduser == 'guid') {
-                return self::get_auserid_from_guid( $db, $data->user);
-            } else {
-                return self::get_auserid_from_db( $db, $data->kinduser, $data->user, true);
-            }
+    public static function get_asuerid(mmogame_database $db, string $kinduser, string $user) {
+        if ($kinduser == 'usercode') {
+            return self::get_auserid_from_usercode($db, $user);
+        } else if ($kinduser == 'guid') {
+            return self::get_auserid_from_guid( $db, $user);
         } else {
-            return self::get_auserid_from_guid( $db, $data->user);
+            return self::get_auserid_from_db( $db, $kinduser, $user, true);
         }
     }
 
