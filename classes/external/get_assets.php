@@ -92,7 +92,7 @@ class get_assets extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'avatars' => new external_multiple_structure(
-                new external_value(PARAM_INT, 'An avatar filename'),
+                new external_value(PARAM_TEXT, 'An avatar filename'),
                 'The list of avatar filenames',
                 VALUE_OPTIONAL
             ),
@@ -102,7 +102,7 @@ class get_assets extends external_api {
                 VALUE_OPTIONAL
             ),
             'colorpalettes' => new external_multiple_structure(
-                new external_value(PARAM_TEXT, 'A color palette'),
+                new external_value(PARAM_RAW, 'A color palette'),
                 'The list of color palettes',
                 VALUE_OPTIONAL
             ),
@@ -160,7 +160,12 @@ class get_assets extends external_api {
             unset( $pals[$id]);
         }
 
+        $colorpalettes = [];
+        foreach( $pals as $pal ) {
+            $colorpalettes [] = implode( ',', $pal);
+        }
+
         $result[ 'colorpaletteids'] = array_keys( $pals);
-        $result[ 'colorpalettes'] = array_values( $pals);
+        $result[ 'colorpalettes'] = $colorpalettes;
     }
 }

@@ -13,16 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Regrade modal form is used to regrade or dryrun the attempts and questions.
- *
- * @module mmogametype_quiz
- * @copyright 2024 Vasilis Daloukas
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-// eslint-disable-next-line no-unused-vars, no-undef
-class mmogameQuizAduel extends mmogameQuiz {
+import mmoGameQuiz from 'mmogamequiz';
+export default class extends mmoGameQuiz {
     constructor() {
         super();
         this.cIcons = 8;
@@ -180,7 +172,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             return;
         }
 
-        this.state = parseInt( json.state);
+        this.state = parseInt(json.state);
 
         // Need for a change on colors.
         if (this.savedColors === undefined || this.savedColors !== json.colors) {
@@ -470,7 +462,7 @@ class mmogameQuizAduel extends mmogameQuiz {
         }
         this.strip.innerHTML = s;
 
-        this.strip.style.zIndex = 1;
+        this.strip.style.zIndex = '1';
     }
 
     showScore(json) {
@@ -569,8 +561,8 @@ class mmogameQuizAduel extends mmogameQuiz {
     }
 
     sendGetHighScore() {
-        var xmlhttp = new XMLHttpRequest();
-        var instance = this;
+        let xmlhttp = new XMLHttpRequest();
+        let instance = this;
         xmlhttp.onreadystatechange = () => {
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                         let json = JSON.parse(xmlhttp.responseText);
@@ -580,7 +572,7 @@ class mmogameQuizAduel extends mmogameQuiz {
 
         xmlhttp.open("POST", this.url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
-        var data = JSON.stringify({"command": "gethighscore", "mmogameid": this.mmogameid, "pin": this.pin,
+        let data = JSON.stringify({"command": "gethighscore", "mmogameid": this.mmogameid, "pin": this.pin,
             'kinduser': this.kinduser, "user": this.auserid, "count": 10});
         xmlhttp.send(data);
     }
@@ -590,7 +582,7 @@ class mmogameQuizAduel extends mmogameQuiz {
             this.body.removeChild(this.highScore);
             this.highScore = undefined;
             this.strip.style.visibility = 'visible';
-            this.strip.style.zIndex = 1;
+            this.strip.style.zIndex = '1';
             return;
         }
 
@@ -626,11 +618,10 @@ class mmogameQuizAduel extends mmogameQuiz {
         canvas.height = this.areaHeight;
         canvas.style.zIndex = 8;
         canvas.style.position = "absolute";
-        //this.canvasHighScore = canvas;
 
         this.highScore.appendChild(canvas);
 
-        var ctx = canvas.getContext("2d");
+        let ctx = canvas.getContext("2d");
         let fontSize = this.minFontSize;
         ctx.font = fontSize + "px sans-serif";
 
@@ -687,27 +678,27 @@ class mmogameQuizAduel extends mmogameQuiz {
 <table border=1>
     <tr>
         <td><center>
-            <img height="90" src="assets/cutred.svg" alt="" />
+            <img height="90" src="../../../../assets/cutred.svg" alt="" />
         </td>
         <td>[LANG_ADUEL_CUT]</td>
         <td><center>
-            <img height="90" src="assets/skip.svg" alt="" />
+            <img height="90" src="../../../../assets/skip.svg" alt="" />
         </td>
         <td>[LANG_ADUEL_SKIP]</td>
         <td><center>
-            <img height="90" src="assets/wizard.svg" alt="" />
+            <img height="90" src="../../../../assets/wizard.svg" alt="" />
         </td>
         <td>[LANG_ADUEL_WIZARD]</td>
     </tr>
 
     <tr>
         <td><center>
-            <img height="90" src="type/quiz/assets/aduel/example1.png" alt="" />
+            <img height="90" src="../../assets/aduel/example1.png" alt="" />
         </td><center>
 
         <td>[LANG_ADUEL_EXAMPLE1]</td>
         <td><center>
-            <img height="90" src="type/quiz/assets/aduel/example2.png" alt="" />
+            <img height="90" src="../../assets/aduel/example2.png" alt="" />
         </td>
 
         <td>[LANG_ADUEL_EXAMPLE2]</td>

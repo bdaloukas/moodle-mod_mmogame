@@ -1,4 +1,60 @@
 <?php
+require_once(__DIR__ . '/../../config.php');
+
+global $PAGE;
+
+$PAGE->set_url(new moodle_url('/mod/mmogame/gate2.php'));
+$PAGE->set_pagelayout('embedded'); // Layout χωρίς header και footer.
+$PAGE->set_context(context_system::instance());
+
+global $CFG, $DB, $USER, $OUTPUT;
+
+// Load the JavaScript module.
+$mmogameid = required_param('id', PARAM_INT);
+$pin = required_param('pin', PARAM_INT);
+
+$rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid, $pin]);
+if ($rgame === false) {
+    $data = new stdClass();
+    $data->mmogameid = $mmogameid;
+    $data->pin = $pin;
+    echo get_string( 'ivalid_mmogame_or_pin', 'mmogame', $data);
+    die;
+}
+//$PAGE->requires->js_call_amd('mod_mmogame/helloworld', 'mmogame_gate', [1,927568,'moodle',$USER->id]);
+//$PAGE->requires->js_call_amd('mod_mmogame/helloworld', 'mmogame_gate');
+//$PAGE->requires->js(new moodle_url('/mod/mmogame/amd/src/helloworld.js?mmogameid=1&pin=2&kinduser=moodle&user=3'));
+
+//$PAGE->requires->js('/mod/mmogame/type/quiz/amd/src/mmogamequizalone.js');
+$PAGE->requires->js('/mod/mmogame/type/quiz/amd/src/mmogamequiz.js');
+
+/*
+$PAGE->requires->js_init_code("
+    require(['../../type/quiz/amd/mmogamequizalone'], function(mmoGameQuizAlone) {
+        // Δημιουργία αντικειμένου μέσω της init με παραμέτρους
+        var obj = mmoGameQuizAlone.init($rgame->id,$rgame->pin, '$rgame->kinduser', '$USER->id');
+        console.log(obj); // Μπορείς να κάνεις οποιαδήποτε ενέργεια με το αντικείμενο εδώ
+    });
+");
+*/
+$PAGE->requires->js_init_code("
+    require(['mmogametype_quiz/mmogamequiz'], function(mmoGameQuiz) {
+        var obj = new mmoGameQuiz($rgame->id,$rgame->pin, '$rgame->kinduser', '$USER->id');
+        console.log(obj); // Μπορείς να κάνεις οποιαδήποτε ενέργεια με το αντικείμενο εδώ
+    });
+");
+//obj.init($rgame->id,$rgame->pin, '$rgame->kinduser', '$USER->id');
+
+$PAGE->requires->strings_for_js( ['js_name', 'js_question_time', 'js_sound', 'js_help'], 'mmogame');
+
+
+// Output the page.
+echo $OUTPUT->header();
+echo $OUTPUT->footer();
+
+die;
+
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -49,7 +105,7 @@ if ($rgame === false) {
 <style>
 <?php echo file_get_contents( dirname(__FILE__)."/styles.css"); ?>
 </style>
-<body onload="runmmogame()">
+<body>
 
 <?php
 
@@ -65,75 +121,26 @@ if ($rgame->kinduser == 'moodle') {
     $usercode = '0';
 }
 
-echo "<script>\n";
-mmogame_change_javascript( $rgame->type, 'js/mmogame.js');
-$class = 'mmogame'.ucfirst($rgame->type).ucfirst($rgame->model);
-mmogame_change_javascript( $rgame->type, 'js/gate.js', '[CLASS]', $class);
-mmogame_change_javascript( $rgame->type, "type/$rgame->type/js/$rgame->type.js");
-mmogame_change_javascript( $rgame->type, 'type/'.$rgame->type.'/js/'.$rgame->type.'_'.$rgame->model.'.js');
+global $PAGE;
 
-?>
-    function runmmogame() {
-        let game = new mmogameGate();
-        game.repairColors( <?php echo $colors;?>)
-        game.open(<?php echo "\"$CFG->wwwroot/mod/mmogame/json.php\",$rgame->id,
-            $rgame->pin,$usercode,\"$rgame->kinduser\"" ?>);
-    }
- </script>
-</body>
+//$PAGE->requires->require_js('/mod/mmogame/amd/src/helloworld.js');
 
-<?php
-/**
- * Reads a JavaScript file and changes some string for translation replacing [LANG_...], [LANGM_...], [CLASS].
- *
- * @param string $type (type is a sub-plugin name e.g. quiz).
- * @param string $file
- * @param string $search
- * @param string $replace
- *
- * @package    mod_mmogame
- * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- **/
-function mmogame_change_javascript(string $type, string $file, string $search = '', string $replace = ''): void {
-    if (!file_exists( dirname(__FILE__).'/'.$file)) {
-        return;
-    }
 
-    $s = file_get_contents( dirname(__FILE__).'/'.$file);
+/*
+$PAGE->requires->js_call_amd('mod_mmogame/mmogame_gate', 'init', [
+    'mmogameid' => $rgame->id,
+    'pin' => $rgame->pin,
+    'kinduser' => $rgame->kinduser,
+    'user' => $usercode
+]);
+*/
+$PAGE->requires->js('../../type/quiz/amd/mmogamequizalone');
+$PAGE->requires->js_init_code("
+    require(['../../type/quiz/amd/mmogamequizalone'], function(mmoGameQuizAlone) {
+        // Δημιουργία αντικειμένου μέσω της init με παραμέτρους
+        var obj = mmoGameQuizAlone.init($rgame->id,$rgame->pin, '$rgame->kinduser', '$usercode');
+        console.log(obj); // Μπορείς να κάνεις οποιαδήποτε ενέργεια με το αντικείμενο εδώ
+    });
+");
 
-    // Remove multi-line comments (/* ... */).
-    $s = preg_replace('/\/\*.*?\*\//s', '', $s);
-
-    $s = preg_replace('/\n\s*\n/', "\n", $s); // Remove empty lines.
-
-    // Changes variables.
-    $source = $dest = [];
-    if ($search != '') {
-        $source[] = $search;
-        $dest[] = $replace;
-    }
-
-    // Start from [LANG and finish with ].
-    preg_match_all('/\[LANG_[A-Z0-9_]+\]/', $s, $matches);
-
-    foreach ($matches as $stringm) {
-        foreach ($stringm as $string) {
-            $source[] = $string;
-            $name = 'js_'.strtolower( substr( trim($string, '[]'), 5));
-            $dest[] = get_string( $name, 'mmogametype_'.$type);
-        }
-    }
-
-    // Start from [LANGM (for whole module) and finish with ].
-    preg_match_all('/\[LANGM_[A-Z0-9_]+\]/', $s, $matches);
-    foreach ($matches as $stringm) {
-        foreach ($stringm as $string) {
-            $source[] = $string;
-            $name = 'js_'.strtolower( substr( trim($string, '[]'), 6));
-            $dest[] = get_string( $name, 'mmogame');
-        }
-    }
-
-    echo str_replace( $source, $dest, $s);
-}
+echo 'ok';

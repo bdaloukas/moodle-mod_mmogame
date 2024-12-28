@@ -42,7 +42,7 @@
 
 $functions = [
     'mod_mmogame_get_assets' => [
-        'classname'     => 'mod_mmogame_external',
+        'classname'     => 'mod_mmogame\external\get_assets',
         'description'   => 'Gets the list of avatars.',
         'type'          => 'write',
         'ajax'          => true,
