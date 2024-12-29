@@ -1818,14 +1818,12 @@ define([''], function() {
 
         this.btnSubmit.style.visibility = visible ? 'visible' : 'hidden';
     }
-
     gateComputeSizes() {
         this.computeSizes();
         this.iconSize = Math.round(0.8 * this.iconSize);
         this.padding = Math.round(0.8 * this.padding);
     }
-
-        getStringM( name) {
+    getStringM( name) {
             return M.util.get_string(name, 'mmogame');
         }
     };

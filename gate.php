@@ -26,7 +26,7 @@ require( "../../config.php");
 
 global $CFG, $DB, $USER, $OUTPUT, $PAGE;
 
-//$PAGE->set_url(new moodle_url('/mod/mmogame/gate2.php'));
+$PAGE->set_url(new moodle_url('/mod/mmogame/gate2.php'));
 $PAGE->set_pagelayout('embedded'); // Layout χωρίς header και footer.
 $PAGE->set_context(context_system::instance());
 
