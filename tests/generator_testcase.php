@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_mmogame\external\get_assets;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -39,7 +41,6 @@ class mmogame_generator_testcase extends advanced_testcase {
 
     /**
      * Test the get_services web service.
-     * @runInSeparateProcess
      */
     public function test_services() {
         global $USER;
@@ -56,7 +57,7 @@ class mmogame_generator_testcase extends advanced_testcase {
                 'kinduser' => 'guid', 'enabled' => 1]);
 
         // Test 1: Call without optional parameter avatars, colorpalettes.
-        $class = new \mod_mmogame\external\get_assets();
+        $class = new get_assets();
         $result = $class->execute($rgame->id, 'moodle', $USER->id);
         $this->assertArrayNotHasKey('avatars', $result);
         $this->assertArrayNotHasKey('colorpalettes', $result);

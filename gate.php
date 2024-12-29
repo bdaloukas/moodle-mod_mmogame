@@ -22,6 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// No login check is expected here because users can play users as guest and as normal users
+// If are normal users include later require_login.
+// @codingStandardsIgnoreLine
 require( "../../config.php");
 
 global $CFG, $DB, $USER, $OUTPUT, $PAGE;
@@ -43,6 +46,9 @@ if ($rgame === false) {
     die;
 }
 
+if ($rgame->kinduser == 'moodle' ) {
+    require_login();
+}
 $PAGE->requires->js('/mod/mmogame/type/quiz/amd/src/mmogamequiz.js');
 
 $PAGE->requires->js_init_code("

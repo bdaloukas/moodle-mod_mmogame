@@ -555,7 +555,7 @@ define([''], function() {
         if (num === 1) {
             button.style.background = this.getColorHex(this.colorScore);
             button.style.color = this.getColorContrast(this.colorScore);
-            button.title = this.getLangM('grade');
+            button.title = this.getStringM('grade');
         } else {
             button.style.background = this.getColorHex(this.colorScore2);
             button.style.color = this.getColorContrast(this.colorScore2);
@@ -762,7 +762,10 @@ define([''], function() {
             dif = 0;
             this.sendTimeout();
         }
-        this.labelTimer.innerHTML = (dif < 0 ? "-" : "") + Math.floor(dif / 60.0) + ":" + ("0" + (dif % 60)).substr(-2);
+        const minutes = Math.floor(Math.abs(dif) / 60);
+        const seconds = Math.abs(dif) % 60;
+        const prefix = dif < 0 ? "-" : "";
+        this.labelTimer.innerHTML = `${prefix}${minutes}:${seconds.toString().padStart(2, '0')}`;
 
         if (dif === 0) {
             return;
@@ -1198,6 +1201,8 @@ define([''], function() {
                 if (pos >= 0) {
                     s = s.slice(0, pos);
                 }
+                const filenameWithExt = avatar.split('/').pop(); // Extract the file name with its extension
+                s = filenameWithExt.split('.').slice(0, -1).join('.'); // Remove the extension from the file name
             }
             s = this.repairNickname(s);
             if (this.divNicknames[num] !== undefined && this.divNicknames[num].innerHTML !== s) {
@@ -1823,7 +1828,7 @@ define([''], function() {
         this.iconSize = Math.round(0.8 * this.iconSize);
         this.padding = Math.round(0.8 * this.padding);
     }
-    getStringM( name) {
+    getStringM(name) {
             return M.util.get_string(name, 'mmogame');
         }
     };
