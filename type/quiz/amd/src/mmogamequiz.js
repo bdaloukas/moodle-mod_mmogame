@@ -329,7 +329,8 @@ define('mmogamequiz', ['mod_mmogame/mmogame'], function(mmoGame) {
                 label.style.position = "absolute";
                 label.style.width = this.labelWidth + "px";
 
-                label.innerHTML = this.repairHTML(this.answers[i], this.mapFiles, this.mapFilesWidth, this.mapFilesHeight);
+                // A label.innerHTML = this.repairHTML(this.answers[i], this.mapFiles, this.mapFilesWidth, this.mapFilesHeight);
+                label.innerHTML = this.answers[i];
 
                 label.style.font = "FontAwesome";
                 label.style.fontSize = fontSize + "px";
@@ -598,7 +599,7 @@ define('mmogamequiz', ['mod_mmogame/mmogame'], function(mmoGame) {
                     }
                 };
 
-                let url = instance.url.substr(0, instance.url.length - 8) + "state.php";
+                let url = instance.url.slice(0, -8) + "state.php";
 
                 xmlhttp.open("POST", url, true);
 
@@ -614,6 +615,10 @@ define('mmogamequiz', ['mod_mmogame/mmogame'], function(mmoGame) {
             if (this.helpUrl !== '') {
                 window.open(this.helpUrl, "_blank");
             }
+        }
+
+        getStringG(name) {
+            return M.util.get_string(name, 'mmogametype_quiz');
         }
     };
     });

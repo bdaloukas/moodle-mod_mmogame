@@ -137,9 +137,6 @@ export default class extends mmoGameQuiz {
         this.createDivColor(this.body, 0, window.innerHeight - copyrightHeight - 1, window.innerWidth - 1, copyrightHeight,
             this.getColorGray(this.colorScore2));
         this.vertical = this.areaHeight > this.areaWidth;
-
-        this.maxImageWidth = (this.vertical ? this.areaWidth : this.areaWidth / 2);
-        this.maxImageHeight = (this.vertical ? this.areaHeight / 2 : this.areaWidth);
     }
 
     updateButtonTool(btn, tool) {
@@ -696,12 +693,12 @@ export default class extends mmoGameQuiz {
             <img height="90" src="../../assets/aduel/example1.png" alt="" />
         </td><center>
 
-        <td>[LANG_ADUEL_EXAMPLE1]</td>
+        <td>` + this.getStringG( 'js_aduel_example1') + `</td>
         <td><center>
-            <img height="90" src="../../assets/aduel/example2.png" alt="" />
+            <img height="83" src="../../assets/aduel/example2.png" alt="" />
         </td>
 
-        <td>[LANG_ADUEL_EXAMPLE2]</td>
+        <td>\` + this.getStringG( 'js_aduel_example2') + \`</td>
     </tr>
 </table>        
         `;

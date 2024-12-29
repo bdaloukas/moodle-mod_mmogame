@@ -92,7 +92,7 @@ define([], function() {
             this.onAfterOpenGame();
         }
     }
-
+/* A
     createImageButton(parent, left, top, width, height, classname, filename, wrap, alt) {
         let button = document.createElement("img");
         if (alt !== undefined && alt !== '') {
@@ -100,8 +100,9 @@ define([], function() {
         }
 
         button.classList.add("mmogame_imgbutton");
-        button.tabIndex = 0;
         button.setAttribute("role", "button");
+
+        button.tabIndex = 0;
         button.style.position = "absolute";
         button.style.left = left + "px";
         button.style.top = top + "px";
@@ -121,7 +122,19 @@ define([], function() {
 
         return button;
     }
+*/
 
+        createImageButton(parent, left, top, width, height, classname, filename, wrap, alt) {
+            let button = this.createImage(parent, left, top, width, height, filename);
+
+            if (alt !== undefined && alt !== '') {
+                button.alt = alt;
+            }
+            button.classList.add("mmogame_imgbutton");
+            button.setAttribute("role", "button");
+
+            return button;
+        }
     createImage(parent, left, top, width, height, filename) {
         let button = document.createElement("img");
 
@@ -474,6 +487,7 @@ define([], function() {
 
         return this.colors;
     }
+/* A
     repairHTML(s, mapFiles, mapFilesWidth, mapFilesHeight) {
         if (s === undefined) {
             return '';
@@ -518,7 +532,7 @@ define([], function() {
 
         return s;
     }
-
+*/
     repairP(s) {
         if (s === undefined) {
             return "";
@@ -719,7 +733,8 @@ define([], function() {
         div.style.width = width + "px";
 
         div.style.fontSize = fontSize + "px";
-        div.innerHTML = this.repairHTML(this.definition, this.mapFiles, this.mapFilesWidth, this.mapFilesHeight);
+        // A div.innerHTML = this.repairHTML(this.definition, this.mapFiles, this.mapFilesWidth, this.mapFilesHeight);
+        div.innerHTML = this.definition;
         div.style.textAlign = "left";
 
         if (onlyMetrics) {
@@ -793,18 +808,13 @@ define([], function() {
         let height = window.innerHeight - this.getCopyrightHeight() - this.padding - top;
 
         if (this.divMessageBackground === undefined) {
-            let div = document.createElement("div");
-            div.style.position = "absolute";
-            div.style.left = left + "px";
-            div.style.top = top + "px";
-            div.style.width = width + "px";
-            div.style.height = height + "px";
+            let div = this.createDiv(this.divMessageBackground, left, top, width, height);
             div.style.background = this.getColorHex(this.colorDefinition);
             this.divMessageBackground = div;
-            this.body.appendChild(this.divMessageBackground);
         }
 
-        if (this.divMessage === undefined) {
+        if (this.divMessage !== undefined) {
+        } else {
             let div = document.createElement("div");
             div.style.position = "absolute";
             div.style.left = left + "px";
@@ -838,15 +848,9 @@ define([], function() {
         let height1 = height / 8;
 
         if (this.divMessageBackground === undefined) {
-            let div = document.createElement("div");
-            div.style.position = "absolute";
-            div.style.left = left + "px";
-            div.style.top = top + "px";
-            div.style.width = width + "px";
-            div.style.height = height + "px";
+            let div = this.createDiv(this.divMessageBackground, left, top, width, height);
             div.style.background = this.getColorHex(this.colorDefinition);
             this.divMessageBackground = div;
-            this.body.appendChild(this.divMessageBackground);
         }
 
         if (this.divMessage === undefined) {
@@ -1194,7 +1198,7 @@ define([], function() {
                 s = avatar;
                 let pos = s.lastIndexOf("/");
                 if (pos >= 0) {
-                    s = s.substr(pos + 1);
+                    s = s.slice(pos + 1);
                 }
                 pos = s.lastIndexOf(".");
                 if (pos >= 0) {
@@ -1511,6 +1515,7 @@ define([], function() {
         label1.style.whiteSpace = "nowrap";
         this.area.appendChild(label1);
 
+        // Button refresh color palettes
         let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
             '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",
@@ -1539,6 +1544,8 @@ define([], function() {
         label.style.width = "0 px";
         label.style.whiteSpace = "nowrap";
         this.area.appendChild(label);
+
+        // Button refresh avatars
         btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize,
             this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
         btn.addEventListener("click",

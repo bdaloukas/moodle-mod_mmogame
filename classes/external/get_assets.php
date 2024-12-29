@@ -84,7 +84,7 @@ class get_assets extends external_api {
 
         // Generate colorpalettes array if colorpalettes > 0.
         if ($colorpalettes > 0) {
-            self::compute_colorpalettes($mmogame, $avatars, $result);
+            self::compute_colorpalettes($mmogame, $colorpalettes, $result);
         }
 
         return $result;

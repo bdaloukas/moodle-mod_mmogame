@@ -38,7 +38,7 @@ define(['mmogamequiz'], function(mmoGameQuiz) {
             this.createButtonsAvatar(1, Math.round(this.padding + (i++) * (this.iconSize + this.padding)));
             this.buttonsAvatar[1].style.top = (this.padding + this.nickNameHeight) + "px";
 
-            this.divNickname = this.createDiv(this.body, this.buttonAvatarLeft, this.padding, this.iconSize, this.buttonAvatarTop);
+            this.createDiv(this.body, this.buttonAvatarLeft, this.padding, this.iconSize, this.buttonAvatarTop);
 
             this.createDivScorePercent(this.padding + (i++) * (this.iconSize + this.padding),
                 this.padding + this.nickNameHeight, 1);
@@ -47,7 +47,7 @@ define(['mmogamequiz'], function(mmoGameQuiz) {
             let instance = this;
             if (this.hasHelp()) {
                 this.createButtonHelp(this.padding + (i++) * (this.iconSize + this.padding), this.padding);
-                this.buttonHelp.addEventListener("click", function () {
+                this.buttonHelp.addEventListener("click", function() {
                     instance.onClickHelp(instance.buttonHelp);
                 });
             }
@@ -62,9 +62,6 @@ define(['mmogamequiz'], function(mmoGameQuiz) {
             this.createDivColor(this.body, 0, window.innerHeight - copyrightHeight - 1, window.innerWidth - 1, copyrightHeight,
                 this.getColorGray(this.colorCopyright));
             this.vertical = this.areaHeight > this.areaWidth;
-
-            this.maxImageWidth = (this.vertical ? this.areaWidth : this.areaWidth / 2);
-            this.maxImageHeight = (this.vertical ? this.areaHeight / 2 : this.areaWidth);
         }
 
         updatePercent(json) {
@@ -88,8 +85,8 @@ define(['mmogamequiz'], function(mmoGameQuiz) {
         onServerFastJson(response) {
             let pos = response.indexOf("-");
             if (pos >= 0) {
-                let state = parseInt(response.substr(0, pos));
-                let timefastjson = parseInt(response.substr(pos + 1));
+                let state = parseInt(response.slice(0, pos));
+                let timefastjson = parseInt(response.slice(pos + 1));
                 if (timefastjson !== this.timefastjson || state !== this.state) {
                     this.sendGetAttempt();
                     return;
@@ -149,8 +146,8 @@ define(['mmogamequiz'], function(mmoGameQuiz) {
 
 <table border=1>
     <tr>
-        <td><img height="90" src="../../assets/aduel/example2.png" alt="" /></td>
-        <td>[LANG_ADUEL_EXAMPLE2]</td>
+        <td><img height="83" src="../../assets/aduel/example2.png" alt="" /></td>
+        <td>` + this.getStringG('js_aduel_example2') + `</td>
     </tr>
 </table>
         `;
