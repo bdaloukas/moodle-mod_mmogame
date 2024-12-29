@@ -133,7 +133,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $questionid = $generator->create_multichoice_question($categoryid, '1', '1',
             ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN']);
         $recs = $DB->get_records('question_answers', ['question' => $questionid], 'fraction DESC', '*', 0, 1);
-        $this->assertEquals( count($recs), 1);
+        $this->assertTrue( count($recs) == 1);
         $answerid = reset( $recs)->id;
 
         $rgame = $this->getDataGenerator()->create_module('mmogame',
@@ -177,5 +177,62 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $data->reset_mmogame_all = 1;
         $data->reset_mmogame_deleted_course = 1;
         mmogametype_quiz_reset_userdata( $data, $mmogame->get_id());
+    }
+
+    /**
+     * Test the get_services web service.
+     */
+    public function test_service_get_attempt() {
+        global $DB, $USER;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $this->assertFalse($DB->record_exists('mmogame', ['course' => $course->id]));
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_mmogame');
+
+        $new = new stdClass();
+        $new->name = 'Test category';
+        $new->context = 1;
+        $new->info = 'Info';
+        $new->stamp = rand();
+        $categoryid = $DB->insert_record( 'question_categories', $new);
+        $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR']);
+
+        // Alone.
+        // Game without categoryid.
+        $rgame = $this->getDataGenerator()->create_module('mmogame',
+            ['course' => $course, 'qbank' => 'moodlequestion', 'pin' => rand(),
+                'numgame' => 1, 'type' => 'quiz', 'model' => 'alone', 'typemodel' => 'quiz,alone',
+                'kinduser' => 'guid', 'enabled' => 1]);
+        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
+        $mmogame->update_state( 1);
+        $class = new mmogametype_quiz\external\get_attempt();
+        $result = $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1);
+        $this->assertTrue($result['attempt'] == 0);
+
+        // Game with categoryid.
+        $rgame = $this->getDataGenerator()->create_module('mmogame',
+            ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
+                'numgame' => 1, 'type' => 'quiz', 'model' => 'alone', 'typemodel' => 'quiz,alone',
+                'kinduser' => 'guid', 'enabled' => 1]);
+        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
+        $mmogame->update_state( 1);
+        $class = new mmogametype_quiz\external\get_attempt();
+        $result = $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1);
+        $this->assertTrue($result['attempt'] != 0);
+
+        // Aduel.
+        $rgame = $this->getDataGenerator()->create_module('mmogame',
+            ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
+                'numgame' => 1, 'type' => 'quiz', 'model' => 'aduel', 'typemodel' => 'quiz,aduel',
+                'kinduser' => 'guid', 'enabled' => 1]);
+        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
+        $mmogame->update_state( 1);
+        $class = new mmogametype_quiz\external\get_attempt();
+        $result = $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1);
+        $this->assertTrue($result['attempt'] != 0);
     }
 }

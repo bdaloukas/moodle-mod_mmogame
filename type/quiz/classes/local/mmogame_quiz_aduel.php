@@ -264,8 +264,8 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
      * @param object $data
      * @return bool|object
      */
-    public function append_json(array &$ret, $attempt, object $data): bool {
-        $query = parent::append_json( $ret, $attempt, $data);
+    public function append_json(array &$ret, $attempt, string $subcommand = ''): bool {
+        $query = parent::append_json( $ret, $attempt);
 
         $auserid = $this->get_auserid();
 
@@ -273,34 +273,32 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
             return false;
         }
 
-        if (isset( $data->subcommand)) {
-            if ($data->subcommand === 'tool1') {
-                if ($this->auserid == $this->aduel->auserid1) {
-                    if ($this->aduel->tool1numattempt1 == 0 || $this->aduel->tool1numattempt1 == $attempt->numattempt) {
-                        $this->aduel->tool1numattempt1 = $attempt->numattempt;
-                        $this->db->update_record( 'mmogame_am_aduel_pairs',
+        if ($subcommand === 'tool1') {
+            if ($this->auserid == $this->aduel->auserid1) {
+                if ($this->aduel->tool1numattempt1 == 0 || $this->aduel->tool1numattempt1 == $attempt->numattempt) {
+                    $this->aduel->tool1numattempt1 = $attempt->numattempt;
+                    $this->db->update_record( 'mmogame_am_aduel_pairs',
                         ['id' => $this->aduel->id, 'tool1numattempt1' => $attempt->numattempt]);
-                    }
-                } else if ($this->auserid == $this->aduel->auserid2) {
-                    if ($this->aduel->tool1numattempt2 == 0 || $this->aduel->tool1numattempt2 == $attempt->numattempt) {
-                        $this->aduel->tool1numattempt2 = $attempt->numattempt;
-                        $this->db->update_record( 'mmogame_am_aduel_pairs',
-                        ['id' => $this->aduel->id, 'tool1numattempt2' => $attempt->numattempt]);
-                    }
                 }
-            } else if ($data->subcommand == 'tool3' && $this->iswizard( $attempt->id)) {
-                if ($this->auserid == $this->aduel->auserid1) {
-                    if ($this->aduel->tool3numattempt1 == 0 || $this->aduel->tool3numattempt1 == $attempt->numattempt) {
-                        $this->aduel->tool3numattempt1 = $attempt->numattempt;
-                        $this->db->update_record( 'mmogame_am_aduel_pairs',
+            } else if ($this->auserid == $this->aduel->auserid2) {
+                if ($this->aduel->tool1numattempt2 == 0 || $this->aduel->tool1numattempt2 == $attempt->numattempt) {
+                    $this->aduel->tool1numattempt2 = $attempt->numattempt;
+                    $this->db->update_record( 'mmogame_am_aduel_pairs',
+                        ['id' => $this->aduel->id, 'tool1numattempt2' => $attempt->numattempt]);
+                }
+            }
+        } else if ($subcommand == 'tool3' && $this->iswizard( $attempt->id)) {
+            if ($this->auserid == $this->aduel->auserid1) {
+                if ($this->aduel->tool3numattempt1 == 0 || $this->aduel->tool3numattempt1 == $attempt->numattempt) {
+                    $this->aduel->tool3numattempt1 = $attempt->numattempt;
+                    $this->db->update_record( 'mmogame_am_aduel_pairs',
                         ['id' => $this->aduel->id, 'tool3numattempt1' => $attempt->numattempt]);
-                    }
-                } else if ($this->auserid == $this->aduel->auserid2) {
-                    if ($this->aduel->tool3numattempt2 == 0 || $this->aduel->tool3numattempt2 == $attempt->numattempt) {
-                        $this->aduel->tool3numattempt2 = $attempt->numattempt;
-                        $this->db->update_record( 'mmogame_am_aduel_pairs',
+                }
+            } else if ($this->auserid == $this->aduel->auserid2) {
+                if ($this->aduel->tool3numattempt2 == 0 || $this->aduel->tool3numattempt2 == $attempt->numattempt) {
+                    $this->aduel->tool3numattempt2 = $attempt->numattempt;
+                    $this->db->update_record( 'mmogame_am_aduel_pairs',
                         ['id' => $this->aduel->id, 'tool3numattempt2' => $attempt->numattempt]);
-                    }
                 }
             }
         }
@@ -414,7 +412,7 @@ class mmogame_quiz_aduel extends mmogame_quiz_alone {
         // Get the ids of all the queries.
         $ids = $this->qbank->get_queries_ids();
 
-        if ($ids === false) {
+        if ($ids === false || count( $ids) == 0) {
             return false;
         }
 

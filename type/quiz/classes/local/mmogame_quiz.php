@@ -105,27 +105,23 @@ class mmogame_quiz extends mmogame {
      *
      * @param array $ret (returns info about the current attempt)
      * @param bool|object $attempt
-     * @param object $data
+     * @param string $subcommand
      * @return false|object (the query of attempt)
      *
      */
-    public function append_json(array &$ret, $attempt, object $data) {
+    public function append_json(array &$ret, $attempt, string $subcommand = '') {
         $auserid = $this->get_auserid();
 
         $info = $this->get_avatar_info( $auserid);
-        $ret['auserid'] = $info->auserid;
         $ret['avatar'] = $info->avatar;
         $ret['nickname'] = $info->nickname;
         $ret['colors'] = implode( ',', $info->colors);
-        $ret['usercode'] = $info->usercode;
-
         $ret['fastjson'] = $this->rgame->fastjson;
         $ret['name'] = $this->rgame->name;
         $ret['state'] = $this->rstate->state;
         $ret['rank'] = $this->get_rank( $auserid, 'sumscore');
         $ret['sumscore'] = $info->sumscore;
         $ret['timefastjson'] = $this->rgame->timefastjson;
-
         $ret['percentcompleted'] = $info->percentcompleted;
         $ret['completedrank'] = $this->get_rank( $auserid, 'percentcompleted');
 

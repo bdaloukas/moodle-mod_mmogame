@@ -813,8 +813,7 @@ define([], function() {
             this.divMessageBackground = div;
         }
 
-        if (this.divMessage !== undefined) {
-        } else {
+        if (this.divMessage === undefined) {
             let div = document.createElement("div");
             div.style.position = "absolute";
             div.style.left = left + "px";
