@@ -30,10 +30,9 @@ define('mmogamequiz', ['mod_mmogame/mmogame'], function(mmoGame) {
          * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
          */
 
-        constructor(mmogameid, pin, kinduser, user) {
+        constructor() {
             super();
             this.hideSubmit = false;
-            this.gateOpen( mmogameid, pin, kinduser, user);
         }
 
         setColors(colors, nameLoad) {

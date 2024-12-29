@@ -15,8 +15,7 @@
 
 define(['mmogamequiz'], function(mmoGameQuiz) {
     return class mmoGameQuizAlone extends mmoGameQuiz {
-        constructor(mmogameid, pin, kinduser, user) {
-            //super( mmogameid, pin, kinduser, user);
+        constructor() {
             super();
             this.cIcons = this.hasHelp() ? 5 : 4;
             this.autosave = true;

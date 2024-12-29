@@ -37,6 +37,9 @@ $PAGE->set_context(context_system::instance());
 $mmogameid = required_param('id', PARAM_INT);
 $pin = required_param('pin', PARAM_INT);
 
+$color = $DB->get_record_select( 'mmogame_aa_colorpalettes', 'id=?', [2]);
+$colors = '['.$color->color1.', '.$color->color2.', '.$color->color3.', '.$color->color4.', '.$color->color5.']';
+
 $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid, $pin]);
 if ($rgame === false) {
     $data = new stdClass();
@@ -51,14 +54,21 @@ if ($rgame->kinduser == 'moodle' ) {
 }
 $PAGE->requires->js('/mod/mmogame/type/quiz/amd/src/mmogamequiz.js');
 
+$PAGE->requires->strings_for_js(
+    ['js_avatars', 'js_code', 'js_help', 'js_name', 'js_palette', 'js_grade',
+        'js_grade_last_question', 'js_grade_opponent', 'js_opponent', 'js_palette', 'js_percent',
+        'js_question_time',
+        'js_ranking_grade', 'js_ranking_percent', 'js_sound'],
+    'mmogame');
+
 $PAGE->requires->js_init_code("
     require(['mmogametype_quiz/mmogamequiz'], function(mmoGameQuiz) {
-        var obj = new mmoGameQuiz($rgame->id,$rgame->pin, '$rgame->kinduser', '$USER->id');
+        var obj = new mmoGameQuiz()
+        obj.repairColors( $colors)
+        obj.gateOpen( $rgame->id,$rgame->pin, '$rgame->kinduser', '$USER->id');
         console.log(obj); // Μπορείς να κάνεις οποιαδήποτε ενέργεια με το αντικείμενο εδώ
     });
 ");
-
-$PAGE->requires->strings_for_js( ['js_name', 'js_question_time', 'js_sound', 'js_help'], 'mmogame');
 
 // Output the page.
 echo $OUTPUT->header();

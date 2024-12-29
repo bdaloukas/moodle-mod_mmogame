@@ -12,8 +12,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-define([''], function() {
+define([], function() {
     return class mmoGame {
     kindSound = 0;
     state = 0;
@@ -555,7 +554,7 @@ define([''], function() {
         if (num === 1) {
             button.style.background = this.getColorHex(this.colorScore);
             button.style.color = this.getColorContrast(this.colorScore);
-            button.title = this.getStringM('grade');
+            button.title = this.getStringM('js_grade');
         } else {
             button.style.background = this.getColorHex(this.colorScore2);
             button.style.color = this.getColorContrast(this.colorScore2);
@@ -572,17 +571,17 @@ define([''], function() {
         div.style.color = this.getColorContrast(this.colorScore);
         if (num === 1) {
             this.labelScore = div;
-            div.title = '[LANGM_GRADE]';
+            div.title = this.getStringM('js_grade');
         } else {
             this.labelScore2 = div;
-            div.title = "[LANGM_GRADE_OPONENT]";
+            div.title = this.getStringM('js_grade_opponent');
         }
 
         let h = this.iconSize / 3;
         div = this.createDiv(this.body, left, top, this.iconSize / 2, h);
         div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
-        div.title = '[LANGM_RANKING_GRADE]';
+        div.title = this.getStringM('js_ranking_grade');
         if (num === 1) {
             this.labelScoreRank = div;
         } else {
@@ -592,7 +591,7 @@ define([''], function() {
         div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2, h);
         div.style.textAlign = "center";
         div.style.color = this.getColorContrast(this.colorScore);
-        div.title = '[LANGM_GRADE_LAST_QUESTION]';
+        div.title = this.getStringM('js_grade_last_question');
         button.disabled = true;
         if (num === 1) {
             this.labelAddScore = div;
@@ -608,7 +607,7 @@ define([''], function() {
         div.style.fontSize = h + "px";
         div.style.lineHeight = h + "px";
         div.style.color = label.style.color;
-        div.title = '[LANGM_RANKING_PERCENT].';
+        div.title = this.getStringM('js_ranking_percent');
         if (num === 1) {
             this.labelScoreRankB = div;
         }
@@ -622,7 +621,7 @@ define([''], function() {
         div.style.fontSize = label.style.fontSize;
         div.style.fontWeight = 'bold';
         div.style.color = label.style.color;
-        div.title = '[LANGM_PERCENT]';
+        div.title = this.getStringM('js_percent');
         this.autoResizeText(div, this.iconSize / 2, this.iconSize / 2, false);
         if (num === 1) {
             this.labelScoreB = div;
@@ -648,19 +647,19 @@ define([''], function() {
         div.innerHTML = '23:59';
         this.autoResizeText(div, sizeIcon, sizeIcon, false, 0, 0, 1);
         div.innerHTML = '';
-        div.title = this.getStringM('question_time');
+        div.title = this.getStringM('js_question_time');
     }
 
     createButtonSound(left, top) {
         this.buttonSound = this.createImageButton(this.body, left, top, this.iconSize, this.iconSize, "mmogame_button_red",
             this.getMuteFile());
-        this.buttonSound.alt = this.getStringM('sound');
+        this.buttonSound.alt = this.getStringM('js_sound');
         let instance = this;
         this.buttonSound.addEventListener("click", function() {
             instance.onClickSound(instance.buttonSound);
         });
 
-        this.buttonSound.title = this.getStringM('sound');
+        this.buttonSound.title = this.getStringM('js_sound');
     }
 
     onClickSound(btn) {
@@ -672,7 +671,7 @@ define([''], function() {
 
     createButtonHelp(left, top) {
         this.buttonHelp = this.createImageButton(this.body, left, top, this.iconSize, this.iconSize, "", 'assets/help.svg');
-        this.buttonHelp.alt = this.getStringM('help');
+        this.buttonHelp.alt = this.getStringM('js_help');
     }
 
     readJsonFiles(json) {
@@ -1155,7 +1154,7 @@ define([''], function() {
         }
         this.buttonsAvatar[num] = this.createImageButton(this.body, left, this.avatarTop, this.iconSize, this.iconSize, "", "");
         if (num === 2 && this.avatarTop !== undefined) {
-            this.buttonsAvatar[num].title = this.getStringM('opponent');
+            this.buttonsAvatar[num].title = this.getStringM('js_opponent');
         }
 
         if (this.divNicknames === undefined) {
@@ -1227,7 +1226,7 @@ define([''], function() {
     }
 
     // Gate
-    gateOpen(mmogameid, pin, auserid, kinduser) {
+    gateOpen(mmogameid, pin, kinduser, auserid) {
         this.minFontSize *= 2;
         this.maxFontSize *= 2;
 
@@ -1328,8 +1327,9 @@ define([''], function() {
         let instance = this;
         let size;
 
+        const labels = [this.getStringM('js_name') + ": ", this.getStringM('js_code'), this.getStringM('js_palette')];
         this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, function(fontSize) {
-            size = instance.gateComputeLabelSize(fontSize, ['[LANGM_CODE]: ', '[LANGM_NAME]: ', '[LANGM_PALETTE]']);
+            size = instance.gateComputeLabelSize(fontSize, labels);
 
             if (size[0] >= maxWidth) {
                 return 1;
@@ -1366,8 +1366,9 @@ define([''], function() {
         } else {
             bottom = 0;
         }
+
         bottom = this.gateCreateLabelEditVertical(0, bottom, newWidth - 2 * this.padding, this.fontSize, size[0],
-            this.getStringM('name') + ": ") + 2 * this.padding;
+            this.getStringM('js_name') + ": ") + 2 * this.padding;
         this.edtNickname = this.edt;
         this.edtNickname.addEventListener("keyup", function() {
             instance.gateUpdateSubmit();
@@ -1375,7 +1376,7 @@ define([''], function() {
 
         let label1 = document.createElement("label");
         label1.style.position = "absolute";
-        label1.innerHTML = "[LANGM_PALETTE]";
+        label1.innerHTML = this.getStringM('js_palette');
         label1.style.font = "FontAwesome";
         label1.style.fontSize = this.fontSize + "px";
         label1.style.width = "0px";
@@ -1404,7 +1405,7 @@ define([''], function() {
 
         let label = document.createElement("label");
         label.style.position = "absolute";
-        label.innerHTML = "[LANGM_AVATARS]";
+        label.innerHTML = this.getStringM('js_avatars');
         label.style.font = "FontAwesome";
         label.style.fontSize = this.fontSize + "px";
         label.style.width = "0 px";
@@ -1451,8 +1452,11 @@ define([''], function() {
         let instance = this;
         let size;
 
+        const sName = this.getStringM('js_name') + ": ";
+        let labels = [this.getStringM('js_code'), sName, this.getStringM('js_palette')];
+
         this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, function(fontSize) {
-            size = instance.gateComputeLabelSize(fontSize, ['[LANGM_CODE]: ', '[LANGM_NAME]: ', '[LANGM_PALETTE]']);
+            size = instance.gateComputeLabelSize(fontSize, labels);
 
             if (size[0] >= maxWidth) {
                 return 1;
@@ -1489,8 +1493,9 @@ define([''], function() {
         } else {
             bottom = 0;
         }
-        let sizeLabel = this.gateComputeLabelSize(this.fontSize, ['[LANGM_NAME]: ']);
-        bottom = this.gateCreateLabelEdit(0, bottom, newWidth - 2 * this.padding, this.fontSize, sizeLabel[0], "[LANGM_NAME]: ");
+        let sizeLabel = this.gateComputeLabelSize(this.fontSize, [sName]);
+        bottom = this.gateCreateLabelEdit(0, bottom, newWidth - 2 * this.padding,
+            this.fontSize, sizeLabel[0], this.getStringM('js_name') + ": ");
 
         this.edtNickname = this.edt;
         this.edtNickname.addEventListener("keyup", function() {
@@ -1499,7 +1504,7 @@ define([''], function() {
 
         let label1 = document.createElement("label");
         label1.style.position = "absolute";
-        label1.innerHTML = "[LANGM_PALETTE]";
+        label1.innerHTML = this.getStringM('js_palette');
         label1.style.font = "FontAwesome";
         label1.style.fontSize = this.fontSize + "px";
         label1.style.width = "0px";
@@ -1528,7 +1533,7 @@ define([''], function() {
 
         let label = document.createElement("label");
         label.style.position = "absolute";
-        label.innerHTML = "[LANGM_AVATARS]";
+        label.innerHTML = this.getStringM('js_avatars');
         label.style.font = "FontAwesome";
         label.style.fontSize = this.fontSize + "px";
         label.style.width = "0 px";
@@ -1676,27 +1681,37 @@ define([''], function() {
     }
 
     gateCreateCode(left, top, width, fontSize, labelWidth) {
-        return this.gateCreateLabelEdit(left, top, width, fontSize, labelWidth, "[LANGM_CODE]: ");
+        return this.gateCreateLabelEdit(left, top, width, fontSize, labelWidth, this.getStringM('js_code'));
     }
 
-    gateShowAvatars(json, left, top, width, height, countX) {
-        this.avatar = undefined;
-        let leftOriginal = left;
-        let instance = this;
-        let w = Math.round(this.padding / 2) + "px";
-        for (let i = 0; i < json.countavatars; i++) {
-            let btn = this.createCenterImageButton(this.area, left, top, this.iconSize - this.padding,
-                this.iconSize - this.padding, "", 'assets/avatars/' + json['avatar' + (i + 1)]);
-            btn.classList.add("mmogame_avatar");
-            let id = json['avatarid' + (i + 1)];
-            btn.addEventListener("click",
-                function() {
-                    instance.gateUpdateAvatar(btn, id, w);
-                }
-            );
+    gateShowAvatars(response, left, top, width, height, countX) {
+        if (!response.avatars || response.avatars.length === 0) {
+            return; // Exit early if no avatars exist
+        }
 
+        this.avatar = undefined;
+        const count = response.avatars.length;
+        let leftOriginal = left;
+        let w = Math.round(this.padding / 2) + "px";
+        for (let i = 0; i < count; i++) {
+            let avatarImagePath = 'assets/avatars/' + response.avatars[i];
+            let btn = this.createCenterImageButton(
+                this.area,
+                left, top,
+                this.iconSize - this.padding, this.iconSize - this.padding,
+                "",
+                avatarImagePath
+            );
+            btn.classList.add("mmogame_avatar");
+            let id = response.avatarids[i];
+            btn.addEventListener("click", () => {
+                this.gateUpdateAvatar(btn, id, w);
+            });
+
+            // Move left position after placing the button
             left += this.iconSize;
 
+            // Reset left and move to the next row after filling countX buttons
             if ((i + 1) % countX === 0) {
                 top += this.iconSize;
                 left = leftOriginal;
@@ -1739,45 +1754,58 @@ define([''], function() {
 
             // Handling the response
             getAssets[0].done(function(response) {
-                 return JSON.parse(response);
+                if (updateColors) {
+                    instance.gateShowColorPalettes(response, leftColors, topColors, gridWidthColors, gridHeightColors,
+                        countXcolors, countYcolors);
+                }
+                if (updateAvatars) {
+                    instance.gateShowAvatars(response, leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars);
+                }
             }).fail(function(error) {
                 return error;
             });
         });
     }
 
-    gateShowColorPalettes(json, left, top, width, height, countX, countY) {
-        let instance = this;
-        let i = 0;
+    gateShowColorPalettes(response, left, top, width, height, countX, countY) {
+        let i = 0; // Counter for color palettes
+        const count = response.colorpalettes.length;
         this.canvasColor = undefined;
+        const canvasSize = this.iconSize - this.padding * 3 / 2;
+        const parsedPalettes = response.colorpalettes.map(palette =>
+            palette.split(",").map(value => parseInt(value, 10) || 0)
+        );
         for (let iy = 0; iy < countY; iy++) {
             for (let ix = 0; ix < countX; ix++) {
-                i++;
-                if (i > json.count) {
-                    break;
+                // Check if we exceed available palettes or encounter invalid data
+                if (i >= count || !parsedPalettes[i] || !response.colorpaletteids[i]) {
+                    i++; // Increment and continue if invalid
+                    continue;
                 }
-                let a = json["palette" + i];
-                if (a === undefined) {
-                    break;
-                }
+
+                // Create a new canvas element
                 let canvas = document.createElement('canvas');
                 canvas.style.position = "absolute";
-                canvas.style.left = (left + (ix % countX) * this.iconSize) + "px";
-                canvas.style.top = (top + iy * this.iconSize) + "px";
-                canvas.width = this.iconSize - this.padding * 3 / 2;
-                canvas.height = this.iconSize - this.padding * 3 / 2;
+                canvas.style.left = `${left + ix * this.iconSize}px`;
+                canvas.style.top = `${top + iy * this.iconSize}px`;
+                canvas.width = canvasSize;
+                canvas.height = canvasSize;
                 canvas.style.cursor = 'pointer';
                 canvas.classList.add("mmogame_color");
-                this.area.appendChild(canvas);
-                for (let j = 0; j < a.length; j++) {
-                    a[j] = parseInt(a[j]);
-                }
-                this.showColorPalette(canvas, a);
-                let id = json['paletteid' + i];
 
-                canvas.addEventListener("click", function() {
-                    instance.gateUpdateColorPalete(canvas, id);
+                // Append canvas to the area
+                this.area.appendChild(canvas);
+
+                // Render the color palette on the canvas
+                this.showColorPalette(canvas, parsedPalettes[i]);
+
+                // Get the palette ID and attach a click event listener
+                let id = response.colorpaletteids[i];
+                canvas.addEventListener("click", ()=> {
+                    this.gateUpdateColorPalete(canvas, id);
                 });
+
+                i++;
             }
         }
         this.area.classList.add("palete");
@@ -1829,7 +1857,7 @@ define([''], function() {
         this.padding = Math.round(0.8 * this.padding);
     }
     getStringM(name) {
-            return M.util.get_string(name, 'mmogame');
+        return M.util.get_string(name, 'mmogame');
         }
     };
 });
