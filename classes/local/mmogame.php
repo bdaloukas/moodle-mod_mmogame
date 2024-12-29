@@ -286,11 +286,11 @@ class mmogame {
             return false;
         }
 
-        $classname = 'mmogametype_' . $rgame->type.'\local\mmogame_' . $rgame->type.'_'.$rgame->model;
+        $classname = 'mmogametype_' . $rgame->type.'\local\mmogametype_' . $rgame->type.'_'.$rgame->model;
         if (!class_exists($classname)) {
             throw new coding_exception("Class $classname does not exist for type: $rgame->type");
         }
-        return $classname::get_new($db, $rgame);
+        return new $classname($db, $rgame);
     }
 
     /**
