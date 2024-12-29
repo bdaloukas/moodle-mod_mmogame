@@ -17,7 +17,7 @@
 /**
  * mmogame generator tests
  *
- * @package    mmogame
+ * @package    mod_mmogame
  * @category   test
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -54,7 +54,7 @@ class mmogame_generator_testcase extends advanced_testcase {
             ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
                 'numgame' => 1, 'type' => 'quiz', 'model' => 'aduel', 'typemodel' => 'quiz,aduel',
                 'kinduser' => 'guid', 'enabled' => 1]);
-//print_r( $rgame);
+
         // Test 1: Call without optional parameter avatars, colorpalettes.
         $class = new \mod_mmogame\external\get_assets();
         $result = $class->execute($rgame->id, 'moodle', $USER->id);

@@ -24,6 +24,7 @@
 
 namespace mod_mmogame\local;
 
+use coding_exception;
 use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\qbank\mmogame_qbank;
 
@@ -277,7 +278,7 @@ class mmogame {
      * @param mmogame_database $db
      * @param int $id
      * @return false|mmogame
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function create(mmogame_database $db, int $id) {
         $rgame = $db->get_record_select('mmogame', "id=?", [$id]);
@@ -287,7 +288,7 @@ class mmogame {
 
         $classname = 'mmogametype_' . $rgame->type.'\local\mmogame_' . $rgame->type.'_'.$rgame->model;
         if (!class_exists($classname)) {
-            throw new \coding_exception("Class $classname does not exist for type: $rgame->type");
+            throw new coding_exception("Class $classname does not exist for type: $rgame->type");
         }
         return $classname::get_new($db, $rgame);
     }
@@ -699,14 +700,5 @@ class mmogame {
         $class::delete_auser( $db, $rgame, $auserid);
 
         $db->delete_records_select( 'mmogame_aa_users', 'id=?', [$auserid]);
-    }
-
-    /**
-     * Tries to find an attempt of open games, otherwise creates a new attempt.
-     *
-     * @return false|object (a new attempt of false if no attempt)
-     */
-    public function get_attempt() {
-        return false;
     }
 }

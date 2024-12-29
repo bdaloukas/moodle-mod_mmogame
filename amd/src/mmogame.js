@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-//import * as Str from '/core/str';
-
 define([''], function() {
     return class mmoGame {
     kindSound = 0;
@@ -1228,7 +1226,6 @@ define([''], function() {
         this.minFontSize *= 2;
         this.maxFontSize *= 2;
 
-        //this.url = url;
         this.mmogameid = mmogameid;
         this.pin = pin;
         this.auserid = auserid;
@@ -1717,7 +1714,7 @@ define([''], function() {
         if (!updateAvatars) {
             countXavatars = countYavatars = 0;
         }
-        alert("service");
+
         let instance = this;
         require(['core/ajax'], function(Ajax) {
             // Defining the parameters to be passed to the service
@@ -1737,9 +1734,7 @@ define([''], function() {
 
             // Handling the response
             getAssets[0].done(function(response) {
-
                  return JSON.parse(response);
-                 //console.log(response);
             }).fail(function(error) {
                 return error;
             });
@@ -1831,7 +1826,6 @@ define([''], function() {
     }
 
         getStringM( name) {
-            //return Str( name, 'mmogame');
             return M.util.get_string(name, 'mmogame');
         }
     };

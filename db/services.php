@@ -40,6 +40,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $functions = [
     'mod_mmogame_get_assets' => [
         'classname'     => 'mod_mmogame\external\get_assets',
