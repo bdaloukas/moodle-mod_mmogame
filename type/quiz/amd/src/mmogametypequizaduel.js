@@ -14,8 +14,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 define(['mmogametype_quiz/mmogametypequiz'],
-    function(mmoGameTypeQuiz) {
-        return class mmoGameTypeQuizAduel extends mmoGameTypeQuiz {
+    function(MmoGameTypeQuiz) {
+        return class MmoGameTypeQuizAduel extends MmoGameTypeQuiz {
     constructor() {
         super();
         this.cIcons = 8;

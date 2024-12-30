@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 define([''], function() {
-    return class mmoGame {
+    return class MmoGame {
     kindSound = 0;
     state = 0;
     body;

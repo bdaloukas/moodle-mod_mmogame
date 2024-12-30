@@ -60,11 +60,12 @@ $PAGE->requires->strings_for_js(
         'js_ranking_grade', 'js_ranking_percent', 'js_sound'],
     'mmogame');
 
-$PAGE->requires->js_call_amd('mmogametype_quiz/mmogametypequizalone');
+$classname = "MmoGameType".ucfirst( $rgame->type).ucfirst( $rgame->model);
+$PAGE->requires->js_call_amd('mmogametype_'.$rgame->type.'/'.strtolower( $classname));
 $PAGE->requires->js_init_code("
-    require(['mmogametype_quiz/mmogametypequizalone'], function(mmoGameTypeQuizAlone) {
-        var obj = new mmoGameTypeQuizAlone()
-        obj.repairColors( $colors)
+    require(['mmogametype_" . $rgame->type."/" . strtolower( $classname)."'], function(".$classname.") {
+        var obj = new ".$classname."();
+        obj.repairColors( $colors);
         obj.gateOpen( $rgame->id,$rgame->pin, '$rgame->kinduser', '$USER->id');
         console.log(obj); // Μπορείς να κάνεις οποιαδήποτε ενέργεια με το αντικείμενο εδώ
     });
