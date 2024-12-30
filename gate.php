@@ -60,19 +60,6 @@ $PAGE->requires->strings_for_js(
         'js_ranking_grade', 'js_ranking_percent', 'js_sound'],
     'mmogame');
 
-/*
-$PAGE->requires->js_call_amd('mmogametype_quiz/mmogametypequiz');
-$PAGE->requires->js_init_code("
-    require(['mmogametype_quiz/mmogametypequiz'], function(mmoGameTypeQuiz) {
-        var obj = new mmoGameTypeQuiz()
-        obj.repairColors( $colors)
-        obj.gateOpen( $rgame->id,$rgame->pin, '$rgame->kinduser', '$USER->id');
-        console.log(obj); // Μπορείς να κάνεις οποιαδήποτε ενέργεια με το αντικείμενο εδώ
-    });
-");
-*/
-
-
 $PAGE->requires->js_call_amd('mmogametype_quiz/mmogametypequizalone');
 $PAGE->requires->js_init_code("
     require(['mmogametype_quiz/mmogametypequizalone'], function(mmoGameTypeQuizAlone) {
@@ -82,9 +69,6 @@ $PAGE->requires->js_init_code("
         console.log(obj); // Μπορείς να κάνεις οποιαδήποτε ενέργεια με το αντικείμενο εδώ
     });
 ");
-
-
-
 
 // Output the page.
 echo $OUTPUT->header();

@@ -223,7 +223,6 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $class = new mmogametype_quiz\external\get_attempt();
         $result = $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1);
         $this->assertTrue($result['attempt'] != 0);
-        print_r( $result);
 
         // Aduel.
         $rgame = $this->getDataGenerator()->create_module('mmogame',
@@ -235,6 +234,5 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $class = new mmogametype_quiz\external\get_attempt();
         $result = $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1);
         $this->assertTrue($result['attempt'] != 0);
-        print_r( $result);
     }
 }

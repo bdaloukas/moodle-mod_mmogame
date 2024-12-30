@@ -101,15 +101,15 @@ class get_attempt extends external_api {
 
         $mmogame->append_json( $ret, $attempt);
 
-        $formattedRet = [];
+        $formattedret = [];
         foreach ($ret as $key => $value) {
-            $formattedRet[] = [
+            $formattedret[] = [
                 'key' => $key,
                 'value' => $value,
             ];
         }
 
-        return ['ret' => $formattedRet];
+        return ['ret' => $formattedret];
     }
 
     /**
@@ -119,14 +119,13 @@ class get_attempt extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            // Το κλειδί είναι string και η τιμή είναι integer.
             'ret' => new external_multiple_structure(
                 new external_single_structure([
                     'key' => new external_value(PARAM_TEXT, 'The key of the entry'),
                     'value' => new external_value(PARAM_RAW, 'The value of the entry'),
                 ]),
                 'The list of key-value pairs'
-            )
+            ),
         ]);
     }
 }
