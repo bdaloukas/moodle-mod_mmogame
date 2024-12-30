@@ -666,15 +666,6 @@ define([''], function() {
         this.buttonHelp.alt = this.getStringM('js_help');
     }
 
-    readJsonFiles(json) {
-        this.mapFiles = new Map();
-        this.mapFilesWidth = new Map();
-        this.mapFilesHeight = new Map();
-        this.mapFiles.set(json.fileg1, json.filec1);
-        this.mapFilesWidth.set(json.fileg1, json.width1);
-        this.mapFilesHeight.set(json.fileg1, json.height1);
-    }
-
     findbest(low, up, fn) {
         if (low < 1) {
             low = 1;
@@ -948,52 +939,6 @@ define([''], function() {
         }
     }
 
-    createDivName(left, top, labelWidth, inpWidth, label, value) {
-        let div = this.createDiv(this.area, left, top, labelWidth, this.iconSize);
-        div.innerHTML = label + ": ";
-        div.style.whiteSpace = "nowrap";
-        div.style.textAlign = "right";
-        div.style.color = this.getColorContrast(this.colorBackground);
-        this.autoResizeText(div, labelWidth, this.areaHeight, false, this.minFontSize, this.maxFontSize, 1);
-
-        let divInp = document.createElement("input");
-        divInp.style.position = "absolute";
-        divInp.style.width = inpWidth + "px";
-        divInp.style.type = "text";
-        divInp.style.fontSize = div.style.fontSize;
-        divInp.value = value;
-        divInp.style.left = (left + labelWidth + this.padding) + "px";
-        divInp.style.top = top + "px";
-        divInp.autofocus = true;
-        divInp.style.background = this.getColorHex(this.colorBackground);
-        divInp.style.color = this.getColorContrast(this.colorBackground);
-        this.area.appendChild(divInp);
-        divInp.autofocus = true;
-        let instance = this;
-        divInp.addEventListener("keydown", function() {
-            if (event.key === "Enter") {
-                instance.sendSetAvatar(divInp.value, -1);
-            }
-        });
-
-        return divInp;
-    }
-
-    createCheckbox(parent, left, top, width, height, value) {
-        let checkbox = document.createElement('input');
-        checkbox.type = "checkbox";
-        checkbox.value = value;
-        checkbox.style.position = "absolute";
-        checkbox.style.left = left + "px";
-        checkbox.style.top = top + "px";
-        checkbox.style.width = width + "px";
-        checkbox.style.height = height + "px";
-
-        parent.appendChild(checkbox);
-
-        return checkbox;
-    }
-
     showColorPalette(canvas, colors) {
         let ctx = canvas.getContext("2d");
         let width = canvas.width;
@@ -1014,58 +959,19 @@ define([''], function() {
         ctx.strokeRect(0, 0, width, height);
     }
 
-    sendSetAvatar(nickname, avatarid) {
-        let xmlhttp = new XMLHttpRequest();
-        let instance = this;
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState === 4 && this.status === 200) {
-                let json = JSON.parse(this.responseText);
-                instance.updateButtonsAvatar(1, json.avatar);
-                instance.sendGetAttempt();
-            }
-        };
-
-        xmlhttp.open("POST", this.url, true);
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        let data = JSON.stringify({
-            "command": "setavatar", "mmogameid": this.mmogameid, "pin": this.pin,
-            'kinduser': this.kinduser, "user": this.auserid, 'avatarid': avatarid, 'nickname': nickname
-        });
-        xmlhttp.send(data);
-    }
-
-    sendSetColorPalette(colorpaletteid) {
-        let xmlhttp = new XMLHttpRequest();
-        let instance = this;
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState === 4 && this.status === 200) {
-                instance.colors = undefined;
-                instance.openGame(instance.url, instance.mmogameid, instance.pin, instance.auserid, instance.kinduser);
-            }
-        };
-
-        xmlhttp.open("POST", this.url, true);
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        let data = JSON.stringify({
-            "command": "setcolorpalette", "mmogameid": this.mmogameid, "pin": this.pin,
-            'kinduser': this.kinduser, "user": this.auserid, "id": colorpaletteid
-        });
-        xmlhttp.send(data);
-    }
-
-        setColorsString(s) {
-            let a = [0x9B7ED9, 0x79F2F2, 0x67BF5A, 0xD0F252, 0xBF5B21];
-            if (s !== undefined && s.length >= 0) {
-                let b = s.split(",");
-                if (b.length === 5) {
-                    a = b;
-                    for (let i = 0; i < 5; i++) {
-                        a[i] = parseInt(a[i]);
-                    }
+    setColorsString(s) {
+        let a = [0x9B7ED9, 0x79F2F2, 0x67BF5A, 0xD0F252, 0xBF5B21];
+        if (s !== undefined && s.length >= 0) {
+            let b = s.split(",");
+            if (b.length === 5) {
+                a = b;
+                for (let i = 0; i < 5; i++) {
+                    a[i] = parseInt(a[i]);
                 }
             }
-            this.setColors(a);
         }
+        this.setColors(a);
+    }
     computeDifClock(json) {
         if (json.time !== undefined) {
             this.difClock = ((new Date()).getTime() - json.time) / 1000;
@@ -1294,41 +1200,10 @@ define([''], function() {
                 instance.openGame();
                 instance.colors = undefined;
                 instance.onServerGetAttempt(json, '');
-                // A instance.gateOnServerGetAttempt(JSON.parse(this.responseText), auserid);
             }).fail(function(error) {
                 return error;
             });
         });
-
-        /* A
-        let xmlhttp = new XMLHttpRequest();
-        let instance = this;
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState === 4 && this.status === 200) {
-                instance.gateOnServerGetAttempt(JSON.parse(this.responseText), auserid);
-            }
-        };
-
-        xmlhttp.open("POST", this.url, true);
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        let d = {
-            "command": "getattempt", "mmogameid": this.mmogameid, "pin": this.pin, "kinduser": this.kinduser,
-            "user": auserid, "nickname": nickname, "paletteid": paletteid, "avatarid": avatarid
-        };
-        if (this.helpurl === undefined) {
-            d.helpurl = 1;
-        }
-        let data = JSON.stringify(d);
-        xmlhttp.send(data);*/
-    }
-
-    gateOnServerGetAttempt(json, auserid) {
-        if (json.errorcode !== undefined) {
-            return;
-        }
-
-        this.openGame(this.url, this.mmogameid, this.pin, auserid, this.kinduser, false);
-        this.onServerGetAttempt(json);
     }
 
     gateCreateScreen() {
@@ -1386,7 +1261,9 @@ define([''], function() {
 
         let bottom;
         if (this.kinduser !== 'guid' && this.kinduser !== 'moodle') {
-            bottom = this.gateCreateCode(0, 0, maxWidth, this.fontSize, size[0]);
+            // A bottom = this.gateCreateCode(0, 0, maxWidth, this.fontSize, size[0]);
+            bottom = this.gateCreateLabelEditVertical(0, 0, maxWidth, this.fontSize, size[0],
+                this.getStringM('js_code') + ": ") + 2 * this.padding;
             this.edtCode = this.edt;
             this.edtCode.addEventListener("keyup", function() {
                 instance.gateUpdateSubmit();
@@ -1513,7 +1390,9 @@ define([''], function() {
 
         let bottom;
         if (this.kinduser !== 'guid' && this.kinduser !== 'moodle') {
-            bottom = this.gateCreateCode(0, 0, maxWidth, this.fontSize, size[0]);
+            // B bottom = this.gateCreateCode(0, 0, maxWidth, this.fontSize, size[0]);
+            bottom = this.gateCreateLabelEditVertical(0, 0, maxWidth, this.fontSize, size[0],
+                this.getStringM('js_code')) + 2 * this.padding;
             this.edtCode = this.edt;
             this.edtCode.addEventListener("keyup", function() {
                 instance.gateUpdateSubmit();
@@ -1522,7 +1401,7 @@ define([''], function() {
             bottom = 0;
         }
         let sizeLabel = this.gateComputeLabelSize(this.fontSize, [sName]);
-        bottom = this.gateCreateLabelEdit(0, bottom, newWidth - 2 * this.padding,
+        bottom = this.gateCreateLabelEditHorizontal(0, bottom, newWidth - 2 * this.padding,
             this.fontSize, sizeLabel[0], this.getStringM('js_name') + ": ");
 
         this.edtNickname = this.edt;
@@ -1635,44 +1514,6 @@ define([''], function() {
         return [maxWidth, maxHeight];
     }
 
-    gateCreateLabelEdit(left, top, width, fontSize, labelWidth, title) {
-        let label = document.createElement("label");
-        label.style.position = "absolute";
-
-        label.innerHTML = title;
-
-        label.style.font = "FontAwesome";
-        label.style.fontSize = fontSize + "px";
-
-        this.area.appendChild(label);
-
-        label.style.position = "absolute";
-        label.style.left = left + "px";
-        label.style.top = top + "px";
-        label.style.width = labelWidth + "px";
-        label.style.align = "left";
-        label.style.color = this.getColorContrast(this.colorBackground);
-
-        let ret = top + Math.max(label.scrollHeight, fontSize) + this.padding;
-
-        let leftEdit = (left + labelWidth + this.padding);
-        const div = document.createElement("input");
-        this.divShortAnswer = div;
-        div.style.position = "absolute";
-        div.style.width = (width - leftEdit - this.padding) + "px";
-        div.style.type = "text";
-        div.style.fontSize = fontSize + "px";
-
-        div.style.left = leftEdit + "px";
-        div.style.top = top + "px";
-        div.autofocus = true;
-
-        this.area.appendChild(div);
-        this.edt = div;
-
-        return ret;
-    }
-
     gateCreateLabelEditVertical(left, top, width, fontSize, labelWidth, title) {
         const label = document.createElement("label");
         label.style.position = "absolute";
@@ -1709,10 +1550,6 @@ define([''], function() {
         this.edt = div;
 
         return top + fontSize + this.padding;
-    }
-
-    gateCreateCode(left, top, width, fontSize, labelWidth) {
-        return this.gateCreateLabelEdit(left, top, width, fontSize, labelWidth, this.getStringM('js_code'));
     }
 
     gateShowAvatars(response, left, top, width, height, countX) {
@@ -1890,5 +1727,43 @@ define([''], function() {
     getStringM(name) {
         return M.util.get_string(name, 'mmogame');
         }
+
+    gateCreateLabelEditHorizontal(left, top, width, fontSize, labelWidth, title) {
+        let label = document.createElement("label");
+        label.style.position = "absolute";
+
+        label.innerHTML = title;
+
+        label.style.font = "FontAwesome";
+        label.style.fontSize = fontSize + "px";
+
+        this.area.appendChild(label);
+
+        label.style.position = "absolute";
+        label.style.left = left + "px";
+        label.style.top = top + "px";
+        label.style.width = labelWidth + "px";
+        label.style.align = "left";
+        label.style.color = this.getColorContrast(this.colorBackground);
+
+        let ret = top + Math.max(label.scrollHeight, fontSize) + this.padding;
+
+        let leftEdit = (left + labelWidth + this.padding);
+        const div = document.createElement("input");
+        div.style.position = "absolute";
+        div.style.width = (width - leftEdit - this.padding) + "px";
+        div.style.type = "text";
+        div.style.fontSize = fontSize + "px";
+
+        div.style.left = leftEdit + "px";
+        div.style.top = top + "px";
+        div.autofocus = true;
+
+        this.area.appendChild(div);
+        this.edt = div;
+
+        return ret;
+    }
+
     };
 });

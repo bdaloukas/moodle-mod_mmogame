@@ -13,8 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import mmoGameTypeQuiz from 'mmogametypequiz';
-export default class extends mmoGameTypeQuiz {
+define(['mmogametype_quiz/mmogametypequiz'],
+    function(mmoGameTypeQuiz) {
+        return class mmoGameTypeQuizAduel extends mmoGameTypeQuiz {
     constructor() {
         super();
         this.cIcons = 8;
@@ -318,9 +319,7 @@ export default class extends mmoGameTypeQuiz {
                 this.aItemAnswer[i].classList.add("disabled");
             }
         }
-        if (this.divShortAnswer !== undefined) {
-            this.divShortAnswer.disabled = true;
-        }
+
         if (this.btnSubmit !== undefined) {
             this.body.removeChild(this.btnSubmit);
             this.btnSubmit = undefined;
@@ -693,7 +692,7 @@ export default class extends mmoGameTypeQuiz {
             <img height="90" src="../../assets/aduel/example1.png" alt="" />
         </td><center>
 
-        <td>` + this.getStringG( 'js_aduel_example1') + `</td>
+        <td>` + this.getStringG('js_aduel_example1') + `</td>
         <td><center>
             <img height="83" src="../../assets/aduel/example2.png" alt="" />
         </td>
@@ -703,4 +702,5 @@ export default class extends mmoGameTypeQuiz {
 </table>        
         `;
     }
-}
+};
+});

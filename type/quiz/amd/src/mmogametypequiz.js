@@ -120,7 +120,6 @@ define(['mod_mmogame/mmogame'], function(mmoGame) {
             this.single = json.single;
             this.errorcode = json.errorcode;
 
-            this.readJsonFiles(json);
             if (json.state !== 0) {
                 this.createScreen(json, false);
             }
