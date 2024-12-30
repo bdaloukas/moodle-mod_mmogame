@@ -1057,7 +1057,7 @@ define([''], function() {
             let a = [0x9B7ED9, 0x79F2F2, 0x67BF5A, 0xD0F252, 0xBF5B21];
             if (s !== undefined && s.length >= 0) {
                 let b = s.split(",");
-                if (b.length == 5) {
+                if (b.length === 5) {
                     a = b;
                     for (let i = 0; i < 5; i++) {
                         a[i] = parseInt(a[i]);
@@ -1122,7 +1122,6 @@ define([''], function() {
     }
 
     createButtonsAvatar(num, left, widthNickName = 0, heightNickName = 0) {
-        console.log( "createButtonsAvatar " + num + " " + left + " " + widthNickName + " " + heightNickName);
         if (widthNickName === 0) {
             widthNickName = this.iconSize;
         }
@@ -1180,7 +1179,7 @@ define([''], function() {
             this.divNicknames[num].style.visibility = 'hidden';
             return;
         }
-console.log(this);
+
         if (this.nicknames[num] !== nickname || nickname === "") {
             this.nicknames[num] = nickname;
             let s = nickname;
@@ -1260,7 +1259,6 @@ console.log(this);
     }
 
     gatePlayGame(user, nickname, paletteid, avatarid) {
-        console.log( "gatePlayGame");
         if (user === 0 && this.kinduser === 'guid') {
             user = this.getUserGUID();
         }
@@ -1289,17 +1287,15 @@ console.log(this);
 
             // Handling the response
             getAttempt[0].done(function(response) {
-                let json = {};  // Create an empty object r
+                let json = {}; // Create an empty object r
                 response.ret.forEach(function(item) {
                     json[item.key] = item.value; // Assign the value of each key-value pair to the object r
                 });
-                console.log(json);
                 instance.openGame();
                 instance.colors = undefined;
                 instance.onServerGetAttempt(json, '');
                 // A instance.gateOnServerGetAttempt(JSON.parse(this.responseText), auserid);
             }).fail(function(error) {
-                console.log(error);
                 return error;
             });
         });
