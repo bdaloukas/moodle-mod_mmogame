@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import mmoGameQuiz from 'mmogamequiz';
-export default class extends mmoGameQuiz {
+import mmoGameTypeQuiz from 'mmogametypequiz';
+export default class extends mmoGameTypeQuiz {
     constructor() {
         super();
         this.cIcons = 8;

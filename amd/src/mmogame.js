@@ -12,7 +12,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-define([], function() {
+
+define([''], function() {
     return class mmoGame {
     kindSound = 0;
     state = 0;
@@ -64,33 +65,10 @@ define([], function() {
         this.area = undefined;
     }
 
-    openGame(url, id, pin, auserid, kinduser, callOnAfterOpenGame) {
+    openGame() {
         this.removeBodyChilds();
         this.area = undefined;
-
-        this.game = [];
-
-        this.url = url;
-        this.mmogameid = id;
-        this.pin = pin;
-        this.kinduser = kinduser;
-        if (this.kinduser === undefined || this.kinduser === "") {
-            this.kinduser = "usercode";
-        }
-        this.auserid = auserid;
-        if (this.auserid === 0 && this.kinduser === 'guid') {
-            this.auserid = this.getUserGUID();
-        }
-
         this.computeSizes();
-        if (!callOnAfterOpenGame) {
-            return;
-        }
-        if (this.kinduser === undefined) {
-            this.onAfterOpenGame();
-        } else {
-            this.onAfterOpenGame();
-        }
     }
 /* A
     createImageButton(parent, left, top, width, height, classname, filename, wrap, alt) {
@@ -1075,6 +1053,19 @@ define([], function() {
         xmlhttp.send(data);
     }
 
+        setColorsString(s) {
+            let a = [0x9B7ED9, 0x79F2F2, 0x67BF5A, 0xD0F252, 0xBF5B21];
+            if (s !== undefined && s.length >= 0) {
+                let b = s.split(",");
+                if (b.length == 5) {
+                    a = b;
+                    for (let i = 0; i < 5; i++) {
+                        a[i] = parseInt(a[i]);
+                    }
+                }
+            }
+            this.setColors(a);
+        }
     computeDifClock(json) {
         if (json.time !== undefined) {
             this.difClock = ((new Date()).getTime() - json.time) / 1000;
@@ -1131,6 +1122,7 @@ define([], function() {
     }
 
     createButtonsAvatar(num, left, widthNickName = 0, heightNickName = 0) {
+        console.log( "createButtonsAvatar " + num + " " + left + " " + widthNickName + " " + heightNickName);
         if (widthNickName === 0) {
             widthNickName = this.iconSize;
         }
@@ -1188,7 +1180,7 @@ define([], function() {
             this.divNicknames[num].style.visibility = 'hidden';
             return;
         }
-
+console.log(this);
         if (this.nicknames[num] !== nickname || nickname === "") {
             this.nicknames[num] = nickname;
             let s = nickname;
@@ -1249,7 +1241,7 @@ define([], function() {
                     && localStorage.getItem("paletteid") !== null) {
                     let avatarid = parseInt(localStorage.getItem("avatarid"));
                     let paletteid = parseInt(localStorage.getItem("paletteid"));
-                    this.gatePlaygame(auserid, localStorage.getItem("nickname"), paletteid, avatarid);
+                    this.gatePlayGame(auserid, localStorage.getItem("nickname"), paletteid, avatarid);
                     return;
                 }
                 break;
@@ -1258,7 +1250,7 @@ define([], function() {
                     && localStorage.getItem("avatarid") !== null && localStorage.getItem("paletteid") !== null) {
                     let avatarid = parseInt(localStorage.getItem("avatarid"));
                     let paletteid = parseInt(localStorage.getItem("paletteid"));
-                    this.gatePlaygame(localStorage.getItem("auserid"), localStorage.getItem("nickname"), paletteid, avatarid);
+                    this.gatePlayGame(localStorage.getItem("auserid"), localStorage.getItem("nickname"), paletteid, avatarid);
                     return;
                 }
                 break;
@@ -1267,15 +1259,52 @@ define([], function() {
         this.gateCreateScreen();
     }
 
-    gatePlaygame(auserid, nickname, paletteid, avatarid) {
-        if (auserid === 0 && this.kinduser === 'guid') {
-            auserid = this.getUserGUID();
+    gatePlayGame(user, nickname, paletteid, avatarid) {
+        console.log( "gatePlayGame");
+        if (user === 0 && this.kinduser === 'guid') {
+            user = this.getUserGUID();
         }
-        localStorage.setItem("auserid", auserid);
+        localStorage.setItem("auserid", user);
         localStorage.setItem("nickname", nickname);
         localStorage.setItem("paletteid", paletteid);
         localStorage.setItem("avatarid", avatarid);
 
+        let instance = this;
+        require(['core/ajax'], function(Ajax) {
+            // Defining the parameters to be passed to the service
+            let params = {
+                mmogameid: instance.mmogameid,
+                kinduser: instance.kinduser,
+                user: user,
+                nickname: nickname,
+                avatarid: avatarid,
+                colorpaletteid: paletteid,
+            };
+
+            // Calling the service through the Moodle AJAX API
+            let getAttempt = Ajax.call([{
+                methodname: 'mmogametype_quiz_get_attempt',
+                args: params
+            }]);
+
+            // Handling the response
+            getAttempt[0].done(function(response) {
+                let json = {};  // Create an empty object r
+                response.ret.forEach(function(item) {
+                    json[item.key] = item.value; // Assign the value of each key-value pair to the object r
+                });
+                console.log(json);
+                instance.openGame();
+                instance.colors = undefined;
+                instance.onServerGetAttempt(json, '');
+                // A instance.gateOnServerGetAttempt(JSON.parse(this.responseText), auserid);
+            }).fail(function(error) {
+                console.log(error);
+                return error;
+            });
+        });
+
+        /* A
         let xmlhttp = new XMLHttpRequest();
         let instance = this;
         xmlhttp.onreadystatechange = function() {
@@ -1294,7 +1323,7 @@ define([], function() {
             d.helpurl = 1;
         }
         let data = JSON.stringify(d);
-        xmlhttp.send(data);
+        xmlhttp.send(data);*/
     }
 
     gateOnServerGetAttempt(json, auserid) {
@@ -1444,7 +1473,7 @@ define([], function() {
             this.iconSize, "", 'assets/submit.svg', false, 'submit');
         this.btnSubmit.style.visibility = 'hidden';
         this.btnSubmit.addEventListener("click", function() {
-            instance.gatePlaygame(instance.edtCode === undefined ? instance.auserid : instance.edtCode.value,
+            instance.gatePlayGame(instance.edtCode === undefined ? instance.auserid : instance.edtCode.value,
                 instance.edtNickname.value, instance.paletteid, instance.avatarid);
         });
     }
@@ -1577,7 +1606,7 @@ define([], function() {
         this.btnSubmit.style.visibility = 'hidden';
         this.btnSubmit.addEventListener("click",
             function() {
-                instance.gatePlaygame(instance.edtCode === undefined ? instance.auserid : instance.edtCode.value,
+                instance.gatePlayGame(instance.edtCode === undefined ? instance.auserid : instance.edtCode.value,
                     instance.edtNickname.value, instance.paletteid, instance.avatarid);
             });
     }

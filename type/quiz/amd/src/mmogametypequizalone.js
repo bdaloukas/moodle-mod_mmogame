@@ -13,18 +13,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-define(['mmogamequiz'], function(mmoGameQuiz) {
-    return class mmoGameQuizAlone extends mmoGameQuiz {
+define(['mmogametype_quiz/mmogametypequiz'],
+    function(mmoGameTypeQuiz) {
+    return class mmoGameTypeQuizAlone extends mmoGameTypeQuiz {
         constructor() {
             super();
             this.cIcons = this.hasHelp() ? 5 : 4;
             this.autosave = true;
             this.autosubmit = true;
             this.type = 'alone';
-        }
-
-        static init(mmogameid, pin, kinduser, user) {
-            return new this(mmogameid, pin, kinduser, user);
         }
 
         createIconBar() {

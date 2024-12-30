@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-define('mmogamequiz', ['mod_mmogame/mmogame'], function(mmoGame) {
-    return class mmoGameQuiz extends mmoGame {
+define(['mod_mmogame/mmogame'], function(mmoGame) {
+    return class mmoGameTypeQuiz extends mmoGame {
         mmogameid;
         kinduser;
         auserid;
