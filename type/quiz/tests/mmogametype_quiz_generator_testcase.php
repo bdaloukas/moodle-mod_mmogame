@@ -210,7 +210,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1);
+        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
         $this->assertTrue($result['attempt'] == 0);
 
         // Game with categoryid.
@@ -221,7 +221,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1);
+        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
         $this->assertTrue($result['attempt'] != 0);
 
         // Aduel.
@@ -232,7 +232,21 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1);
+        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
         $this->assertTrue($result['attempt'] != 0);
+    }
+
+    /**
+     * Convert from the returning of external function to array.
+     *
+     * @param array $result
+     * @return array
+     */
+    private function external_to_array(array $result): array {
+        $a = [];
+        foreach ($result['ret'] as $item) {
+            $a[$item['key']] = $item['value'];
+        }
+        return $a;
     }
 }
