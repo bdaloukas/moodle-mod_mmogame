@@ -181,13 +181,14 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param object $attempt
      * @param object $query
      * @param string $useranswer
+     * @param string $useranswerid
      * @param bool $autograde
      * @param array $ret (will contain all information)
      * @return bool (is correct or not)
      */
-    public function set_answer(object $attempt, object $query, string $useranswer, bool $autograde, array &$ret): bool {
-
-        $retvalue = parent::set_answer( $attempt, $query, $useranswer, $autograde, $ret);
+    public function set_answer(object $attempt, object $query, string $useranswer, string $useranswerid,
+                               bool $autograde, array &$ret): bool {
+        $retvalue = parent::set_answer( $attempt, $query, $useranswer, $useranswerid, $autograde, $ret);
 
         $ret['iscorrect'] = $attempt->iscorrect;
         if ($this->auserid == $this->aduel->auserid1) {
@@ -497,7 +498,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         ksort( $map2);
         $ret = [];
         foreach ($map2 as $q) {
-            $q2 = $this->qbank->load( $q->id, true);
+            $q2 = $this->qbank->load( $q->id);
             $ret[] = $q2;
         }
 
@@ -514,12 +515,15 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     /**
      * Updates the database and array $ret about the correctness of user's answer
      *
-     * @param object $data
      * @param array $ret
+     * @param $attempt
+     * @param $answer
+     * @param $answerid
+     * @param $subcommand
      * @return false|object: the attempt
      */
-    public function set_answer_model(object $data, array &$ret) {
-        $attempt = parent::set_answer_model($data, $ret);
+    public function set_answer_model(array &$ret, $attempt, $answer, $answerid, $subcommand) {
+        $attempt = parent::set_answer_model($ret, $attempt, $answer, $answerid, $subcommand);
 
         $aduel = $this->aduel;
 

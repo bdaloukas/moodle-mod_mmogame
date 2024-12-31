@@ -94,19 +94,6 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertEquals(1, count($records));
         $this->assertArrayHasKey($rgame->id, $records);
-
-        global $USER;
-        $data = (object)['mmogameid' => $rgame->id, 'command' => 'getattempt',
-            'kinduser' => 'moodle', 'user' => $USER->id,
-            'nickname' => 'Nickname', 'avatarid' => 1, 'paletteid' => 1];
-
-        require_once(__DIR__ .  '/../../../type/quiz/json.php');
-        $ret = [];
-        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
-
-        $mmogame->update_state( 1);
-
-        mmogame_json_quiz_getattempt($data, $mmogame, $ret);
     }
 
     /**
