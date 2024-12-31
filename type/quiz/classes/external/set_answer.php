@@ -121,12 +121,10 @@ class set_answer extends external_api {
      * @param string $name
      * @param string $questiontext
      * @param array $answers
-     * @param array $ansersids
+     * @param array $answerids
      * @param array $answertexts
-     * @param $answerids
-     * @param $answertexts
      * @return int question id
-     * @throws dml_exception
+     * @throws \dml_exception
      */
     public function create_multichoice_question(int $categoryid, string $name, string $questiontext, array $answers,
                                                 array &$answerids, array &$answertexts): int {
