@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mmogametype_quiz data generator.
+ * mod_mmogame Data generator.
  *
  * @package    mod_mmogame
  * @category   test
@@ -24,9 +24,9 @@
  */
 
 /**
- * mod_game data generator class.
+ * mod_game Data generator class.
  *
- * @package    mmogametype_quiz
+ * @package    mod_mmogame
  * @category   test
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -55,11 +55,16 @@ class mod_mmogame_generator extends testing_module_generator {
      * @param string $name
      * @param string $questiontext
      * @param array $answers
+     * @param $answerids
+     * @param $answertexts
      * @return int question id
      * @throws dml_exception
      */
-    public function create_multichoice_question(int $categoryid, string $name, string $questiontext, array $answers): int {
+    public function create_multichoice_question(int $categoryid, string $name, string $questiontext, array $answers,
+                                                &$answerids, &$answertexts): int {
         global $DB, $USER;
+
+        $answerids = $answertexts = [];
 
         // Insert a record in the question table.
         $new = new stdClass();
@@ -80,11 +85,11 @@ class mod_mmogame_generator extends testing_module_generator {
         foreach ($answers as $answer) {
             $new = new stdClass();
             $new->question = $questionid;
-            $new->answer = $answer;
+            $answertexts[] = $new->answer = $answer;
             $new->fraction = $first ? 1 : 0;
             $new->feedback = '';
             $new->feedbackformat = FORMAT_MOODLE;
-            $DB->insert_record('question_answers', $new);
+            $answerids[] = $DB->insert_record('question_answers', $new);
 
             $first = false;
         }

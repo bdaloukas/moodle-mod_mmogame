@@ -88,7 +88,7 @@ class mmogametype_quiz extends mmogame {
     }
 
     /**
-     * Saves to array $ret informations about the $attempt.
+     * Saves to array $ret information about the $attempt.
      *
      * @param array $ret (returns info about the current attempt)
      * @param bool|object $attempt

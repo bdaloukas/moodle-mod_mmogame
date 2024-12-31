@@ -66,6 +66,8 @@ class set_answer extends external_api {
      */
     public static function execute(int $mmogameid, string $kinduser, string $user, int $attempt, string $answer,
                                    ?int $answerid, string $subcommand): array {
+        global $DB;
+
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
@@ -111,4 +113,88 @@ class set_answer extends external_api {
             ),
         ]);
     }
+
+    /**
+     * Creates a question in the database.
+     *
+     * @param int $categoryid
+     * @param string $name
+     * @param string $questiontext
+     * @param array $answers
+     * @param array $ansersids
+     * @param array $answertexts
+     * @param $answerids
+     * @param $answertexts
+     * @return int question id
+     * @throws dml_exception
+     */
+    public function create_multichoice_question(int $categoryid, string $name, string $questiontext, array $answers,
+                                                array &$answerids, array &$answertexts): int {
+        global $DB, $USER;
+
+        $answerids = $answertexts = [];
+
+        // Insert a record in the question table.
+        $new = new stdClass();
+        $new->category = $categoryid;
+        $new->name = $name;
+        $new->questiontext = $questiontext;
+        $new->questiontextformat = FORMAT_MOODLE;
+        $new->qtype = 'multichoice';
+        $new->defaultmark = 1;
+        $new->penalty = 0.333333;
+        $new->single = 0;
+        $new->shuffleanswers = 1;
+        $new->flags = 0;
+        $new->generalfeedback = '';
+        $questionid = $DB->insert_record('question', $new);
+
+        $first = true;
+        foreach ($answers as $answer) {
+            $new = new stdClass();
+            $new->question = $questionid;
+            $answertexts[] = $new->answer = $answer;
+            $new->fraction = $first ? 1 : 0;
+            $new->feedback = '';
+            $new->feedbackformat = FORMAT_MOODLE;
+            $answerids[] = $DB->insert_record('question_answers', $new);
+
+            $first = false;
+        }
+
+        // Add multiple-choice-specific options.
+        $qtypeoptions = new stdClass();
+        $qtypeoptions->questionid = $questionid;
+        $qtypeoptions->layout = 0; // 0 = Vertical layout
+        $qtypeoptions->single = 1; // Only one choice allowed.
+        $qtypeoptions->shuffleanswers = 1; // Shuffle answer order.
+        $qtypeoptions->correctfeedback = ''; // Feedback for correct answers.
+        $qtypeoptions->correctfeedbackformat = FORMAT_HTML;
+        $qtypeoptions->partiallycorrectfeedback = '';
+        $qtypeoptions->partiallycorrectfeedbackformat = FORMAT_HTML;
+        $qtypeoptions->incorrectfeedback = '';
+        $qtypeoptions->incorrectfeedbackformat = FORMAT_HTML;
+        $qtypeoptions->answernumbering = 'abc'; // Answer numbering.
+        $DB->insert_record('qtype_multichoice_options', $qtypeoptions);
+
+        // Insert a new record in the question_bank_entries table.
+        $qbe = new stdClass();
+        $qbe->questioncategoryid = $categoryid;
+        $qbe->ownerid = $USER->id;
+        $qbe->timecreated = time();
+        $qbe->timemodified = time();
+        $qbe->status = 0;
+        $qbeid = $DB->insert_record('question_bank_entries', $qbe);
+
+        // Insert a record in the question_versions table.
+        $qv = new stdClass();
+        $qv->version = 1;
+        $qv->questionbankentryid = $qbeid;
+        $qv->questionid = $questionid;
+        $qv->status = 'ready';
+        $DB->insert_record('question_versions', $qv);
+
+        return $questionid;
+    }
+
 }

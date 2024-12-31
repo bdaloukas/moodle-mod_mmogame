@@ -258,7 +258,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param array $ret (returns info about the current attempt)
      * @param false|object $attempt
      * @param string $subcommand
-     * @return bool|object
+     * @return bool
      */
     public function append_json(array &$ret, $attempt, string $subcommand = ''): bool {
         $query = parent::append_json( $ret, $attempt);
@@ -516,13 +516,13 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Updates the database and array $ret about the correctness of user's answer
      *
      * @param array $ret
-     * @param $attempt
-     * @param $answer
-     * @param $answerid
-     * @param $subcommand
+     * @param object $attempt
+     * @param string $answer
+     * @param ?int $answerid
+     * @param string $subcommand
      * @return false|object: the attempt
      */
-    public function set_answer_model(array &$ret, $attempt, $answer, $answerid, $subcommand) {
+    public function set_answer_model(array &$ret, int $attempt, string $answer, ?int $answerid = null, string $subcommand = '') {
         $attempt = parent::set_answer_model($ret, $attempt, $answer, $answerid, $subcommand);
 
         $aduel = $this->aduel;
@@ -530,7 +530,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $player = ( $aduel->auserid1 == $this->auserid ? 1 : 2);
         $ret['aduelPlayer'] = $player;
 
-        if (isset( $data->subcommand) && $data->subcommand === 'tool2') {
+        if ($subcommand === 'tool2') {
             $field = 'tool2numattempt'.$player;
             if ($aduel->$field == 0) {
                 $this->db->update_record( 'mmogame_am_aduel_pairs', ['id' => $aduel->id, $field => $attempt->numattempt]);

@@ -68,8 +68,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
     /**
      * Test for creating a quiz alone.
      */
-    public function test_create_quiz_alone_instance() {
-        global $DB;
+    public function test_quiz_alone() {
+        global $DB, $USER;
 
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -85,15 +85,45 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $new->info = 'Info';
         $new->stamp = rand();
         $categoryid = $DB->insert_record( 'question_categories', $new);
-        $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN']);
 
+        // Create mmoGame.
         $rgame = $this->getDataGenerator()->create_module('mmogame',
-            ['course' => $course, 'qbank' => 'moodlequestion', 'qbankparams' => $categoryid, 'pin' => rand(),
+            ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
                 'numgame' => 1, 'type' => 'quiz', 'model' => 'alone', 'typemodel' => 'quiz,alone',
                 'kinduser' => 'guid', 'enabled' => 1]);
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertEquals(1, count($records));
         $this->assertArrayHasKey($rgame->id, $records);
+        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
+        $mmogame->update_state( 1);
+
+        // Command get_attempt with empty questionbank.
+        $mmogame->update_state( 1);
+        $class = new mmogametype_quiz\external\get_attempt();
+        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result['attempt'] == 0);
+
+        // Command get_attempt with 1 question.
+
+        $answerids = $answertexts = [];
+        $generator->create_multichoice_question($categoryid, '1', '1',
+            ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'], $answerids, $answertexts);
+        $mmogame->update_state( 1);
+        $class = new mmogametype_quiz\external\get_attempt();
+        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result['attempt'] != 0);
+
+        // Command set_answer correct.
+        $this->assertTrue($result['attempt'] != 0);
+        $class = new mmogametype_quiz\external\set_answer();
+        $result = $this->external_to_array( $class->execute( $rgame->id, 'moodle', $USER->id,
+            $result['attempt'], $answertexts[0], $answerids[0], ''));
+
+        // Command set_answer error.
+        $this->assertTrue($result['attempt'] != 0);
+        $class = new mmogametype_quiz\external\set_answer();
+        $result = $this->external_to_array( $class->execute( $rgame->id, 'moodle', $USER->id,
+            $result['attempt'], $answertexts[1], $answerids[1], ''));
     }
 
     /**

@@ -292,14 +292,14 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * Updates the database and array $ret about the correctness of user's answer
      *
      * @param array $ret
-     * @param $attempt
-     * @param $answer
-     * @param $answerid
-     * @param $subcommand
+     * @param int $attempt
+     * @param string $answer
+     * @param ?int $answerid
+     * @param string $subcommand
      * @return false|object: the attempt
      */
-    public function set_answer_model(array &$ret, $attempt, $answer, $answerid, $subcommand) {
-        if (!isset( $attempt) || $attempt == 0) {
+    public function set_answer_model(array &$ret, int $attempt, string $answer, ?int $answerid = null, string $subcommand = '') {
+        if ($attempt == 0) {
             return false;
         }
 
