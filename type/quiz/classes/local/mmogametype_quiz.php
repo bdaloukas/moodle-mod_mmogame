@@ -46,18 +46,6 @@ class mmogametype_quiz extends mmogame {
     protected bool $callupdategrades = true;
 
     /**
-     * Constructor.
-     *
-     * @param mmogame_database $db (the database)
-     * @param object $rgame (a record from table mmogame)
-     * @return mmogame_quiz
-     */
-    public static function get_new(mmogame_database $db, object $rgame) {
-        $classname = 'mmogametype_' . $rgame->type.'\local\mmogametype_' . $rgame->type.'_'.$rgame->model;
-        return new $classname( $db, $rgame, false);
-    }
-
-    /**
      * return the name of tabler attempts.
      */
     public static function get_table_attempts(): string {
@@ -86,7 +74,6 @@ class mmogametype_quiz extends mmogame {
             $this->set_errorcode( ERRORCODE_NO_QUERIES);
             return false;
         }
-
         $a['numattempt'] = $numattempt == 0 ? $this->compute_next_numattempt() : $numattempt;
         $a['timestart'] = time();
         if ($timeclose != 0) {

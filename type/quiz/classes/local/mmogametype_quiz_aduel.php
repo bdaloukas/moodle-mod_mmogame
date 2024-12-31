@@ -182,17 +182,12 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param object $query
      * @param string $useranswer
      * @param bool $autograde
-     * @param bool $submit
      * @param array $ret (will contain all information)
      * @return bool (is correct or not)
      */
-    public function set_answer(object $attempt, object $query, string $useranswer, bool $autograde, bool $submit,
-        array &$ret): bool {
+    public function set_answer(object $attempt, object $query, string $useranswer, bool $autograde, array &$ret): bool {
 
-        $retvalue = parent::set_answer( $attempt, $query, $useranswer, $autograde, $submit, $ret);
-        if (!$submit) {
-            return $retvalue;
-        }
+        $retvalue = parent::set_answer( $attempt, $query, $useranswer, $autograde, $ret);
 
         $ret['iscorrect'] = $attempt->iscorrect;
         if ($this->auserid == $this->aduel->auserid1) {
@@ -524,7 +519,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @return false|object: the attempt
      */
     public function set_answer_model(object $data, array &$ret) {
-        $attempt = parent::set_answer_model( $data, $ret);
+        $attempt = parent::set_answer_model($data, $ret);
 
         $aduel = $this->aduel;
 

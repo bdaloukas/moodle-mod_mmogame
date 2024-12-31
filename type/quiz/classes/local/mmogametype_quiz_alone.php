@@ -88,13 +88,13 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @param object $attempt
      * @param object $query
      * @param string $useranswer
+     * @param string $useranswerid
      * @param bool $autograde
-     * @param bool $submit
      * @param array $ret (will contain all information)
      * @return bool (is correct or not)
      */
-    public function set_answer(object $attempt, object $query, string $useranswer, bool $autograde, bool $submit,
-        array &$ret): bool {
+    public function set_answer(object $attempt, object $query, string $useranswer, string $useranswerid,
+                               bool $autograde, array &$ret): bool {
 
         if ($autograde) {
             $fraction = 0.0;
@@ -111,17 +111,15 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                 if ($useranswer == null) {
                     $useranswer = '';
                 }
-                $a['useranswerid'] = $attempt->useranswerid = $useranswer;
+                $a['useranswerid'] = $attempt->useranswerid = $useranswerid;
             }
             $a['useranswer'] = $attempt->useranswer = $useranswer;
         }
 
-        if ($submit) {
-            $attempt->timeanswer = $time;
-            $a['timeanswer'] = $attempt->timeanswer;
-        }
+        $attempt->timeanswer = $time;
+        $a['timeanswer'] = $attempt->timeanswer;
 
-        if ($submit && $autograde) {
+        if ($autograde) {
             if ($this->callupdategrades) {
                 $a['score'] = $attempt->score = $this->get_score_query( $attempt->iscorrect, $query);
 
@@ -244,7 +242,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             FROM {mmogame_aa_grades} ag
             LEFT JOIN {mmogame_aa_avatars} av ON av.id=ag.avatarid
             WHERE mmogameid=? AND numgame=? AND sumscore > 0
-            ORDER BY {$scorekey} DESC";
+            ORDER BY $scorekey DESC";
         $recs = $this->db->get_records_sql($sql, [$this->rgame->id, $this->rgame->numgame], 0, $count);
 
         // Process rankings for the given records and update the map.
@@ -293,17 +291,20 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     /**
      * Updates the database and array $ret about the correctness of user's answer
      *
-     * @param object $data
      * @param array $ret
+     * @param $attempt
+     * @param $answer
+     * @param $answerid
+     * @param $subcommand
      * @return false|object: the attempt
      */
-    public function set_answer_model(object $data, array &$ret) {
-        if (!isset( $data->attempt) || $data->attempt == 0) {
+    public function set_answer_model(array &$ret, $attempt, $answer, $answerid, $subcommand) {
+        if (!isset( $attempt) || $attempt == 0) {
             return false;
         }
 
         $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=? AND id=?',
-            [$this->get_id(), $this->auserid, $data->attempt]);
+            [$this->get_id(), $this->auserid, $attempt]);
         if ($attempt === false) {
             return false;
         }
@@ -316,20 +317,18 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
 
         $autograde = true;
         $query = $this->qbank->load( $attempt->queryid);
-        if (isset( $data->subcommand) && $data->subcommand == 'tool2') {
+        if (isset( $subcommand) && $subcommand == 'tool2') {
             $autograde = false;
             $ret['tool2'] = 1;
         }
-        $iscorrect = $this->set_answer( $attempt, $query, $data->answer, $autograde, $data->submit != 0, $ret);
+        $iscorrect = $this->set_answer( $attempt, $query, $answer, $answerid, $autograde, $ret);
 
         $ret['iscorrect'] = $iscorrect ? 1 : 0;
         $ret['correct'] = $query->concept;
-        $ret['submit'] = $data->submit;
         $ret['attempt'] = $attempt->id;
 
         $info = $this->get_avatar_info( $this->auserid);
         $ret['sumscore'] = $info->sumscore;
-        $ret['nickname'] = $info->nickname;
         $ret['rank'] = $this->get_rank( $this->auserid, 'sumscore');
 
         $ret['percentcompleted'] = $info->percentcompleted;

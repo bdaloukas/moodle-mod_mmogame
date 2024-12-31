@@ -60,13 +60,14 @@ $PAGE->requires->strings_for_js(
         'js_ranking_grade', 'js_ranking_percent', 'js_sound'],
     'mmogame');
 
+$url = $CFG->wwwroot.'/mod/mmogame';
 $classname = "MmoGameType".ucfirst( $rgame->type).ucfirst( $rgame->model);
 $PAGE->requires->js_call_amd('mmogametype_'.$rgame->type.'/'.strtolower( $classname));
 $PAGE->requires->js_init_code("
     require(['mmogametype_" . $rgame->type."/" . strtolower( $classname)."'], function(".$classname.") {
         var obj = new ".$classname."();
         obj.repairColors( $colors);
-        obj.gateOpen( $rgame->id,$rgame->pin, '$rgame->kinduser', '$USER->id');
+        obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$USER->id', '$url');
         console.log(obj); // Μπορείς να κάνεις οποιαδήποτε ενέργεια με το αντικείμενο εδώ
     });
 ");

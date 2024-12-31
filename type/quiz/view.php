@@ -60,7 +60,7 @@ function mmogame_quiz_manage($id, $mmogame, $url) {
     }
 
     // Create form.
-    $classname = 'mmogametype_quiz\local\mmogame_quiz_' . $mmogame->get_model().'_admin';
+    $classname = 'mmogametype_quiz\local\mmogametype_quiz_' . $mmogame->get_model().'_admin';
     $mform = new $classname( $id, $mmogame);
 
     echo $OUTPUT->header();
@@ -106,6 +106,6 @@ function mmogame_quiz_manage_submit($mmogame) {
     if ($changenumgame) {
         $data->numgame = $numgame;
     }
-    $class = "mmogameModel_".$mmogame->get_model();
+    $class = "mod_mmogame\local\model\mmogame_model_".$mmogame->get_model();
     $class::json_setadmin( $data, $mmogame);
 }

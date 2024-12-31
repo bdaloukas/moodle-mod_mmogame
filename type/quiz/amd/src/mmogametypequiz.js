@@ -43,8 +43,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.colorScore2 = c[4];
         }
 
-        openGame(url, id, pin, auserid, kinduser, callOnAfterOpenGame) {
-            super.openGame(url, id, pin, auserid, kinduser, callOnAfterOpenGame);
+        openGame() {
+            super.openGame();
 
             this.audioYes = new Audio('assets/yes1.mp3');
             this.audioYes.load();
@@ -75,6 +75,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         onServerGetAttempt(json) {
+            console.log( json);
             this.computeDifClock(json);
 
             if (this.colors === undefined) {
@@ -177,7 +178,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
 
             if (this.endofgame) {
-                this.createDivMessage('LANGM_GAME_OVER_' + this.errorcode);
+                this.createDivMessage( this.getStringM('js_game_over'));
                 this.showScore(json);
                 return;
             }
@@ -598,7 +599,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     }
                 };
 
-                let url = instance.url.slice(0, -8) + "state.php";
+                let url = instance.url + "/state.php";
 
                 xmlhttp.open("POST", url, true);
 

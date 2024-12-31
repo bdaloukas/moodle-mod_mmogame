@@ -26,10 +26,7 @@
 // will tell you what you need to do.
 //
 // The commands in here will all be database-neutral,
-// using the methods of database_manager class
-//
-// Please do not forget to use upgrade_set_timeout()
-// before any action that may take longer time to finish.
+// using the methods of database_manager class.
 
 /**
  * Web service for mmogametype_quiz
@@ -46,6 +43,12 @@ $functions = [
     'mmogametype_quiz_get_attempt' => [
         'classname'     => 'mmogametype_quiz\external\get_attempt',
         'description'   => 'Starts a new attempt or continues the last attempt.',
+        'type'          => 'write',
+        'ajax'          => true,
+    ],
+    'mmogametype_quiz_set_answer' => [
+        'classname'     => 'mmogametype_quiz\external\set_answer',
+        'description'   => 'Save the answer to the question.',
         'type'          => 'write',
         'ajax'          => true,
     ],

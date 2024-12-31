@@ -460,42 +460,6 @@ class mmogame {
     }
 
     /**
-     * Set the nickname and avatar for the user auserid.
-     *
-     * @param int $auserid
-     * @param string $nickname
-     * @param int $avatarid
-     */
-    public function set_avatar(int $auserid, string $nickname, int $avatarid) {
-        $info = $this->get_avatar_info( $auserid);
-
-        $a = [];
-        if ($avatarid > 0) {
-            $rec = $this->db->get_record_select( 'mmogame_aa_avatars', 'id=?', [$avatarid]);
-            if ($rec !== false) {
-                $rec = $this->db->get_record_select( 'mmogame_aa_grades',
-                    'mmogameid=? AND numgame=? AND avatarid=? AND auserid<>?',
-                    [$this->rgame->id, $this->rgame->numgame, $avatarid, $auserid]);
-                if ($rec === false) {
-                    $a['avatarid'] = $avatarid;
-                }
-            }
-        }
-
-        $count = $this->db->count_records_select( 'mmogame_aa_grades',
-            'mmogameid=? AND numgame=? AND nickname=? AND auserid <> ?',
-            [$this->rgame->id, $this->rgame->numgame, $nickname, $auserid]);
-        if ($count == 0) {
-            $a['nickname'] = $nickname;
-        }
-
-        if (count( $a) > 0) {
-            $a['id'] = $info->id;
-            $this->db->update_record( 'mmogame_aa_grades', $a);
-        }
-    }
-
-    /**
      * Returns the available color palettes for the user auserid.
      *
      * @return array with id in key and 5 colors at value
@@ -508,17 +472,6 @@ class mmogame {
         }
 
         return $ret;
-    }
-
-    /**
-     * Set the colorpaletterid for the user auserid.
-     *
-     * @param int $auserid
-     * @param int $colorpaletteid
-     */
-    public function set_colorpalette(int $auserid, int $colorpaletteid) {
-        $info = $this->get_avatar_info( $auserid);
-        $this->db->update_record( 'mmogame_aa_grades', ['id' => $info->id, 'colorpaletteid' => $colorpaletteid]);
     }
 
     /**
@@ -582,71 +535,6 @@ class mmogame {
             $this->db->update_record( 'mmogame',
                 ['id' => $this->rgame->id, 'timefastjson' => $timefastjson]);
         }
-    }
-
-    /**
-     * Compare the contrast of $a and $b and returns -1,0 or 1.
-     *
-     * @param int $a
-     * @param int $b
-     * @return int (the result of comparison)
-     */
-    public static function usort_mmogame_palettes_contrast(int $a, int $b): int {
-        return self::get_contrast( $a) <=> self::get_contrast( $b);
-    }
-
-    /**
-     * Returns the contract of a color.
-     *
-     * @param int $color
-     * @return int (the contrast)
-     */
-    public static function get_contrast(int $color) {
-        $red    = ( $color >> 16 ) & 0xFF;    // Red is the Left Most Byte.
-        $green  = ( $color >> 8 ) & 0xFF;     // Green is the Middle Byte.
-        $blue   = $color & 0xFF;
-
-        return (($red * 299) + ($green * 587) + ($blue * 114)) / 1000;
-    }
-
-    /**
-     * Returns the hue of a color
-     *
-     * @param int $color
-     * @return double
-     */
-    public static function calcualtehue(int $color) {
-        $red    = ( $color >> 16 ) & 0xFF;    // Red is the Left Most Byte.
-        $green  = ( $color >> 8 ) & 0xFF;     // Green is the Middle Byte.
-        $blue   = $color & 0xFF;
-
-        $min = min($red, $green, $blue);
-        $max = max($red, $green, $blue);
-
-        switch ($max) {
-            case 0:
-                // If the max value is 0.
-                $hue = 0;
-                break;
-            case $min:
-                // If the maximum and minimum values are the same.
-                $hue = 0;
-                break;
-            default:
-                $delta = $max - $min;
-                if ($red == $max) {
-                    $hue = ($green - $blue) / $delta;
-                } else if ($green == $max) {
-                    $hue = 2 + ($blue - $red) / $delta;
-                } else {
-                    $hue = 4 + ($red - $green) / $delta;
-                }
-                $hue *= 60;
-                if ($hue < 0) {
-                    $hue += 360;
-                }
-        }
-        return $hue;
     }
 
     /**

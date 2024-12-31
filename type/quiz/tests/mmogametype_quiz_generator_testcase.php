@@ -237,6 +237,58 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
     }
 
     /**
+     * Test the get_services web service.
+     */
+    public function test_service_set_answer() {
+        global $DB, $USER;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $this->assertFalse($DB->record_exists('mmogame', ['course' => $course->id]));
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_mmogame');
+
+        $new = new stdClass();
+        $new->name = 'Test category';
+        $new->context = 1;
+        $new->info = 'Info';
+        $new->stamp = rand();
+        $categoryid = $DB->insert_record( 'question_categories', $new);
+        $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR']);
+
+        // Alone.
+
+        // Game with categoryid.
+        $rgame = $this->getDataGenerator()->create_module('mmogame',
+            ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
+                'numgame' => 1, 'type' => 'quiz', 'model' => 'alone', 'typemodel' => 'quiz,alone',
+                'kinduser' => 'guid', 'enabled' => 1]);
+        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
+        $mmogame->update_state( 1);
+        $class = new mmogametype_quiz\external\get_attempt();
+        $result = $this->external_to_array(
+            $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        // Command set_answer.
+        $this->assertTrue($result['attempt'] != 0);
+        $class = new mmogametype_quiz\external\set_answer();
+        $result = $this->external_to_array( $class->execute( $rgame->id, 'moodle', $USER->id,
+            $result['attempt'], $result['answer_1'], $result['answerid_1'], ''));
+
+        // Aduel.
+        $rgame = $this->getDataGenerator()->create_module('mmogame',
+            ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
+                'numgame' => 1, 'type' => 'quiz', 'model' => 'aduel', 'typemodel' => 'quiz,aduel',
+                'kinduser' => 'guid', 'enabled' => 1]);
+        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
+        $mmogame->update_state( 1);
+        $class = new mmogametype_quiz\external\get_attempt();
+        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result['attempt'] != 0);
+    }
+
+    /**
      * Convert from the returning of external function to array.
      *
      * @param array $result

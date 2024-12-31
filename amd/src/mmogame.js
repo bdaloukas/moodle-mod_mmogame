@@ -70,37 +70,6 @@ define([''], function() {
         this.area = undefined;
         this.computeSizes();
     }
-/* A
-    createImageButton(parent, left, top, width, height, classname, filename, wrap, alt) {
-        let button = document.createElement("img");
-        if (alt !== undefined && alt !== '') {
-            button.alt = alt;
-        }
-
-        button.classList.add("mmogame_imgbutton");
-        button.setAttribute("role", "button");
-
-        button.tabIndex = 0;
-        button.style.position = "absolute";
-        button.style.left = left + "px";
-        button.style.top = top + "px";
-        button.draggable = false;
-
-        if (width !== 0) {
-            button.style.width = width + "px";
-        }
-        if (height !== 0) {
-            button.style.height = height + "px";
-        }
-        button.style.fontSize = height + "px";
-        if (filename !== undefined && filename !== '') {
-            button.src = filename;
-        }
-        parent.appendChild(button);
-
-        return button;
-    }
-*/
 
         createImageButton(parent, left, top, width, height, classname, filename, wrap, alt) {
             let button = this.createImage(parent, left, top, width, height, filename);
@@ -1126,7 +1095,8 @@ define([''], function() {
     }
 
     // Gate
-    gateOpen(mmogameid, pin, kinduser, auserid) {
+    gateOpen(mmogameid, pin, kinduser, auserid, url) {
+        this.url = url;
         this.minFontSize *= 2;
         this.maxFontSize *= 2;
 
