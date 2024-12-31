@@ -66,15 +66,15 @@ class set_answer extends external_api {
      */
     public static function execute(int $mmogameid, string $kinduser, string $user, int $attempt, string $answer,
                                    ?int $answerid, string $subcommand): array {
-        global $DB;
-
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
             'kinduser' => $kinduser,
             'user' => $user,
-            'answer' => $answer ?? null,
-            'answerid' => $avatarid ?? null,
+            'attempt' => $attempt,
+            'answer' => $answer,
+            'answerid' => $answerid ?? null,
+            'subcommand' => $subcommand,
         ]);
 
         $ret = [];
@@ -135,7 +135,7 @@ class set_answer extends external_api {
         $answerids = $answertexts = [];
 
         // Insert a record in the question table.
-        $new = new stdClass();
+        $new = new \stdClass();
         $new->category = $categoryid;
         $new->name = $name;
         $new->questiontext = $questiontext;
@@ -151,7 +151,7 @@ class set_answer extends external_api {
 
         $first = true;
         foreach ($answers as $answer) {
-            $new = new stdClass();
+            $new = new \stdClass();
             $new->question = $questionid;
             $answertexts[] = $new->answer = $answer;
             $new->fraction = $first ? 1 : 0;
@@ -163,7 +163,7 @@ class set_answer extends external_api {
         }
 
         // Add multiple-choice-specific options.
-        $qtypeoptions = new stdClass();
+        $qtypeoptions = new \stdClass();
         $qtypeoptions->questionid = $questionid;
         $qtypeoptions->layout = 0; // 0 = Vertical layout
         $qtypeoptions->single = 1; // Only one choice allowed.
@@ -178,7 +178,7 @@ class set_answer extends external_api {
         $DB->insert_record('qtype_multichoice_options', $qtypeoptions);
 
         // Insert a new record in the question_bank_entries table.
-        $qbe = new stdClass();
+        $qbe = new \stdClass();
         $qbe->questioncategoryid = $categoryid;
         $qbe->ownerid = $USER->id;
         $qbe->timecreated = time();
@@ -187,7 +187,7 @@ class set_answer extends external_api {
         $qbeid = $DB->insert_record('question_bank_entries', $qbe);
 
         // Insert a record in the question_versions table.
-        $qv = new stdClass();
+        $qv = new \stdClass();
         $qv->version = 1;
         $qv->questionbankentryid = $qbeid;
         $qv->questionid = $questionid;

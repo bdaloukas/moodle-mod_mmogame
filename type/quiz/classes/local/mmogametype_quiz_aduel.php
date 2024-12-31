@@ -516,7 +516,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Updates the database and array $ret about the correctness of user's answer
      *
      * @param array $ret
-     * @param object $attempt
+     * @param int $attempt
      * @param string $answer
      * @param ?int $answerid
      * @param string $subcommand

@@ -55,8 +55,8 @@ class mod_mmogame_generator extends testing_module_generator {
      * @param string $name
      * @param string $questiontext
      * @param array $answers
-     * @param $answerids
-     * @param $answertexts
+     * @param array $answerids
+     * @param array $answertexts
      * @return int question id
      * @throws dml_exception
      */
@@ -124,7 +124,7 @@ class mod_mmogame_generator extends testing_module_generator {
         $qv->questionbankentryid = $qbeid;
         $qv->questionid = $questionid;
         $qv->status = 'ready';
-        $qvid = $DB->insert_record('question_versions', $qv);
+        $$DB->insert_record('question_versions', $qv);
 
         return $questionid;
     }
