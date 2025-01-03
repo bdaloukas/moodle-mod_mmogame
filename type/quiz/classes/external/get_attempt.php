@@ -35,7 +35,6 @@ use mod_mmogame\local\mmogame;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_attempt extends external_api {
-
     /**
      * Returns description of method parameters
      * @return external_function_parameters
@@ -65,7 +64,7 @@ class get_attempt extends external_api {
      * @throws invalid_parameter_exception
      */
     public static function execute(int $mmogameid, string $kinduser, string $user,
-                                   ?string $nickname, ?int $avatarid, ?int $colorpaletteid): array {
+                                   ?string $nickname, ?int $avatarid, ?int $colorpaletteid): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
@@ -78,19 +77,18 @@ class get_attempt extends external_api {
 
         $ret = [];
 
-        $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid( $mmogame->get_db(), $kinduser, $user);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
+        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user);
 
-        $mmogame->login_user( $auserid);
+        $mmogame->login_user($auserid);
 
         $ret['type'] = $mmogame->get_type();
         $ret['model'] = $mmogame->get_model();
 
         if (isset($nickname) && isset($avatarid) && isset($colorpaletteid)) {
-            $info = $mmogame->get_avatar_info( $auserid);
-            $mmogame->get_db()->update_record( 'mmogame_aa_grades',
-                ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid,
-                    'colorpaletteid' => $colorpaletteid, ]);
+            $info = $mmogame->get_avatar_info($auserid);
+            $mmogame->get_db()->update_record('mmogame_aa_grades',
+                ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid,  'colorpaletteid' => $colorpaletteid]);
         }
 
         if ($mmogame->get_state() != 0) {
@@ -99,33 +97,17 @@ class get_attempt extends external_api {
             $attempt = false;
         }
 
-        $mmogame->append_json( $ret, $attempt);
+        $mmogame->append_json($ret, $attempt);
 
-        $formattedret = [];
-        foreach ($ret as $key => $value) {
-            $formattedret[] = [
-                'key' => $key,
-                'value' => $value,
-            ];
-        }
-
-        return ['ret' => $formattedret];
+        return json_encode( $ret);
     }
 
     /**
      * Describe the return types.
      *
-     * @return external_single_structure
+     * @return external_value
      */
-    public static function execute_returns(): external_single_structure {
-        return new external_single_structure([
-            'ret' => new external_multiple_structure(
-                new external_single_structure([
-                    'key' => new external_value(PARAM_TEXT, 'The key of the entry'),
-                    'value' => new external_value(PARAM_RAW, 'The value of the entry'),
-                ]),
-                'The list of key-value pairs'
-            ),
-        ]);
+    public static function execute_returns(): external_value {
+        return new external_value(PARAM_RAW, 'A JSON-encoded object with dynamic keys and values');
     }
 }

@@ -40,6 +40,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             this.colorDefinition = c[1];
             this.colorScore = c[2];
+            this.colorCopyright = c[3];
             this.colorScore2 = c[4];
         }
 
@@ -51,7 +52,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.audioNo = new Audio('assets/no1.mp3');
             this.audioNo.load();
         }
-
+/* A
         sendGetAttempt(param, subcommand) {
             let xmlhttp = new XMLHttpRequest();
             let instance = this;
@@ -73,18 +74,18 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             let data = JSON.stringify(d);
             xmlhttp.send(data);
         }
+*/
 
         onServerGetAttempt(json) {
-            console.log( json);
-            this.computeDifClock(json);
+            this.computeDifClock(json.time, json.timestart, json.timeclose);
 
-            if (this.colors === undefined) {
+            if (json.colors !== undefined) {
                 this.setColorsString(json.colors);
                 this.createIconBar();
             }
 
-            if (json.name !== undefined) {
-                window.document.title = json.name;
+            if (name !== undefined) {
+                window.document.title = name;
             }
 
             if (json.helpurl !== undefined) {
@@ -105,24 +106,17 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             this.qtype = json.qtype;
             if (json.qtype === 'multichoice') {
-                this.answers = [];
-                this.answersID = [];
-                for (let i = 1; i <= json.answers; i++) {
-                    let answerid = json["answerid_" + i];
-                    let answer = this.repairP(json["answer_" + i]);
-                    this.answersID.push(answerid);
-                    this.answers.push(answer);
-
-                }
+                this.answers = json.answers;
+                this.answersID = json.answerids;
             }
             this.answer = json.answer !== undefined ? json.answer : null;
             this.endofgame = json.endofgame !== undefined && json.endofgame !== 0;
             this.definition = this.repairP(json.definition);
-            this.single = json.single;
             this.errorcode = json.errorcode;
 
             if (json.state !== 0) {
-                this.createScreen(json, false);
+                this.createScreen(json.sumscore, json.rank, json.name, '', '', '',
+                    json.percentcompleted, false);
             }
 
             this.updateLabelTimer();
@@ -169,7 +163,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.sendTimeout();
         }
 
-        createScreen(json, disabled) {
+        createScreen(sumscore, rank, name, usercode, addscore, completerank, percentcompleted, disabled) {
             if (this.area !== undefined) {
                 this.body.removeChild(this.area);
                 this.area = undefined;
@@ -178,8 +172,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
 
             if (this.endofgame) {
-                this.createDivMessage( this.getStringM('js_game_over'));
-                this.showScore(json);
+                this.createDivMessage(this.getStringM('js_game_over'));
+                this.showScore(sumscore, rank, name, usercode, addscore, completerank, percentcompleted);
                 return;
             }
 
@@ -188,7 +182,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             } else {
                 this.createScreenHorizontal(disabled);
             }
-            this.showScore(json);
+            this.showScore(sumscore, rank, name, usercode, addscore, completerank, percentcompleted);
         }
 
         createScreenVertical(disabled) {
@@ -215,7 +209,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             );
 
             this.radioSize = Math.round(this.fontSize);
-            this.explainLeft = 0;
             let defSize = this.createDefinition(0, 0, maxWidth, false, this.fontSize);
 
             this.nextTop = instance.createAnswer(0, defSize[1] + this.padding, maxWidth, false, this.fontSize, disabled);
@@ -235,13 +228,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                             instance.area.removeChild(instance.btnSubmit);
                             instance.btnSubmit = undefined;
                         }
-                        instance.sendAnswer(true);
+                        instance.sendAnswer();
                     }
                 );
             }
 
             this.stripLeft = this.padding;
-            this.stripTop = this.nextTop;
             this.stripWidth = 2 * this.iconSize;
             this.stripHeight = this.iconSize;
         }
@@ -288,11 +280,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.btnSubmit = this.createImageButton(this.body, width + (width - this.iconSize) / 2, this.nextTop, 0, this.iconSize,
                 "", 'assets/submit.svg', false, 'submit');
             this.btnSubmit.addEventListener("click", function() {
-                instance.sendAnswer(true);
+                instance.sendAnswer();
             });
 
             this.stripLeft = width + this.padding;
-            this.stripTop = this.nextTop;
             this.stripWidth = 2 * this.iconSize;
             this.stripHeight = this.iconSize;
         }
@@ -315,21 +306,19 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }
             }
 
-            this.multichoiceLeft = left;
             this.aItemAnswer = new Array(n);
             this.aItemLabel = new Array(n);
             this.aItemCorrectX = new Array(n);
             let retSize = [0, 0];
-            this.labelWidth = Math.round(width - fontSize - this.padding - this.getMultichoiceSpace(fontSize));
+            this.labelWidth = Math.round(width - fontSize - this.padding);
             let checkboxSize = Math.round(fontSize);
             let top1 = top;
-            let offsetLabel = this.getMultichoiceSpace(fontSize);
+            let offsetLabel = 0;
             for (let i = 0; i < n; i++) {
                 let label = document.createElement("label");
                 label.style.position = "absolute";
                 label.style.width = this.labelWidth + "px";
 
-                // A label.innerHTML = this.repairHTML(this.answers[i], this.mapFiles, this.mapFilesWidth, this.mapFilesHeight);
                 label.innerHTML = this.answers[i];
 
                 label.style.font = "FontAwesome";
@@ -338,7 +327,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 if (onlyMetrics) {
                     this.body.appendChild(label);
-                    let newSize = label.scrollWidth + fontSize + this.padding + this.getMultichoiceSpace(fontSize);
+                    let newSize = label.scrollWidth + fontSize + this.padding;
                     if (newSize > retSize[0]) {
                         retSize[0] = newSize;
                     }
@@ -426,7 +415,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 if (i === j) {
                     item.classList.add("checked");
-                    this.answer = this.answersID[i];
+                    this.answer = this.answers[i];
+                    this.answerid = this.answersID[i];
                 } else if (item.classList.contains("checked")) {
                     item.classList.remove("checked");
                 }
@@ -434,43 +424,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.drawRadio(item, disabled ? colorBack : 0xFFFFFF, color);
             }
             if (this.autosave && callSendAnswer) {
-                this.sendAnswer(this.autosubmit);
+                this.sendAnswer();
             }
-        }
-
-        getMultichoiceSpace() {
-            return 0;
-        }
-
-        sendAnswer(submit, subcommand) {
-            if (submit) {
-                clearTimeout(this.timerTimeout);
-                this.timerTimeout = undefined;
-            }
-
-            let xmlhttp = new XMLHttpRequest();
-            let instance = this;
-            xmlhttp.onreadystatechange = function() {
-                if (this.readyState === 4 && this.status === 200) {
-                    let json = JSON.parse(this.responseText);
-                    if (submit) {
-                        json.submit = 1;
-                    }
-                    instance.onServerAnswer(json);
-                }
-            };
-            xmlhttp.open("POST", this.url, true);
-
-            xmlhttp.setRequestHeader("Content-Type", "application/json");
-            let a = {
-                "command": "answer", "mmogameid": this.mmogameid, "pin": this.pin, 'kinduser': this.kinduser,
-                "user": this.auserid, "attempt": this.attempt, "answer": this.answer, 'submit': submit ? 1 : 0
-            };
-            if (subcommand !== undefined) {
-                a.subcommand = subcommand;
-            }
-            let data = JSON.stringify(a);
-            xmlhttp.send(data);
         }
 
         sendTimeout() {
@@ -491,17 +446,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             xmlhttp.send(data);
         }
 
-        onServerAnswer(json) {
-            if (json.submit === 0) {
-                return;
-            }
-            this.correct = json.correct;
+        updateScreenAfterAnswer(correct, iscorrect) {
+            this.playAudio(iscorrect !== 0 ? this.audioYes : this.audioNo);
 
-            this.playAudio(json.iscorrect !== 0 ? this.audioYes : this.audioNo);
-
-            if (json.correct !== undefined) {
+            if (correct !== undefined) {
                 if (this.qtype === "multichoice") {
-                    this.onServerAnswerMultichoice(json);
+                    this.onServerAnswerMultichoice();
                 }
             }
             this.disableInput();
@@ -519,17 +469,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 instance.area.removeChild(btn);
             });
 
-            if (!json.iscorrect && this.qtype !== "multichoice") {
-                let w = this.nextLeft - this.explainLeft - 2 * this.padding - this.iconSize;
-                let ans2 = this.createDiv(this.body, this.explainLeft + this.iconSize + this.padding, this.nextTop, this.iconSize,
-                    this.iconSize);
-                ans2.style.lineHeight = this.iconSize + "px";
-                ans2.style.color = this.getColorContrast(this.colorBackground);
-                ans2.innerHTML = json.correct;
-                this.autoResizeText(ans2, w, this.iconSize, false, this.minFontSize, this.maxFontSize, 0.9);
-            }
-
-            this.showScore(json);
+            this.showScore();
         }
 
         getSVGcorrect(size, iscorrect, colorCorrect, colorError) {
@@ -546,9 +486,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             }
         }
 
-        onServerAnswerMultichoice(json) {
-            let aCorrect = json.correct.split(",");
-
+        onServerAnswerMultichoice() {
+            let aCorrect = this.correct.split(",");
             for (let i = 0; i < this.answersID.length; i++) {
                 let label = this.aItemLabel[i];
                 let checked = this.aItemAnswer[i].classList.contains("checked");
@@ -556,7 +495,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 if (aCorrect.includes(this.answersID[i])) {
                     iscorrect = true;
-                } else if (json.correct !== undefined && checked) {
+                } else if (checked) {
                     iscorrect = false;
                 } else {
                     continue;

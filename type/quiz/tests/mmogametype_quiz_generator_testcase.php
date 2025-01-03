@@ -61,8 +61,6 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
         $this->assertEquals(1, count($records));
         $this->assertArrayHasKey($mmogame->id, $records);
-
-        $this->test_create_quiz_alone_instance();
     }
 
     /**
@@ -100,8 +98,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         // Command get_attempt with empty questionbank.
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
-        $this->assertTrue($result['attempt'] == 0);
+        $result = json_decode( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result->attempt == 0);
 
         // Command get_attempt with 1 question.
 
@@ -110,20 +108,20 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
             ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'], $answerids, $answertexts);
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
-        $this->assertTrue($result['attempt'] != 0);
+        $result = json_decode( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result->attempt != 0);
 
         // Command set_answer correct.
-        $this->assertTrue($result['attempt'] != 0);
+        $this->assertTrue($result->attempt != 0);
         $class = new mmogametype_quiz\external\set_answer();
-        $result = $this->external_to_array( $class->execute( $rgame->id, 'moodle', $USER->id,
-            $result['attempt'], $answertexts[0], $answerids[0], ''));
+        $result = json_decode( $class->execute( $rgame->id, 'moodle', $USER->id,
+            $result->attempt, $answertexts[0], $answerids[0], ''));
 
         // Command set_answer error.
-        $this->assertTrue($result['attempt'] != 0);
+        $this->assertTrue($result->attempt != 0);
         $class = new mmogametype_quiz\external\set_answer();
-        $result = $this->external_to_array( $class->execute( $rgame->id, 'moodle', $USER->id,
-            $result['attempt'], $answertexts[1], $answerids[1], ''));
+        $result = json_decode( $class->execute( $rgame->id, 'moodle', $USER->id,
+            $result->attempt, $answertexts[1], $answerids[1], ''));
     }
 
     /**
@@ -148,7 +146,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $categoryid = $DB->insert_record( 'question_categories', $new);
 
         $questionid = $generator->create_multichoice_question($categoryid, '1', '1',
-            ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN']);
+            ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'], $answerids, $answertexts);
         $recs = $DB->get_records('question_answers', ['question' => $questionid], 'fraction DESC', '*', 0, 1);
         $this->assertTrue( count($recs) == 1);
         $answerid = reset( $recs)->id;
@@ -216,7 +214,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $new->info = 'Info';
         $new->stamp = rand();
         $categoryid = $DB->insert_record( 'question_categories', $new);
-        $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR']);
+        $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR'], $answerids, $answertexts);
 
         // Alone.
         // Game without categoryid.
@@ -227,8 +225,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
-        $this->assertTrue($result['attempt'] == 0);
+        $result = json_decode( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result->attempt == 0);
 
         // Game with categoryid.
         $rgame = $this->getDataGenerator()->create_module('mmogame',
@@ -238,8 +236,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
-        $this->assertTrue($result['attempt'] != 0);
+        $result = json_decode( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result->attempt != 0);
 
         // Aduel.
         $rgame = $this->getDataGenerator()->create_module('mmogame',
@@ -249,8 +247,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
-        $this->assertTrue($result['attempt'] != 0);
+        $result = json_decode( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result->attempt != 0);
     }
 
     /**
@@ -273,7 +271,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $new->info = 'Info';
         $new->stamp = rand();
         $categoryid = $DB->insert_record( 'question_categories', $new);
-        $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR']);
+        $generator->create_multichoice_question($categoryid, '1', '1', ['ONE', 'TWO', 'THREE', 'FOUR'], $answerids, $answertexts);
 
         // Alone.
 
@@ -285,13 +283,12 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $this->external_to_array(
-            $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $result = json_decode( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
         // Command set_answer.
-        $this->assertTrue($result['attempt'] != 0);
+        $this->assertTrue($result->attempt != 0);
         $class = new mmogametype_quiz\external\set_answer();
-        $result = $this->external_to_array( $class->execute( $rgame->id, 'moodle', $USER->id,
-            $result['attempt'], $result['answer_1'], $result['answerid_1'], ''));
+        $result = json_decode( $class->execute( $rgame->id, 'moodle', $USER->id,
+            $result->attempt, $result->answers[0], $result->answerids[0], ''));
 
         // Aduel.
         $rgame = $this->getDataGenerator()->create_module('mmogame',
@@ -301,21 +298,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state( 1);
         $class = new mmogametype_quiz\external\get_attempt();
-        $result = $this->external_to_array( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
-        $this->assertTrue($result['attempt'] != 0);
-    }
-
-    /**
-     * Convert from the returning of external function to array.
-     *
-     * @param array $result
-     * @return array
-     */
-    private function external_to_array(array $result): array {
-        $a = [];
-        foreach ($result['ret'] as $item) {
-            $a[$item['key']] = $item['value'];
-        }
-        return $a;
+        $result = json_decode( $class->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result->attempt != 0);
     }
 }

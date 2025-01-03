@@ -61,22 +61,43 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.vertical = this.areaHeight > this.areaWidth;
         }
 
-        updatePercent(json) {
-            if (this.labelPercent !== undefined) {
-                let s = json.percentcompleted === undefined ? '' : '<b>' + Math.round(100 * json.percentcompleted) + ' %</b>';
-                if (this.labelPercent.innerHTML !== s) {
-                    this.labelPercent.innerHTML = s;
-                    this.autoResizeText(this.labelPercent, this.iconSize - 2 * this.padding, this.iconSize / 2, false, 0, 0, 1);
-                }
-            }
+        sendAnswer() {
+            // Clear any existing timeout to prevent duplicate calls
+            clearTimeout(this.timerTimeout);
+            this.timerTimeout = undefined;
+
+            let instance = this;
+            require(['core/ajax'], function(Ajax) {
+                // Define the parameters to be passed to the service
+                let params = {
+                    mmogameid: instance.mmogameid,
+                    kinduser: instance.kinduser,
+                    user: instance.auserid,
+                    attempt: instance.attempt,
+                    answer: instance.answer,
+                    answerid: instance.answerid,
+                    subcommand: '',
+                };
+                // Call the service through the Moodle AJAX API
+                let ret = Ajax.call([{
+                    methodname: 'mmogametype_quiz_set_answer', // Service method name
+                    args: params // Parameters to pass
+                }]);
+
+                // Handle the server response
+                ret[0].done(function(response) {
+                    instance.onServerAnswer(JSON.parse(response)); // Trigger further action
+                }).fail(function(error) {
+                    // Return the error if the call fails
+                    return error;
+                });
+            });
         }
 
         onServerAnswer(json) {
-            super.onServerAnswer(json);
+            this.correct = json.correct;
 
-            if (json.submit !== 0) {
-                this.updatePercent(json);
-            }
+            this.updateScreenAfterAnswer(this.correct, this.iscorrect);
         }
 
         onServerFastJson(response) {
@@ -96,45 +117,41 @@ define(['mmogametype_quiz/mmogametypequiz'],
         onServerGetAttempt(json, param) {
             if (json.state === 0 && param === undefined) {
                 json.qtype = '';
-                super.onServerGetAttempt(json, param);
-                this.showScore(json);
+                super.onServerGetAttempt(json.time, json.timeclose, json.colors, json.name, json.helprl, json.errorcode,
+                    json.state, json.fastjson, json.avatar, json.nickname, json.timefastjson, json.attempt, json.qtype,
+                    json.answer, json.answerids, json.answers, json.endofgame, json.definition);
+                this.showScore(json.sumcorrect, json.rank, json.name, json.usercode, json.addscore, json.completedrank,
+                    json.percentcompleted, json.rankc, json.sumscore);
 
-                this.createDivMessageStart('[LANGM_WAIT_TO_START]');
+                this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                 return;
             }
 
             super.onServerGetAttempt(json, param);
-            this.updatePercent(json);
             if (this.btnSubmit !== undefined) {
                 this.btnSubmit.style.visibility = "hidden";
             }
         }
 
-        showScore(json) {
-            let rank = json.rank;
-            let rankc = json.completedrank;
+        showScore(sumcorrect, rank, name, usercode, addscore, completedrank, percentcompleted, rankc, sumscore) {
             if (rank !== undefined && rankc !== undefined) {
                 if (parseInt(rank) < parseInt(rankc)) {
-                    json.completedrank = '';
-                    json.rank = '# ' + rank;
+                    this.completedrank = '';
+                    this.rank = '# ' + rank;
                 } else {
-                    json.rank = '';
-                    json.completedrank = '# ' + rankc;
+                    this.rank = '';
+                    this.completedrank = '# ' + rankc;
                 }
             }
 
-            let s = json.sumscore;
-            json.sumscore = this.labelScore.innerHTML;
-            super.showScore(json);
-            json.sumscore = s;
-            s = json.sumscore === undefined ? '' : '<b>' + json.sumscore + '</b>';
+            let s = sumscore;
+            super.showScore(sumcorrect, rank, name, usercode, addscore, completedrank, percentcompleted);
+            sumscore = s;
+            s = sumscore === undefined ? '' : '<b>' + sumscore + '</b>';
             if (this.labelScore.innerHTML !== s) {
                 this.labelScore.innerHTML = s;
                 this.autoResizeText(this.labelScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0, 1);
             }
-
-            json.rank = rank;
-            json.completedrank = rankc;
         }
 
         showHelpScreen(div) {

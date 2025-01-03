@@ -148,12 +148,14 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             }
 
             $n = 0;
+            $answers = $answerids = [];
             foreach ($rec->answers as $info) {
                 $n++;
-                $ret['answer'.$num.'_'.$n] = $info->answer;
-                $ret['answerid'.$num.'_'.$n] = $info->id;
+                $answers[] = $info->answer;
+                $answerids[] = $info->id;
             }
-            $ret['answers'.$num] = $n;
+            $ret['answers'.$num] = $answers;
+            $ret['answerids'.$num] = $answerids;
         }
 
         return $rec;
