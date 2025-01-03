@@ -1070,7 +1070,6 @@ define([''], function() {
                         this.gatePlayGame(localStorage.getItem("auserid"), localStorage.getItem("nickname"), paletteid, avatarid);
                         return;
                     }
-                    //this.gatePlayGame(auserid, pin, 0, 0);
                     break;
             }
 
