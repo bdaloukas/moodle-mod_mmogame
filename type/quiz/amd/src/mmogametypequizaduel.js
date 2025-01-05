@@ -107,7 +107,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.areaTop + this.areaHeight, this.iconSize, this.iconSize, "mmogame_button_red", 'assets/skip.svg');
         }
         this.buttonSkip.addEventListener("click", function() {
-            instance.sendAnswer(true, "tool2");
+            instance.sendAnswer("tool2");
         });
         this.buttonSkip.title = '[LANG_HELP_SKIP]';
 
@@ -268,7 +268,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         this.answer = '';
-        this.sendAnswer(true);
+        this.sendAnswer();
 
         let btn = super.createImageButton(this.area, this.nextLeft, this.nextTop, 0, this.iconSize, "", 'assets/next.svg', false,
             'alt');
@@ -297,7 +297,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.updateButtonTool(this.buttonWizard, -1);
     }
 
-    onServerAnswer(json) {
+    processSetAnswer(json) {
         if (json.submit === 0) {
             return;
         }
@@ -355,9 +355,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
     }
 
-    sendAnswer(submit, subcommand) {
+    sendAnswer(subcommand = '') {
         if (this.correct === undefined) {
-            super.sendAnswer(submit, subcommand);
+            super.sendAnswer(subcommand);
         }
     }
 
@@ -462,12 +462,11 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     showScore(json) {
-        let rank = json.rank;
         let rankc = json.completedrank;
-        if (rank !== undefined && rankc !== undefined) {
-            if (parseInt(rank) < parseInt(rankc)) {
+        if (json.rank !== undefined && rankc !== undefined) {
+            if (parseInt(json.rank) < parseInt(rankc)) {
                 json.completedrank = '';
-                json.rank = '# ' + rank;
+                json.rank = '# ' + json.rank;
             } else {
                 json.rank = '';
                 json.completedrank = '# ' + rankc;
@@ -478,10 +477,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
             super.showScore(json);
         } else {
             let s = json.sumscore;
-            json.sumscore = this.labelScore.innerHTML;
+            let sumscore = this.labelScore.innerHTML;
             super.showScore(json);
             json.sumscore = s;
-            s = json.sumscore === undefined ? '' : '<b>' + json.sumscore + '</b>';
+            s = sumscore === undefined ? '' : '<b>' + sumscore + '</b>';
             if (this.labelScore.innerHTML !== s) {
                 this.labelScore.innerHTML = s;
                 this.autoResizeText(this.labelScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0, 1);
@@ -502,19 +501,19 @@ define(['mmogametype_quiz/mmogametypequiz'],
             let rank = json.aduelRank;
             let score = json.aduelScore;
 
-            if (json.aduelRank !== undefined && json.aduel_completedrank !== undefined) {
+            if (json.aduelRank !== undefined && json.aduelCompletedrank !== undefined) {
                 let rank1 = parseInt(json.aduelRank);
-                let rank2 = parseInt(json.aduel_completedrank);
+                let rank2 = parseInt(json.aduelCompletedrank);
                 if (rank1 <= rank2) {
                     rank = '#' + rank1;
                     score = json.aduelScore;
-                    this.labelScore2.title = '[LANG_GRADE]';
-                    this.labelScoreRank2.title = "[LANG_POSITION_GRADE]";
+                    this.labelScore2.title = this.getStringM('js_grade');
+                    this.labelScoreRank2.title = this.getStringM('js_position_grade');
                 } else {
                     rank = '#' + rank2;
-                    score = Math.round(100 * json.aduel_completedrank) + "%";
-                    this.labelScore2.title = "[LANG_PERCENT_OPONENT]";
-                    this.labelScoreRank2.title = "[LANG_POSITION_PERCENT]";
+                    score = Math.round(100 * json.aduelCompletedrank) + "%";
+                    this.labelScore2.title = this.getStringM('js_percent_opponent');
+                    this.labelScoreRank2.title = this.getStringM('js_position_percent');
                 }
             }
             let s = '<b>' + score + '</b>';
@@ -526,12 +525,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.labelScoreRank2.style.lineHeight = (this.iconSize / 3) + "px";
             this.autoResizeText(this.labelScoreRank2, 0.5 * this.iconSize, this.iconSize / 3, true, 0, 0, 1);
 
-            this.labelAddScore2.innerHTML = json.aduel_addscore === undefined ? '' : json.aduel_addscore;
+            this.labelAddScore2.innerHTML = json.aduelAddscore === undefined ? '' : json.aduelAddscore;
             this.autoResizeText(this.labelAddScore2, this.iconSize, this.iconSize / 3, true, 0, 0, 1);
         }
-
-        json.rank = rank;
-        json.completedrank = rankc;
     }
 
     onServerFastJson(response) {
@@ -549,7 +545,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
-            this.sendGetAttempt();
+            this.callGetAttempt({kinduser: this.kinduser, user: this.user, mmogameid: this.mmogameid});
             return;
         }
 

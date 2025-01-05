@@ -61,7 +61,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.vertical = this.areaHeight > this.areaWidth;
         }
 
-        sendAnswer() {
+        callSetAnswer() {
             // Clear any existing timeout to prevent duplicate calls
             clearTimeout(this.timerTimeout);
             this.timerTimeout = undefined;
@@ -72,7 +72,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 let params = {
                     mmogameid: instance.mmogameid,
                     kinduser: instance.kinduser,
-                    user: instance.auserid,
+                    user: instance.user,
                     attempt: instance.attempt,
                     answer: instance.answer,
                     answerid: instance.answerid,
@@ -86,7 +86,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
                 // Handle the server response
                 ret[0].done(function(response) {
-                    instance.onServerAnswer(JSON.parse(response)); // Trigger further action
+                    instance.processSetAnswer(JSON.parse(response)); // Trigger further action
                 }).fail(function(error) {
                     // Return the error if the call fails
                     return error;
@@ -94,10 +94,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
             });
         }
 
-        onServerAnswer(json) {
+        processSetAnswer(json) {
             this.correct = json.correct;
 
-            this.updateScreenAfterAnswer(this.correct, this.iscorrect);
+            this.updateScreenAfterAnswer(json);
         }
 
         onServerFastJson(response) {
@@ -106,7 +106,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 let state = parseInt(response.slice(0, pos));
                 let timefastjson = parseInt(response.slice(pos + 1));
                 if (timefastjson !== this.timefastjson || state !== this.state) {
-                    this.sendGetAttempt();
+                    this.sendGetAttempt( {mmogameid: this.mmogameid, kinduser: this.kinduser, user: this.user});
                     return;
                 }
             }
@@ -114,20 +114,19 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.sendFastJSON();
         }
 
-        onServerGetAttempt(json, param) {
-            if (json.state === 0 && param === undefined) {
+        processGetAttempt(json) {
+            if (json.state === 0) {
                 json.qtype = '';
                 super.onServerGetAttempt(json.time, json.timeclose, json.colors, json.name, json.helprl, json.errorcode,
                     json.state, json.fastjson, json.avatar, json.nickname, json.timefastjson, json.attempt, json.qtype,
                     json.answer, json.answerids, json.answers, json.endofgame, json.definition);
-                this.showScore(json.sumcorrect, json.rank, json.name, json.usercode, json.addscore, json.completedrank,
-                    json.percentcompleted, json.rankc, json.sumscore);
+                this.showScore(json);
 
                 this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                 return;
             }
 
-            super.onServerGetAttempt(json, param);
+            super.processGetAttempt(json);
             if (this.btnSubmit !== undefined) {
                 this.btnSubmit.style.visibility = "hidden";
             }

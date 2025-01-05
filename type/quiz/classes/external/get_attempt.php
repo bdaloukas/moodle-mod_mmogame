@@ -43,10 +43,10 @@ class get_attempt extends external_api {
         return new external_function_parameters([
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_ALPHANUM, 'The user data'),
-            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user'),
-            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar'),
-            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette'),
+            'user' => new external_value(PARAM_RAW, 'The user data'),
+            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user', VALUE_OPTIONAL, null,),
+            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar', VALUE_OPTIONAL, null,),
+            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette', VALUE_OPTIONAL, null,),
         ]);
     }
 
@@ -64,7 +64,7 @@ class get_attempt extends external_api {
      * @throws invalid_parameter_exception
      */
     public static function execute(int $mmogameid, string $kinduser, string $user,
-                                   ?string $nickname, ?int $avatarid, ?int $colorpaletteid): string {
+                                   ?string $nickname = null, ?int $avatarid = null, ?int $colorpaletteid = null): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,

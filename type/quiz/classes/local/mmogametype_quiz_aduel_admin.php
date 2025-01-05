@@ -33,6 +33,6 @@ namespace mmogametype_quiz\local;
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mmogametype_quiz_aduel_admin extends mmogame_quiz_alone_admin {
+class mmogametype_quiz_aduel_admin extends mmogametype_quiz_alone_admin {
 
 }

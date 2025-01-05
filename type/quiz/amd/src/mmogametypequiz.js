@@ -17,7 +17,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
     return class MmoGameTypeQuiz extends MmoGame {
         mmogameid;
         kinduser;
-        auserid;
+        user;
         url;
         pin;
         labelTimer;
@@ -52,31 +52,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.audioNo = new Audio('assets/no1.mp3');
             this.audioNo.load();
         }
-/* A
-        sendGetAttempt(param, subcommand) {
-            let xmlhttp = new XMLHttpRequest();
-            let instance = this;
-            xmlhttp.onreadystatechange = function() {
-                if (this.readyState === 4 && this.status === 200) {
-                    instance.onServerGetAttempt(JSON.parse(this.responseText), param);
-                }
-            };
 
-            xmlhttp.open("POST", this.url, true);
-            xmlhttp.setRequestHeader("Content-Type", "application/json");
-            let d = {
-                "command": "getattempt", "mmogameid": this.mmogameid, "pin": this.pin, "kinduser": this.kinduser,
-                "user": this.auserid, "subcommand": subcommand
-            };
-            if (this.helpurl === undefined) {
-                d.helpurl = 1;
-            }
-            let data = JSON.stringify(d);
-            xmlhttp.send(data);
-        }
-*/
-
-        onServerGetAttempt(json) {
+        processGetAttempt(json) {
             this.computeDifClock(json.time, json.timestart, json.timeclose);
 
             if (json.colors !== undefined) {
@@ -115,8 +92,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.errorcode = json.errorcode;
 
             if (json.state !== 0) {
-                this.createScreen(json.sumscore, json.rank, json.name, '', '', '',
-                    json.percentcompleted, false);
+                this.createScreen(json, false);
             }
 
             this.updateLabelTimer();
@@ -163,17 +139,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.sendTimeout();
         }
 
-        createScreen(sumscore, rank, name, usercode, addscore, completerank, percentcompleted, disabled) {
-            if (this.area !== undefined) {
-                this.body.removeChild(this.area);
-                this.area = undefined;
-            }
-            this.removeDivMessage();
-            this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
+        createScreen(json, disabled) {
+            this.createArea();
 
             if (this.endofgame) {
                 this.createDivMessage(this.getStringM('js_game_over'));
-                this.showScore(sumscore, rank, name, usercode, addscore, completerank, percentcompleted);
+                this.showScore(json);
                 return;
             }
 
@@ -182,7 +153,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             } else {
                 this.createScreenHorizontal(disabled);
             }
-            this.showScore(sumscore, rank, name, usercode, addscore, completerank, percentcompleted);
+            this.showScore(json);
         }
 
         createScreenVertical(disabled) {
@@ -424,7 +395,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.drawRadio(item, disabled ? colorBack : 0xFFFFFF, color);
             }
             if (this.autosave && callSendAnswer) {
-                this.sendAnswer();
+                this.callSetAnswer();
             }
         }
 
@@ -441,17 +412,17 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             xmlhttp.setRequestHeader("Content-Type", "application/json");
             let data = JSON.stringify({
                 "command": "timeout", "mmogameid": this.mmogameid, "pin": this.pin, 'kinduser': this.kinduser,
-                "user": this.auserid, "attempt": this.attempt
+                "user": this.user, "attempt": this.attempt
             });
             xmlhttp.send(data);
         }
 
-        updateScreenAfterAnswer(correct, iscorrect) {
-            this.playAudio(iscorrect !== 0 ? this.audioYes : this.audioNo);
+        updateScreenAfterAnswer(json) {
+            this.playAudio(json.iscorrect !== 0 ? this.audioYes : this.audioNo);
 
-            if (correct !== undefined) {
+            if (json.correct !== undefined) {
                 if (this.qtype === "multichoice") {
-                    this.onServerAnswerMultichoice();
+                    this.updateScreenAfterAnswerMultichoice();
                 }
             }
             this.disableInput();
@@ -465,11 +436,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 false, 'alt');
             let instance = this;
             btn.addEventListener("click", function() {
-                instance.sendGetAttempt();
+                instance.callGetAttempt({mmogameid: instance.mmogameid, kinduser: instance.kinduser, user: instance.user});
                 instance.area.removeChild(btn);
             });
 
-            this.showScore();
+            this.showScore(json);
         }
 
         getSVGcorrect(size, iscorrect, colorCorrect, colorError) {
@@ -486,7 +457,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             }
         }
 
-        onServerAnswerMultichoice() {
+        updateScreenAfterAnswerMultichoice() {
             let aCorrect = this.correct.split(",");
             for (let i = 0; i < this.answersID.length; i++) {
                 let label = this.aItemLabel[i];

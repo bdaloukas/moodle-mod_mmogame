@@ -481,6 +481,71 @@ define([''], function() {
             return s2;
         }
 
+        createDivScore(left, top, num) {
+            let button = document.createElement("button");
+            button.style.position = "absolute";
+            button.classList.add("mmogame_button");
+            button.style.left = left + "px";
+            button.style.top = top + "px";
+            button.style.width = this.iconSize + "px";
+            button.style.height = this.iconSize + "px";
+            button.style.lineHeight = this.iconSize + "px";
+            button.style.textAlign = "center";
+            button.style.borderRadius = this.iconSize + "px";
+            button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
+            button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
+            button.title = this.getStringM('js_grade');
+            button.alt = this.getStringM('js_grade');
+            if (num === 1) {
+                this.buttonScore = button;
+                button.style.background = this.getColorHex(this.colorScore);
+                button.style.color = this.getColorContrast(this.colorScore);
+            } else {
+                this.buttonScore2 = button;
+                button.style.background = this.getColorHex(this.colorScore2);
+                button.style.color = this.getColorContrast(this.colorScore2);
+            }
+
+            this.body.appendChild(button);
+
+            button.innerHTML = '100 %';
+            this.autoResizeText(button, this.iconSize, this.iconSize, false, 0, 0, 1);
+            button.innerHTML = '';
+
+            let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
+            div.style.lineHeight = (this.iconSize / 2) + "px";
+            div.style.textAlign = "center";
+            div.style.color = this.getColorContrast(this.colorScore);
+            div.title = this.getStringM('js_grade');
+            if (num === 1) {
+                this.labelScore = div;
+            } else {
+                this.labelScore2 = div;
+            }
+
+            let h = this.iconSize / 3;
+            div = this.createDiv(this.body, left, top, this.iconSize, h);
+            div.style.textAlign = "center";
+            div.style.color = this.getColorContrast(this.colorScore);
+            button.disabled = true;
+            if (num === 1) {
+                this.labelScoreRank = div;
+            } else {
+                this.labelScoreRank2 = div;
+            }
+
+            div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize, h);
+            div.style.textAlign = "center";
+            div.style.color = this.getColorContrast(this.colorScore);
+            div.title = this.getStringM('js_grade_last_question');
+            button.disabled = true;
+            if (num === 1) {
+                this.labelAddScore = div;
+            } else {
+                this.labelAddScore2 = div;
+            }
+        }
+
         createDivScorePercent(left, top, num) {
             let button = document.createElement("button");
             button.style.position = "absolute";
@@ -1066,30 +1131,34 @@ define([''], function() {
                     case 'moodle':
                         if (options.nickname !== '' && options.avatarid !== 0 && options.paletteid !== 0) {
                             instance.gatePlayGame(false, user, options.nickname, options.paletteid, options.avatarid);
-                            return;
+                            return true;
                         }
                         break;
                     case 'guid':
                         if (!options.hasOwnProperty('userGUID')) {
                             options.userGUID = '';
                         }
+                        if (options.userGUID !== '') {
+                            options.userGUID = instance.uuid4();
+                        }
                         if (options.userGUID !== '' && options.nickname !== '' && options.avatarid !== 0 &&
                             options.paletteid !== 0) {
                             instance.gatePlayGame(false, options.userGUID, options.nickname, options.paletteid, options.avatarid);
-                            return;
+                            return true;
                         }
                         break;
                 }
                 instance.gateCreateScreen();
+                return true;
             }).catch(error => {
-                console.log(error);
+                instance.showError(error.message);
+                return false;
             });
         }
 
         gatePlayGame(save, user, nickname, paletteid, avatarid) {
             if (!save) {
-                console.log('gatePlayGame ' + user + ' ' + nickname + ' ' + paletteid + ' ' + avatarid);
-                this.sendGetAttempt(user, nickname, paletteid, avatarid);
+                this.callGetAttempt({user: user, nickname: nickname, paletteid: paletteid, avatarid: avatarid, firstcall: true});
                 return;
             }
 
@@ -1101,38 +1170,48 @@ define([''], function() {
             let instance = this;
             this.saveOptions(options)
                 .then(function() {
-                    instance.sendGetAttempt(user, nickname, paletteid, avatarid);
+                    instance.callGetAttempt({user: user, nickname: nickname, paletteid: paletteid, avatarid: avatarid});
+                    return true;
                 })
                 .catch(error => {
-                    console.log(error);
+                    instance.showError(error.message);
+                    return false;
                 });
         }
 
-        sendGetAttempt(user = '', nickname = '', paletteid = 0, avatarid = 0) {
-            console.log('sendGetAttempt ' + user + ' ' + nickname + ' ' + paletteid + ' ' + avatarid);
-            let params = {
-                mmogameid: this.mmogameid,
-                kinduser: this.kinduser,
-                user: user,
-                nickname: nickname,
-                avatarid: avatarid,
-                colorpaletteid: paletteid,
-            };
-
+        callGetAttempt(params) {
+            console.log('callGetAttempt', params);
             let instance = this;
             require(['core/ajax'], function(Ajax) {
+                let params2 = {mmogameid: instance.mmogameid,
+                    kinduser: instance.kinduser, user: params.user};
+                if (params.firstcall) {
+                    params2.nickname = params.nickname;
+                    params2.paletteid = params.paletteid;
+                    params2.avatarid = params.avatarid;
+                }
                 // Calling the service through the Moodle AJAX API
                 let getAttempt = Ajax.call([{
                     methodname: 'mmogametype_quiz_get_attempt',
-                    args: params
+                    args: {
+                        mmogameid: instance.mmogameid,
+                        kinduser: instance.kinduser,
+                        user: params.user,
+                        nickname: params.nickname,
+                        avatarid: params.avatarid,
+                        colorpaletteid: params.paletteid
+                    },
                 }]);
 
                 // Handling the response
                 getAttempt[0].done(function(response) {
-                    instance.openGame();
-                    instance.colors = undefined;
-                    instance.onServerGetAttempt(JSON.parse(response));
+                    if (params.firstcall) {
+                        instance.openGame();
+                        instance.colors = undefined;
+                    }
+                    instance.processGetAttempt(JSON.parse(response));
                 }).fail(function(error) {
+                    console.log('callGetAttempt error', error);
                     return error;
                 });
             });
@@ -1141,13 +1220,7 @@ define([''], function() {
         gateCreateScreen() {
             this.vertical = window.innerWidth < window.innerHeight;
 
-            if (this.area !== undefined) {
-                this.body.removeChild(this.area);
-                this.area = undefined;
-            }
-            this.removeDivMessage();
-
-            this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
+            this.createArea();
 
             if (this.vertical) {
                 this.gateCreateScreenVertical();
@@ -1230,7 +1303,7 @@ define([''], function() {
                         elements[0].parentNode.removeChild(elements[0]);
                     }
 
-                    instance.gateSendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors,
+                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
                         0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
                         true, false);
                 }
@@ -1258,7 +1331,7 @@ define([''], function() {
                         elements[0].parentNode.removeChild(elements[0]);
                     }
 
-                    instance.gateSendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors,
+                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
                         0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
                         false, true);
                 }
@@ -1269,7 +1342,7 @@ define([''], function() {
             label.style.top = (bottom + gridHeightColors) + "px";
 
             // Vertical
-            this.gateSendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors,
+            this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
                 0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars,
                 gridHeightAvatars);
 
@@ -1361,7 +1434,7 @@ define([''], function() {
                         elements[0].parentNode.removeChild(elements[0]);
                     }
 
-                    instance.gateSendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 0,
+                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors, 0,
                         bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
                         true, false);
                 }
@@ -1391,7 +1464,7 @@ define([''], function() {
                         elements[0].parentNode.removeChild(elements[0]);
                     }
 
-                    instance.gateSendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors, 0,
+                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors, 0,
                         bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
                         false, true);
                 }
@@ -1403,7 +1476,7 @@ define([''], function() {
             label.style.top = (bottom + gridHeightColors) + "px";
 
             // Horizontal
-            this.gateSendGetColorsAvatarsVertical(0, bottom, gridWidthColors, gridHeightColors,
+            this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
                 0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars,
                 gridHeightAvatars);
 
@@ -1518,7 +1591,7 @@ define([''], function() {
             }
         }
 
-        gateSendGetColorsAvatarsVertical(leftColors, topColors, gridWidthColors, gridHeightColors, leftAvatars, topAvatars,
+        gateSendGetColorsAvatars(leftColors, topColors, gridWidthColors, gridHeightColors, leftAvatars, topAvatars,
                                          gridWidthAvatars, gridHeightAvatars, updateColors = true, updateAvatars = true) {
 
             let countXcolors = Math.floor(gridWidthColors / this.iconSize);
@@ -1553,13 +1626,15 @@ define([''], function() {
 
                 // Handling the response
                 getAssets[0].done(function(response) {
+                    let json = JSON.parse(response);
+                    console.log(json);
                     if (updateColors) {
                         instance.gateShowColorPalettes(leftColors, topColors, gridWidthColors,
-                            gridHeightColors, countXcolors, countYcolors, response.colorpaletteids, response.colorpalettes);
+                            gridHeightColors, countXcolors, countYcolors, json.colorpaletteids, json.colorpalettes);
                     }
                     if (updateAvatars) {
                         instance.gateShowAvatars(leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars,
-                            response.avatarids, response.avatars);
+                            json.avatarids, json.avatars);
                     }
                 }).fail(function(error) {
                     return error;
@@ -1753,7 +1828,6 @@ define([''], function() {
                             records.forEach(record => {
                                 optionsObject[record.name] = record.value;
                             });
-                            console.log(optionsObject);
                             resolve(optionsObject); // Επιστροφή του αντικειμένου
                         } else {
                             resolve({}); // Επιστροφή άδειου αντικειμένου αν δεν υπάρχουν εγγραφές
@@ -1785,13 +1859,7 @@ define([''], function() {
                     for (let name in optionsObject) {
                         if (optionsObject.hasOwnProperty(name)) {
                             let value = optionsObject[name];
-                            let saveRequest = store.put({name: name, value: value});
-
-                            saveRequest.onsuccess = function() {
-                            };
-
-                            saveRequest.onerror = function() {
-                            };
+                            store.put({name: name, value: value});
                         }
                     }
 
@@ -1809,6 +1877,20 @@ define([''], function() {
                     reject(new Error("Failed to open database"));
                 };
             });
+        }
+
+        showError(message) {
+            this.createDivMessage(message);
+        }
+
+        createArea() {
+            if (this.area !== undefined) {
+                this.body.removeChild(this.area);
+                this.area = undefined;
+            }
+            this.removeDivMessage();
+
+            this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
         }
     };
 });
