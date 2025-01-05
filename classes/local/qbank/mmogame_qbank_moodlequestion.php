@@ -188,16 +188,17 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @param object $query
      * @param string $useranswer
+     * @param int|null $
      * @param object $mmogame
      * @param float $fraction
      *
      * @return true or false
      */
-    public function is_correct(object $query, string $useranswer, object $mmogame, float &$fraction): bool {
+    public function is_correct(object $query, string $useranswer, ?int $useranswerid, object $mmogame, float &$fraction): bool {
         if ($query->qtype == 'shortanswer') {
             return $this->is_correct_shortanswer( $query, $useranswer, $mmogame);
         } else {
-            return $this->is_correct_multichoice( $query, $useranswer, $fraction);
+            return $this->is_correct_multichoice( $query, $useranswer, $useranswerid, $fraction);
         }
     }
 
@@ -227,9 +228,9 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @return true or false
      */
-    protected function is_correct_multichoice(object $query, string $useranswer, float &$fraction): bool {
+    protected function is_correct_multichoice(object $query, string $useranswer, ?int $useranswerid, float &$fraction): bool {
         if ($query->multichoice->single) {
-            return $this->is_correct_multichoice_single1( $query, $useranswer, $fraction);
+            return $this->is_correct_multichoice_single1( $query, $useranswerid, $fraction);
         } else {
             return $this->is_correct_multichoice_single0( $query, $useranswer, $fraction);
         }
@@ -239,15 +240,15 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * Check if $useranswer is the correct answer (internal function for multichoice answers with one correct answer)
      *
      * @param object $query
-     * @param string $useranswer
+     * @param int $useranswerid
      * @param float $fraction
      *
      * @return true or false
      */
-    protected function is_correct_multichoice_single1(object $query, string $useranswer, float &$fraction): bool {
+    protected function is_correct_multichoice_single1(object $query, int $useranswerid, float &$fraction): bool {
         $fraction = null;
         foreach ($query->answers as $answer) {
-            if (intval( $answer->id) == intval( $useranswer)) {
+            if (intval( $answer->id) == $useranswerid) {
                 $fraction = $answer->fraction;
                 break;
             }

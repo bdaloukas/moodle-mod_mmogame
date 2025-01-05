@@ -19,8 +19,6 @@ namespace mmogametype_quiz\external;
 use coding_exception;
 use core_external\external_api;
 use core_external\external_function_parameters;
-use core_external\external_multiple_structure;
-use core_external\external_single_structure;
 use core_external\external_value;
 
 use invalid_parameter_exception;
@@ -62,7 +60,7 @@ class set_answer extends external_api {
      * @param string $answer
      * @param int|null $answerid
      * @param string $subcommand
-     * @return array
+     * @return string
      * @throws coding_exception
      * @throws invalid_parameter_exception
      */

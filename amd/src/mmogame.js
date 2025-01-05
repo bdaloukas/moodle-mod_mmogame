@@ -12,6 +12,20 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 define([''], function() {
     return class MmoGame {
@@ -39,13 +53,7 @@ define([''], function() {
          */
         constructor() {
             this.body = document.getElementsByTagName("body")[0];
-            this.kindSound = window.localStorage.getItem('kindSound');
-            if (isNaN(this.kindSound)) {
-                this.kindSound = 0;
-            }
-            if (this.kindSound !== 0 && this.kindSound !== 1 && this.kindSound !== 2) {
-                this.kindSound = 0;
-            }
+            this.kindSound = 0;
 
             let size = parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue('font-size'));
             this.minFontSize = size;
@@ -341,16 +349,6 @@ define([''], function() {
                 pos = pos3;
             }
             item.innerHTML = s;
-        }
-
-        getUserGUID() {
-            let guid = window.localStorage.getItem('UserGUID');
-            if (guid === null || guid === '') {
-                guid = this.uuid4();
-                window.localStorage.setItem("UserGUID", guid);
-            }
-
-            return guid;
         }
 
         pad(num, size) {
@@ -1036,60 +1034,82 @@ define([''], function() {
             this.divNicknames[num].style.visibility = 'visible';
         }
 
-        // Gate
-        gateOpen(mmogameid, pin, kinduser, auserid, url) {
+        gateOpen(mmogameid, pin, kinduser, user, url) {
             this.url = url;
             this.minFontSize *= 2;
             this.maxFontSize *= 2;
 
             this.mmogameid = mmogameid;
             this.pin = pin;
-            this.auserid = auserid;
             this.kinduser = kinduser;
+            this.user = user;
             this.gateComputeSizes();
-            this.areaTop = this.padding;
 
+            this.areaTop = this.padding;
             this.areaWidth = Math.round(window.innerWidth - 2 * this.padding);
             this.areaHeight = Math.round(window.innerHeight - this.areaTop) - this.padding;
 
-            switch (kinduser) {
-                case 'moodle':
-                    if (localStorage.getItem("nickname") !== null && localStorage.getItem("avatarid") !== null
-                        && localStorage.getItem("paletteid") !== null) {
-                        let avatarid = parseInt(localStorage.getItem("avatarid"));
-                        let paletteid = parseInt(localStorage.getItem("paletteid"));
-                        this.gatePlayGame(auserid, localStorage.getItem("nickname"), paletteid, avatarid);
-                        return;
-                    }
-                    break;
-                case 'guid':
-                    if (localStorage.getItem("auserid") !== null && localStorage.getItem("nickname") !== null
-                        && localStorage.getItem("avatarid") !== null && localStorage.getItem("paletteid") !== null) {
-                        let avatarid = parseInt(localStorage.getItem("avatarid"));
-                        let paletteid = parseInt(localStorage.getItem("paletteid"));
-                        this.gatePlayGame(localStorage.getItem("auserid"), localStorage.getItem("nickname"), paletteid, avatarid);
-                        return;
-                    }
-                    break;
-            }
+            let instance = this;
+            this.getOptions().then(function(options) {
+                if (!options.hasOwnProperty('kindsound')) {
+                    options.kindsound = 0;
+                }
+                instance.kindSound = options.kindSound === 1 || options.kindSound === 2 ? options.kindSound : 0;
 
-            this.gateCreateScreen();
+                if (!options.hasOwnProperty('nickname')) {
+                    options.nickname = '';
+                }
+                options.avatarid = options.hasOwnProperty('avatarid') && options.avatarid !== undefined ? options.avatarid : 0;
+                options.paletteid = options.hasOwnProperty('paletteid') ? options.paletteid : 0;
+
+                switch (kinduser) {
+                    case 'moodle':
+                        if (options.nickname !== '' && options.avatarid !== 0 && options.paletteid !== 0) {
+                            instance.gatePlayGame(false, user, options.nickname, options.paletteid, options.avatarid);
+                            return;
+                        }
+                        break;
+                    case 'guid':
+                        if (!options.hasOwnProperty('userGUID')) {
+                            options.userGUID = '';
+                        }
+                        if (options.userGUID !== '' && options.nickname !== '' && options.avatarid !== 0 &&
+                            options.paletteid !== 0) {
+                            instance.gatePlayGame(false, options.userGUID, options.nickname, options.paletteid, options.avatarid);
+                            return;
+                        }
+                        break;
+                }
+                instance.gateCreateScreen();
+            }).catch(error => {
+                console.log(error);
+            });
         }
 
-        gatePlayGame(user, nickname, paletteid, avatarid) {
-            if (user === 0 && this.kinduser === 'guid') {
-                user = this.getUserGUID();
+        gatePlayGame(save, user, nickname, paletteid, avatarid) {
+            if (!save) {
+                console.log('gatePlayGame ' + user + ' ' + nickname + ' ' + paletteid + ' ' + avatarid);
+                this.sendGetAttempt(user, nickname, paletteid, avatarid);
+                return;
             }
-            localStorage.setItem("auserid", user);
-            localStorage.setItem("nickname", nickname);
-            localStorage.setItem("paletteid", paletteid);
-            localStorage.setItem("avatarid", avatarid);
 
-            // Defining the parameters to be passed to the service
-            this.sendGetAttempt(user, nickname, paletteid, avatarid);
+            let options = {nickname: nickname, avatarid: avatarid, paletteid: paletteid};
+            if (this.kinduser === 'guid') {
+                options.userGUID = user;
+            }
+
+            let instance = this;
+            this.saveOptions(options)
+                .then(function() {
+                    instance.sendGetAttempt(user, nickname, paletteid, avatarid);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         }
 
         sendGetAttempt(user = '', nickname = '', paletteid = 0, avatarid = 0) {
+            console.log('sendGetAttempt ' + user + ' ' + nickname + ' ' + paletteid + ' ' + avatarid);
             let params = {
                 mmogameid: this.mmogameid,
                 kinduser: this.kinduser,
@@ -1258,7 +1278,7 @@ define([''], function() {
                 this.iconSize, "", 'assets/submit.svg', false, 'submit');
             this.btnSubmit.style.visibility = 'hidden';
             this.btnSubmit.addEventListener("click", function() {
-                instance.gatePlayGame(instance.edtCode === undefined ? instance.auserid : instance.edtCode.value,
+                instance.gatePlayGame(true, instance.edtCode === undefined ? instance.user : instance.edtCode.value,
                     instance.edtNickname.value, instance.paletteid, instance.avatarid);
             });
         }
@@ -1393,7 +1413,7 @@ define([''], function() {
             this.btnSubmit.style.visibility = 'hidden';
             this.btnSubmit.addEventListener("click",
                 function() {
-                    instance.gatePlayGame(instance.edtCode === undefined ? instance.auserid : instance.edtCode.value,
+                    instance.gatePlayGame(true, instance.edtCode === undefined ? instance.user : instance.edtCode.value,
                         instance.edtNickname.value, instance.paletteid, instance.avatarid);
                 });
         }
@@ -1520,7 +1540,7 @@ define([''], function() {
                 let params = {
                     mmogameid: instance.mmogameid,
                     kinduser: instance.kinduser,
-                    user: instance.auserid,
+                    user: instance.user,
                     avatars: countXavatars * countYavatars,
                     colorpalettes: countXcolors * countYcolors,
                 };
@@ -1703,6 +1723,92 @@ define([''], function() {
             this.divMessage.innerHTML = message;
             this.body.appendChild(this.divMessage);
             this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
+        }
+
+        getOptions() {
+            return new Promise((resolve, reject) => {
+                let request = indexedDB.open("PreferencesDB", 4); // Άνοιγμα της βάσης δεδομένων
+
+                request.onupgradeneeded = function(event) {
+                    let db = event.target.result;
+                    // Δημιουργία του object store "options" αν δεν υπάρχει
+                    if (!db.objectStoreNames.contains("options")) {
+                        db.createObjectStore("options", {keyPath: "name"});
+                    }
+                };
+
+                request.onsuccess = function(event) {
+                    let db = event.target.result;
+
+                    let transaction = db.transaction(["options"], "readonly"); // Δημιουργία συναλλαγής ανάγνωσης
+                    let store = transaction.objectStore("options");
+
+                    let getAllRequest = store.getAll(); // Διαβάζει όλες τις εγγραφές από το object store
+
+                    getAllRequest.onsuccess = function(event) {
+                        let records = event.target.result; // Όλες οι εγγραφές από το object store
+                        if (records.length > 0) {
+                            // Μετατροπή σε object με τα name ως κλειδιά
+                            let optionsObject = {};
+                            records.forEach(record => {
+                                optionsObject[record.name] = record.value;
+                            });
+                            console.log(optionsObject);
+                            resolve(optionsObject); // Επιστροφή του αντικειμένου
+                        } else {
+                            resolve({}); // Επιστροφή άδειου αντικειμένου αν δεν υπάρχουν εγγραφές
+                        }
+                    };
+
+                    getAllRequest.onerror = function() {
+                        reject(new Error("Failed to read options"));
+                    };
+                };
+
+                request.onerror = function() {
+                    resolve({});
+                };
+            });
+        }
+
+        saveOptions(optionsObject) {
+            return new Promise((resolve, reject) => {
+                let request = indexedDB.open("PreferencesDB", 4);
+
+                request.onsuccess = function(event) {
+                    let db = event.target.result;
+
+                    let transaction = db.transaction(["options"], "readwrite"); // Δημιουργία συναλλαγής για εγγραφή
+                    let store = transaction.objectStore("options");
+
+                    // Για κάθε ζεύγος name-value στο αντικείμενο, το αποθηκεύουμε στην IndexedDB
+                    for (let name in optionsObject) {
+                        if (optionsObject.hasOwnProperty(name)) {
+                            let value = optionsObject[name];
+                            let saveRequest = store.put({name: name, value: value});
+
+                            saveRequest.onsuccess = function() {
+                            };
+
+                            saveRequest.onerror = function() {
+                            };
+                        }
+                    }
+
+                    // Επιτυχής ολοκλήρωση της συναλλαγής
+                    transaction.oncomplete = function() {
+                        resolve();
+                    };
+
+                    transaction.onerror = function() {
+                        reject(new Error("Failed to save options"));
+                    };
+                };
+
+                request.onerror = function() {
+                    reject(new Error("Failed to open database"));
+                };
+            });
         }
     };
 });

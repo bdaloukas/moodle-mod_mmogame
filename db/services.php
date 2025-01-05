@@ -48,5 +48,6 @@ $functions = [
         'description'   => 'Gets the list of avatars.',
         'type'          => 'write',
         'ajax'          => true,
+        'loginrequired' => false,
     ],
 ];

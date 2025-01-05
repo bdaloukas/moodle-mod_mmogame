@@ -45,11 +45,20 @@ $functions = [
         'description'   => 'Starts a new attempt or continues the last attempt.',
         'type'          => 'write',
         'ajax'          => true,
+        'loginrequired' => false,
     ],
     'mmogametype_quiz_set_answer' => [
         'classname'     => 'mmogametype_quiz\external\set_answer',
         'description'   => 'Save the answer to the question.',
         'type'          => 'write',
         'ajax'          => true,
+        'loginrequired' => false,
+    ],
+    'mmogametype_quiz_get_highscore' => [
+        'classname'     => 'mmogametype_quiz\external\get_highscore',
+        'description'   => 'Gets the high scores for the game.',
+        'type'          => 'write',
+        'ajax'          => true,
+        'loginrequired' => false,
     ],
 ];

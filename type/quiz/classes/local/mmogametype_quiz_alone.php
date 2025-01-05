@@ -98,7 +98,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
 
         if ($autograde) {
             $fraction = 0.0;
-            $attempt->iscorrect = $this->qbank->is_correct( $query, $useranswer, $this, $fraction);
+            $attempt->iscorrect = $this->qbank->is_correct( $query, $useranswer, $useranswerid, $this, $fraction);
         }
 
         $time = time();

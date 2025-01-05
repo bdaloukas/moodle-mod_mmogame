@@ -557,20 +557,28 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     sendGetHighScore() {
-        let xmlhttp = new XMLHttpRequest();
-        let instance = this;
-        xmlhttp.onreadystatechange = () => {
-                    if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-                        let json = JSON.parse(xmlhttp.responseText);
-                        instance.createScreenHighScore(json);
-                    }
-                };
+        let params = {
+            mmogameid: this.mmogameid,
+            kinduser: this.kinduser,
+            user: this.user,
+            count: 10,
+        };
 
-        xmlhttp.open("POST", this.url, true);
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        let data = JSON.stringify({"command": "gethighscore", "mmogameid": this.mmogameid, "pin": this.pin,
-            'kinduser': this.kinduser, "user": this.auserid, "count": 10});
-        xmlhttp.send(data);
+        let instance = this;
+        require(['core/ajax'], function(Ajax) {
+            // Calling the service through the Moodle AJAX API
+            let getHighScore = Ajax.call([{
+                methodname: 'mmogametype_quiz_get_highscore',
+                args: params
+            }]);
+
+            // Handling the response
+            getHighScore[0].done(function(response) {
+                instance.createScreenHighScore(JSON.parse(response));
+            }).fail(function(error) {
+                return error;
+            });
+        });
     }
 
     createScreenHighScore(json) {

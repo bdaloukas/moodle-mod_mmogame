@@ -25,6 +25,9 @@
 // No login check is expected here because users can play users as guest and as normal users
 // If are normal users include later require_login.
 // @codingStandardsIgnoreLine
+
+define('NO_MOODLE_COOKIES', true);
+
 require( "../../config.php");
 
 global $CFG, $DB, $USER, $OUTPUT, $PAGE;
