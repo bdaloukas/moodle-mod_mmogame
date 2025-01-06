@@ -1180,7 +1180,6 @@ define([''], function() {
         }
 
         callGetAttempt(params) {
-            console.log('callGetAttempt', params);
             let instance = this;
             require(['core/ajax'], function(Ajax) {
                 let params2 = {mmogameid: instance.mmogameid,
@@ -1211,7 +1210,6 @@ define([''], function() {
                     }
                     instance.processGetAttempt(JSON.parse(response));
                 }).fail(function(error) {
-                    console.log('callGetAttempt error', error);
                     return error;
                 });
             });
@@ -1627,7 +1625,6 @@ define([''], function() {
                 // Handling the response
                 getAssets[0].done(function(response) {
                     let json = JSON.parse(response);
-                    console.log(json);
                     if (updateColors) {
                         instance.gateShowColorPalettes(leftColors, topColors, gridWidthColors,
                             gridHeightColors, countXcolors, countYcolors, json.colorpaletteids, json.colorpalettes);

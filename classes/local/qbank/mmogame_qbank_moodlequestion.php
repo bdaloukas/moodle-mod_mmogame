@@ -147,10 +147,8 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
                 }
             }
 
-            $n = 0;
             $answers = $answerids = [];
             foreach ($rec->answers as $info) {
-                $n++;
                 $answers[] = $info->answer;
                 $answerids[] = $info->id;
             }
@@ -188,7 +186,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @param object $query
      * @param string $useranswer
-     * @param int|null $
+     * @param int|null $useranswerid
      * @param object $mmogame
      * @param float $fraction
      *
@@ -224,6 +222,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @param object $query
      * @param string $useranswer
+     * @param int|null $useranswerid
      * @param float $fraction
      *
      * @return true or false
@@ -283,6 +282,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @param object $query
      * @return ?string
+     * @throws RandomException
      */
     public function get_layout(object $query): ?string {
         if ($query->qtype != 'multichoice') {
