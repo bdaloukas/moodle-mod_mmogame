@@ -19,8 +19,6 @@ namespace mmogametype_quiz\external;
 use coding_exception;
 use core_external\external_api;
 use core_external\external_function_parameters;
-use core_external\external_multiple_structure;
-use core_external\external_single_structure;
 use core_external\external_value;
 
 use invalid_parameter_exception;
@@ -44,9 +42,9 @@ class get_attempt extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_RAW, 'The user data'),
-            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user', VALUE_OPTIONAL, null,),
-            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar', VALUE_OPTIONAL, null,),
-            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette', VALUE_OPTIONAL, null,),
+            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user', VALUE_OPTIONAL, null, ),
+            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar', VALUE_OPTIONAL, null, ),
+            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette', VALUE_OPTIONAL, null, ),
         ]);
     }
 
@@ -59,7 +57,7 @@ class get_attempt extends external_api {
      * @param string|null $nickname
      * @param int|null $avatarid
      * @param int|null $colorpaletteid
-     * @return array
+     * @return string
      * @throws coding_exception
      * @throws invalid_parameter_exception
      */
