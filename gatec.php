@@ -23,7 +23,7 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// No login check is expected here because users can play users as guest and as normal users
+// No login check is expected here because users can play users as guest and as normal users.
 define('NO_MOODLE_COOKIES', true);
 require( "../../config.php");
 
