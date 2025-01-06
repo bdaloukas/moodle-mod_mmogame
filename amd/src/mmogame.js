@@ -1624,14 +1624,13 @@ define([''], function() {
 
                 // Handling the response
                 getAssets[0].done(function(response) {
-                    let json = JSON.parse(response);
                     if (updateColors) {
                         instance.gateShowColorPalettes(leftColors, topColors, gridWidthColors,
-                            gridHeightColors, countXcolors, countYcolors, json.colorpaletteids, json.colorpalettes);
+                            gridHeightColors, countXcolors, countYcolors, response.colorpaletteids, response.colorpalettes);
                     }
                     if (updateAvatars) {
                         instance.gateShowAvatars(leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars,
-                            json.avatarids, json.avatars);
+                            response.avatarids, response.avatars);
                     }
                 }).fail(function(error) {
                     return error;
@@ -1889,5 +1888,19 @@ define([''], function() {
 
             this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
         }
+
+        clearDB(url) {
+            let options = {nickname: ''};
+            this.saveOptions(options)
+                .then(function() {
+                    window.location.href = url;
+                    return true;
+                })
+                .catch(() => {
+                    return false;
+                });
+
+        }
+
     };
 });

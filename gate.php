@@ -70,9 +70,7 @@ $PAGE->requires->js_init_code("
     require(['mmogametype_" . $rgame->type."/" . strtolower( $classname)."'], function(".$classname.") {
         var obj = new ".$classname."();
         obj.repairColors( $colors);
-        console.log( $rgame->id, $rgame->pin, '$rgame->kinduser', '$USER->id', '$url');
         obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$USER->id', '$url');
-        console.log(obj); // Μπορείς να κάνεις οποιαδήποτε ενέργεια με το αντικείμενο εδώ
     });
 ");
 

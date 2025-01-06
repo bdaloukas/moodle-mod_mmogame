@@ -15,49 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the gate code thats clear saved user info.
+ * This file contains the gate code that's clear saved user info.
+ *
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// No login check is expected here because users can play users as guest and as normal users
 define('NO_MOODLE_COOKIES', true);
 require( "../../config.php");
 
-?>
-<html lang="en">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="MMOGAME clear.">
-<title>MMOGAME clear</title>
-<div id="message"></div>
-<script>
-window.localStorage.removeItem('auserid');
-window.localStorage.removeItem('nickname');
-window.localStorage.removeItem('UserGUID');
-document.getElementById("message").innerHTML = 'Player is changed';
-</script>
+global $CFG, $DB, $USER, $OUTPUT, $PAGE;
 
-<?php
-/**
- * Removes ausersid, nickname, UserGUID from window.localStorage and goes to gate.php
- *
- * @package    mod_mmogame
- * @copyright  2024 Vasilis Daloukas
- * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- **/
-if (array_key_exists( 'HTTPS', $_SERVER) && $_SERVER['HTTPS'] = 'On') {
-    $url = 'https://';
-} else {
-    $url = 'http://';
-}
+$mmogameid = required_param('id', PARAM_INT);
+$pin = required_param('pin', PARAM_INT);
 
-$url .= $_SERVER['HTTP_HOST'];
+$PAGE->set_url(new moodle_url('/mod/mmogame/gate2.php'));
+$PAGE->set_pagelayout('embedded'); // Layout χωρίς header και footer.
+$PAGE->set_context(context_system::instance());
 
-$url .= $_SERVER['REQUEST_URI'];
-$url = str_replace( '/gatec.php', '/gate.php', $url);
-echo '<a href="'.$url.'">Continue</a>';
+$PAGE->requires->js_call_amd('mod_mmogame/mmogame');
 
-?>
-</html>
+$url = "$CFG->wwwroot/mod/mmogame/gate.php?id=$mmogameid&pin=$pin";
+$PAGE->requires->js_init_code("
+    require(['mod_mmogame/mmogame'], function(mmogame) {
+        var obj = new mmogame();
+        obj.clearDB('" . $url."');
+    });
+");
+
+// Output the page.
+echo $OUTPUT->header();
+echo $OUTPUT->footer();
