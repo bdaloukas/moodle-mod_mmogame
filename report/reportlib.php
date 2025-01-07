@@ -39,7 +39,10 @@ function mmogame_report_default_report($context) {
 
 /**
  * Returns an array of reports to which the current user has access to.
+ * @param $context
  * @return array reports are ordered as they should be for display in tabs.
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function mmogame_report_list($context) {
     global $DB;

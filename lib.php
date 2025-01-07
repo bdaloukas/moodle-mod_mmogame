@@ -255,7 +255,7 @@ function mmogame_supports(string $feature): ?bool {
 }
 
 /**
- * Returns the same as {@link mmogame_num_attempt_summary()} but wrapped in a link
+ * Returns the same as mmogame_num_attempt_summary() but wrapped in a link
  * to the mmogame reports.
  *
  * @param stdClass $mmogame the mmogame object. Only $mmogame->id is used at the moment.

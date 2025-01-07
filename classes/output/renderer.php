@@ -1403,7 +1403,7 @@ class renderer extends plugin_renderer_base {
      * @param int $currentgroup currently selected group, if there is one.
      * @return string HTML fragment for the link.
      */
-    public function quiz_override_summary_links(stdClass $quiz, cm_info|stdClass $cm, $currentgroup = 0): string {
+    public function quiz_override_summary_links(stdClass $quiz, $cm, $currentgroup = 0): string {
 
         $baseurl = new moodle_url('/mod/quiz/overrides.php', ['cmid' => $cm->id]);
         $counts = quiz_override_summary($quiz, $cm, $currentgroup);
