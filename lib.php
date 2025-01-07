@@ -253,3 +253,69 @@ function mmogame_supports(string $feature): ?bool {
             return null;
     }
 }
+
+/**
+ * Returns the same as {@link mmogame_num_attempt_summary()} but wrapped in a link
+ * to the mmogame reports.
+ *
+ * @param stdClass $mmogame the mmogame object. Only $mmogame->id is used at the moment.
+ * @param stdClass $cm the cm object. Only $cm->course, $cm->groupmode and
+ *      $cm->groupingid fields are used at the moment.
+ * @param stdClass $context the mmogame context.
+ * @param bool $returnzero if false (default), when no attempts have been made
+ *      '' is returned instead of 'Attempts: 0'.
+ * @param int $currentgroup if there is a concept of current group where this method is being called
+ *         (e.g., a report) pass it in here. Default 0 which means no current group.
+ * @return string HTML fragment for the link.
+ */
+function mmogame_attempt_summary_link_to_reports(stdClass $mmogame, stdClass $cm, stdClass $context,
+                                                 bool $returnzero = false, int $currentgroup = 0): string {
+    global $PAGE;
+
+    return $PAGE->get_renderer('mod_mmogame')->mmogame_attempt_summary_link_to_reports(
+        $mmogame, $cm, $context, $returnzero, $currentgroup);
+}
+
+/**
+ * Return a textual summary of the number of attempts that have been made at a particular mmogame,
+ * returns '' if no attempts have been made yet, unless $returnzero is passed as true.
+ *
+ * @param stdClass $mmogame the mmogame object. Only $mmogame->id is used at the moment.
+ * @param stdClass $cm the cm object. Only $cm->course, $cm->groupmode and
+ *      $cm->groupingid fields are used at the moment.
+ * @param bool $returnzero if false (default), when no attempts have been
+ *      made '' is returned instead of 'Attempts: 0'.
+ * @param int $currentgroup if there is a concept of current group where this method is being called
+ *         (e.g., a report) pass it in here. Default 0 which means no current group.
+ * @return string a string like "Attempts: 123", "Attemtps 123 (45 from your groups)" or
+ *          "Attemtps 123 (45 from this group)".
+ */
+function mmogame_num_attempt_summary(stdClass $mmogame, stdClass $cm, bool $returnzero = false, int $currentgroup = 0): string {
+    global $DB, $USER;
+    $numattempts = $DB->count_records('mmogame_quiz_attempts', ['mmogameid' => $mmogame->id]);
+    if ($numattempts || $returnzero) {
+        if (groups_get_activity_groupmode($cm)) {
+            $a = new stdClass();
+            $a->total = $numattempts;
+            if ($currentgroup) {
+                $a->group = $DB->count_records_sql('SELECT COUNT(DISTINCT qa.id) FROM ' .
+                    '{mmogame_quiz_attempts} qa JOIN ' .
+                    '{groups_members} gm ON qa.userid = gm.userid ' .
+                    'WHERE mmogameid = ? AND groupid = ?',
+                    [$mmogame->id, $currentgroup]);
+                return get_string('attemptsnumthisgroup', 'mmogameid', $a);
+            } else if ($groups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid)) {
+                list($usql, $params) = $DB->get_in_or_equal(array_keys($groups));
+                $a->group = $DB->count_records_sql('SELECT COUNT(DISTINCT qa.id) FROM ' .
+                    '{mmogame_quiz_attempts} qa JOIN ' .
+                    '{groups_members} gm ON qa.userid = gm.userid ' .
+                    'WHERE mmogameid = ? AND ' .
+                    "groupid $usql", array_merge([$mmogame->id], $params));
+                return get_string('attemptsnumyourgroups', 'mmogame', $a);
+            }
+        }
+        return get_string('attemptsnum', 'mmogame', $numattempts);
+    }
+    return '';
+}
+

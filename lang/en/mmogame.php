@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['attempts'] = 'Attempts';
+$string['attemptsnum'] = 'Attempts: {$a}';
 $string['casesensitive'] = 'Case sensitive';
 $string['countgroup'] = 'Number of groups';
 $string['crontask'] = 'Crontask mmogame';

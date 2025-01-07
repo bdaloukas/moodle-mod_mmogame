@@ -15,18 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * This script controls the display of the quiz reports.
  *
- * @package mod_mmogame
+ * @package   mod_mmogame
  * @copyright 2024 Vasilis Daloukas
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+define('NO_OUTPUT_BUFFERING', true);
 
-$plugin->component = 'mod_mmogame';  // Full name of the plugin (used for diagnostics).
-$plugin->version   = 2025010710;  // The current module version (Date: YYYYMMDDXX).
-$plugin->requires  = 2022030300;  // Requires Moodle 4.0.
-$plugin->cron      = 0;           // Period for cron to check this module (secs).
-$plugin->release   = '2024-12-29';
-$plugin->maturity = MATURITY_STABLE;
+require_once(__DIR__ . '/../../config.php');
+
+require_login();

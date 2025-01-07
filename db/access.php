@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = [
 
     // Ability to see that the mmogame exists, and the basic information
-    // about it, for example the start date and time limit.
+    // about it, for example, the start date and time limit.
     'mod/mmogame:view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -39,6 +39,19 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
+
+    // View the mmogame reports.
+    'mod/mmogame:viewreports' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+
 
     // Ability to add a new mmogame to the course.
     'mod/mmogame:addinstance' => [
@@ -53,31 +66,9 @@ $capabilities = [
         'clonepermissionsfrom' => 'moodle/course:manageactivities',
     ],
 
-    // Ability to do the mmogame as a 'student'.
-    'mod/mmogame:attempt' => [
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'student' => CAP_ALLOW,
-        ],
-    ],
-
     // Edit the mmogame settings, add and remove questions.
     'mod/mmogame:manage' => [
         'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-    ],
-
-
-    // Delete attempts using the overview report.
-    'mod/mmogame:deleteattempts' => [
-        'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
