@@ -45,13 +45,15 @@ function mmogame_report_default_report($context) {
  * @throws dml_exception
  */
 function mmogame_report_list(stdClass $context) {
+
+    return ['overview'];
     global $DB;
     static $reportlist = null;
     if (!is_null($reportlist)) {
         return $reportlist;
     }
 
-    $reports = $DB->get_records('mmogame_reports', null, 'displayorder DESC', 'name, capability');
+    $reports = $DB->get_records('mmogame_aa_reports', null, 'displayorder DESC', 'name, capability');
     $reportdirs = core_component::get_plugin_list('mmogame');
 
     // Order the reports tab in descending order of displayorder.

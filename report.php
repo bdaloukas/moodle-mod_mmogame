@@ -27,3 +27,13 @@ define('NO_OUTPUT_BUFFERING', true);
 require_once(__DIR__ . '/../../config.php');
 
 require_login();
+
+$id = optional_param('id', 0, PARAM_INT);
+$mode = required_param('mode', PARAM_ALPHANUM);
+
+
+$cm = $DB->get_record('course_modules', ['id' => $id], '*', MUST_EXIST);
+$rgame = $DB->get_record('mmogame', ['id' => $cm->instance], '*', MUST_EXIST);
+
+$controller = new \mmogametype_quiz\output\overview\overview_controller();
+$controller->display();

@@ -68,6 +68,7 @@ $string['privacy:metadata:mmogame_quiz_attempt:timestart'] = 'timestart';
 $string['privacy:metadata:mmogame_quiz_attempt:useranswer'] = 'useranswer';
 $string['privacy:metadata:mmogame_quiz_attempt:useranswerid'] = 'useranswerid';
 $string['privacy:metadata:mmogame_quiz_attempts'] = 'Quiz attempts';
+$string['report_overview'] = 'Quiz overview';
 $string['showcorrect'] = 'Show correct answer';
 $string['state0'] = 'Wait to start';
 $string['waittostart'] = 'Waiting for game to start';

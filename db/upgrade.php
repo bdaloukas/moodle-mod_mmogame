@@ -535,24 +535,5 @@ function xmldb_mmogame_upgrade( $oldversion) {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2025010707)) {
-        $table = new xmldb_table( 'mmogame_reports');
-
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
-        $table->add_field('type', XMLDB_TYPE_CHAR, '30', null, false, null, '');
-        $table->add_field('model', XMLDB_TYPE_CHAR, '30', null, false, null, '');
-        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
-        $table->add_field('displayorder', XMLDB_TYPE_INTEGER, '10', true, XMLDB_NOTNULL, null, '0');
-        $table->add_field('capability', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
-
-        $table->add_key('PRIMARY', XMLDB_KEY_PRIMARY, [ 'id']);
-        $table->add_index('typemodelname', XMLDB_INDEX_UNIQUE, ['type', 'model', 'name']);
-
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
-    }
-
     return true;
 }

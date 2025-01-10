@@ -319,3 +319,53 @@ function mmogame_num_attempt_summary(stdClass $mmogame, stdClass $cm, bool $retu
     return '';
 }
 
+/**
+ * This function extends the settings navigation block for the site.
+ *
+ * It is safe to rely on PAGE here as we will only ever be within the module
+ * context when this is called
+ *
+ * @param settings_navigation $settings
+ * @param navigation_node $mmogamenode
+ * @return void
+ */
+function mmogame_extend_settings_navigation(settings_navigation $settings, navigation_node $mmogamenode) {
+    global $CFG;
+
+    $model = 'quiz';
+
+    // Require {@link questionlib.php}
+    // Included here as we only ever want to include this file if we really need to.
+    require_once($CFG->libdir . '/questionlib.php');
+
+    // We want to add these new nodes after the Edit settings node, and before the
+    // Locally assigned roles node. Of course, both of those are controlled by capabilities.
+    $keys = $mmogamenode->get_children_key_list();
+    $beforekey = null;
+    $i = array_search('modedit', $keys);
+    if ($i === false && array_key_exists(0, $keys)) {
+        $beforekey = $keys[0];
+    } else if (array_key_exists($i + 1, $keys)) {
+        $beforekey = $keys[$i + 1];
+    }
+
+    question_extend_settings_navigation($mmogamenode, $settings->get_page()->cm->context)->trim_if_empty();
+
+    if (has_any_capability(['mod/quiz:viewreports', 'mod/quiz:grade'], $settings->get_page()->cm->context)) {
+        require_once($CFG->dirroot . '/mod/mmogame/report/reportlib.php');
+        $reportlist = mmogame_report_list($settings->get_page()->cm->context);
+
+        $url = new moodle_url('/mod/mmogame/report.php',
+            ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist)]);
+        $reportnode = $mmogamenode->add_node(navigation_node::create(get_string('results', 'quiz'), $url,
+            navigation_node::TYPE_SETTING,
+            null, 'mmogame_report', new pix_icon('i/report', '')));
+
+        foreach ($reportlist as $report) {
+            $url = new moodle_url('/mod/mmogame/report.php', ['id' => $settings->get_page()->cm->id, 'mode' => $report]);
+            $reportnode->add_node(navigation_node::create(get_string('report_'.$report, 'mmogametype_'.$model), $url,
+                navigation_node::TYPE_SETTING,
+                null, 'mmogame_report_' . $report, new pix_icon('i/item', '')));
+        }
+    }
+}
