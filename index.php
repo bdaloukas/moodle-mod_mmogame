@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_mmogame\event\course_module_instance_list_viewed;
+
 require_once("../../config.php");
 require_once("lib.php");
 
@@ -34,7 +36,7 @@ require_login($course);
 $PAGE->set_pagelayout('incourse');
 
 $params = ['context' => $coursecontext];
-$event = \mod_mmogame\event\course_module_instance_list_viewed::create($params);
+$event = course_module_instance_list_viewed::create($params);
 $event->trigger();
 
 // Print the header.

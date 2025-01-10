@@ -114,7 +114,9 @@ class overview_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Exorta data to cvs format
+     * Exports data to cvs format
+     *
+     * @param html_table $table
      *
      * @throws moodle_exception
      * @throws \moodle_exception
