@@ -40,8 +40,10 @@ class overview_renderer extends plugin_renderer_base {
     /**
      * Renders
      *
-     * @throws moodle_exception
+     * @param overview_renderable $report
+     * @return string|void
      * @throws \moodle_exception
+     * @throws moodle_exception
      */
     public function render_overview(overview_renderable $report) {
 

@@ -334,7 +334,6 @@ function mmogame_extend_settings_navigation(settings_navigation $settings, navig
 
     $model = 'quiz';
 
-    // Require {@link questionlib.php}
     // Included here as we only ever want to include this file if we really need to.
     require_once($CFG->libdir . '/questionlib.php');
 
