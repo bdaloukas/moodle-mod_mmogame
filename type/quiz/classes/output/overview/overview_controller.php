@@ -46,22 +46,29 @@ class overview_controller {
      * @throws dml_exception
      */
     public function display(): void {
-        global $PAGE, $OUTPUT;
+        global $DB, $PAGE, $OUTPUT;
 
         $id = required_param('id', PARAM_INT);
+        $numgame = optional_param('numgame', null, PARAM_INT);
         $auserid = optional_param('auserid', null, PARAM_INT);
+        $queryid = optional_param('queryid', null, PARAM_INT);
         $cvs = optional_param('cvs', null, PARAM_RAW);
+
+        if (! $cm = get_coursemodule_from_id('mmogame', $id)) {
+            throw new moodle_exception('invalidcoursemoduleid', 'error', '', null, $id);
+        }
+        if (! $rgame = $DB->get_record('mmogame', ['id' => $cm->instance])) {
+            throw new moodle_exception('invalidcoursemoduleid', 'error', '', $cm->instance);
+        }
+
         // Set up the page.
         $PAGE->set_url(new moodle_url('/mod/mmogame/report.php', ['id' => $id, 'mode' => 'overview']));
         $PAGE->set_context(context_system::instance());
         $PAGE->set_title(get_string('report_overview', 'mmogametype_quiz'));
         $PAGE->set_heading('Heading');
 
-        // Get data from the database.
-        $records = $this->get_data( $auserid);
-
         // Create renderable object.
-        $renderable = new overview_renderable($records, $id, $auserid, $cvs);
+        $renderable = new overview_renderable($rgame, $id, $numgame, $auserid, $queryid, $cvs);
 
         $render = $PAGE->get_renderer('mmogametype_quiz', 'overview\overview');
 
@@ -71,25 +78,5 @@ class overview_controller {
         }
         echo $render->render($renderable);
         echo $OUTPUT->footer();
-    }
-
-    /**
-     * Reads from database the data
-     *
-     * @param int|null $auserid
-     * @return array
-     * @throws dml_exception
-     */
-    private function get_data(?int $auserid): array {
-        global $DB;
-
-        $params = [];
-        $select = '';
-        if ($auserid !== null) {
-            $select .= ' AND auserid=?';
-            $params[] = $auserid;
-        }
-
-        return $DB->get_records_select('mmogame_quiz_attempts', substr( $select, 4), $params);
     }
 }

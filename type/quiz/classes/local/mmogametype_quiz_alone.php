@@ -112,8 +112,11 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                     $useranswer = '';
                 }
                 $a['useranswerid'] = $attempt->useranswerid = $useranswerid;
+                $a['useranswer'] = null;
+            } else {
+                $a['useranswer'] = $attempt->useranswer = $useranswer;
+                $a['useranswerid'] = null;
             }
-            $a['useranswer'] = $attempt->useranswer = $useranswer;
         }
 
         $attempt->timeanswer = $time;

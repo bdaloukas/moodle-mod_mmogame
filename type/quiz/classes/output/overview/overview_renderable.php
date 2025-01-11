@@ -26,31 +26,181 @@
 
 namespace mmogametype_quiz\output\overview;
 
+use dml_exception;
+use renderable;
+use stdClass;
+
 /**
  * Renderable class to store data of the quiz attempts report.
  */
-class overview_renderable implements \renderable {
+class overview_renderable implements renderable {
     /** @var int $id: The course module id. */
-    public $id;
-    /** @var int $id: The auserid. */
-    public $auserid;
-    /** @var int $id: The records with result. */
-    public $records;
-    /** @var int $id: True if user asked for exporting to cvs format */
-    public $cvs;
-
+    public int $id;
+    /** @var ?int $auserid: The auserid. */
+    public ?int $auserid;
+    /** @var stdClass $rgame: The records with result. */
+    public stdClass $rgame;
+    /** @var ?string $export: True if user asked for exporting to cvs format */
+    public ?string $export;
+    /** @var string $where: The WHERE part of an SQL */
+    private string $where;
+    /** @var array $params: The params of an SQL */
+    private array $params;
+    /** @var string $where0: The params of an SQL */
+    private string $where0;
+    /** @var array $params0: The params of an SQL */
+    private array $params0;
+    /** @var ?int $numgame: The params of an SQL */
+    public ?int $numgame;
+    /** @var ?int $queryid: The queryid */
+    public ?int $queryid;
     /**
      * The constructor
      *
-     * @param ?array $records
-     * @param ?int $id
+     * @param stdClass $rgame
+     * @param int $id
+     * @param int|null $numgame
      * @param ?int $auserid
-     * @param ?string $cvs
+     * @param int|null $queryid
+     * @param ?string $export
      */
-    public function __construct($records = [], $id = null, $auserid = null, $cvs = null) {
+    public function __construct(stdClass $rgame, int $id, ?int $numgame, ?int $auserid, ?int $queryid, ?string $export) {
         $this->id = $id;
+        $this->rgame = $rgame;
+
+        $this->numgame = $numgame;
         $this->auserid = $auserid;
-        $this->records = $records;
-        $this->cvs = !($cvs === null);
+        $this->queryid = $queryid;
+        $this->export = $export != '' ? $export : null;
+
+        // Get data from the database.
+        [$this->where0, $this->params0] = $this->get_where( $rgame->id, null, null, null);
+        [$this->where, $this->params] = $this->get_where( $rgame->id, $numgame, $auserid, $queryid);
+    }
+
+    /**
+     * Reads from database the data
+     *
+     * @return array
+     * @throws dml_exception
+     */
+    public function get_data(): array {
+        global $DB;
+
+        return $DB->get_records_sql("SELECT * FROM {mmogame_quiz_attempts} mqa WHERE $this->where ORDER BY id", $this->params);
+    }
+
+    /**
+     * Computes the where part for an SQL
+     *
+     * @param int $mmogameid
+     * @param int|null $numgame
+     * @param int|null $auserid
+     * @param int|null $queryid
+     * @return array
+     */
+    protected function get_where(int $mmogameid, ?int $numgame, ?int $auserid, ?int $queryid): array {
+        $where = 'mqa.mmogameid=?';
+        $params = [$mmogameid];
+
+        if ($numgame !== null && $numgame != 0) {
+            $where .= ' AND mqa.numgame=?';
+            $params[] = $numgame;
+        }
+
+        if ($auserid !== null && $auserid != 0) {
+            $where .= ' AND mqa.auserid=?';
+            $params[] = $auserid;
+        }
+
+        if ($queryid !== null && $queryid != 0) {
+            $where .= ' AND mqa.queryid=?';
+            $params[] = $queryid;
+        }
+
+        return [$where, $params];
+    }
+
+    /**
+     * Reads from database the data
+     *
+     * @return array
+     * @throws dml_exception
+     */
+    public function get_auserid_options(): array {
+        global $DB;
+
+        $ret = [ null => ''];
+
+        if ($this->rgame->kinduser == 'moodle') {
+            $sql = "SELECT DISTINCT a.auserid, u.lastname, u.firstname
+                FROM {mmogame_quiz_attempts} mqa, {mmomgame_aa_users} u
+                WHERE $this->where0
+                AND mqa.userid = u.instanceid
+                ORDER BY u.lastname, u.firstname, mqa.auserid";
+            $recs = $DB->get_records_sql( $sql, $this->params0);
+            foreach ($recs as $rec) {
+                $ret[$rec->userid] = $rec->lastname.' '.$rec->firstname;
+            }
+        } else if ($this->rgame->kinduser == 'guid') {
+            $sql = "SELECT DISTINCT auserid
+                FROM {mmogame_quiz_attempts} mqa
+                WHERE $this->where0
+                ORDER BY auserid";
+
+            $recs = $DB->get_records_sql($sql, $this->params0);
+            foreach ($recs as $rec) {
+                $ret[$rec->auserid] = $rec->auserid;
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Reads from database the data
+     *
+     * @return array
+     * @throws dml_exception
+     */
+    public function get_queries_options(): array {
+        global $DB;
+
+        if ($this->rgame->qbank == 'moodlequestion') {
+            $sql = "SELECT DISTINCT mqa.queryid, q.name
+                FROM {mmogame_quiz_attempts} mqa, {question} q
+                WHERE $this->where0 AND mqa.queryid = q.id
+                ORDER BY q.name, mqa.queryid";
+            $recs = $DB->get_records_sql( $sql, $this->params0);
+            $ret = [ null => ''];
+            foreach ($recs as $rec) {
+                $ret[$rec->queryid] = $rec->name;
+            }
+            return $ret;
+        }
+
+        return [];
+    }
+
+    /**
+     * Reads from numgame the data
+     *
+     * @return array
+     * @throws dml_exception
+     */
+    public function get_numgame_options(): array {
+        global $DB;
+
+        $sql = "SELECT DISTINCT numgame
+                FROM {mmogame_quiz_attempts} mqa
+                WHERE $this->where0
+                ORDER BY numgame";
+        $recs = $DB->get_records_sql( $sql, $this->params0);
+        $ret = [ null => ''];
+        foreach ($recs as $rec) {
+            $ret[$rec->numgame] = $rec->numgame;
+        }
+
+        return $ret;
     }
 }

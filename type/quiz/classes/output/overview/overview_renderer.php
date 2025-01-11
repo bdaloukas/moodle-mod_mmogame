@@ -34,7 +34,7 @@ use moodle_url;
 use plugin_renderer_base;
 
 /**
- * Renderer class to sbow or export data of the quiz attempts report.
+ * Renderer class to show or export data of the quiz attempts report.
  */
 class overview_renderer extends plugin_renderer_base {
     /**
@@ -53,15 +53,26 @@ class overview_renderer extends plugin_renderer_base {
             'action' => new moodle_url('/mod/mmogame/report.php', ['id' => $report->id, 'mode' => 'overview']),
         ]);
 
-        $form .= html_writer::label('auserid', 'auserid');
-        $form .= html_writer::empty_tag('input', [
-            'type' => 'number',
-            'name' => 'auserid',
-            'value' => $report->auserid,
-        ]);
+        // Add numgame.
+        $form .= html_writer::label(get_string('numgame', 'mod_mmogame').': ', 'numgame', false);
+        $form .= html_writer::select($report->get_numgame_options(), 'numgame', $report->numgame, false,
+                ['class' => 'me-2 mb-2']);
+
+        // Add auserid.
+        $form .= html_writer::label('auserid:', 'auserid', false);
+        $form .= html_writer::select($report->get_auserid_options(), 'auserid', $report->auserid, false,
+                ['class' => 'me-2 mb-2']);
+
+        // Add queries.
+        $options = $report->get_queries_options();
+        $form .= html_writer::label('query: ', 'queries', false);
+        $form .= html_writer::select($options, 'queries', $report->numgame, false,
+                ['class' => 'me-2 mb-2']);
+
         $form .= html_writer::empty_tag('input', [
             'type' => 'submit',
             'value' => 'submit',
+            'class' => 'me-2 mb-2',
         ]);
 
         $form .= html_writer::empty_tag('input', [
@@ -86,22 +97,23 @@ class overview_renderer extends plugin_renderer_base {
 
         // Show results.
         $output = $form;
-        if (!empty($report->records)) {
+        $records = $report->get_data();
+        if (!empty($records)) {
+            $strftimedaydate = get_string("strftimedaydate");
             $table = new html_table();
-            $table->head = ['ID', 'auserid', 'numgame', 'numattempt', 'queryid', 'useranswer', 'iscorrect', 'timeanswer'];
-            foreach ($report->records as $record) {
+            $table->head = ['auserid', 'numgame', 'numattempt', 'queryid', 'useranswer', 'iscorrect', 'timeanswer'];
+            foreach ($records as $record) {
                 $table->data[] = [
-                    $record->id,
                     $record->auserid,
                     $record->numgame,
                     $record->numattempt,
                     $record->queryid,
                     $record->useranswer,
                     $record->iscorrect,
-                    $record->timeanswer,
+                    $record->timeanswer != 0 ? userdate($record->timeanswer, $strftimedaydate) : '',
                 ];
             }
-            if ($report->cvs) {
+            if ($report->export == 'cvs') {
                 $this->export_table_to_csv( $table);
                 exit;
             }
