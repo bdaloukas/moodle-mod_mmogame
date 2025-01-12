@@ -24,6 +24,8 @@
 
 namespace mod_mmogame\local\database;
 
+use coding_exception;
+use dml_exception;
 use stdClass;
 
 /**
@@ -53,6 +55,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $table
      * @param array $a
      * @return bool|int if the insertions are ok, otherwise false.
+     * @throws dml_exception
      */
     public function insert_record(string $table, array $a) {
         global $DB;
@@ -68,6 +71,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param int $returnid
      * @param bool $customsequence
      * @return true if the insertions are ok, otherwise false.
+     * @throws dml_exception
      */
     public function insert_record_raw(string $table, array $a, int $returnid, bool $customsequence): bool {
         global $DB;
@@ -85,6 +89,7 @@ class mmogame_database_moodle extends mmogame_database {
      *
      * @param string $sql
      * @param ?array $params
+     * @throws dml_exception
      */
     public function execute(string $sql, ?array $params=null): void {
         global $DB;
@@ -100,6 +105,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param array|null $params Optional parameters for the SQL condition.
      * @param string $fields Fields to return, defaults to '*'.
      * @return object|false The database record as an object, or false if not found.
+     * @throws dml_exception
      */
     public function get_record_select(string $table, string $select, ?array $params=null, string $fields='*') {
         global $DB;
@@ -116,8 +122,10 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $sort Optional sorting order.
      * @param string $fields The fields to return, default is '*'.
      * @return object|false The first matching database record as an object, or false if no record is found.
+     * @throws dml_exception
      */
-    public function get_record_select_first(string $table, string $select, ?array $params=null, string $sort='', $fields='*') {
+    public function get_record_select_first(string $table, string $select, ?array $params=null, string $sort='',
+                                            string $fields='*') {
         global $DB;
 
         $recs = $DB->get_records_select( $table, $select, $params, $sort, $fields, 0, 1);
@@ -138,6 +146,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param int $limitfrom The starting point of records to return, default is 0.
      * @param int $limitnum The number of records to return, default is 0 (no limit).
      * @return array An array of database records as objects.
+     * @throws dml_exception
      */
     public function get_records_select(string $table, string $select, ?array $params=null, string $sort='',
                                        string $fields='*', int $limitfrom=0, int $limitnum=0): array {
@@ -155,6 +164,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param array|null $params Optional parameters for the SELECT statement.
      * @param string $countitem The COUNT item to be used, defaults to "COUNT('*')".
      * @return int The number of records that match the given conditions.
+     * @throws dml_exception
      */
     public function count_records_select(string $table, string $select, ?array $params=null,
                                          string $countitem="COUNT('*')"): int {
@@ -169,6 +179,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $sql The custom SQL SELECT query to execute.
      * @param array|null $params Optional parameters for the SQL query.
      * @return object|false The database record as an object, or false if no record is found.
+     * @throws dml_exception
      */
     public function get_record_sql(string $sql, ?array $params=null) {
         global $DB;
@@ -184,6 +195,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param int $limitfrom The starting point of records to return, default is 0.
      * @param int $limitnum The number of records to return, default is 0 (no limit).
      * @return array An array of database records as objects.
+     * @throws dml_exception
      */
     public function get_records_sql(string $sql, ?array $params=null, int $limitfrom=0, int $limitnum=0): array {
         global $DB;
@@ -196,11 +208,12 @@ class mmogame_database_moodle extends mmogame_database {
      *
      * @param string $table
      * @param array $a
+     * @throws dml_exception
      */
     public function update_record(string $table, array $a) {
         global $DB;
 
-        $rec = new \stdClass;
+        $rec = new stdClass;
         foreach ($a as $name => $value) {
             $rec->$name = $value;
         }
@@ -215,6 +228,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $select The SQL condition for the WHERE clause.
      * @param array|null $params Optional parameters for the SQL condition.
      * @return void
+     * @throws dml_exception
      */
     public function delete_records_select(string $table, string $select, ?array $params=null) {
         global $DB;
@@ -232,6 +246,8 @@ class mmogame_database_moodle extends mmogame_database {
      * @param bool $equal
      * @param bool $onemptyitems
      * @return array
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_in_or_equal($items, int $type = SQL_PARAMS_QM, string $prefix = 'param',
         bool $equal = true, bool $onemptyitems = false): array {

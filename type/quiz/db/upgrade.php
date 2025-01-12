@@ -42,11 +42,19 @@
 /**
  * Upgrades database
  *
- * @param int $oldversion
+ * @param string $oldversion
+ * @return true
+ * @throws ddl_change_structure_exception
+ * @throws ddl_exception
+ * @throws ddl_field_missing_exception
+ * @throws ddl_table_missing_exception
+ * @throws downgrade_exception
+ * @throws moodle_exception
+ * @throws upgrade_exception
  */
-function xmldb_mmogametype_quiz_upgrade( $oldversion) {
+function xmldb_mmogametype_quiz_upgrade( string $oldversion): bool {
 
-    global $CFG, $DB;
+    global $DB;
 
     $dbman = $DB->get_manager();
 

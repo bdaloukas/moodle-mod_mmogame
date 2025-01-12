@@ -25,6 +25,7 @@
 namespace mod_mmogame\local\model;
 
 use mod_mmogame\local\mmogame;
+use stdClass;
 
 /**
  * The class mmogame_model_aduel has the code for model ADuel
@@ -72,7 +73,7 @@ class mmogame_model_aduel {
         $stat = $db->get_record_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=? AND queryid IS NULL',
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
         if ($stat === false) {
-            $stat = new \stdClass();
+            $stat = new stdClass();
             $stat->percent = $stat->id = $stat->count1 = $stat->count2 = 0;
         }
 

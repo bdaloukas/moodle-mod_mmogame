@@ -203,4 +203,34 @@ class overview_renderable implements renderable {
 
         return $ret;
     }
+
+    /**
+     * Reads answer from DB
+     *
+     * @param stdClass $rec
+     * @param array $answers
+     * @return ?string
+     * @throws dml_exception
+     */
+    public function get_answer(stdClass $rec, array &$answers): ?string {
+        global $DB;
+
+        if ($this->rgame->qbank == 'moodlequestion') {
+            if ($rec->useranswerid === null) {
+                return $rec->useranswer;
+            } else if ($rec->useranswerid === 0) {
+                return '';
+            } else if (array_key_exists( $rec->useranswerid, $answers)) {
+                return $answers[$rec->useranswerid];
+            } else {
+                $rec2 = $DB->get_record_select( 'question_answers', 'id=?', [$rec->useranswerid]);
+                $answer = $rec2 === false ? null : strip_tags( $rec2->answer);
+                $answers[$rec->useranswerid] = $answer;
+
+                return $answer;
+            }
+        } else {
+            return $rec->useranswer;
+        }
+    }
 }

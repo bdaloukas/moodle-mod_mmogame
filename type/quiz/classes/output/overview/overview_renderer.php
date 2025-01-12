@@ -59,14 +59,15 @@ class overview_renderer extends plugin_renderer_base {
                 ['class' => 'me-2 mb-2']);
 
         // Add auserid.
-        $form .= html_writer::label('auserid:', 'auserid', false);
-        $form .= html_writer::select($report->get_auserid_options(), 'auserid', $report->auserid, false,
+        $auseridoptions = $report->get_auserid_options();
+        $form .= html_writer::label(get_string('user', 'mod_mmogame').': ', 'auserid', false);
+        $form .= html_writer::select($auseridoptions, 'auserid', $report->auserid, false,
                 ['class' => 'me-2 mb-2']);
 
         // Add queries.
-        $options = $report->get_queries_options();
-        $form .= html_writer::label('query: ', 'queries', false);
-        $form .= html_writer::select($options, 'queries', $report->numgame, false,
+        $queryoptions = $report->get_queries_options();
+        $form .= html_writer::label(get_string('question').':', 'queries', false);
+        $form .= html_writer::select($queryoptions, 'queries', $report->numgame, false,
                 ['class' => 'me-2 mb-2']);
 
         $form .= html_writer::empty_tag('input', [
@@ -101,16 +102,33 @@ class overview_renderer extends plugin_renderer_base {
         if (!empty($records)) {
             $strftimedaydate = get_string("strftimedaydate");
             $table = new html_table();
-            $table->head = ['auserid', 'numgame', 'numattempt', 'queryid', 'useranswer', 'iscorrect', 'timeanswer'];
+            $table->head = [
+                get_string('numgame', 'mod_mmogame'),
+                get_string('user', 'mod_mmogame'),
+                get_string('numattempt', 'mod_mmogame'),
+                get_string('question'),
+                get_string('answer'),
+                get_string('iscorrect', 'mod_mmogame'),
+                get_string('grade', 'mod_mmogame'),
+                get_string('timeanswer', 'mod_mmogame'),
+            ];
+            $answers = [];
             foreach ($records as $record) {
+                $iscorrect = '';
+                if ($record->iscorrect === -1) {
+                    continue;
+                } else if ($record->iscorrect == 1) {
+                    $iscorrect = get_string('yes');
+                }
                 $table->data[] = [
-                    $record->auserid,
                     $record->numgame,
+                    array_key_exists( $record->auserid, $auseridoptions) ? $auseridoptions[$record->auserid] : '',
                     $record->numattempt,
-                    $record->queryid,
-                    $record->useranswer,
-                    $record->iscorrect,
+                    array_key_exists( $record->queryid, $queryoptions) ? $queryoptions[$record->queryid] : '',
+                    $report->get_answer( $record, $answers),
+                    $iscorrect,
                     $record->timeanswer != 0 ? userdate($record->timeanswer, $strftimedaydate) : '',
+                    $record->score,
                 ];
             }
             if ($report->export == 'cvs') {

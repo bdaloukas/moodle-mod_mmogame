@@ -33,6 +33,7 @@ const MMOGAME_QBANK_MOODLEGLOSSARY = 'moodleglossary';
  * @param object $mform An object from the form in mod.html
  *
  * @return int The id of the newly inserted game record
+ * @throws dml_exception
  */
 function mmogame_add_instance(object $mform): int {
     global $DB;
@@ -71,9 +72,10 @@ function mmogame_add_instance(object $mform): int {
 /**
  * Given an ID of an instance of this module, this function will permanently delete the instance and any data that depends on it.
  *
- * @param int $mmogameid Id of the module instance
+ * @param int $mmogameid id of the module instance
  * @return boolean Success/Failure
- **/
+ * @throws dml_exception
+ */
 function mmogame_delete_instance(int $mmogameid): bool {
     global $CFG, $DB;
 
@@ -162,7 +164,8 @@ function mmogame_before_add_or_update_question( stdClass $mmogame): void {
  *
  * @param object $mmogame An object from the form in mod.html
  * @return boolean Success/Fail
- **/
+ * @throws dml_exception
+ */
 function mmogame_update_instance(object $mmogame): bool {
     global $DB;
 
@@ -289,6 +292,8 @@ function mmogame_attempt_summary_link_to_reports(stdClass $mmogame, stdClass $cm
  *         (e.g., a report) pass it in here. Default 0 which means no current group.
  * @return string a string like "Attempts: 123", "Attemtps 123 (45 from your groups)" or
  *          "Attemtps 123 (45 from this group)".
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function mmogame_num_attempt_summary(stdClass $mmogame, stdClass $cm, bool $returnzero = false, int $currentgroup = 0): string {
     global $DB, $USER;
@@ -328,6 +333,8 @@ function mmogame_num_attempt_summary(stdClass $mmogame, stdClass $cm, bool $retu
  * @param settings_navigation $settings
  * @param navigation_node $mmogamenode
  * @return void
+ * @throws \core\exception\moodle_exception
+ * @throws coding_exception
  */
 function mmogame_extend_settings_navigation(settings_navigation $settings, navigation_node $mmogamenode) {
     global $CFG;
@@ -338,7 +345,7 @@ function mmogame_extend_settings_navigation(settings_navigation $settings, navig
     require_once($CFG->libdir . '/questionlib.php');
 
     // We want to add these new nodes after the Edit settings node, and before the
-    // Locally assigned roles node. Of course, both of those are controlled by capabilities.
+    // Locally assigned roles' node. Of course, both of those are controlled by capabilities.
     $keys = $mmogamenode->get_children_key_list();
     $beforekey = null;
     $i = array_search('modedit', $keys);

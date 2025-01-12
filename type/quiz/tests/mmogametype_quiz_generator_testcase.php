@@ -119,6 +119,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $new->stamp = rand();
         $categoryid = $DB->insert_record( 'question_categories', $new);
 
+        $answerids = $answertexts = [];
         $questionid = $generator->create_multichoice_question($categoryid, '1', '1',
             ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'], $answerids, $answertexts);
         $recs = $DB->get_records('question_answers', ['question' => $questionid], 'fraction DESC', '*', 0, 1);

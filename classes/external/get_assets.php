@@ -58,6 +58,7 @@ class get_assets extends external_api {
      * @param int $avatars
      * @param int $colorpalettes
      * @return array
+     * @throws \coding_exception
      * @throws invalid_parameter_exception
      */
     public static function execute(int $mmogameid, string $kinduser, string $user, int $avatars = 0,

@@ -245,7 +245,7 @@ class mmogame {
     }
 
     /**
-     * Return coresponding auserid from input parameters).
+     * Return corresponding auserid from input parameters.
      * @param mmogame_database $db
      * @param string $kinduser
      * @param string $user

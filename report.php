@@ -22,6 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mmogametype_quiz\output\overview\overview_controller;
+
 define('NO_OUTPUT_BUFFERING', true);
 
 require_once(__DIR__ . '/../../config.php');
@@ -35,5 +37,5 @@ $mode = required_param('mode', PARAM_ALPHANUM);
 $cm = $DB->get_record('course_modules', ['id' => $id], '*', MUST_EXIST);
 $rgame = $DB->get_record('mmogame', ['id' => $cm->instance], '*', MUST_EXIST);
 
-$controller = new \mmogametype_quiz\output\overview\overview_controller();
+$controller = new overview_controller();
 $controller->display();

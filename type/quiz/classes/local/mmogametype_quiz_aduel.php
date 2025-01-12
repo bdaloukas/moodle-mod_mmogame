@@ -28,6 +28,7 @@ namespace mmogametype_quiz\local;
 
 use mod_mmogame\local\model\mmogame_model_aduel;
 use mod_mmogame\local\database\mmogame_database;
+use stdClass;
 
 /** Identifier the state for "play" of model Aduel */
 const STATE_PLAY = 1;
@@ -415,7 +416,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         // Initializes data.
         $qs = [];
         foreach ($ids as $id) {
-            $q = new \stdClass();
+            $q = new stdClass();
             $q->id = $id;
             $q->qpercent = $q->qcountused = $q->ucountused  = $q->utimeerror = $q->uscore = $q->upercent = 0;
 

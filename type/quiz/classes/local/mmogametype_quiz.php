@@ -26,8 +26,8 @@
 
 namespace mmogametype_quiz\local;
 
-use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\mmogame;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -66,7 +66,7 @@ class mmogametype_quiz extends mmogame {
         if ($queryid === 0) {
             $query = null;
         } else {
-            $query = $this->qbank->load( $queryid, true);
+            $query = $this->qbank->load( $queryid);
         }
 
         $a = $this->qbank->get_attempt_new( 1, true, $query);
@@ -113,7 +113,7 @@ class mmogametype_quiz extends mmogame {
         $ret['completedrank'] = $this->get_rank( $auserid, 'percentcompleted');
 
         if ($attempt === false) {
-            $attempt = new \stdClass();
+            $attempt = new stdClass();
             $attempt->id = 0;
             $attempt->timestart = 0;
             $attempt->timeclose = 0;

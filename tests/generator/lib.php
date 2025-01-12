@@ -60,8 +60,8 @@ class mod_mmogame_generator extends testing_module_generator {
      * @return int question id
      * @throws dml_exception
      */
-    public function create_multichoice_question(int $categoryid, string $name, string $questiontext, array $answers,
-                                                &$answerids, &$answertexts): int {
+    public function create_multichoice_question(int   $categoryid, string $name, string $questiontext, array $answers,
+                                                array &$answerids, array &$answertexts): int {
         global $DB, $USER;
 
         $answerids = $answertexts = [];

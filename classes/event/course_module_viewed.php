@@ -26,6 +26,10 @@
 
 namespace mod_mmogame\event;
 
+use coding_exception;
+use context_module;
+use stdClass;
+
 /**
  * The mod_mmogame course module viewed event class.
  */
@@ -33,13 +37,14 @@ class course_module_viewed extends \core\event\course_module_viewed {
     /**
      * Create instance of event.
      *
+     * @param stdClass $mmogame
+     * @param context_module $context
+     * @return course_module_viewed
+     * @throws coding_exception
      * @since Moodle 2.7
      *
-     * @param \stdClass $mmogame
-     * @param \context_module $context
-     * @return course_module_viewed
      */
-    public static function viewed(\stdClass $mmogame, \context_module $context) {
+    public static function viewed(stdClass $mmogame, context_module $context): \core\event\base {
         $data = ['context' => $context, 'objectid' => $mmogame->id];
         $event = self::create($data);
         $event->add_record_snapshot('mmogame', $mmogame);
@@ -53,9 +58,10 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @param stdClass $mmogame
      * @param context_module $context
      *
-     * @return event
+     * @return \core\event\base
+     * @throws coding_exception
      */
-    public static function played(\stdClass $mmogame, \context_module $context) {
+    public static function played(stdClass $mmogame, context_module $context): \core\event\base {
         $data = ['context' => $context, 'objectid' => $mmogame->id];
         $event = self::create($data);
         $event->add_record_snapshot('mmogame', $mmogame);

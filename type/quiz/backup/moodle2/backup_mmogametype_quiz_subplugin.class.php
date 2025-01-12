@@ -37,8 +37,9 @@ class backup_mmogametype_quiz_subplugin extends backup_subplugin {
      * Returns the subplugin information to attach to game element
      *
      * @return backup_subplugin_element
+     * @throws base_element_struct_exception
      */
-    protected function define_type_subplugin_structure() {
+    protected function define_type_subplugin_structure(): backup_subplugin_element {
         // Create XML elements.
         $subplugin = $this->get_subplugin_element();
         $subpluginwrapper = new backup_nested_element($this->get_recommended_name());

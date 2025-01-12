@@ -24,6 +24,8 @@
 
 namespace mod_mmogame\local\qbank;
 
+use mod_mmogame\local\mmogame;
+use Random\RandomException;
 use stdClass;
 
 /**
@@ -118,7 +120,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Copy data from questions to $ret that is used to JSON call.
      *
-     * @param object $mmogame
+     * @param mmogame $mmogame
      * @param array $ret
      * @param string $num
      * @param int $id
@@ -126,7 +128,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @param bool $fillconcept
      * @return false|object
      */
-    public function load_json(object $mmogame, array &$ret, string $num, int $id, string $layout, bool $fillconcept) {
+    public function load_json(mmogame $mmogame, array &$ret, string $num, int $id, string $layout, bool $fillconcept) {
         $rec = $this->load( $id);
 
         $ret['qtype'.$num] = $rec->qtype;

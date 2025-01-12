@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_mmogame\local\mmogame;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $course, $cm, $id, $mmogame, $CFG, $PAGE;
@@ -49,10 +51,11 @@ if (has_capability('mod/mmogame:manage', $context)) {
  * Creates the admin form.
  *
  * @param int $id
- * @param object $mmogame
+ * @param mmogame $mmogame
  * @param string $url (url for playing the game)
- **/
-function mmogame_quiz_manage($id, $mmogame, $url) {
+ * @throws coding_exception
+ */
+function mmogame_quiz_manage(int $id, mmogame $mmogame, string $url) {
     global $OUTPUT;
 
     if (count( $_POST) > 0) {
@@ -74,11 +77,9 @@ function mmogame_quiz_manage($id, $mmogame, $url) {
 /**
  * For admin form has the code for prev/next numgame and prev/next state.
  *
- * @param object $mmogame
+ * @param mmogame $mmogame
  **/
-function mmogame_quiz_manage_submit($mmogame) {
-    global $DB;
-
+function mmogame_quiz_manage_submit(mmogame $mmogame) {
     $state = $mmogame->get_state();
     $numgame = $mmogame->get_numgame();
 

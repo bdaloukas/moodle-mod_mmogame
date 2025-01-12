@@ -33,7 +33,7 @@ require('../../config.php');
 $fastjson = filter_input(INPUT_POST, 'fastjson', FILTER_SANITIZE_NUMBER_INT);
 
 $ret = '';
-$filemain = $CFG->dataroot. '/local/mmogame/states/'.substr( $fastjson, -2) ."/{$fastjson}";
+$filemain = $CFG->dataroot. '/local/mmogame/states/'.substr( $fastjson, -2) ."/$fastjson";
 if (!file_exists( $filemain.'.txt')) {
     return;
 }

@@ -28,7 +28,8 @@
  * Given an ID of an instance of this module, this function will permanently delete the instance and any data that depends on it.
  *
  * @param int $mmogameid (id of the module instance)
- **/
+ * @throws dml_exception
+ */
 function mmogametype_quiz_delete_instance(int $mmogameid): void {
     global $DB;
 
@@ -43,9 +44,11 @@ function mmogametype_quiz_delete_instance(int $mmogameid): void {
  *
  * @param object $data (the data submitted from the reset course).
  * @param string $ids (id of all mmogame that have to be deleted).
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
-    global $DB, $CFG;
+    global $DB;
 
     $a = ['mmogame_quiz_attempts', 'mmogame_aa_grades'];
 
@@ -69,6 +72,7 @@ function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
  * Return the models that this sub-plugin implements.
  *
  * @return array (model => name)
+ * @throws coding_exception
  */
 function mmogametype_quiz_get_models(): array {
     return [

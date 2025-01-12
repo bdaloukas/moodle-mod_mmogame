@@ -52,6 +52,8 @@ class mod_mmogame_mod_form extends moodleform_mod {
 
     /**
      * Definition of form.
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function definition() {
         global $CFG;
@@ -100,6 +102,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * Definition for params about models
      *
      * @param object $mform
+     * @throws coding_exception
      */
     protected function definition_models(object $mform) {
         $types = mmogame_get_types();
@@ -159,6 +162,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @param array $files
      *
      * @return array
+     * @throws coding_exception
      */
     public function validation($data, $files): array {
 
@@ -202,9 +206,10 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * Computes the categories of all question of the current course;
      *
      * @return bool|array of question categories
+     * @throws dml_exception
      */
     public function get_array_question_categories() {
-        global $CFG, $DB, $COURSE;
+        global $DB, $COURSE;
 
         $courseid = $COURSE->id;
         $context = context_course::instance( $courseid);
@@ -286,6 +291,8 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * Computes the categories of all question of the current course
      *
      * @param object $mform
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function definition_question(object $mform): void {
         $numcategories = 3;

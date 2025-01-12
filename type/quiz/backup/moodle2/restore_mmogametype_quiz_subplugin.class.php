@@ -38,7 +38,7 @@ class restore_mmogametype_quiz_subplugin extends restore_subplugin {
      * Returns array the paths to be handled by the subplugin at mmogame level
      * @return array
      */
-    protected function define_type_subplugin_structure() {
+    protected function define_type_subplugin_structure(): array {
         $paths = [];
 
         $elename = $this->get_namefor('type');
@@ -53,6 +53,7 @@ class restore_mmogametype_quiz_subplugin extends restore_subplugin {
      * Processes one mmogametype_quiz element
      *
      * @param mixed $data
+     * @throws dml_exception
      */
     public function process_mmogametype_quiz_type($data) {
         global $DB;

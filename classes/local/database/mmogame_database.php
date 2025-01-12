@@ -23,11 +23,9 @@
  */
 namespace mod_mmogame\local\database;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This is the base class for database access.
  */
 class mmogame_database {
 
-};
+}

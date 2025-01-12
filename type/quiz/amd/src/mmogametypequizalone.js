@@ -106,7 +106,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 let state = parseInt(response.slice(0, pos));
                 let timefastjson = parseInt(response.slice(pos + 1));
                 if (timefastjson !== this.timefastjson || state !== this.state) {
-                    this.sendGetAttempt( {mmogameid: this.mmogameid, kinduser: this.kinduser, user: this.user});
+                    this.sendGetAttempt({mmogameid: this.mmogameid, kinduser: this.kinduser, user: this.user});
                     return;
                 }
             }
