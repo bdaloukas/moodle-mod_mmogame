@@ -42,9 +42,9 @@ class get_attempt extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_RAW, 'The user data'),
-            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user', VALUE_OPTIONAL, null, ),
-            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar', VALUE_OPTIONAL, null, ),
-            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette', VALUE_OPTIONAL, null, ),
+            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user'),
+            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar'),
+            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette'),
         ]);
     }
 
@@ -68,9 +68,9 @@ class get_attempt extends external_api {
             'mmogameid' => $mmogameid,
             'kinduser' => $kinduser,
             'user' => $user,
-            'nickname' => $nickname ?? null,
-            'avatarid' => $avatarid ?? null,
-            'colorpaletteid' => $colorpaletteid ?? null,
+            'nickname' => $nickname,
+            'avatarid' => $avatarid,
+            'colorpaletteid' => $colorpaletteid,
         ]);
 
         $ret = [];
