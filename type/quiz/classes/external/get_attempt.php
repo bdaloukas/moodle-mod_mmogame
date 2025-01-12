@@ -80,9 +80,6 @@ class get_attempt extends external_api {
 
         $mmogame->login_user($auserid);
 
-        $ret['type'] = $mmogame->get_type();
-        $ret['model'] = $mmogame->get_model();
-
         if (isset($nickname) && isset($avatarid) && isset($colorpaletteid)) {
             $info = $mmogame->get_avatar_info($auserid);
             $mmogame->get_db()->update_record('mmogame_aa_grades',

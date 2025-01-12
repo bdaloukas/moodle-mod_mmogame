@@ -115,13 +115,13 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         processGetAttempt(json) {
-            if (json.state === 0) {
+            if (parseInt(json.state) === 0) {
                 json.qtype = '';
-                super.onServerGetAttempt(json.time, json.timeclose, json.colors, json.name, json.helprl, json.errorcode,
-                    json.state, json.fastjson, json.avatar, json.nickname, json.timefastjson, json.attempt, json.qtype,
-                    json.answer, json.answerids, json.answers, json.endofgame, json.definition);
+                if (json.colors !== undefined) {
+                    this.setColorsString(json.colors);
+                    this.createIconBar();
+                }
                 this.showScore(json);
-
                 this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                 return;
             }
@@ -155,11 +155,11 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         showHelpScreen(div) {
             div.innerHTML = `<br>
-<div>[LANG_ALONE_HELP]</div><br>
+<div>` + this.getStringG('js_alone_help') + `</div><br>
 
 <table border=1>
     <tr>
-        <td><img height="83" src="../../assets/aduel/example2.png" alt="" /></td>
+        <td><img height="83" src="assets/aduel/example2.png" alt="" /></td>
         <td>` + this.getStringG('js_aduel_example2') + `</td>
     </tr>
 </table>

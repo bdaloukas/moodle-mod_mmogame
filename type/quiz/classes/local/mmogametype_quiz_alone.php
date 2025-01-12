@@ -56,6 +56,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
             [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
+
         if ($attempt !== false) {
             if ($attempt->timestart == 0) {
                 $attempt->timestart = time();

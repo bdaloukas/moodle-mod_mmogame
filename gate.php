@@ -59,9 +59,12 @@ if ($rgame->kinduser == 'moodle' ) {
 $PAGE->requires->strings_for_js(
     ['js_avatars', 'js_code', 'js_help', 'js_name', 'js_palette', 'js_grade',
         'js_grade_last_question', 'js_grade_opponent', 'js_opponent', 'js_palette', 'js_percent',
-        'js_question_time',
+        'js_question_time', 'js_wait_to_start',
         'js_ranking_grade', 'js_ranking_percent', 'js_sound'],
     'mmogame');
+$PAGE->requires->strings_for_js(
+    ['js_alone_help', 'js_aduel_example2'],
+    'mmogametype_quiz');
 
 $url = $CFG->wwwroot.'/mod/mmogame';
 $classname = "MmoGameType".ucfirst( $rgame->type).ucfirst( $rgame->model);

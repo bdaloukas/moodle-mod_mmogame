@@ -52,7 +52,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.audioNo = new Audio('assets/no1.mp3');
             this.audioNo.load();
         }
-
         processGetAttempt(json) {
             this.computeDifClock(json.time, json.timestart, json.timeclose);
 
@@ -264,7 +263,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled) {
-            let n = this.answers.length;
+            let n = this.answers === undefined ? 0 : this.answers.length;
             let instance = this;
 
             let aChecked = [];

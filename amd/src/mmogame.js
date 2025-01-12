@@ -497,7 +497,6 @@ define([''], function() {
             button.title = this.getStringM('js_grade');
             button.alt = this.getStringM('js_grade');
             if (num === 1) {
-                this.buttonScore = button;
                 button.style.background = this.getColorHex(this.colorScore);
                 button.style.color = this.getColorContrast(this.colorScore);
             } else {
@@ -1773,7 +1772,7 @@ define([''], function() {
 
         createDivMessageDo(left, top, width, height, message, heightmessage) {
             if (this.divMessageBackground === undefined) {
-                let div = this.createDiv(this.divMessageBackground, left, top, width, height);
+                let div = this.createDiv(this.body, left, top, width, height);
                 div.style.background = this.getColorHex(this.colorDefinition);
                 this.divMessageBackground = div;
             }

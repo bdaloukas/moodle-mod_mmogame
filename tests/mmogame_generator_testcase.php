@@ -17,7 +17,7 @@
 /**
  * mmogame generator tests
  *
- * @package    mmogame
+ * @package    mod_mmogame
  * @category   test
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -41,7 +41,6 @@ class mmogame_generator_testcase extends advanced_testcase {
 
     /**
      * Test the get_services web service.
-     * @runInSeparateProcess
      */
     public function test_services() {
         global $USER;
