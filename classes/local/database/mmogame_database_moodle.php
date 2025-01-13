@@ -102,15 +102,17 @@ class mmogame_database_moodle extends mmogame_database {
      *
      * @param string $table The name of the database table.
      * @param string $select The SQL condition to use in the WHERE clause.
-     * @param array|null $params Optional parameters for the SQL condition.
+     * @param ?array $params Optional parameters for the SQL condition.
      * @param string $fields Fields to return, defaults to '*'.
-     * @return false|stdClass The database record as an object, or false if not found.
+     * @return ?stdClass The database record as an object, or false if not found.
      * @throws dml_exception
      */
     public function get_record_select(string $table, string $select, ?array $params=null, string $fields='*'): ?stdClass {
         global $DB;
 
-        return $DB->get_record_select( $table, $select, $params, $fields);
+        $rec = $DB->get_record_select( $table, $select, $params, $fields);
+
+        return $rec === false ? null : $rec;
     }
 
     /**

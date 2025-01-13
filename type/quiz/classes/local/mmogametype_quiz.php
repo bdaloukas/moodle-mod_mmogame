@@ -71,7 +71,7 @@ class mmogametype_quiz extends mmogame {
         }
 
         $a = $this->qbank->get_attempt_new( 1, true, $query);
-        if ($a === false) {
+        if ($a === null) {
             $this->set_errorcode( ERRORCODE_NO_QUERIES);
             return null;
         }

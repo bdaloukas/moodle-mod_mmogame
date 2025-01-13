@@ -42,7 +42,7 @@ class mmogame_model_aduel {
      * @param object $data
      * @param mmogame $game
      */
-    public static function json_setadmin(object $data, mmogame $game) {
+    public static function json_setadmin(object $data, mmogame $game): void {
         if (isset( $data->numgame) && $data->numgame > 0) {
             $game->get_rstate()->state = 0;
             $game->get_db()->update_record( 'mmogame', ['id' => $game->get_id(), 'numgame' => $data->numgame]);
@@ -63,16 +63,16 @@ class mmogame_model_aduel {
      * @param int $maxalone
      * @param bool $newplayer1
      * @param bool $newplayer2
-     * @return false|mixed
+     * @return ?stdClass
      */
-    public static function get_aduel(mmogame $mmogame, int $maxalone, bool &$newplayer1, bool &$newplayer2) {
+    public static function get_aduel(mmogame $mmogame, int $maxalone, bool &$newplayer1, bool &$newplayer2): ?stdClass {
         $newplayer1 = $newplayer2 = false;
         $auserid = $mmogame->get_auserid();
         $db = $mmogame->get_db();
 
         $stat = $db->get_record_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=? AND queryid IS NULL',
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
-        if ($stat === false) {
+        if ($stat === null) {
             $stat = new stdClass();
             $stat->percent = $stat->id = $stat->count1 = $stat->count2 = 0;
         }
@@ -112,7 +112,7 @@ class mmogame_model_aduel {
                 'mmogameid=? AND numgame=? AND auserid1 = ? AND auserid2 IS NULL',
                 [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
             if ($count > $maxalone) {
-                return false;   // Wait an opponent.
+                return null;   // Wait an opponent.
             }
             return self::get_aduel_new( $mmogame, $newplayer1, $stat);
         }
@@ -150,10 +150,10 @@ class mmogame_model_aduel {
      *
      * @param mmogame $mmogame
      * @param bool $newplayer1
-     * @param object $stat (the record of table mmogame_aa_stats)
-     * @return mixed
+     * @param stdClass $stat (the record of table mmogame_aa_stats)
+     * @return ?stdClass
      */
-    public static function get_aduel_new(mmogame $mmogame, bool &$newplayer1, object $stat) {
+    public static function get_aduel_new(mmogame $mmogame, bool &$newplayer1, stdClass $stat): ?stdClass {
         $db = $mmogame->get_db();
 
         $a = ['mmogameid' => $mmogame->get_id(), 'numgame' => $mmogame->get_numgame(), 'auserid1' => $mmogame->get_auserid(),
@@ -174,10 +174,10 @@ class mmogame_model_aduel {
      * Return an attempt record of the game
      *
      * @param mmogame $mmogame
-     * @param object $aduel
-     * @return false|object (the attempt record)
+     * @param stdClass $aduel
+     * @return ?stdClass (the attempt record)
      */
-    public static function get_attempt(mmogame $mmogame, object $aduel) {
+    public static function get_attempt(mmogame $mmogame, stdClass $aduel): ?stdClass {
 
         $table = $mmogame->get_table_attempts();
         $db = $mmogame->get_db();
@@ -211,7 +211,7 @@ class mmogame_model_aduel {
         }
         $mmogame->get_db()->update_record( 'mmogame_am_aduel_pairs', $a);
 
-        return false;
+        return null;
     }
 
     /**
@@ -219,7 +219,7 @@ class mmogame_model_aduel {
      *
      * @param mmogame $mmogame
      */
-    public static function delete(mmogame $mmogame) {
+    public static function delete(mmogame $mmogame): void {
         $mmogame->get_db()->delete_records_select( 'mmogame_am_aduel_pairs', 'mmogameid=?', [$mmogame->get_id()]);
     }
 }

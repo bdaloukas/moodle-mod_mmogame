@@ -40,9 +40,9 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * Constructor.
      *
      * @param mmogame_database $db (the database)
-     * @param object $rgame (a record from table mmogame)
+     * @param stdClass $rgame (a record from table mmogame)
      */
-    public function __construct(mmogame_database $db, object $rgame) {
+    public function __construct(mmogame_database $db, stdClass $rgame) {
         $this->callupdategrades = true;
         parent::__construct($db, $rgame);
     }
@@ -50,14 +50,14 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     /**
      * Tries to find an attempt of open games, otherwise creates a new attempt.
      *
-     * @return false|object (a new attempt of false if no attempt)
+     * @return ?stdClass (a new attempt of false if no attempt)
      */
-    public function get_attempt() {
+    public function get_attempt(): ?stdClass {
         $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
             [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
 
-        if ($attempt !== false) {
+        if ($attempt !== null) {
             if ($attempt->timestart == 0) {
                 $attempt->timestart = time();
                 $this->db->update_record( 'mmogame_quiz_attempts',
@@ -111,9 +111,6 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         if (!$istimeout) {
             if ($this->qbank->is_multichoice( $query)) {
                 // Handle multiple-choice answers.
-                if ($useranswer == null) {
-                    $useranswer = '';
-                }
                 $a['useranswerid'] = $attempt->useranswerid = $useranswerid;
                 $a['useranswer'] = null;
             } else {
@@ -291,7 +288,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     /**
      * Do nothing on this model.
      *
-     * @param object $attempt
+     * @param stdClass $attempt
      */
     public function set_attempt(stdClass $attempt): void {
 

@@ -48,9 +48,7 @@ function mmogame_report_default_report($context) {
  * @throws coding_exception
  * @throws dml_exception
  */
-function mmogame_report_list(stdClass $context): array
-{
-
+function mmogame_report_list(stdClass $context): array {
     return ['overview'];
     global $DB;
     static $reportlist = null;

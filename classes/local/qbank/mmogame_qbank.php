@@ -50,7 +50,7 @@ class mmogame_qbank {
      *
      * @param int $count
      * @param bool $usenumattempt
-     * @param array|null $queries
+     * @param ?array $queries
      * @return ?array
      */
     public function get_attempt_new(int $count, bool $usenumattempt, ?array $queries): ?array {
@@ -60,7 +60,7 @@ class mmogame_qbank {
 
         if ($queries === null) {
             $queries = $this->get_queries( $auserid, 0, $count);
-            if ($queries === false) {
+            if ($queries === null) {
                 return null;
             }
         }
@@ -240,7 +240,7 @@ class mmogame_qbank {
         }
 
         $rec = $db->get_record_select( 'mmogame_aa_stats', $select, $a);
-        if ($rec !== false) {
+        if ($rec !== null) {
             $a = ['id' => $rec->id];
             if ($isused > 0) {
                 $a['countused'] = $rec->countused + $isused;

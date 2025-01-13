@@ -40,7 +40,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     /** @var int $numquestions: number of questions that contain one group of questions. */
     protected int $numquestions;
     /** @var ?stdClass $aduel: ADuel object or false if no object yet. */
-    protected $aduel = null;
+    protected ?stdClass $aduel = null;
 
     /** @var int $maxalone: maximum number of questions that a user can play withoyt an oponent. */
     protected int $maxalone = 200;
@@ -84,14 +84,14 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $newplayer1 = $newplayer2 = false;
         for ($step = 1; $step <= 2; $step++) {
             $this->aduel = mmogame_model_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2);
-            if ($this->aduel === false) {
+            if ($this->aduel === null) {
                 $this->set_errorcode( ERRORCODE_ADUEL_NO_RIVALS);
-                return nulll;
+                return null;
             }
 
             if (!$newplayer1 && !$newplayer2) {
                 $rec = mmogame_model_aduel::get_attempt( $this, $this->aduel);
-                if ($rec !== false) {
+                if ($rec !== null) {
                     if ($rec->timestart == 0) {
                         $rec->timestart = time();
                         $this->db->update_record( 'mmogame_quiz_attempts',
@@ -119,7 +119,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      */
     protected function get_attempt_new1(): ?stdClass {
         $queries = $this->get_queries_aduel( 4);
-        if ($queries === false) {
+        if ($queries === null) {
             return null;
         }
 
@@ -149,9 +149,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     /**
      * Creates a new attempt for the second player.
      *
-     * @return false|stdClass (a new attempt of false if no attempt)
+     * @return ?stdClass (a new attempt of false if no attempt)
      */
-    protected function get_attempt_new2() {
+    protected function get_attempt_new2(): ?stdClass {
         $table = 'mmogame_quiz_attempts';
 
         $recs = $this->db->get_records_select( $table, 'mmogameid=? AND numgame=? AND numteam=? AND auserid=?',
@@ -182,11 +182,11 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param stdClass $attempt The quiz attempt object.
      * @param stdClass $query The query object related to the quiz.
      * @param string $useranswer The user's answer as a string.
-     * @param int|null $useranswerid Optional user answer ID.
+     * @param ?int $useranswerid Optional user answer ID.
      * @param bool $autograde Whether autograding is enabled.
      * @param array $ret Output array for additional information.
      * @return bool True if the answer was set successfully, false otherwise.
- */
+     */
     public function set_answer(stdClass $attempt, stdClass $query, string $useranswer, ?int $useranswerid,
                                bool $autograde, array &$ret): bool {
         $retvalue = parent::set_answer( $attempt, $query, $useranswer, $useranswerid, $autograde, $ret);
@@ -260,7 +260,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Saves to array $ret information about the $attempt.
      *
      * @param array $ret (returns info about the current attempt)
-     * @param false|stdClas $attempt
+     * @param false|stdClass $attempt
      * @param string $subcommand
      * @return bool
      */
@@ -340,6 +340,8 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         if ($this->iswizard( $attempt->id)) {
             $ret['tool3'] = 1;
         }
+
+        return true;
     }
 
     /**
@@ -356,10 +358,10 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Saves to array $ret informations about the $attempt (only for the second player).
      *
      * @param array $ret (returns info about the current attempt)
-     * @param object $query
+     * @param stdClass $query
      * @param int $attemptid
      */
-    protected function append_json_only2(array &$ret, object $query, int $attemptid) {
+    protected function append_json_only2(array &$ret, stdClass $query, int $attemptid) {
         $correctid = $query->correctid;
         $ids = [];
         foreach ($query->answers as $answer) {
@@ -518,7 +520,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Updates the database and array $ret about the correctness of user's answer
      *
      * @param array $ret
-     * @param int $attempt
+     * @param ?int $attemptid
      * @param string $answer
      * @param ?int $answerid
      * @param string $subcommand

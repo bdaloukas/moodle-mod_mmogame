@@ -73,7 +73,7 @@ class mmogame {
 
         $this->rstate = $this->db->get_record_select( 'mmogame_aa_states', 'mmogameid=? AND numgame=?',
             [$this->rgame->id, $this->rgame->numgame]);
-        if ($this->rstate === false) {
+        if ($this->rstate === null) {
             $id = $this->db->insert_record( 'mmogame_aa_states',
                 ['mmogameid' => $this->rgame->id,
                 'numgame' => $this->rgame->numgame, 'state' => 0,
@@ -228,17 +228,17 @@ class mmogame {
      * @param string $kind (the kind of user e.g., Moodle, GUID)
      * @param string $userid
      * @param bool $create
-     * @return false|int
+     * @return ?int
      */
-    public static function get_auserid_from_db(object $db, string $kind, string $userid, bool $create) {
+    public static function get_auserid_from_db(mmogame_database $db, string $kind, int $userid, bool $create) {
         $rec = $db->get_record_select( 'mmogame_aa_users', 'kind = ? AND instanceid=?', [$kind, $userid]);
 
-        if ($rec !== false) {
+        if ($rec !== null) {
             return $rec->id;
         }
 
         if (!$create) {
-            return false;
+            return null;
         }
 
         return $db->insert_record( 'mmogame_aa_users',
@@ -335,15 +335,15 @@ class mmogame {
      * Returns the grade for user auserid
      *
      * @param int $auserid
-     * @return mixed
+     * @return ?stdClass
      */
-    public function get_grade(int $auserid) {
+    public function get_grade(int $auserid): ?stdClass {
 
         $db = $this->db;
 
         $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
             [$this->rgame->id, $this->rgame->numgame, $auserid]);
-        if ($rec !== false) {
+        if ($rec !== null) {
             return $rec;
         }
 
@@ -390,7 +390,7 @@ class mmogame {
             " LEFT JOIN {mmogame_aa_colorpalettes} c ON c.id=g.colorpaletteid ".
             " WHERE g.mmogameid=? AND g.numgame=? AND g.auserid=?";
         $grades = $this->db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
-        if ($grades === false || count($grades) == 0) {
+        if (count($grades) == 0) {
             $grade = $this->get_grade( $auserid);
             if ($grade === false) {
                 return false;
