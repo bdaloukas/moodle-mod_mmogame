@@ -25,7 +25,6 @@
 namespace mod_mmogame\local\qbank;
 
 use mod_mmogame\local\mmogame;
-use Random\RandomException;
 use stdClass;
 
 /**
@@ -42,9 +41,9 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @param int $id
      * @param bool $loadextra
      * @param string $fields
-     * @return false|object
+     * @return ?stdClass
      */
-    public function load(int $id, bool $loadextra = true, string $fields = '') {
+    public function load(int $id, bool $loadextra = true, string $fields = ''): ?stdClass {
         if ($fields == '') {
             $fields = 'qbe.id, q.id as questionid,q.qtype,q.name,q.questiontext as definition';
         }
@@ -55,7 +54,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             " ORDER BY qv.version DESC";
         $recs = $db->get_records_sql( $sql, [$id], 0, 1);
         if ($recs === false || count( $recs) == 0) {
-            return false;
+            return null;
         }
         $ret = reset( $recs);
 
@@ -73,10 +72,10 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Loads data from table question_answers.
      *
-     * @param object $query
-     * @return object $query
+     * @param stdClass $query
+     * @return stdClass $query
      */
-    private function load2(object $query): object {
+    private function load2(stdClass $query): stdClass {
         $recs = $this->mmogame->get_db()->get_records_select( 'question_answers', 'question=?',
             [$query->questionid], 'fraction DESC', 'id,answer,fraction');
         unset( $query->correctid);
@@ -126,9 +125,9 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @param int $id
      * @param string $layout
      * @param bool $fillconcept
-     * @return false|object
+     * @return stdClass
      */
-    public function load_json(mmogame $mmogame, array &$ret, string $num, int $id, string $layout, bool $fillconcept) {
+    public function load_json(mmogame $mmogame, array &$ret, string $num, int $id, string $layout, bool $fillconcept): stdClass {
         $rec = $this->load( $id);
 
         $ret['qtype'.$num] = $rec->qtype;
@@ -167,9 +166,9 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @param string $ids
      * @param bool $loadextra
      * @param string $fields
-     * @return bool|array
+     * @return ?array
      */
-    protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition') {
+    protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition'): ?array {
 
         [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal( explode( ',', $ids));
         $recs = $this->mmogame->get_db()->get_records_select( 'question', $insql, $inparams, '', $fields);
@@ -186,15 +185,15 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Check if $useranswer is the correct answer
      *
-     * @param object $query
+     * @param stdClass $query
      * @param string $useranswer
-     * @param int|null $useranswerid
-     * @param object $mmogame
+     * @param ?int $useranswerid
+     * @param mmogame $mmogame
      * @param float $fraction
      *
      * @return true or false
      */
-    public function is_correct(object $query, string $useranswer, ?int $useranswerid, object $mmogame, float &$fraction): bool {
+    public function is_correct(stdClass $query, string $useranswer, ?int $useranswerid, mmogame $mmogame, float &$fraction): bool {
         if ($query->qtype == 'shortanswer') {
             return $this->is_correct_shortanswer( $query, $useranswer, $mmogame);
         } else {
@@ -205,13 +204,13 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Check if $useranswer is the correct answer (internal function for short answers)
      *
-     * @param object $query
+     * @param stdClass $query
      * @param string $useranswer
-     * @param object $mmogame
+     * @param mmogame $mmogame
      *
      * @return true or false
      */
-    protected function is_correct_shortanswer(object $query, string $useranswer, object $mmogame): bool {
+    protected function is_correct_shortanswer(stdClass $query, string $useranswer, mmogame $mmogame): bool {
         if ($mmogame->get_rgame()->casesensitive) {
             return $query->concept == $useranswer;
         } else {
@@ -222,14 +221,14 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Check if $useranswer is the correct answer (internal function for multichoice answers)
      *
-     * @param object $query
+     * @param stdClass $query
      * @param string $useranswer
-     * @param int|null $useranswerid
+     * @param ?int $useranswerid
      * @param float $fraction
      *
      * @return true or false
      */
-    protected function is_correct_multichoice(object $query, string $useranswer, ?int $useranswerid, float &$fraction): bool {
+    protected function is_correct_multichoice(stdClass $query, string $useranswer, ?int $useranswerid, float &$fraction): bool {
         if ($query->multichoice->single) {
             return $this->is_correct_multichoice_single1( $query, $useranswerid, $fraction);
         } else {
@@ -240,13 +239,13 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Check if $useranswer is the correct answer (internal function for multichoice answers with one correct answer)
      *
-     * @param object $query
+     * @param stdClass $query
      * @param int $useranswerid
      * @param float $fraction
      *
      * @return true or false
      */
-    protected function is_correct_multichoice_single1(object $query, int $useranswerid, float &$fraction): bool {
+    protected function is_correct_multichoice_single1(stdClass $query, int $useranswerid, float &$fraction): bool {
         $fraction = null;
         foreach ($query->answers as $answer) {
             if (intval( $answer->id) == $useranswerid) {
@@ -261,12 +260,12 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Check if $useranswer is the correct answer (internal function for multichoice answers with many correct answers)
      *
-     * @param object $query
+     * @param stdClass $query
      * @param string $useranswer
      * @param float $fraction
      * @return true or false
      */
-    protected function is_correct_multichoice_single0(object $query, string $useranswer, float &$fraction): bool {
+    protected function is_correct_multichoice_single0(stdClass $query, string $useranswer, float &$fraction): bool {
         $fraction = 0.0;
         $aids = explode( ',', $useranswer);
         foreach ($query->answers as $answer) {
@@ -282,11 +281,10 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Return the layout (a string that is needed to put the answers in the correct order)
      *
-     * @param object $query
+     * @param stdClass $query
      * @return ?string
-     * @throws RandomException
      */
-    public function get_layout(object $query): ?string {
+    public function get_layout(stdClass $query): ?string {
         if ($query->qtype != 'multichoice') {
             return null;
         }
@@ -310,20 +308,20 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Check if the question is multi choice
      *
-     * @param object $query
+     * @param stdClass $query
      * @return true or false
      */
-    public static function is_multichoice(object $query): bool {
+    public static function is_multichoice(stdClass $query): bool {
         return $query->qtype == 'multichoice';
     }
 
     /**
      * Check if the question is shortanswer
      *
-     * @param object $query
+     * @param stdClass $query
      * @return true or false
      */
-    public static function is_shortanswer(object $query): bool {
+    public static function is_shortanswer(stdClass $query): bool {
         return $query->qtype == 'shortanswer';
     }
 

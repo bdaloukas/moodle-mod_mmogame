@@ -25,7 +25,8 @@
  */
 namespace mod_mmogame\privacy;
 
-use core_privacy\local\request\contextlist;
+use context;
+use core_privacy\local\request\plugin\subplugin_provider;
 
 /**
  * Privacy class for requesting user data.
@@ -34,17 +35,17 @@ use core_privacy\local\request\contextlist;
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface mmogametype_provider extends \core_privacy\local\request\plugin\subplugin_provider {
+interface mmogametype_provider extends subplugin_provider {
     /**
      * This method is used to export any user data this sub-plugin has using the mmogame_plugin_request_data object to get the
      * context and userid.
      *
-     * @param  object $context
+     * @param  context $context
      * @param int $mmogameid
      * @param string $model
      * @param int $auserid
      * @param int $numgame
      * @param array $path
      */
-    public static function export_type_user_data($context, $mmogameid, $model, $auserid, $numgame, $path);
+    public static function export_type_user_data(context $context, int $mmogameid, string $model, int $auserid, int $numgame, array $path);
 }

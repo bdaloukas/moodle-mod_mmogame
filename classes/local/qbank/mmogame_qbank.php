@@ -51,9 +51,9 @@ class mmogame_qbank {
      * @param int $count
      * @param bool $usenumattempt
      * @param array|null $queries
-     * @return array|false
+     * @return ?array
      */
-    public function get_attempt_new(int $count, bool $usenumattempt, ?array $queries) {
+    public function get_attempt_new(int $count, bool $usenumattempt, ?array $queries): ?array {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
         $auserid = $this->mmogame->get_auserid();
@@ -61,7 +61,7 @@ class mmogame_qbank {
         if ($queries === null) {
             $queries = $this->get_queries( $auserid, 0, $count);
             if ($queries === false) {
-                return false;
+                return null;
             }
         }
 
@@ -100,12 +100,12 @@ class mmogame_qbank {
      * @param int $numteam
      * @param int $count (how many queries they want)
      *
-     * @return false|array of int or false if no queries found.
+     * @return ?array of int or false if no queries found.
      */
-    protected function get_queries(int $auserid, int $numteam, int $count) {
+    protected function get_queries(int $auserid, int $numteam, int $count): ?array {
         $ids = $this->get_queries_ids();
         if ($ids === false) {
-            return false;
+            return null;
         }
 
         $db = $this->mmogame->get_db();
@@ -150,7 +150,7 @@ class mmogame_qbank {
             }
         }
 
-        return count( $ret) ? $ret : false;
+        return count( $ret) ? $ret : null;
     }
 
     /**
@@ -207,10 +207,10 @@ class mmogame_qbank {
      * @param bool $isused
      * @param bool $iscorrect
      * @param bool $iserror
-     * @param array|null $values
+     * @param ?array $values
      */
     public function update_stats(?int $auserid, ?int $numteam, ?int $queryid, bool $isused, bool $iscorrect, bool $iserror,
-        ?array $values = null) {
+        ?array $values = null): void {
 
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();

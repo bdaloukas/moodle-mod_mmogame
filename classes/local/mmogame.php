@@ -27,6 +27,7 @@ namespace mod_mmogame\local;
 use coding_exception;
 use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\qbank\mmogame_qbank;
+use stdClass;
 
 /**
  * The class mmogame is the base class for all games
@@ -573,11 +574,11 @@ class mmogame {
     /**
      * Deletes info for a given mmogame and auser
      *
-     * @param object $db
-     * @param object $rgame
+     * @param mmogame_database $db
+     * @param stdClass $rgame
      * @param int $auserid
      */
-    public static function delete_auser(object $db, object $rgame, int $auserid) {
+    public static function delete_auser(mmogame_database $db, stdClass $rgame, int $auserid) {
         $db->delete_records_select( 'mmogame_aa_grades', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
         $db->delete_records_select( 'mmogame_aa_stats', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
         $db->delete_records_select( 'mmogame_am_aduel_pairs',

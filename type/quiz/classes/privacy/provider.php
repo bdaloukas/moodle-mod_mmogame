@@ -91,7 +91,7 @@ class provider implements
      * @param array $path
      * information to help with exporting.
      */
-    public static function export_type_user_data($context, $mmogameid, $model, $auserid, $numgame, $path) {
+    public static function export_type_user_data(\context $context, int $mmogameid, string $model, int $auserid, int $numgame, array $path) {
         global $DB;
 
         $recs = $DB->get_records_select( 'mmogame_quiz_attempts',

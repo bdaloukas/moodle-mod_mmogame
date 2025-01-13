@@ -26,6 +26,7 @@
 
 namespace mmogametype_quiz\local;
 
+use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\mmogame;
 use stdClass;
 
@@ -55,13 +56,13 @@ class mmogametype_quiz extends mmogame {
     /**
      * Creates a new attempt
      *
-     * @param int $queryid
+     * @param ?int $queryid
      * @param int $timelimit
      * @param int $numattempt
      * @param int $timeclose
-     * @return false|object (the new attempt or false if no attempt)
+     * @return ?stdClass (the new attempt or false if no attempt)
      */
-    protected function get_attempt_new_internal(int $queryid, int $timelimit, int $numattempt, int $timeclose) {
+    protected function get_attempt_new_internal(?int $queryid, int $timelimit, int $numattempt, int $timeclose): ?stdClass {
         $table = 'mmogame_quiz_attempts';
         if ($queryid === 0) {
             $query = null;
@@ -72,7 +73,7 @@ class mmogametype_quiz extends mmogame {
         $a = $this->qbank->get_attempt_new( 1, true, $query);
         if ($a === false) {
             $this->set_errorcode( ERRORCODE_NO_QUERIES);
-            return false;
+            return null;
         }
         $a['numattempt'] = $numattempt == 0 ? $this->compute_next_numattempt() : $numattempt;
         $a['timestart'] = time();
@@ -91,12 +92,11 @@ class mmogametype_quiz extends mmogame {
      * Saves to array $ret information about the $attempt.
      *
      * @param array $ret (returns info about the current attempt)
-     * @param bool|object $attempt
+     * @param ?stdClass $attempt
      * @param string $subcommand
-     * @return false|object (the query of attempt)
-     *
+     * @return bool
      */
-    public function append_json(array &$ret, $attempt, string $subcommand = '') {
+    public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): bool {
         $auserid = $this->get_auserid();
 
         $info = $this->get_avatar_info( $auserid);
@@ -112,7 +112,7 @@ class mmogametype_quiz extends mmogame {
         $ret['percentcompleted'] = $info->percentcompleted;
         $ret['completedrank'] = $this->get_rank( $auserid, 'percentcompleted');
 
-        if ($attempt === false) {
+        if ($attempt === null) {
             $attempt = new stdClass();
             $attempt->id = 0;
             $attempt->timestart = 0;
@@ -122,25 +122,20 @@ class mmogametype_quiz extends mmogame {
         }
         $ret['attempt'] = $attempt->id;
 
-        $recquery = false;
-
-        if ($attempt->queryid != 0) {
-            $recquery = $this->get_qbank()->load_json( $this, $ret, '', $attempt->queryid, $attempt->layout, false);
-        }
         $ret['timestart'] = $attempt->timestart;
         $ret['timeclose'] = $attempt->timeclose;
 
-        return $recquery;
+        return true;
     }
 
     /**
      * Return the score with negative values. If "n" is the number of answers, if it corrects returns (n-1) else returns (-1)
      *
      * @param bool $iscorrect
-     * @param object $query
+     * @param stdClass $query
      * @return int
      */
-    protected function get_score_query_negative(bool $iscorrect, object $query): int {
+    protected function get_score_query_negative(bool $iscorrect, stdClass $query): int {
         if (!$this->qbank->is_multichoice( $query)) {
             return $iscorrect ? 1 : 0;
         }
@@ -151,11 +146,11 @@ class mmogametype_quiz extends mmogame {
     /**
      * Deletes info for a given mmogame and auser
      *
-     * @param object $db
-     * @param object $rgame
+     * @param mmogame_database $db
+     * @param stdClass $rgame
      * @param int $auserid
      */
-    public static function delete_auser(object $db, object $rgame, int $auserid) {
+    public static function delete_auser(mmogame_database $db, stdClass $rgame, int $auserid): void {
         $db->delete_records_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
     }
 }
