@@ -36,7 +36,7 @@ use stdClass;
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mmogame {
+abstract class mmogame {
     /** @var mmogame_database $db: database to be used. */
     protected mmogame_database $db;
     /** @var stdClass $rgame: the record of table mmogame. */
@@ -134,9 +134,9 @@ class mmogame {
     /**
      * Return the variable rstate.
      *
-     * @return int
+     * @return stdClass
      */
-    public function get_rstate(): int {
+    public function get_rstate(): stdClass {
         return $this->rstate;
     }
 
@@ -342,10 +342,10 @@ class mmogame {
             " WHERE g.id IS NULL ".
             " ORDER BY a.numused,a.randomkey";
         $recs = $db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame], 0, 1);
-        if ($recs === false || count($recs) === 0) {
+        if (count($recs) === 0) {
             // All avatars are used in this numgame (players > avatars).
             $recs = $db->get_records_select('mmogame_aa_avatars', '', null, 'numused, randomkey', '*', 0, 1);
-            if ($recs === false || count( $recs) == 0) {
+            if (count( $recs) == 0) {
                 return 0;
             }
         }
@@ -377,7 +377,7 @@ class mmogame {
         $a = ['mmogameid' => $this->rgame->id, 'numgame' => $this->rgame->numgame, 'auserid' => $auserid,
              'timemodified' => time(), 'sumscore' => 0,
         ];
-        if ($grades !== false && count( $grades) > 0) {
+        if (count( $grades) > 0) {
             $grade = reset( $grades);
             $a['avatarid'] = $grade->avatarid;
             $a['usercode'] = $grade->usercode;
@@ -615,4 +615,20 @@ class mmogame {
 
         $db->delete_records_select( 'mmogame_aa_users', 'id=?', [$auserid]);
     }
+
+    /**
+     * Saves to array $ret information about the $attempt.
+     *
+     * @param array $ret (returns info about the current attempt)
+     * @param ?stdClass $attempt
+     * @param string $subcommand
+     * @return ?stdClass
+     */
+    abstract public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass;
+    /**
+     * Set the state of the current game.
+     *
+     * @param int $state
+     */
+    abstract public function set_state(int $state): void;
 }

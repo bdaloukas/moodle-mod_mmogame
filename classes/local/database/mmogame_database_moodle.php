@@ -54,10 +54,10 @@ class mmogame_database_moodle extends mmogame_database {
      *
      * @param string $table
      * @param array $a
-     * @return bool|int if the insertions are ok, otherwise false.
+     * @return ?int if the insertions are ok, otherwise false.
      * @throws dml_exception
      */
-    public function insert_record(string $table, array $a) {
+    public function insert_record(string $table, array $a): ?int {
         global $DB;
 
         return $DB->insert_record( $table, (object )$a);
@@ -70,10 +70,10 @@ class mmogame_database_moodle extends mmogame_database {
      * @param array $a
      * @param int $returnid
      * @param bool $customsequence
-     * @return bool|int if the insertions are ok, otherwise false.
+     * @return ?int if the insertions are ok, otherwise false.
      * @throws dml_exception
      */
-    public function insert_record_raw(string $table, array $a, int $returnid, bool $customsequence): bool {
+    public function insert_record_raw(string $table, array $a, int $returnid, bool $customsequence): ?int {
         global $DB;
 
         $rec = new StdClass;
@@ -158,13 +158,15 @@ class mmogame_database_moodle extends mmogame_database {
      *
      * @param string $sql The custom SQL SELECT query to execute.
      * @param ?array $params Optional parameters for the SQL query.
-     * @return object|false The database record as an object, or false if no record is found.
+     * @return ?stdClass :mixed The database record as an object, or false if no record is found.
      * @throws dml_exception
      */
-    public function get_record_sql(string $sql, ?array $params=null) {
+    public function get_record_sql(string $sql, ?array $params=null): ?stdClass {
         global $DB;
 
-        return $DB->get_record_sql($sql, $params);
+        $rec = $DB->get_record_sql($sql, $params);
+
+        return $rec === false ? null : $rec;
     }
 
     /**
@@ -190,7 +192,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @param array $a
      * @throws dml_exception
      */
-    public function update_record(string $table, array $a) {
+    public function update_record(string $table, array $a): void {
         global $DB;
 
         $rec = new stdClass;
@@ -207,13 +209,13 @@ class mmogame_database_moodle extends mmogame_database {
      * @param string $table The name of the database table.
      * @param string $select The SQL condition for the WHERE clause.
      * @param ?array $params Optional parameters for the SQL condition.
-     * @return void
+     * @return bool
      * @throws dml_exception
      */
-    public function delete_records_select(string $table, string $select, ?array $params=null) {
+    public function delete_records_select(string $table, string $select, ?array $params=null): bool {
         global $DB;
 
-        $DB->delete_records_select($table, $select, $params);
+        return $DB->delete_records_select($table, $select, $params);
     }
 
     /**

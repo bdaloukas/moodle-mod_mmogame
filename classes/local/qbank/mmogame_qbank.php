@@ -24,6 +24,7 @@
 namespace mod_mmogame\local\qbank;
 use mod_mmogame;
 use mod_mmogame\local\mmogame;
+use stdClass;
 
 /**
  * The class mmogame_qbank is a based class for saved questions (e.g., glossary, question bank)
@@ -32,7 +33,7 @@ use mod_mmogame\local\mmogame;
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mmogame_qbank {
+abstract class mmogame_qbank {
     /** @var mod_mmogame\local\mmogame: the object mmogame that is connected to the question bank. */
     protected mod_mmogame\local\mmogame $mmogame;
 
@@ -288,4 +289,14 @@ class mmogame_qbank {
             $db->insert_record( 'mmogame_aa_stats', $a);
         }
     }
+
+    /**
+     * Loads data for question id.
+     *
+     * @param int $id
+     * @param bool $loadextra
+     * @param string $fields
+     * @return ?stdClass
+     */
+    abstract public function load(int $id, bool $loadextra = true, string $fields = ''): ?stdClass;
 }

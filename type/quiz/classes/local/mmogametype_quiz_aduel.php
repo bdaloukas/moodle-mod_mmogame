@@ -260,17 +260,17 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Saves to array $ret information about the $attempt.
      *
      * @param array $ret (returns info about the current attempt)
-     * @param false|stdClass $attempt
+     * @param ?stdClass $attempt
      * @param string $subcommand
-     * @return bool
+     * @return ?stdClass
      */
-    public function append_json(array &$ret, $attempt, string $subcommand = ''): bool {
+    public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass {
         $query = parent::append_json( $ret, $attempt);
 
         $auserid = $this->get_auserid();
 
         if ($this->aduel === false || $query === false) {
-            return false;
+            return null;
         }
 
         if ($subcommand === 'tool1') {
@@ -341,7 +341,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $ret['tool3'] = 1;
         }
 
-        return true;
+        return null;
     }
 
     /**
@@ -361,7 +361,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param stdClass $query
      * @param int $attemptid
      */
-    protected function append_json_only2(array &$ret, stdClass $query, int $attemptid) {
+    protected function append_json_only2(array &$ret, stdClass $query, int $attemptid): void {
         $correctid = $query->correctid;
         $ids = [];
         foreach ($query->answers as $answer) {
@@ -389,7 +389,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param array $ret (returns info about the current attempt)
      * @param object $query
      */
-    protected function append_json_only1(array &$ret, object $query) {
+    protected function append_json_only1(array &$ret, object $query): void {
         $correctid = $query->correctid;
 
         $count = $ret['answers'];
@@ -406,14 +406,14 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Return the queries for ADuel.
      *
      * @param int $count (how many)
-     * @return false|array or false
+     * @return ?array or false
      */
-    public function get_queries_aduel(int $count) {
+    public function get_queries_aduel(int $count): ?array {
         // Get the ids of all the queries.
         $ids = $this->qbank->get_queries_ids();
 
-        if ($ids === false || count( $ids) == 0) {
-            return false;
+        if ($ids === null || count( $ids) == 0) {
+            return null;
         }
 
         // Initializes data.
@@ -513,7 +513,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         }
         $this->qbank->update_stats( $this->auserid, null, null, count( $ret), 0, 0,
             ['countanswers' => count( $ids)]);
-        return count( $ret) ? $ret : false;
+        return count( $ret) ? $ret : null;
     }
 
     /**

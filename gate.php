@@ -55,6 +55,7 @@ if ($rgame === false) {
 if ($rgame->kinduser == 'moodle' ) {
     require_login();
 }
+$user = $rgame->kinduser == 'moodle' ? $USER->id : '';
 
 $PAGE->requires->strings_for_js(
     ['js_avatars', 'js_code', 'js_help', 'js_name', 'js_palette', 'js_grade',
@@ -73,7 +74,7 @@ $PAGE->requires->js_init_code("
     require(['mmogametype_" . $rgame->type."/" . strtolower( $classname)."'], function(".$classname.") {
         var obj = new ".$classname."();
         obj.repairColors( $colors);
-        obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$USER->id', '$url');
+        obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$user', '$url');
     });
 ");
 

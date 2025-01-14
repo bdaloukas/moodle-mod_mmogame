@@ -25,6 +25,7 @@
 namespace mod_mmogame\local\model;
 
 use mod_mmogame\local\mmogame;
+use stdClass;
 
 define('STATE_LAST', 1);
 
@@ -39,10 +40,10 @@ class mmogame_model_alone {
     /**
      * Administrator can change numgame or state
      *
-     * @param object $data
+     * @param stdClass $data
      * @param mmogame $mmogame
      */
-    public static function json_setadmin(object $data, mmogame $mmogame) {
+    public static function json_setadmin(stdClass $data, mmogame $mmogame): void {
         $rgame = $mmogame->get_rgame();
 
         if (isset( $data->numgame) && $data->numgame > 0) {

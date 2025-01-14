@@ -312,7 +312,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
 
         $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=? AND id=?',
             [$this->get_id(), $this->auserid, $attemptid]);
-        if ($attempt === false) {
+        if ($attempt === null) {
             return null;
         }
 

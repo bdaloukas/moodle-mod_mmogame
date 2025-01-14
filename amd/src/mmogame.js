@@ -1137,10 +1137,7 @@ define([''], function() {
                         if (!options.hasOwnProperty('userGUID')) {
                             options.userGUID = '';
                         }
-                        if (options.userGUID !== '') {
-                            options.userGUID = instance.uuid4();
-                        }
-                        if (options.userGUID !== '' && options.nickname !== '' && options.avatarid !== 0 &&
+                        if (options.userGUID.length >= 10 && options.nickname !== '' && options.avatarid !== 0 &&
                             options.paletteid !== 0) {
                             instance.gatePlayGame(false, options.userGUID, options.nickname, options.paletteid, options.avatarid);
                             return true;
@@ -1163,7 +1160,7 @@ define([''], function() {
 
             let options = {nickname: nickname, avatarid: avatarid, paletteid: paletteid};
             if (this.kinduser === 'guid') {
-                options.userGUID = user;
+                options.userGUID = (user === '' ? this.uuid4() : user);
             }
 
             let instance = this;

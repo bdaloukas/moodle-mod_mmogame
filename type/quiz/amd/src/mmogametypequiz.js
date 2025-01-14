@@ -85,7 +85,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.answers = json.answers;
                 this.answersID = json.answerids;
             }
-            this.answer = json.answer !== undefined ? json.answer : null;
+            this.answer = json.answer !== undefined ? json.answer : undefined;
+
             this.endofgame = json.endofgame !== undefined && json.endofgame !== 0;
             this.definition = this.repairP(json.definition);
             this.errorcode = json.errorcode;
@@ -267,7 +268,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             let instance = this;
 
             let aChecked = [];
-            if (this.answer !== null) {
+            if (this.answer !== undefined) {
                 aChecked = this.answer.split(",");
             }
             if (aChecked.length > 0) {
@@ -385,7 +386,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 if (i === j) {
                     item.classList.add("checked");
-                    this.answer = this.answers[i];
+                    //this.answer = this.answers[i];
                     this.answerid = this.answersID[i];
                 } else if (item.classList.contains("checked")) {
                     item.classList.remove("checked");

@@ -42,7 +42,7 @@ require_once(dirname(__FILE__) . '/../../lib.php');
  * within the mmogame system, including handling attempts, scoring,
  * and maintaining related user data.
  */
-class mmogametype_quiz extends mmogame {
+abstract class mmogametype_quiz extends mmogame {
     /** @var bool $stopatend: stops at the end of this game. */
     protected bool $callupdategrades = true;
 
@@ -94,9 +94,9 @@ class mmogametype_quiz extends mmogame {
      * @param array $ret (returns info about the current attempt)
      * @param ?stdClass $attempt
      * @param string $subcommand
-     * @return bool
+     * @return ?stdClass
      */
-    public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): bool {
+    public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass {
         $auserid = $this->get_auserid();
 
         $info = $this->get_avatar_info( $auserid);
@@ -122,10 +122,15 @@ class mmogametype_quiz extends mmogame {
         }
         $ret['attempt'] = $attempt->id;
 
+        $recquery = null;
+        if ($attempt->queryid != 0) {
+            $recquery = $this->get_qbank()->load_json( $this, $ret, '', $attempt->queryid, $attempt->layout, false);
+        }
+
         $ret['timestart'] = $attempt->timestart;
         $ret['timeclose'] = $attempt->timeclose;
 
-        return true;
+        return $recquery;
     }
 
     /**

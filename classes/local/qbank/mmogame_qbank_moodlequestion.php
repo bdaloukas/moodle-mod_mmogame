@@ -53,7 +53,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             " WHERE qbe.id=qv.questionbankentryid AND qv.questionid=q.id AND qbe.id=? ".
             " ORDER BY qv.version DESC";
         $recs = $db->get_records_sql( $sql, [$id], 0, 1);
-        if ($recs === false || count( $recs) == 0) {
+        if (count( $recs) == 0) {
             return null;
         }
         $ret = reset( $recs);
@@ -166,14 +166,14 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @param string $ids
      * @param bool $loadextra
      * @param string $fields
-     * @return ?array
+     * @return array
      */
-    protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition'): ?array {
+    protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition'): array {
 
         [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal( explode( ',', $ids));
         $recs = $this->mmogame->get_db()->get_records_select( 'question', $insql, $inparams, '', $fields);
 
-        if ($recs !== false && $loadextra) {
+        if ($loadextra) {
             foreach ($recs as $rec) {
                 $this->load2($rec);
             }
@@ -328,16 +328,16 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
      * Return the id of all questions
      *
-     * @return array|false
+     * @return ?array
      */
-    public function get_queries_ids() {
+    public function get_queries_ids(): ?array {
         $rgame = $this->mmogame->get_rgame();
         $qtypes = [];
         $qtypes[] = 'shortanswer';
         $qtypes[] = 'multichoice';
 
         if ( count($qtypes) === 0) {
-            return false;
+            return null;
         }
         $db = $this->mmogame->get_db();
 
