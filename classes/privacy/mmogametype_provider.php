@@ -47,5 +47,6 @@ interface mmogametype_provider extends subplugin_provider {
      * @param int $numgame
      * @param array $path
      */
-    public static function export_type_user_data(context $context, int $mmogameid, string $model, int $auserid, int $numgame, array $path);
+    public static function export_type_user_data(context $context, int $mmogameid, string $model, int $auserid,
+                                                 int $numgame, array $path);
 }

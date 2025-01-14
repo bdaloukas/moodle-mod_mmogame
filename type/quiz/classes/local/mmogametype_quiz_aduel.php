@@ -526,7 +526,8 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param string $subcommand
      * @return ?stdClass: the attempt
      */
-    public function set_answer_model(array &$ret, ?int $attemptid, string $answer, ?int $answerid = null, string $subcommand = ''): ?stdClass {
+    public function set_answer_model(array &$ret, ?int $attemptid, string $answer, ?int $answerid = null,
+                                     string $subcommand = ''): ?stdClass {
         $attempt = parent::set_answer_model($ret, $attemptid, $answer, $answerid, $subcommand);
 
         $aduel = $this->aduel;

@@ -23,11 +23,15 @@
  */
 
 namespace mmogametype_quiz\privacy;
-use mod_mmogame\privacy\mmogame_plugin_request_data;
+use coding_exception;
+use context;
 use core_privacy\local\metadata\collection;
+use core_privacy\local\request\core_userlist_provider;
 use core_privacy\local\request\writer;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
+use dml_exception;
+use mod_mmogame\privacy\mmogametype_provider;
 
 /**
  * Privacy class for requesting user data.
@@ -41,10 +45,10 @@ class provider implements
     \core_privacy\local\metadata\provider,
 
     // This plugin is a subplugin of mmogame and must meet that contract.
-    \mod_mmogame\privacy\mmogametype_provider,
-    \core_privacy\local\request\core_userlist_provider {
+    mmogametype_provider,
+    core_userlist_provider {
     /**
-     * Return meta data about this plugin.
+     * Return metadata about this plugin.
      *
      * @param  collection $collection A list of information to add to.
      * @return collection Return the collection after adding to it.
@@ -83,15 +87,18 @@ class provider implements
     /**
      * Export all user data for this plugin.
      *
-     * @param object $context
+     * @param context $context
      * @param int $mmogameid
      * @param string $model
      * @param int $auserid
      * @param int $numgame
      * @param array $path
      * information to help with exporting.
+     * @throws coding_exception
+     * @throws dml_exception
      */
-    public static function export_type_user_data(\context $context, int $mmogameid, string $model, int $auserid, int $numgame, array $path) {
+    public static function export_type_user_data(context $context, int $mmogameid, string $model, int $auserid,
+                                                 int     $numgame, array $path): void {
         global $DB;
 
         $recs = $DB->get_records_select( 'mmogame_quiz_attempts',

@@ -30,10 +30,13 @@ define('NO_OUTPUT_BUFFERING', true);
 define('NO_CONFIG_CHECK', true);
 require('../../config.php');
 
+global $CFG;
+
 $fastjson = filter_input(INPUT_POST, 'fastjson', FILTER_SANITIZE_NUMBER_INT);
 
 $ret = '';
-$filemain = $CFG->dataroot. '/local/mmogame/states/'.substr( $fastjson, -2) ."/$fastjson";
+$subdir = $fastjson % 100;
+$filemain = $CFG->dataroot. '/local/mmogame/states/'.$subdir."/$fastjson";
 if (!file_exists( $filemain.'.txt')) {
     return;
 }

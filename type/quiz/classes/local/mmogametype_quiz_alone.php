@@ -304,7 +304,8 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @param string $subcommand
      * @return ?stdClass: the attempt
      */
-    public function set_answer_model(array &$ret, ?int $attemptid, string $answer, ?int $answerid = null, string $subcommand = ''): ?stdClass {
+    public function set_answer_model(array &$ret, ?int $attemptid, string $answer, ?int $answerid = null,
+                                     string $subcommand = ''): ?stdClass {
         if ($attemptid === null) {
             return null;
         }

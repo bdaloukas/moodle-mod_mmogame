@@ -26,21 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/mmogame/lib.php');
 
-
-/**
- * Get the default report for the current user.
- * @param stdClass $context the quiz context.
- * @return false|mixed|string
- * @throws coding_exception
- * @throws dml_exception
- */
-/*
-function mmogame_report_default_report($context) {
-    $reports = mmogame_report_list($context);
-    return reset($reports);
-}*/
-
-
 /**
  * Returns an array of reports to which the current user has access to.
  * @param stdClass $context
