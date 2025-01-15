@@ -551,6 +551,8 @@ define([''], function() {
                 this.labelScoreRank2 = div;
             }
 
+            this.createAddScore(left, top + this.iconSize - h, this.iconSize, h, num);
+/* A
             div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize, h);
             div.style.textAlign = "center";
             div.style.color = this.getColorContrast(this.colorScore);
@@ -561,6 +563,7 @@ define([''], function() {
             } else {
                 this.labelAddScore2 = div;
             }
+*/
         }
 
         createDivScorePercent(left, top, num) {
@@ -605,7 +608,9 @@ define([''], function() {
                 this.labelScoreRank2 = div;
             }
 
-            div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2, h);
+            this.createAddScore(left, top + this.iconSize - h, this.iconSize / 2, h);
+/* A
+div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2, h);
             div.style.textAlign = "center";
             div.style.color = this.getColorContrast(this.colorScore);
             div.title = this.getStringM('js_grade_last_question');
@@ -615,7 +620,7 @@ define([''], function() {
             } else {
                 this.labelAddScore2 = div;
             }
-
+*/
             let label = num === 1 ? this.labelScoreRank : this.labelScoreRank2;
 
             div = this.createDiv(this.body, left + this.iconSize / 2, top, this.iconSize / 2, h);
@@ -1427,6 +1432,7 @@ define([''], function() {
                 this.fontSize, sizeLabel[0], this.getStringM('js_name') + ": ");
 
             this.edtNickname = this.edt;
+
             this.edtNickname.addEventListener("keyup", function() {
                 instance.gateUpdateSubmit();
             });
@@ -1538,8 +1544,8 @@ define([''], function() {
             return [maxWidth, maxHeight];
         }
 
-        gateCreateLabel(left, top, width, fontSize, labelWidth, title) {
-            const label = document.createElement("label");
+        gateCreateLabel(left, top, labelWidth, fontSize, title) {
+            const label = document.createElement('label');
             label.style.position = "absolute";
 
             label.innerHTML = title;
@@ -1559,27 +1565,12 @@ define([''], function() {
             return label;
         }
         gateCreateLabelEditVertical(left, top, width, fontSize, labelWidth, title) {
-            const label = this.gateCreateLabel(left, top, width, fontSize, labelWidth, title);
+            const label = this.gateCreateLabel(left, top, labelWidth, fontSize, title);
 
             top += label.scrollHeight;
 
-            let leftEdit = left + 'px';
+            this.edt = this.gateCreateInput(left, top, width, fontSize);
 
-            this.edt = this.gateCreateLabel(leftEdit,top,width,'');
-/* A
-            const div = document.createElement("input");
-            div.style.position = "absolute";
-            div.style.type = "text";
-            div.style.fontSize = fontSize + "px";
-
-            div.style.left = leftEdit + "px";
-            div.style.top = top + "px";
-            div.autofocus = true;
-
-            this.area.appendChild(div);
-            this.edt = div;
-            div.style.width = width + "px";
-*/
             return top + fontSize + this.padding;
         }
 
@@ -1764,26 +1755,12 @@ define([''], function() {
         }
 
         gateCreateLabelEditHorizontal(left, top, width, fontSize, labelWidth, title) {
-            const label = this.gateCreateLabel(left, top, width, fontSize, labelWidth, title);
+            const label = this.gateCreateLabel(left, top, labelWidth, fontSize, title);
 
             let ret = top + Math.max(label.scrollHeight, fontSize) + this.padding;
 
             let leftEdit = (left + labelWidth + this.padding);
-            this.edt = this.gateCreateLabel(leftEdit, top, width - leftEdit - this.padding, '');
-/*
-            const div = document.createElement("input");
-            div.style.position = "absolute";
-            div.style.type = "text";
-            div.style.fontSize = fontSize + "px";
-
-            div.style.left = leftEdit + "px";
-            div.style.top = top + "px";
-            div.autofocus = true;
-
-            this.area.appendChild(div);
-            this.edt = div;
-            div.style.width = (width - leftEdit - this.padding) (width - leftEdit - this.padding) + "px";
-*/
+            this.edt = this.gateCreateInput(leftEdit, top, width - leftEdit - this.padding, fontSize);
 
             return ret;
         }
@@ -1919,5 +1896,34 @@ define([''], function() {
 
         }
 
+        gateCreateInput(left, top, width, fontSize) {
+            const div = document.createElement("input");
+            div.style.position = "absolute";
+            div.style.width = width + "px";
+            div.style.type = "text";
+            div.style.fontSize = fontSize + "px";
+
+            div.style.left = left + "px";
+            div.style.top = top + "px";
+            div.autofocus = true;
+
+            this.area.appendChild(div);
+            this.edt = div;
+
+            return div;
+        }
+
+        createAddScore(left, top, width, height, num) {
+            const div = this.createDiv(this.body, left, top, width, height);
+            div.style.textAlign = "center";
+            div.style.color = this.getColorContrast(this.colorScore);
+            div.title = this.getStringM('js_grade_last_question');
+            // A button.disabled = true;
+            if (num === 1) {
+                this.labelAddScore = div;
+            } else {
+                this.labelAddScore2 = div;
+            }
+        }
     };
 });
