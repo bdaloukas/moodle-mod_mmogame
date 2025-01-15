@@ -107,6 +107,7 @@ define([''], function() {
             if (height !== 0) {
                 button.style.height = height + "px";
             }
+
             button.style.fontSize = height + "px";
             if (filename !== undefined && filename !== '') {
                 button.src = filename;
