@@ -671,7 +671,7 @@ define([''], function() {
 
             div = this.createDiv(this.body, left + this.iconSize / 2, top, this.iconSize / 2, h);
             div.style.textAlign = "center";
-            div.style.fontName = label.style.fontName;
+            div.style.fontFamily  = label.style.fontFamily;
             div.style.fontSize = h + "px";
             div.style.lineHeight = h + "px";
             div.style.color = label.style.color;
@@ -685,7 +685,7 @@ define([''], function() {
                 this.iconSize / 2);
             div.style.textAlign = "center";
             div.style.lineHeight = Math.round(this.iconSize / 2) + "px";
-            div.style.fontName = label.style.fontName;
+            div.style.fontFamily  = label.style.fontFamily ;
             div.style.fontSize = label.style.fontSize;
             div.style.fontWeight = 'bold';
             div.style.color = label.style.color;
@@ -1434,21 +1434,12 @@ define([''], function() {
             this.area.appendChild(label1);
 
             // Button refresh color palettes
-            let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
+            let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom,
+                this.iconSize, this.fontSize,
                 '', 'assets/refresh.svg', false, 'refresh');
-            btn.addEventListener("click",
-                function() {
-                    let elements = instance.area.getElementsByClassName("mmogame_color");
+            this.addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors,
+                gridWidthAvatars, gridHeightAvatars, true, false);
 
-                    while (elements[0]) {
-                        elements[0].parentNode.removeChild(elements[0]);
-                    }
-
-                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors, 0,
-                        bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
-                        true, false);
-                }
-            );
             label1.style.left = 0;
             label1.style.color = this.getContrastingColor(this.colorBackground);
             label1.style.top = bottom + "px";
@@ -1922,22 +1913,10 @@ define([''], function() {
             label.style.whiteSpace = "nowrap";
             this.area.appendChild(label);
 
-            let instance = this;
             let btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
                 '', 'assets/refresh.svg', false, 'refresh');
-            btn.addEventListener("click",
-                function() {
-                    let elements = instance.area.getElementsByClassName("mmogame_color");
+            this.addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors, gridWidthAvatars, gridHeightAvatars);
 
-                    while (elements[0]) {
-                        elements[0].parentNode.removeChild(elements[0]);
-                    }
-
-                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
-                        0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
-                        true, false);
-                }
-            );
             label.style.left = 0;
             label.style.color = this.getContrastingColor(this.colorBackground);
             label.style.top = bottom + "px";
@@ -1955,5 +1934,23 @@ define([''], function() {
                 instance.gatePlayGame(true, instance.edtNickname.value, instance.paletteid, instance.avatarid);
             });
         };
+
+        addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors, gridWidthAvatars, gridHeightAvatars,
+                                updateColors, updateAvatars) {
+            const instance = this;
+            btn.addEventListener("click",
+                function() {
+                    let elements = instance.area.getElementsByClassName("mmogame_color");
+
+                    while (elements[0]) {
+                        elements[0].parentNode.removeChild(elements[0]);
+                    }
+
+                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
+                        0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
+                        updateColors, updateAvatars);
+                }
+            );
+        }
     };
 });
