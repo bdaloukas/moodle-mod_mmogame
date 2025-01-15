@@ -1538,7 +1538,7 @@ define([''], function() {
             return [maxWidth, maxHeight];
         }
 
-        gateCreateLabelEditVertical(left, top, width, fontSize, labelWidth, title) {
+        gateCreateLabel(left, top, width, fontSize, labelWidth, title) {
             const label = document.createElement("label");
             label.style.position = "absolute";
 
@@ -1555,6 +1555,11 @@ define([''], function() {
             label.style.width = labelWidth + "px";
             label.style.align = "left";
             label.style.color = this.getColorContrast(this.colorBackground);
+
+            return label;
+        }
+        gateCreateLabelEditVertical(left, top, width, fontSize, labelWidth, title) {
+            const label = this.gateCreateLabel(left, top, width, fontSize, labelWidth, title);
 
             top += label.scrollHeight;
 
@@ -1756,22 +1761,7 @@ define([''], function() {
         }
 
         gateCreateLabelEditHorizontal(left, top, width, fontSize, labelWidth, title) {
-            let label = document.createElement("label");
-            label.style.position = "absolute";
-
-            label.innerHTML = title;
-
-            label.style.font = "FontAwesome";
-            label.style.fontSize = fontSize + "px";
-
-            this.area.appendChild(label);
-
-            label.style.position = "absolute";
-            label.style.left = left + "px";
-            label.style.top = top + "px";
-            label.style.width = labelWidth + "px";
-            label.style.align = "left";
-            label.style.color = this.getColorContrast(this.colorBackground);
+            const label = this.gateCreateLabel(left, top, width, fontSize, labelWidth, title);
 
             let ret = top + Math.max(label.scrollHeight, fontSize) + this.padding;
 
