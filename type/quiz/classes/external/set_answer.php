@@ -42,7 +42,7 @@ class set_answer extends external_api {
         return new external_function_parameters([
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_ALPHANUM, 'The user data'),
+            'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
             'attempt' => new external_value(PARAM_INT, 'The id of the attempt'),
             'answer' => new external_value(PARAM_RAW, 'The answer'),
             'answerid' => new external_value(PARAM_INT, 'The id of the answer'),
@@ -57,14 +57,14 @@ class set_answer extends external_api {
      * @param string $kinduser
      * @param string $user
      * @param int $attempt
-     * @param string $answer
+     * @param ?string $answer
      * @param int|null $answerid
      * @param string $subcommand
      * @return string
      * @throws coding_exception
      * @throws invalid_parameter_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user, int $attempt, string $answer,
+    public static function execute(int $mmogameid, string $kinduser, string $user, int $attempt, ?string $answer,
                                    ?int $answerid, string $subcommand): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
@@ -72,7 +72,7 @@ class set_answer extends external_api {
             'kinduser' => $kinduser,
             'user' => $user,
             'attempt' => $attempt,
-            'answer' => $answer,
+            'answer' => $answer != '' ? $answer : null,
             'answerid' => $answerid ?? null,
             'subcommand' => $subcommand,
         ]);

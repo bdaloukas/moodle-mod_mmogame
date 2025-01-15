@@ -88,13 +88,13 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      *
      * @param stdClass $attempt
      * @param stdClass $query
-     * @param string $useranswer
+     * @param ?string $useranswer
      * @param ?int $useranswerid
      * @param bool $autograde
      * @param array $ret (will contain all information)
      * @return bool (is correct or not)
      */
-    public function set_answer(stdClass $attempt, stdClass $query, string $useranswer, ?int $useranswerid,
+    public function set_answer(stdClass $attempt, stdClass $query, ?string $useranswer, ?int $useranswerid,
                                bool $autograde, array &$ret): bool {
 
         // If auto-grading is enabled, check if the answer is correct and set iscorrect.
@@ -299,12 +299,12 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      *
      * @param array $ret
      * @param ?int $attemptid
-     * @param string $answer
+     * @param ?string $answer
      * @param ?int $answerid
      * @param string $subcommand
      * @return ?stdClass: the attempt
      */
-    public function set_answer_model(array &$ret, ?int $attemptid, string $answer, ?int $answerid = null,
+    public function set_answer_model(array &$ret, ?int $attemptid, ?string $answer, ?int $answerid = null,
                                      string $subcommand = ''): ?stdClass {
         if ($attemptid === null) {
             return null;

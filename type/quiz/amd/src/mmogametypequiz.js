@@ -21,6 +21,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         url;
         pin;
         labelTimer;
+        timeForSendAnswer;
 
         /**
          * Base class for Quiz mmmogame
@@ -33,6 +34,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         constructor() {
             super();
             this.hideSubmit = false;
+            this.timeForSendAnswer = 10000;
         }
 
         setColors(colors, nameLoad) {
@@ -190,8 +192,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             }
 
             if (this.hideSubmit === false) {
-                let top = (this.areaWidth - this.iconSize) / 2;
-                this.btnSubmit = this.createImageButton(this.body, top, this.nextTop, 0, this.iconSize,
+                let space = (this.areaWidth - this.iconSize) / 2;
+                this.btnSubmit = this.createImageButton(this.body, space, this.nextTop, 0, this.iconSize,
                     "", 'assets/submit.svg', false, 'submit');
                 this.btnSubmit.addEventListener("click",
                     function() {
@@ -386,7 +388,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 if (i === j) {
                     item.classList.add("checked");
-                    //this.answer = this.answers[i];
                     this.answerid = this.answersID[i];
                 } else if (item.classList.contains("checked")) {
                     item.classList.remove("checked");
@@ -436,7 +437,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 false, 'alt');
             let instance = this;
             btn.addEventListener("click", function() {
-                instance.callGetAttempt({mmogameid: instance.mmogameid, kinduser: instance.kinduser, user: instance.user});
+                instance.callGetAttempt();
                 instance.area.removeChild(btn);
             });
 
@@ -518,7 +519,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 data.set('type', instance.type);
 
                 xmlhttp.send(data);
-            }, 1000);
+            }, this.timeForSendAnswer);
         }
 
         onClickHelp() {

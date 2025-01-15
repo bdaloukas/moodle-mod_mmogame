@@ -41,7 +41,7 @@ class get_attempt extends external_api {
         return new external_function_parameters([
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_RAW, 'The user data'),
+            'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
             'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user'),
             'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar'),
             'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette'),
@@ -80,7 +80,7 @@ class get_attempt extends external_api {
 
         $mmogame->login_user($auserid);
 
-        if (isset($nickname) && isset($avatarid) && isset($colorpaletteid)) {
+        if ($nickname !== null && $avatarid !== null && $colorpaletteid != null) {
             $info = $mmogame->get_avatar_info($auserid);
             $mmogame->get_db()->update_record('mmogame_aa_grades',
                 ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid,  'colorpaletteid' => $colorpaletteid]);

@@ -63,7 +63,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         callSetAnswer() {
             // Clear any existing timeout to prevent duplicate calls
-            clearTimeout(this.timerTimeout);
+            if (this.timerTimeout !== undefined) {
+                clearTimeout(this.timerTimeout);
+            }
             this.timerTimeout = undefined;
 
             let instance = this;
@@ -74,8 +76,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
                     kinduser: instance.kinduser,
                     user: instance.user,
                     attempt: instance.attempt,
-                    answer: instance.answer,
-                    answerid: instance.answerid,
+                    answer: instance.answer !== undefined ? instance.answer : null,
+                    answerid: instance.answerid !== undefined ? instance.answerid : null,
                     subcommand: '',
                 };
                 // Call the service through the Moodle AJAX API
@@ -88,6 +90,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 ret[0].done(function(response) {
                     instance.processSetAnswer(JSON.parse(response)); // Trigger further action
                 }).fail(function(error) {
+                    instance.createDivMessage(error.message);
                     // Return the error if the call fails
                     return error;
                 });

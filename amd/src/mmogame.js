@@ -379,9 +379,20 @@ define([''], function() {
             uuid[19] = (uuid[19] & 0x3) | 0x8; // The 17th position must start with '10' in binary
 
             // Convert numbers to hexadecimal without using toString
-            return uuid
+            this.user = uuid
                 .map((x) => (typeof x === 'string' ? x : hexDigits[x])) // Convert numeric values to hex using lookup table
                 .join('');
+
+            let options = {userGUID: this.user};
+            let instance = this;
+            this.saveOptions(options)
+                .then(function() {
+                    return true;
+                })
+                .catch(error => {
+                    instance.showError(error.message);
+                    return false;
+                });
         }
 
         computeSizes() {
@@ -481,7 +492,7 @@ define([''], function() {
             return s2;
         }
 
-        createDivScore(left, top, num) {
+        createDivButton(left, top) {
             let button = document.createElement("button");
             button.style.position = "absolute";
             button.classList.add("mmogame_button");
@@ -491,6 +502,12 @@ define([''], function() {
             button.style.height = this.iconSize + "px";
             button.style.lineHeight = this.iconSize + "px";
             button.style.textAlign = "center";
+
+            return button;
+        }
+        createDivScore(left, top, num) {
+            let button = this.createDivButton(left, top);
+
             button.style.borderRadius = this.iconSize + "px";
             button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
             button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
@@ -546,15 +563,8 @@ define([''], function() {
         }
 
         createDivScorePercent(left, top, num) {
-            let button = document.createElement("button");
-            button.style.position = "absolute";
-            button.classList.add("mmogame_button");
-            button.style.left = left + "px";
-            button.style.top = top + "px";
-            button.style.width = this.iconSize + "px";
-            button.style.height = this.iconSize + "px";
-            button.style.lineHeight = this.iconSize + "px";
-            button.style.textAlign = "center";
+            let button = this.createDivButton(left, top);
+
             button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
             button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
             if (num === 1) {
@@ -1103,6 +1113,7 @@ define([''], function() {
             this.minFontSize *= 2;
             this.maxFontSize *= 2;
 
+            // Saves parameters to class variables.
             this.mmogameid = mmogameid;
             this.pin = pin;
             this.kinduser = kinduser;
@@ -1129,7 +1140,7 @@ define([''], function() {
                 switch (kinduser) {
                     case 'moodle':
                         if (options.nickname !== '' && options.avatarid !== 0 && options.paletteid !== 0) {
-                            instance.gatePlayGame(false, user, options.nickname, options.paletteid, options.avatarid);
+                            instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
                             return true;
                         }
                         break;
@@ -1139,11 +1150,13 @@ define([''], function() {
                         }
                         if (options.userGUID.length >= 10 && options.nickname !== '' && options.avatarid !== 0 &&
                             options.paletteid !== 0) {
-                            instance.gatePlayGame(false, options.userGUID, options.nickname, options.paletteid, options.avatarid);
+                            instance.user = options.userGUID;
+                            instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
                             return true;
                         }
                         break;
                 }
+                // Call gateCreateScren to ask user for nickname, colors, avatar.
                 instance.gateCreateScreen();
                 return true;
             }).catch(error => {
@@ -1152,21 +1165,30 @@ define([''], function() {
             });
         }
 
-        gatePlayGame(save, user, nickname, paletteid, avatarid) {
+        gatePlayGame(save, nickname, paletteid, avatarid) {
+            if (this.kinduser === 'guid') {
+                if (this.user === '') {
+                    this.uuid4();
+                }
+            }
+
             if (!save) {
-                this.callGetAttempt({user: user, nickname: nickname, paletteid: paletteid, avatarid: avatarid, firstcall: true});
+                this.nickname = nickname;
+                this.paletteid = paletteid;
+                this.avatarid = avatarid;
+                this.callGetAttempt({nickname: nickname, colorpaletteid: paletteid, avatarid: avatarid});
                 return;
             }
 
             let options = {nickname: nickname, avatarid: avatarid, paletteid: paletteid};
-            if (this.kinduser === 'guid') {
-                options.userGUID = (user === '' ? this.uuid4() : user);
-            }
 
             let instance = this;
             this.saveOptions(options)
                 .then(function() {
-                    instance.callGetAttempt({user: user, nickname: nickname, paletteid: paletteid, avatarid: avatarid});
+                    instance.nickname = nickname;
+                    instance.paletteid = paletteid;
+                    instance.avatarid = avatarid;
+                    instance.callGetAttempt();
                     return true;
                 })
                 .catch(error => {
@@ -1175,37 +1197,35 @@ define([''], function() {
                 });
         }
 
-        callGetAttempt(params) {
+        callGetAttempt(extraparams) {
             let instance = this;
             require(['core/ajax'], function(Ajax) {
-                let params2 = {mmogameid: instance.mmogameid,
-                    kinduser: instance.kinduser, user: params.user};
-                if (params.firstcall) {
-                    params2.nickname = params.nickname;
-                    params2.paletteid = params.paletteid;
-                    params2.avatarid = params.avatarid;
+                let params = {
+                    mmogameid: instance.mmogameid,
+                    kinduser: instance.kinduser,
+                    user: instance.user,
+                    nickname: null,
+                    colorpaletteid: null,
+                    avatarid: null,
+                };
+                if (extraparams !== undefined) {
+                    params = {...params, ...extraparams};
                 }
                 // Calling the service through the Moodle AJAX API
                 let getAttempt = Ajax.call([{
                     methodname: 'mmogametype_quiz_get_attempt',
-                    args: {
-                        mmogameid: instance.mmogameid,
-                        kinduser: instance.kinduser,
-                        user: params.user,
-                        nickname: params.nickname,
-                        avatarid: params.avatarid,
-                        colorpaletteid: params.paletteid
-                    },
+                    args: params,
                 }]);
 
                 // Handling the response
                 getAttempt[0].done(function(response) {
-                    if (params.firstcall) {
+                    if (extraparams !== undefined && extraparams.colorpaletteid !== undefined) {
                         instance.openGame();
                         instance.colors = undefined;
                     }
                     instance.processGetAttempt(JSON.parse(response));
                 }).fail(function(error) {
+                    instance.createDivMessage(error.message);
                     return error;
                 });
             });
@@ -1345,8 +1365,10 @@ define([''], function() {
                 this.iconSize, "", 'assets/submit.svg', false, 'submit');
             this.btnSubmit.style.visibility = 'hidden';
             this.btnSubmit.addEventListener("click", function() {
-                instance.gatePlayGame(true, instance.edtCode === undefined ? instance.user : instance.edtCode.value,
-                    instance.edtNickname.value, instance.paletteid, instance.avatarid);
+                if (instance.edtCode !== undefined) {
+                    instance.user = instance.edtCode.value;
+                }
+                instance.gatePlayGame(true, instance.edtNickname.value, instance.paletteid, instance.avatarid);
             });
         }
 
@@ -1480,8 +1502,10 @@ define([''], function() {
             this.btnSubmit.style.visibility = 'hidden';
             this.btnSubmit.addEventListener("click",
                 function() {
-                    instance.gatePlayGame(true, instance.edtCode === undefined ? instance.user : instance.edtCode.value,
-                        instance.edtNickname.value, instance.paletteid, instance.avatarid);
+                    if (instance.edtCode !== undefined) {
+                        instance.user = instance.edtCode.value;
+                    }
+                    instance.gatePlayGame(true, instance.edtNickname.value, instance.paletteid, instance.avatarid);
                 });
         }
 

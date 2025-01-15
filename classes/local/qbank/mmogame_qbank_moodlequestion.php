@@ -186,14 +186,14 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * Check if $useranswer is the correct answer
      *
      * @param stdClass $query
-     * @param string $useranswer
+     * @param ?string $useranswer
      * @param ?int $useranswerid
      * @param mmogame $mmogame
      * @param float $fraction
      *
      * @return true or false
      */
-    public function is_correct(stdClass $query, string $useranswer, ?int $useranswerid, mmogame $mmogame, float &$fraction): bool {
+    public function is_correct(stdClass $query, ?string $useranswer, ?int $useranswerid, mmogame $mmogame, float &$fraction): bool {
         if ($query->qtype == 'shortanswer') {
             return $this->is_correct_shortanswer( $query, $useranswer, $mmogame);
         } else {
@@ -228,7 +228,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @return true or false
      */
-    protected function is_correct_multichoice(stdClass $query, string $useranswer, ?int $useranswerid, float &$fraction): bool {
+    protected function is_correct_multichoice(stdClass $query, ?string $useranswer, ?int $useranswerid, float &$fraction): bool {
         if ($query->multichoice->single) {
             return $this->is_correct_multichoice_single1( $query, $useranswerid, $fraction);
         } else {

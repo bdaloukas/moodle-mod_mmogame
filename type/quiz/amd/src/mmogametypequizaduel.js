@@ -545,7 +545,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
-            this.callGetAttempt({kinduser: this.kinduser, user: this.user, mmogameid: this.mmogameid});
+            this.callGetAttempt();
             return;
         }
 
