@@ -1564,9 +1564,11 @@ define([''], function() {
             top += label.scrollHeight;
 
             let leftEdit = left + 'px';
-            let div = document.createElement("input");
+
+            this.edt = this.gateCreateLabel(leftEdit,top,width,'');
+/* A
+            const div = document.createElement("input");
             div.style.position = "absolute";
-            div.style.width = width + "px";
             div.style.type = "text";
             div.style.fontSize = fontSize + "px";
 
@@ -1576,7 +1578,8 @@ define([''], function() {
 
             this.area.appendChild(div);
             this.edt = div;
-
+            div.style.width = width + "px";
+*/
             return top + fontSize + this.padding;
         }
 
@@ -1766,9 +1769,10 @@ define([''], function() {
             let ret = top + Math.max(label.scrollHeight, fontSize) + this.padding;
 
             let leftEdit = (left + labelWidth + this.padding);
+            this.edt = this.gateCreateLabel(leftEdit, top, width - leftEdit - this.padding, '');
+/*
             const div = document.createElement("input");
             div.style.position = "absolute";
-            div.style.width = (width - leftEdit - this.padding) + "px";
             div.style.type = "text";
             div.style.fontSize = fontSize + "px";
 
@@ -1778,6 +1782,8 @@ define([''], function() {
 
             this.area.appendChild(div);
             this.edt = div;
+            div.style.width = (width - leftEdit - this.padding) (width - leftEdit - this.padding) + "px";
+*/
 
             return ret;
         }
