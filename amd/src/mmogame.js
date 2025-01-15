@@ -1304,62 +1304,10 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
                 instance.gateUpdateSubmit();
             });
 
-            let label1 = document.createElement("label");
-            label1.style.position = "absolute";
-            label1.innerHTML = this.getStringM('js_palette');
-            label1.style.font = "FontAwesome";
-            label1.style.fontSize = this.fontSize + "px";
-            label1.style.width = "0px";
-            label1.style.whiteSpace = "nowrap";
-            this.area.appendChild(label1);
+            this.gateCreateScreenPalette(bottom, gridWidthColors, gridHeightColors,
+                gridWidthAvatars, gridHeightAvatars);
 
-            let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
-                '', 'assets/refresh.svg', false, 'refresh');
-            btn.addEventListener("click",
-                function() {
-                    let elements = instance.area.getElementsByClassName("mmogame_color");
-
-                    while (elements[0]) {
-                        elements[0].parentNode.removeChild(elements[0]);
-                    }
-
-                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
-                        0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
-                        true, false);
-                }
-            );
-            label1.style.left = 0;
-            label1.style.color = this.getColorContrast(this.colorBackground);
-            label1.style.top = bottom + "px";
             bottom += this.fontSize + this.padding;
-
-            let label = document.createElement("label");
-            label.style.position = "absolute";
-            label.innerHTML = this.getStringM('js_avatars');
-            label.style.font = "FontAwesome";
-            label.style.fontSize = this.fontSize + "px";
-            label.style.width = "0 px";
-            label.style.whiteSpace = "nowrap";
-            this.area.appendChild(label);
-            btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize,
-                this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
-            btn.addEventListener("click",
-                function() {
-                    let elements = instance.area.getElementsByClassName("mmogame_avatar");
-
-                    while (elements[0]) {
-                        elements[0].parentNode.removeChild(elements[0]);
-                    }
-
-                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
-                        0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
-                        false, true);
-                }
-            );
-
-            label.style.left = "0 px";
-            label.style.color = this.getColorContrast(this.colorBackground);
-            label.style.top = (bottom + gridHeightColors) + "px";
 
             // Vertical
             this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
@@ -1367,15 +1315,8 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
                 gridHeightAvatars);
 
             let bottom2 = bottom + gridHeightColors + this.fontSize + this.padding + gridHeightAvatars;
-            this.btnSubmit = this.createImageButton(this.area, (maxWidth - this.iconSize) / 2, bottom2, 0,
-                this.iconSize, "", 'assets/submit.svg', false, 'submit');
-            this.btnSubmit.style.visibility = 'hidden';
-            this.btnSubmit.addEventListener("click", function() {
-                if (instance.edtCode !== undefined) {
-                    instance.user = instance.edtCode.value;
-                }
-                instance.gatePlayGame(true, instance.edtNickname.value, instance.paletteid, instance.avatarid);
-            });
+
+            this.gateCreateButtonSubmit(maxWidth, bottom2);
         }
 
         gateCreateScreenHorizontal() {
@@ -1925,5 +1866,49 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
                 this.labelAddScore2 = div;
             }
         }
+
+        gateCreateScreenPalette(bottom, gridWidthColors, gridHeightColors, gridWidthAvatars, gridHeightAvatars) {
+            const label = document.createElement("label");
+            label.style.position = "absolute";
+            label.innerHTML = this.getStringM('js_palette');
+            label.style.font = "FontAwesome";
+            label.style.fontSize = this.fontSize + "px";
+            label.style.width = "0px";
+            label.style.whiteSpace = "nowrap";
+            this.area.appendChild(label);
+
+            let instance = this;
+            let btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
+                '', 'assets/refresh.svg', false, 'refresh');
+            btn.addEventListener("click",
+                function() {
+                    let elements = instance.area.getElementsByClassName("mmogame_color");
+
+                    while (elements[0]) {
+                        elements[0].parentNode.removeChild(elements[0]);
+                    }
+
+                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
+                        0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
+                        true, false);
+                }
+            );
+            label.style.left = 0;
+            label.style.color = this.getColorContrast(this.colorBackground);
+            label.style.top = bottom + "px";
+        }
+
+        gateCreateButtonSubmit = (maxWidth, bottom2) => {
+            this.btnSubmit = this.createImageButton(this.area, (maxWidth - this.iconSize) / 2, bottom2, 0,
+                this.iconSize, "", 'assets/submit.svg', false, 'submit');
+            this.btnSubmit.style.visibility = 'hidden';
+            const instance = this;
+            this.btnSubmit.addEventListener("click", function() {
+                if (instance.edtCode !== undefined) {
+                    instance.user = instance.edtCode.value;
+                }
+                instance.gatePlayGame(true, instance.edtNickname.value, instance.paletteid, instance.avatarid);
+            });
+        };
     };
 });
