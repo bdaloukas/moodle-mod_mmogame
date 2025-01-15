@@ -642,7 +642,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         let results = JSON.parse(json.results);
 
-        ctx.fillStyle = this.getColorContrast(this.colorBackground);
+        ctx.fillStyle = this.getContrastingColor(this.colorBackground);
 
         let y = Math.round(fontSize * 1.2);
         ctx.textAlign = "center";

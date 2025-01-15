@@ -314,7 +314,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 label.style.left = (left + fontSize + this.padding + offsetLabel) + "px";
                 label.style.top = top + "px";
                 label.style.align = "left";
-                label.style.color = this.getColorContrast(this.colorBackground);
+                label.style.color = this.getContrastingColor(this.colorBackground);
 
                 let checked = aChecked.includes(this.answersID[i]);
                 let item = this.createRadiobox(this.body, checkboxSize, this.colorDefinition, this.colorScore, checked, disabled);

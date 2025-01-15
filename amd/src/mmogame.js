@@ -29,23 +29,34 @@
 
 define([''], function() {
     return class MmoGame {
-        kindSound = 0;
-        state = 0;
-        body;
-        minFontSize;
-        maxFontSize;
-        fontSize;
-        avatarTop;
-        colorsBackground;
-        buttonAvatarTop;
-        buttonAvatarHeight;
+        // Define default properties with appropriate types
+        kindSound = 0; // Type: Number (0 = on, 1 = off, 2 = speak)
+        state = 0; // State of the game
+        body = document.body;
+        minFontSize = 0;
+        maxFontSize = 0;
+        fontSize = 0;
+        avatarTop = 0;
+        iconSize = 0;
+        padding = 0;
+
+        // UI element placeholders
+        area = undefined;
+        buttonSound = undefined;
+
+        // Colors
         colorScore;
         colorScore2;
-        definition;
         colorDefinition;
+        colorsBackground;
+
+        // Other
+        definition;
+        buttonAvatarHeight;
+        buttonAvatarTop;
 
         /**
-         * Basic class for games.
+         * Initialize game properties and compute initial sizes.
          *
          * @module mmogame
          * @copyright 2024 Vasilis Daloukas
@@ -65,7 +76,10 @@ define([''], function() {
             return false;
         }
 
-        removeBodyChilds() {
+        /**
+         * Clear all children of the <body> element.
+         */
+        clearBodyChildren() {
             this.removeDivMessage();
 
             while (this.body.firstChild) {
@@ -74,8 +88,11 @@ define([''], function() {
             this.area = undefined;
         }
 
+        /**
+         * Opens the game by resetting the body and computing sizes.
+         */
         openGame() {
-            this.removeBodyChilds();
+            this.clearBodyChildren();
             this.area = undefined;
             this.computeSizes();
         }
@@ -160,6 +177,16 @@ define([''], function() {
             button.src = filename;
         }
 
+        /**
+         * Creates a <div> element and appends it to a parent.
+         *
+         * @param {HTMLElement} parent - The parent element.
+         * @param {Number} left - Left position.
+         * @param {Number} top - Top position.
+         * @param {Number} width - Width of the div.
+         * @param {Number} height - Height of the div.
+         * @returns {HTMLElement} The created div.
+         */
         createDiv(parent, left, top, width, height) {
             let div = document.createElement("div");
             div.style.position = "absolute";
@@ -192,10 +219,15 @@ define([''], function() {
             }
         }
 
-        playAudio(audio) {
-            if (this.kindSound !== 0 && audio !== null) {
-                if (audio.networkState === 1) {
-                    audio.play();
+        /**
+         * Plays a sound file if sound is enabled.
+         *
+         * @param {HTMLAudioElement} audioElement - The audio element to play.
+         */
+        playAudio(audioElement) {
+            if (this.kindSound !== 0 && audioElement) {
+                if (audioElement.networkState === 1) {
+                    audioElement.play();
                 }
             }
         }
@@ -396,15 +428,29 @@ define([''], function() {
                 });
         }
 
+        /**
+         * Compute sizes for icons and paddings based on screen dimensions.
+         */
         computeSizes() {
-            if (this.cIcons < 5 || this.cIcons === undefined) {
+            // Ensure cIcons is at least 5
+            this.cIcons = this.cIcons ?? 5;
+            if (this.cIcons < 5) {
                 this.cIcons = 5;
             }
-            this.iconSize = Math.min(window.innerWidth / this.cIcons, window.innerHeight / 5);
 
-            this.iconSize = Math.round(this.iconSize - this.iconSize / 10 / this.cIcons);
+            // Calculate the maximum icon size based on window dimensions
+            const maxIconWidth = window.innerWidth / this.cIcons;
+            const maxIconHeight = window.innerHeight / 5;
+            this.iconSize = Math.min(maxIconWidth, maxIconHeight);
 
+            // Adjust the icon size by subtracting 10% divided by the number of icons
+            const adjustment = this.iconSize / 10 / this.cIcons;
+            this.iconSize = Math.round(this.iconSize - adjustment);
+
+            // Calculate the padding based on 10% of the icon size
             this.padding = Math.round(this.iconSize / 10);
+
+            // Subtract the padding from the final icon size
             this.iconSize -= this.padding;
         }
 
@@ -420,7 +466,15 @@ define([''], function() {
             return this.padding;
         }
 
-        getColorHex(x) {
+        /**
+         * Returns the hex color string for a given color code.
+         *
+         * @param {Number} colorCode - The color code.
+         * @returns {string} Hexadecimal representation of the color.
+         */
+        getColorHex(colorCode) {
+            return `#${colorCode.toString(16).padStart(6, '0').toUpperCase()}`;
+/* A
             const hexDigits = '0123456789ABCDEF'; // Lookup table for hexadecimal digits
             const hexArray = [];
 
@@ -433,15 +487,24 @@ define([''], function() {
             }
 
             // Join the hex digits and prefix with '#'
-            return '#' + hexArray.join('');
+            return '#' + hexArray.join('');\
+ */
         }
 
-        getContrast(x) {
-            let r = Math.floor(x / 0x1000000) % 256, // Red.
-                g = Math.floor(x / 0x10000) % 256, // Green.
-                b = Math.floor(x / 0x100) % 256; // Blue.
-
-            return ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        /**
+         * Calculates contrast value for a given color.
+         *
+         * @param {Number} colorCode - The color code.
+         * @returns {Number} Contrast value.
+         */
+        getContrast(colorCode) {
+            // eslint-disable-next-line no-bitwise
+            const r = (colorCode >> 16) & 0xff;
+            // eslint-disable-next-line no-bitwise
+            const g = (colorCode >> 8) & 0xff;
+            // eslint-disable-next-line no-bitwise
+            const b = colorCode & 0xff;
+            return (r * 299 + g * 587 + b * 114) / 1000;
         }
 
         getColorGray(x) {
@@ -455,8 +518,14 @@ define([''], function() {
             return (gray * 0x10000) + (gray * 0x100) + gray;
         }
 
-        getColorContrast(x) {
-            return (this.getContrast(x) >= 128) ? '#000000' : '#ffffff';
+        /**
+         * Returns a contrasting color (black or white) based on brightness.
+         *
+         * @param {Number} colorCode - The color code.
+         * @returns {string} "#000000" or "#FFFFFF".
+         */
+        getContrastingColor(colorCode) {
+            return this.getContrast(colorCode) >= 128 ? '#000000' : '#FFFFFF';
         }
 
         repairColors(colors) {
@@ -516,11 +585,11 @@ define([''], function() {
             button.alt = this.getStringM('js_grade');
             if (num === 1) {
                 button.style.background = this.getColorHex(this.colorScore);
-                button.style.color = this.getColorContrast(this.colorScore);
+                button.style.color = this.getContrastingColor(this.colorScore);
             } else {
                 this.buttonScore2 = button;
                 button.style.background = this.getColorHex(this.colorScore2);
-                button.style.color = this.getColorContrast(this.colorScore2);
+                button.style.color = this.getContrastingColor(this.colorScore2);
             }
 
             this.body.appendChild(button);
@@ -532,7 +601,7 @@ define([''], function() {
             let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
             div.style.lineHeight = (this.iconSize / 2) + "px";
             div.style.textAlign = "center";
-            div.style.color = this.getColorContrast(this.colorScore);
+            div.style.color = this.getContrastingColor(this.colorScore);
             div.title = this.getStringM('js_grade');
             if (num === 1) {
                 this.labelScore = div;
@@ -543,7 +612,7 @@ define([''], function() {
             let h = this.iconSize / 3;
             div = this.createDiv(this.body, left, top, this.iconSize, h);
             div.style.textAlign = "center";
-            div.style.color = this.getColorContrast(this.colorScore);
+            div.style.color = this.getContrastingColor(this.colorScore);
             button.disabled = true;
             if (num === 1) {
                 this.labelScoreRank = div;
@@ -552,18 +621,6 @@ define([''], function() {
             }
 
             this.createAddScore(left, top + this.iconSize - h, this.iconSize, h, num);
-/* A
-            div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize, h);
-            div.style.textAlign = "center";
-            div.style.color = this.getColorContrast(this.colorScore);
-            div.title = this.getStringM('js_grade_last_question');
-            button.disabled = true;
-            if (num === 1) {
-                this.labelAddScore = div;
-            } else {
-                this.labelAddScore2 = div;
-            }
-*/
         }
 
         createDivScorePercent(left, top, num) {
@@ -573,11 +630,11 @@ define([''], function() {
             button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
             if (num === 1) {
                 button.style.background = this.getColorHex(this.colorScore);
-                button.style.color = this.getColorContrast(this.colorScore);
+                button.style.color = this.getContrastingColor(this.colorScore);
                 button.title = this.getStringM('js_grade');
             } else {
                 button.style.background = this.getColorHex(this.colorScore2);
-                button.style.color = this.getColorContrast(this.colorScore2);
+                button.style.color = this.getContrastingColor(this.colorScore2);
             }
 
             this.body.appendChild(button);
@@ -588,7 +645,7 @@ define([''], function() {
             let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize / 2, this.iconSize / 2);
             div.style.lineHeight = (this.iconSize / 2) + "px";
             div.style.textAlign = "center";
-            div.style.color = this.getColorContrast(this.colorScore);
+            div.style.color = this.getContrastingColor(this.colorScore);
             if (num === 1) {
                 this.labelScore = div;
                 div.title = this.getStringM('js_grade');
@@ -600,7 +657,7 @@ define([''], function() {
             let h = this.iconSize / 3;
             div = this.createDiv(this.body, left, top, this.iconSize / 2, h);
             div.style.textAlign = "center";
-            div.style.color = this.getColorContrast(this.colorScore);
+            div.style.color = this.getContrastingColor(this.colorScore);
             div.title = this.getStringM('js_ranking_grade');
             if (num === 1) {
                 this.labelScoreRank = div;
@@ -608,19 +665,8 @@ define([''], function() {
                 this.labelScoreRank2 = div;
             }
 
-            this.createAddScore(left, top + this.iconSize - h, this.iconSize / 2, h);
-/* A
-div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2, h);
-            div.style.textAlign = "center";
-            div.style.color = this.getColorContrast(this.colorScore);
-            div.title = this.getStringM('js_grade_last_question');
-            button.disabled = true;
-            if (num === 1) {
-                this.labelAddScore = div;
-            } else {
-                this.labelAddScore2 = div;
-            }
-*/
+            this.createAddScore(left, top + this.iconSize - h, this.iconSize / 2, h, num);
+
             let label = num === 1 ? this.labelScoreRank : this.labelScoreRank2;
 
             div = this.createDiv(this.body, left + this.iconSize / 2, top, this.iconSize / 2, h);
@@ -661,7 +707,7 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
             div.style.lineHeight = sizeIcon + "px";
             div.style.textAlign = "center";
             div.style.background = this.getColorHex(this.colorBackground); // "#234025"
-            div.style.color = this.getColorContrast(this.colorBackground); // "#DCBFDA"
+            div.style.color = this.getContrastingColor(this.colorBackground); // "#DCBFDA"
             div.name = "timer";
             this.body.appendChild(div);
             this.labelTimer = div;
@@ -744,7 +790,7 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
             }
 
             div.style.background = this.getColorHex(this.colorDefinition);
-            div.style.color = this.getColorContrast(this.colorDefinition);
+            div.style.color = this.getContrastingColor(this.colorDefinition);
             div.style.left = left + "px";
             div.style.top = top + "px";
             div.style.paddingLeft = this.padding + "px";
@@ -838,7 +884,7 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
                 div.style.paddingLeft = this.padding + "px";
                 div.style.paddingRight = this.padding + "px";
 
-                div.style.color = this.getColorContrast(this.colorDefinition);
+                div.style.color = this.getContrastingColor(this.colorDefinition);
                 let top = this.iconSize + 3 * this.padding + height1;
                 div.style.top = (top + this.padding) + "px";
                 div.style.height = (height - height1) + "px";
@@ -1096,7 +1142,7 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
                 if (this.divNicknames[num] !== undefined && this.divNicknames[num].innerHTML !== s) {
                     this.divNicknames[num].innerHTML = s;
                     this.divNicknames[num].style.textAlign = "center";
-                    this.divNicknames[num].style.color = this.getColorContrast(this.colorsBackground);
+                    this.divNicknames[num].style.color = this.getContrastingColor(this.colorsBackground);
                     this.autoResizeText(this.divNicknames[num], this.divNicknamesWidth[num], this.divNicknamesHeight[num], true,
                         0, 0, 1);
                 }
@@ -1404,7 +1450,7 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
                 }
             );
             label1.style.left = 0;
-            label1.style.color = this.getColorContrast(this.colorBackground);
+            label1.style.color = this.getContrastingColor(this.colorBackground);
             label1.style.top = bottom + "px";
             bottom += this.fontSize + this.padding;
 
@@ -1436,7 +1482,7 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
 
             // Avatar
             label.style.left = "0 px";
-            label.style.color = this.getColorContrast(this.colorBackground);
+            label.style.color = this.getContrastingColor(this.colorBackground);
             label.style.top = (bottom + gridHeightColors) + "px";
 
             // Horizontal
@@ -1501,7 +1547,7 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
             label.style.top = top + "px";
             label.style.width = labelWidth + "px";
             label.style.align = "left";
-            label.style.color = this.getColorContrast(this.colorBackground);
+            label.style.color = this.getContrastingColor(this.colorBackground);
 
             return label;
         }
@@ -1723,7 +1769,7 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
                 div.style.paddingRight = this.padding + "px";
 
                 div.style.background = this.getColorHex(this.colorDefinition);
-                div.style.color = this.getColorContrast(this.colorDefinition);
+                div.style.color = this.getContrastingColor(this.colorDefinition);
                 this.divMessage = div;
             }
             this.divMessage.innerHTML = message;
@@ -1857,9 +1903,8 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
         createAddScore(left, top, width, height, num) {
             const div = this.createDiv(this.body, left, top, width, height);
             div.style.textAlign = "center";
-            div.style.color = this.getColorContrast(this.colorScore);
+            div.style.color = this.getContrastingColor(this.colorScore);
             div.title = this.getStringM('js_grade_last_question');
-            // A button.disabled = true;
             if (num === 1) {
                 this.labelAddScore = div;
             } else {
@@ -1894,7 +1939,7 @@ div = this.createDiv(this.body, left, top + this.iconSize - h, this.iconSize / 2
                 }
             );
             label.style.left = 0;
-            label.style.color = this.getColorContrast(this.colorBackground);
+            label.style.color = this.getContrastingColor(this.colorBackground);
             label.style.top = bottom + "px";
         }
 
