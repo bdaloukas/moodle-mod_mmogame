@@ -671,7 +671,7 @@ define([''], function() {
 
             div = this.createDiv(this.body, left + this.iconSize / 2, top, this.iconSize / 2, h);
             div.style.textAlign = "center";
-            div.style.fontFamily  = label.style.fontFamily;
+            div.style.fontFamily = label.style.fontFamily;
             div.style.fontSize = h + "px";
             div.style.lineHeight = h + "px";
             div.style.color = label.style.color;
@@ -685,7 +685,7 @@ define([''], function() {
                 this.iconSize / 2);
             div.style.textAlign = "center";
             div.style.lineHeight = Math.round(this.iconSize / 2) + "px";
-            div.style.fontFamily  = label.style.fontFamily ;
+            div.style.fontFamily = label.style.fontFamily;
             div.style.fontSize = label.style.fontSize;
             div.style.fontWeight = 'bold';
             div.style.color = label.style.color;
