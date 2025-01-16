@@ -72,6 +72,176 @@ define([''], function() {
             this.fontSize = size;
         }
 
+        // UI Methods
+        /**
+         * Creates an HTML element with specified properties and attributes.
+         *
+         * @param {string} tag - The tag of the HTML element (e.g., 'div', 'img', 'button').
+         * @param {Object} options - Options for configuring the element.
+         * @param {HTMLElement} options.parent - The parent element to append the new element.
+         * @param {number} options.left - Horizontal position in pixels.
+         * @param {number} options.top - Vertical position in pixels.
+         * @param {number} options.width - Width of the element in pixels.
+         * @param {number} options.height - Height of the element in pixels.
+         * @param {string} [options.classname] - CSS classes (separated by spaces).
+         * @param {Object} [options.attributes] - Additional attributes for the element (key-value pairs).
+         * @returns {HTMLElement} - The created HTML element.
+         */
+        createElement(tag,
+                      {parent, left, top, width, height,
+                          classname = '', attributes = {}}) {
+            // Create the element
+            const element = document.createElement(tag);
+
+            // Set position and dimensions
+            element.style.position = 'absolute';
+            element.style.left = `${left}px`;
+            element.style.top = `${top}px`;
+            if (width !== undefined) {
+                element.style.width = `${width}px`;
+            }
+            if (height !== undefined) {
+                element.style.height = `${height}px`;
+            }
+
+            // Add CSS classes
+            if (classname.trim()) {
+                element.classList.add(...classname.split(/\s+/));
+            }
+
+            // Apply additional attributes
+            for (const [key, value] of Object.entries(attributes)) {
+                if (key === 'style') {
+                    // Merge styles for inline configuration
+                    Object.assign(element.style, value);
+                } else {
+                    element.setAttribute(key, value);
+                }
+            }
+
+            // Append the element to the parent if provided
+            if (parent) {
+                parent.appendChild(element);
+            }
+
+            return element;
+        }
+
+        /**
+         * Creates a <div> element.
+         *
+         * @param {HTMLElement} parent - The parent element.
+         * @param {number} left - Horizontal position in pixels.
+         * @param {number} top - Vertical position in pixels.
+         * @param {number} width - Width of the <div>.
+         * @param {number} height - Height of the <div>.
+         * @returns {HTMLElement} - The created <div> element.
+         */
+        createDiv(parent, left, top, width, height) {
+            return this.createElement('div', {parent, left, top, width, height});
+        }
+
+        /**
+         * Creates an <img> element.
+         *
+         * @param {HTMLElement} parent - The parent element.
+         * @param {number} left - Horizontal position in pixels.
+         * @param {number} top - Vertical position in pixels.
+         * @param {number} width - Width of the <img> element.
+         * @param {number} height - Height of the <img> element.
+         * @param {string} filename - The source file for the image.
+         * @returns {HTMLElement} - The created <img> element.
+         */
+        createImage(parent, left, top, width, height, filename) {
+            return this.createElement('img', {
+                parent,
+                left,
+                top,
+                width,
+                height,
+                attributes: {src: filename, draggable: false},
+            });
+        }
+
+        createCenterImageButton(parent, left, top, width, height, classname, filename) {
+            let button = document.createElement("img");
+            button.classList.add("mmogame_imgbutton");
+            button.style.position = "absolute";
+            button.draggable = false;
+
+            const img = new Image();
+            img.onload = function() {
+                if (this.width > 0 && this.height > 0) {
+                    let mul = Math.min(width / this.width, height / this.height);
+                    let w = Math.round(this.width * mul);
+                    let h = Math.round(this.height * mul);
+
+                    button.style.width = w + "px";
+                    button.style.height = h + "px";
+                    button.style.left = (left + width / 2 - w / 2) + "px";
+                    button.style.top = (top + height / 2 - h / 2) + "px";
+
+                    button.src = filename;
+                }
+            };
+            img.src = filename;
+
+            parent.appendChild(button);
+            return button;
+        }
+
+        // For check
+        createButton({
+                         parent, left, top, width, height, classname, src, alt, role = 'button',
+                     }) {
+            const button = document.createElement('img');
+            button.style.position = 'absolute';
+            button.style.left = `${left}px`;
+            button.style.top = `${top}px`;
+            button.style.width = `${width}px`;
+            button.style.height = `${height}px`;
+            button.className = classname || '';
+            button.src = src || '';
+            button.alt = alt || '';
+            button.setAttribute('role', role);
+            parent.appendChild(button);
+            return button;
+        }
+
+
+        createDivButton(left, top) {
+            return this.createButton({
+                parent: this.body, // Ή άλλος parent
+                left,
+                top,
+                width: this.iconSize,
+                height: this.iconSize,
+                classname: 'mmogame_button',
+                role: 'button',
+            });
+        }
+
+        createButtonSound(left, top) {
+            this.buttonSound = this.createButton({
+                parent: this.body,
+                left,
+                top,
+                width: this.iconSize,
+                height: this.iconSize,
+                classname: 'mmogame_button_red',
+                src: this.getMuteFile(),
+                alt: this.getStringM('js_sound'),
+                role: 'button',
+            });
+            this.buttonSound.addEventListener("click", () => this.onClickSound(this.buttonSound));
+        }
+
+        // Game Logic
+
+        // Utility Functions
+
+        // Other
+
         hasHelp() {
             return false;
         }
@@ -97,115 +267,10 @@ define([''], function() {
             this.computeSizes();
         }
 
-        createImageButton(parent, left, top, width, height, classname, filename, wrap, alt) {
-            let button = this.createImage(parent, left, top, width, height, filename);
-
-            if (alt !== undefined && alt !== '') {
-                button.alt = alt;
-            }
-            button.classList.add("mmogame_imgbutton");
-            button.setAttribute("role", "button");
-
-            return button;
-        }
-
-        createImage(parent, left, top, width, height, filename) {
-            let button = document.createElement("img");
-
-            button.tabIndex = 0;
-            button.style.position = "absolute";
-            button.style.left = left + "px";
-            button.style.top = top + "px";
-            button.draggable = false;
-
-            if (width !== 0) {
-                button.style.width = width + "px";
-            }
-            if (height !== 0) {
-                button.style.height = height + "px";
-            }
-
-            button.style.fontSize = height + "px";
-            if (filename !== undefined && filename !== '') {
-                button.src = filename;
-            }
-            parent.appendChild(button);
-
-            return button;
-        }
-
-        createCenterImageButton(parent, left, top, width, height, classname, filename) {
-            let button = document.createElement("img");
-            button.classList.add("mmogame_imgbutton");
-            button.style.position = "absolute";
-            button.draggable = false;
-
-            const img = new Image();
-            img.onload = function() {
-                if (this.width === 0 || this.height === 0) {
-                    this.width = this.height = 1;
-                }
-
-                if (this.width > 0 && this.height > 0) {
-                    let mul = Math.min(width / this.width, height / this.height);
-                    let w = Math.round(this.width * mul);
-                    let h = Math.round(this.height * mul);
-
-                    button.style.width = w + "px";
-                    button.style.height = h + "px";
-                    button.style.left = (left + width / 2 - w / 2) + "px";
-                    button.style.top = (top + height / 2 - h / 2) + "px";
-
-                    button.src = filename;
-                    button.innerHTML = filename;
-                    button.style.fontSize = height + "px";
-                }
-            };
-            if (filename !== undefined && filename !== "") {
-                img.style.left = left + "px";
-                img.style.top = top + "px";
-                img.style.visibility = 'hidden';
-                img.src = filename;
-            }
-            button.tabIndex = 0;
-            parent.appendChild(button);
-
-            return button;
-        }
-
         updateImageButton(button, left, top, width, height, filename) {
             button.src = filename;
         }
 
-        /**
-         * Creates a <div> element and appends it to a parent.
-         *
-         * @param {HTMLElement} parent - The parent element.
-         * @param {Number} left - Left position.
-         * @param {Number} top - Top position.
-         * @param {Number} width - Width of the div.
-         * @param {Number} height - Height of the div.
-         * @returns {HTMLElement} The created div.
-         */
-        createDiv(parent, left, top, width, height) {
-            let div = document.createElement("div");
-            div.style.position = "absolute";
-            div.style.left = left + "px";
-            div.style.top = top + "px";
-            div.style.width = width + "px";
-            div.style.height = height + "px";
-
-            parent.appendChild(div);
-
-            return div;
-        }
-
-        createDivColor(parent, left, top, width, height, color) {
-            let div = this.createDiv(parent, left, top, width, height);
-            div.style.background = this.getColorHex(color);
-
-            return div;
-        }
 
         getMuteFile() {
             if (this.kindSound === 0) {
@@ -562,6 +627,7 @@ define([''], function() {
             return s2;
         }
 
+        /* B
         createDivButton(left, top) {
             let button = document.createElement("button");
             button.style.position = "absolute";
@@ -574,7 +640,8 @@ define([''], function() {
             button.style.textAlign = "center";
 
             return button;
-        }
+        }*/
+
         createDivScore(left, top, num) {
             let button = this.createDivButton(left, top);
 
@@ -716,18 +783,6 @@ define([''], function() {
             this.autoResizeText(div, sizeIcon, sizeIcon, false, 0, 0, 1);
             div.innerHTML = '';
             div.title = this.getStringM('js_question_time');
-        }
-
-        createButtonSound(left, top) {
-            this.buttonSound = this.createImageButton(this.body, left, top, this.iconSize, this.iconSize, "mmogame_button_red",
-                this.getMuteFile());
-            this.buttonSound.alt = this.getStringM('js_sound');
-            let instance = this;
-            this.buttonSound.addEventListener("click", function() {
-                instance.onClickSound(instance.buttonSound);
-            });
-
-            this.buttonSound.title = this.getStringM('js_sound');
         }
 
         onClickSound(btn) {
