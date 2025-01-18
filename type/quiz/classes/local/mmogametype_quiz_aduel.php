@@ -181,13 +181,13 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      *
      * @param stdClass $attempt The quiz attempt object.
      * @param stdClass $query The query object related to the quiz.
-     * @param string $useranswer The user's answer as a string.
+     * @param ?string $useranswer The user's answer as a string.
      * @param ?int $useranswerid Optional user answer ID.
      * @param bool $autograde Whether autograding is enabled.
      * @param array $ret Output array for additional information.
      * @return bool True if the answer was set successfully, false otherwise.
      */
-    public function set_answer(stdClass $attempt, stdClass $query, string $useranswer, ?int $useranswerid,
+    public function set_answer(stdClass $attempt, stdClass $query, ?string $useranswer, ?int $useranswerid,
                                bool $autograde, array &$ret): bool {
         $retvalue = parent::set_answer( $attempt, $query, $useranswer, $useranswerid, $autograde, $ret);
 
@@ -521,12 +521,12 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      *
      * @param array $ret
      * @param ?int $attemptid
-     * @param string $answer
+     * @param ?string $answer
      * @param ?int $answerid
      * @param string $subcommand
      * @return ?stdClass: the attempt
      */
-    public function set_answer_model(array &$ret, ?int $attemptid, string $answer, ?int $answerid = null,
+    public function set_answer_model(array &$ret, ?int $attemptid, ?string $answer, ?int $answerid = null,
                                      string $subcommand = ''): ?stdClass {
         $attempt = parent::set_answer_model($ret, $attemptid, $answer, $answerid, $subcommand);
 

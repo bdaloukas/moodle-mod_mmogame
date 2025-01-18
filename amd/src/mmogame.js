@@ -30,30 +30,25 @@
 define([''], function() {
     return class MmoGame {
         // Define default properties with appropriate types
-        kindSound = 0; // Type: Number (0 = on, 1 = off, 2 = speak)
-        state = 0; // State of the game
-        body = document.body;
-        minFontSize = 0;
-        maxFontSize = 0;
-        fontSize = 0;
-        avatarTop = 0;
-        iconSize = 0;
-        padding = 0;
+        state; // State of the game
+        body;
+        minFontSize;
+        maxFontSize;
+        fontSize;
+        avatarTop;
+        colors = {};
+        iconSize;
+        padding;
+        cIcons;
 
         // UI element placeholders
-        area = undefined;
-        buttonSound = undefined;
+        area;
 
         // Colors
         colorScore;
         colorScore2;
         colorDefinition;
         colorsBackground;
-
-        // Other
-        definition;
-        buttonAvatarHeight;
-        buttonAvatarTop;
 
         /**
          * Initialize game properties and compute initial sizes.
@@ -63,63 +58,54 @@ define([''], function() {
          * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
          */
         constructor() {
-            this.body = document.getElementsByTagName("body")[0];
+            // Initialize default properties.
             this.kindSound = 0;
+            this.state = 0;
+            this.minFontSize = 0;
+            this.maxFontSize = 0;
+            this.fontSize = 0;
+            this.avatarTop = 0;
+            this.iconSize = 0;
+            this.padding = 0;
+            this.body = document.getElementsByTagName("body")[0];
 
+            // Compute and set font size properties.
             let size = parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue('font-size'));
             this.minFontSize = size;
             this.maxFontSize = 2 * size;
             this.fontSize = size;
         }
 
-        // UI Methods
+        // UI element creation methods
         /**
-         * Creates an HTML element with specified properties and attributes.
-         *
-         * @param {string} tag - The tag of the HTML element (e.g., 'div', 'img', 'button').
-         * @param {Object} options - Options for configuring the element.
-         * @param {HTMLElement} options.parent - The parent element to append the new element.
-         * @param {number} options.left - Horizontal position in pixels.
-         * @param {number} options.top - Vertical position in pixels.
-         * @param {number} options.width - Width of the element in pixels.
-         * @param {number} options.height - Height of the element in pixels.
-         * @param {string} [options.classname] - CSS classes (separated by spaces).
-         * @param {Object} [options.attributes] - Additional attributes for the element (key-value pairs).
-         * @returns {HTMLElement} - The created HTML element.
+         * Creates a DOM element with specified attributes and styles.
+         * @param {string} tag - The HTML tag to create (e.g., 'div', 'img').
+         * @param {Object} options - Configuration for the element.
+         * @param {HTMLElement} options.parent - Parent element where the new element will be appended.
+         * @param {string} [options.classnames] - Space-separated string of CSS class names.
+         * @param {Object} [options.styles] - Inline styles for the element.
+         * @param {Object} [options.attributes] - Attributes for the element (e.g., src, alt, role).
+         * @returns {HTMLElement} - The created DOM element.
          */
-        createElement(tag,
-                      {parent, left, top, width, height,
-                          classname = '', attributes = {}}) {
-            // Create the element
+        createDOMElement(tag, {parent, classnames = '', styles = {}, attributes = {}} = {}) {
             const element = document.createElement(tag);
 
-            // Set position and dimensions
-            element.style.position = 'absolute';
-            element.style.left = `${left}px`;
-            element.style.top = `${top}px`;
-            if (width !== undefined) {
-                element.style.width = `${width}px`;
-            }
-            if (height !== undefined) {
-                element.style.height = `${height}px`;
+            // Apply classes
+            if (classnames) {
+                element.classList.add(...classnames.split(/\s+/));
             }
 
-            // Add CSS classes
-            if (classname.trim()) {
-                element.classList.add(...classname.split(/\s+/));
-            }
+            // Apply styles
+            Object.assign(element.style, styles);
 
-            // Apply additional attributes
-            for (const [key, value] of Object.entries(attributes)) {
-                if (key === 'style') {
-                    // Merge styles for inline configuration
-                    Object.assign(element.style, value);
-                } else {
+            // Apply attributes
+            Object.entries(attributes).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
                     element.setAttribute(key, value);
                 }
-            }
+            });
 
-            // Append the element to the parent if provided
+            // Append to parent
             if (parent) {
                 parent.appendChild(element);
             }
@@ -131,20 +117,33 @@ define([''], function() {
          * Creates a <div> element.
          *
          * @param {HTMLElement} parent - The parent element.
+         * @param {string} classnames - Horizontal position in pixels.
          * @param {number} left - Horizontal position in pixels.
          * @param {number} top - Vertical position in pixels.
          * @param {number} width - Width of the <div>.
          * @param {number} height - Height of the <div>.
          * @returns {HTMLElement} - The created <div> element.
          */
-        createDiv(parent, left, top, width, height) {
-            return this.createElement('div', {parent, left, top, width, height});
+        createDiv(parent, classnames, left, top, width, height) {
+            return this.createDOMElement('div', {
+                parent,
+                classnames,
+                styles: {
+                    position: 'absolute',
+                    left: `${left}px`,
+                    top: `${top}px`,
+                    width: `${width}px`,
+                    height: `${height}px`,
+                },
+            });
         }
+
 
         /**
          * Creates an <img> element.
          *
          * @param {HTMLElement} parent - The parent element.
+         * @param {string} classnames - List of classes separated by space.
          * @param {number} left - Horizontal position in pixels.
          * @param {number} top - Vertical position in pixels.
          * @param {number} width - Width of the <img> element.
@@ -152,89 +151,164 @@ define([''], function() {
          * @param {string} filename - The source file for the image.
          * @returns {HTMLElement} - The created <img> element.
          */
-        createImage(parent, left, top, width, height, filename) {
-            return this.createElement('img', {
+        createImage(parent, classnames, left, top, width, height, filename) {
+            const styles = {
+                position: 'absolute',
+                left: `${left}px`,
+                top: `${top}px`,
+            };
+
+            // Only add width to styles if it's not 0
+            if (width !== 0) {
+                styles.width = `${width}px`;
+            }
+
+            // Only add height to styles if it's not 0
+            if (height !== 0) {
+                styles.height = `${height}px`;
+            }
+
+            const attributes = {draggable: false};
+            if (filename !== '') {
+                attributes.src = filename;
+            }
+
+            return this.createDOMElement('img', {
                 parent,
-                left,
-                top,
-                width,
-                height,
-                attributes: {src: filename, draggable: false},
+                classnames,
+                styles,
+                attributes,
             });
         }
 
+        // For check
+        createButton(parent, classnames, left, top, width, height, src, alt, role = 'button') {
+            return this.createDOMElement('img', {
+                parent,
+                classnames,
+                styles: {
+                    position: 'absolute',
+                    left: `${left}px`,
+                    top: `${top}px`,
+                    width: `${width}px`,
+                    height: `${height}px`,
+                },
+                attributes: {src, alt, role},
+            });
+        }
+
+        /**
+         * Generic method to create styled text or input fields.
+         * @param {HTMLElement} parent - Parent element where the new element will be appended.
+         * @param {string} type - Type of the element ('label' or 'input').
+         * @param {string} classnames - CSS class names.
+         * @param {Object} styles - Inline styles.
+         * @param {string} text - Inner text or placeholder.
+         * @returns {HTMLElement} - The created element.
+         */
+        createTextElement(parent, type, classnames, styles, text = '') {
+            const attributes = type === 'input' ? {type: 'text', placeholder: text} : {};
+            const element = this.createDOMElement(type, {parent, classnames, styles, attributes});
+            if (type === 'label') {
+                element.innerText = text;
+            }
+            return element;
+        }
+
+        createLabel(parent, classnames, left, top, width, fontSize, text) {
+            return this.createTextElement(parent, 'label', classnames, {
+                position: 'absolute',
+                left: `${left}px`,
+                top: `${top}px`,
+                width: `${width}px`,
+                fontSize: `${fontSize}px`,
+                textAlign: 'left',
+            }, text);
+        }
+
+        createInput(parent, classnames, left, top, width, fontSize, placeholder) {
+            return this.createTextElement(parent, 'input', classnames, {
+                position: 'absolute',
+                left: `${left}px`,
+                top: `${top}px`,
+                width: `${width}px`,
+                fontSize: `${fontSize}px`,
+            }, placeholder);
+        }
+
+        // Game logic and utility methods
+
+        /**
+         * Compute sizes for icons and padding based on the screen dimensions.
+         */
+        computeSizes() {
+            const cIcons = Math.max(this.cIcons || 5, 5);
+            const maxIconWidth = window.innerWidth / cIcons;
+            const maxIconHeight = window.innerHeight / 5;
+
+            this.iconSize = Math.min(maxIconWidth, maxIconHeight);
+            const adjustment = this.iconSize / 10 / cIcons;
+            this.iconSize = Math.round(this.iconSize - adjustment);
+            this.padding = Math.round(this.iconSize / 10);
+            this.iconSize -= this.padding;
+        }
+
+        /**
+         * Creates a centered image button with automatic scaling.
+         * @param {HTMLElement} parent - The parent element where the button will be appended.
+         * @param {number} left - The left position of the container in pixels.
+         * @param {number} top - The top position of the container in pixels.
+         * @param {number} width - The width of the container in pixels.
+         * @param {number} height - The height of the container in pixels.
+         * @param {string} classname - Additional CSS classes to apply to the button.
+         * @param {string} filename - The source URL of the image.
+         * @returns {HTMLElement} - The created image button element.
+         */
         createCenterImageButton(parent, left, top, width, height, classname, filename) {
-            let button = document.createElement("img");
-            button.classList.add("mmogame_imgbutton");
-            button.style.position = "absolute";
-            button.draggable = false;
+            const button = this.createDOMElement('img', {
+                parent,
+                classnames: `mmogame_imgbutton ${classname}`,
+                styles: {
+                    position: 'absolute',
+                    draggable: false,
+                },
+            });
 
             const img = new Image();
             img.onload = function() {
                 if (this.width > 0 && this.height > 0) {
-                    let mul = Math.min(width / this.width, height / this.height);
-                    let w = Math.round(this.width * mul);
-                    let h = Math.round(this.height * mul);
+                    const mul = Math.min(width / this.width, height / this.height);
+                    const w = Math.round(this.width * mul);
+                    const h = Math.round(this.height * mul);
 
-                    button.style.width = w + "px";
-                    button.style.height = h + "px";
-                    button.style.left = (left + width / 2 - w / 2) + "px";
-                    button.style.top = (top + height / 2 - h / 2) + "px";
+                    Object.assign(button.style, {
+                        width: `${w}px`,
+                        height: `${h}px`,
+                        left: `${left + width / 2 - w / 2}px`,
+                        top: `${top + height / 2 - h / 2}px`,
+                    });
 
                     button.src = filename;
                 }
             };
             img.src = filename;
 
-            parent.appendChild(button);
             return button;
         }
 
-        // For check
-        createButton({
-                         parent, left, top, width, height, classname, src, alt, role = 'button',
-                     }) {
-            const button = document.createElement('img');
-            button.style.position = 'absolute';
-            button.style.left = `${left}px`;
-            button.style.top = `${top}px`;
-            button.style.width = `${width}px`;
-            button.style.height = `${height}px`;
-            button.className = classname || '';
-            button.src = src || '';
-            button.alt = alt || '';
-            button.setAttribute('role', role);
-            parent.appendChild(button);
-            return button;
-        }
-
-
-        createDivButton(left, top) {
-            return this.createButton({
-                parent: this.body, // Ή άλλος parent
+        createDivButton(classnames, left, top) {
+            return this.createButton(
+                this.body,
+                classnames,
                 left,
                 top,
-                width: this.iconSize,
-                height: this.iconSize,
-                classname: 'mmogame_button',
-                role: 'button',
-            });
+                this.iconSize,
+                this.iconSize,
+                '',
+                '',
+                'button');
         }
 
-        createButtonSound(left, top) {
-            this.buttonSound = this.createButton({
-                parent: this.body,
-                left,
-                top,
-                width: this.iconSize,
-                height: this.iconSize,
-                classname: 'mmogame_button_red',
-                src: this.getMuteFile(),
-                alt: this.getStringM('js_sound'),
-                role: 'button',
-            });
-            this.buttonSound.addEventListener("click", () => this.onClickSound(this.buttonSound));
-        }
 
         // Game Logic
 
@@ -253,7 +327,7 @@ define([''], function() {
             this.removeDivMessage();
 
             while (this.body.firstChild) {
-                this.body.removeChild(this.body.lastChild);
+                this.body.removeChild(this.body.firstChild);
             }
             this.area = undefined;
         }
@@ -263,42 +337,25 @@ define([''], function() {
          */
         openGame() {
             this.clearBodyChildren();
-            this.area = undefined;
             this.computeSizes();
         }
 
-        updateImageButton(button, left, top, width, height, filename) {
-            button.src = filename;
-        }
-
-
-        getMuteFile() {
-            if (this.kindSound === 0) {
-                return 'assets/sound-on-flat.png';
-            } else if (this.kindSound === 1) {
-                return 'assets/sound-off-flat.png';
-            } else if (this.kindSound === 2) {
-                return 'assets/speak.svg';
-            } else {
-                return 'assets/sound-on-flat.png';
-            }
-        }
-
         /**
-         * Plays a sound file if sound is enabled.
-         *
-         * @param {HTMLAudioElement} audioElement - The audio element to play.
+         * Updates an image button's properties.
+         * @param {HTMLImageElement} button - The button element to update.
+         * @param {string} src - The new source for the image.
          */
-        playAudio(audioElement) {
-            if (this.kindSound !== 0 && audioElement) {
-                if (audioElement.networkState === 1) {
-                    audioElement.play();
-                }
-            }
+        updateImageButton(button, src) {
+            button.src = src;
         }
 
         autoResizeText(item, width, height, wrap, minFontSize, maxFontSize, minRatio) {
-            let minHeight = 0.9 * height;
+            const text = item.innerHTML.toString();
+
+            if (text.length === 0) {
+                return false;
+            }
+
             let low = Math.max(1, minFontSize);
             width = Math.round(width);
             height = Math.round(height);
@@ -309,7 +366,8 @@ define([''], function() {
             let newHeight = 0;
             let newWidth = 0;
 
-            for (let i = 0; i <= 10; i++) {
+            let i = 1;
+            for (;i <= 10; i++) {
                 let el = document.createElement("div");
                 el.style.left = 0;
                 el.style.top = 0;
@@ -319,7 +377,7 @@ define([''], function() {
                 if (!wrap) {
                     el.style.whiteSpace = "nowrap";
                 }
-                el.innerHTML = item.innerHTML;
+                el.innerHTML = text;
                 this.body.appendChild(el);
 
                 let fontSize = (low + up) / 2;
@@ -339,9 +397,6 @@ define([''], function() {
                     }
                     fitHeight = newHeight;
                     fitSize = fontSize;
-                    if (newHeight > minHeight) {
-                        break;
-                    }
                 }
             }
             item.style.fontSize = fitSize + "px";
@@ -350,8 +405,8 @@ define([''], function() {
                 this.autoResizeTextBr(item);
                 newWidth = item.scrollWidth;
                 newHeight = item.scrollHeight;
-                this.autoResizeTextImage(item, newWidth > width ? newWidth - width : 0, newHeight > height ? newHeight - height : 0,
-                    minRatio);
+                this.autoResizeTextImage(item, newWidth > width ? newWidth - width : 0,
+                    newHeight > height ? newHeight - height : 0, minRatio);
             } else {
                 return [item.scrollWidth - 1, item.scrollHeight];
             }
@@ -363,7 +418,7 @@ define([''], function() {
             if (!wrap) {
                 el.style.whiteSpace = "nowrap";
             }
-            el.innerHTML = item.innerHTML;
+            el.innerHTML = text;
             this.body.appendChild(el);
             el.style.fontSize = item.style.fontSize;
             let size = [el.scrollWidth - 1, el.scrollHeight];
@@ -458,77 +513,30 @@ define([''], function() {
         }
 
         uuid4() {
-            const uuid = new Array(36);
-            const hexDigits = '0123456789abcdef'; // Lookup table for hexadecimal digits
-
-            for (let i = 0; i < 36; i++) {
-                uuid[i] = Math.floor(Math.random() * 16); // Generate random numbers for each position
-            }
-
-            // Insert dashes at predefined positions
-            uuid[8] = '-';
-            uuid[13] = '-';
-            uuid[18] = '-';
-            uuid[23] = '-';
-
-            // Set specific bits to comply with UUIDv4 standards
-            uuid[14] = 4; // The 13th position represents version 4 (0100 in binary)
+            const hexDigits = '0123456789abcdef';
+            const uuid = [...Array(36)].map(() => hexDigits[Math.floor(Math.random() * 16)]);
+            uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+            uuid[14] = '4';
             // eslint-disable-next-line no-bitwise
-            uuid[19] = (uuid[19] & 0x3) | 0x8; // The 17th position must start with '10' in binary
+            uuid[19] = hexDigits[(parseInt(uuid[19], 16) & 0x3) | 0x8];
 
-            // Convert numbers to hexadecimal without using toString
-            this.user = uuid
-                .map((x) => (typeof x === 'string' ? x : hexDigits[x])) // Convert numeric values to hex using lookup table
-                .join('');
+            this.user = uuid.join('');
 
             let options = {userGUID: this.user};
             let instance = this;
-            this.saveOptions(options)
+            this.setOptions(options)
                 .then(function() {
                     return true;
                 })
                 .catch(error => {
+                    console.log(error);
                     instance.showError(error.message);
                     return false;
                 });
         }
 
-        /**
-         * Compute sizes for icons and paddings based on screen dimensions.
-         */
-        computeSizes() {
-            // Ensure cIcons is at least 5
-            this.cIcons = this.cIcons ?? 5;
-            if (this.cIcons < 5) {
-                this.cIcons = 5;
-            }
-
-            // Calculate the maximum icon size based on window dimensions
-            const maxIconWidth = window.innerWidth / this.cIcons;
-            const maxIconHeight = window.innerHeight / 5;
-            this.iconSize = Math.min(maxIconWidth, maxIconHeight);
-
-            // Adjust the icon size by subtracting 10% divided by the number of icons
-            const adjustment = this.iconSize / 10 / this.cIcons;
-            this.iconSize = Math.round(this.iconSize - adjustment);
-
-            // Calculate the padding based on 10% of the icon size
-            this.padding = Math.round(this.iconSize / 10);
-
-            // Subtract the padding from the final icon size
-            this.iconSize -= this.padding;
-        }
-
-        getIconSize() {
-            return this.iconSize;
-        }
-
         getCopyrightHeight() {
-            return Math.round(this.getIconSize() / 3);
-        }
-
-        getPadding() {
-            return this.padding;
+            return Math.round(this.iconSize / 3);
         }
 
         /**
@@ -539,21 +547,6 @@ define([''], function() {
          */
         getColorHex(colorCode) {
             return `#${colorCode.toString(16).padStart(6, '0').toUpperCase()}`;
-/* A
-            const hexDigits = '0123456789ABCDEF'; // Lookup table for hexadecimal digits
-            const hexArray = [];
-
-            for (let i = 0; i < 6; i++) {
-                // Extract the least significant nibble and find its hex representation
-                // eslint-disable-next-line no-bitwise
-                hexArray.unshift(hexDigits[x & 0xF]);
-                // eslint-disable-next-line no-bitwise
-                x >>= 4; // Shift right by 4 bits to process the next nibble
-            }
-
-            // Join the hex digits and prefix with '#'
-            return '#' + hexArray.join('');\
- */
         }
 
         /**
@@ -585,369 +578,73 @@ define([''], function() {
 
         /**
          * Returns a contrasting color (black or white) based on brightness.
-         *
          * @param {Number} colorCode - The color code.
          * @returns {string} "#000000" or "#FFFFFF".
          */
         getContrastingColor(colorCode) {
-            return this.getContrast(colorCode) >= 128 ? '#000000' : '#FFFFFF';
+            // eslint-disable-next-line no-bitwise
+            const r = (colorCode >> 16) & 0xff;
+            // eslint-disable-next-line no-bitwise
+            const g = (colorCode >> 8) & 0xff;
+            // eslint-disable-next-line no-bitwise
+            const b = colorCode & 0xff;
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            return brightness >= 128 ? "#000000" : "#FFFFFF";
         }
 
+        /**
+         * Repairs colors by sorting and assigning contrasting background colors.
+         * @param {Array} colors - Array of color codes.
+         */
         repairColors(colors) {
-
-            this.colors = colors;
-            let instance = this;
-            this.colors.sort(function(a, b) {
-                return instance.getContrast(a) - instance.getContrast(b);
-            });
-
+            this.colors = colors.sort((a, b) => this.getContrast(a) - this.getContrast(b));
             this.colorBackground = this.colors[0];
-            this.body.style.background = this.getColorHex(this.colorBackground);
-
-            return this.colors;
+            this.body.style.backgroundColor = this.getColorHex(this.colorBackground);
         }
 
-        repairP(s) {
-            if (s === undefined) {
-                return "";
+        /**
+         * Repairs <p> tags in a string by cleaning up unnecessary tags.
+         * @param {string} text - The input string with potential <p> tags.
+         * @returns {string} The cleaned-up string.
+         */
+        repairP(text) {
+            if (!text) {
+                return '';
             }
-
-            // Remove <p> tags and replace </p> with <br />
-            let s2 = s.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '<br/>').trim();
-
-            // Remove <br> or <br/> at the end of the string
-            s2 = s2.replace(/<br\s*\/?>$/g, '');
-
-            // Remove the <ol><br></ol> sequence if it exists
-            let pos = s2.indexOf('<ol><br></ol>');
-            if (pos >= 0) {
-                s2 = s2.slice(0, pos) + s2.slice(pos + 13);
-            }
-
-            return s2;
+            return text.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '<br>').trim();
         }
 
-        /* B
-        createDivButton(left, top) {
-            let button = document.createElement("button");
-            button.style.position = "absolute";
-            button.classList.add("mmogame_button");
-            button.style.left = left + "px";
-            button.style.top = top + "px";
-            button.style.width = this.iconSize + "px";
-            button.style.height = this.iconSize + "px";
-            button.style.lineHeight = this.iconSize + "px";
-            button.style.textAlign = "center";
-
-            return button;
-        }*/
-
-        createDivScore(left, top, num) {
-            let button = this.createDivButton(left, top);
-
-            button.style.borderRadius = this.iconSize + "px";
-            button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
-            button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
-            button.title = this.getStringM('js_grade');
-            button.alt = this.getStringM('js_grade');
-            if (num === 1) {
-                button.style.background = this.getColorHex(this.colorScore);
-                button.style.color = this.getContrastingColor(this.colorScore);
-            } else {
-                this.buttonScore2 = button;
-                button.style.background = this.getColorHex(this.colorScore2);
-                button.style.color = this.getContrastingColor(this.colorScore2);
-            }
-
-            this.body.appendChild(button);
-
-            button.innerHTML = '100 %';
-            this.autoResizeText(button, this.iconSize, this.iconSize, false, 0, 0, 1);
-            button.innerHTML = '';
-
-            let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
-            div.style.lineHeight = (this.iconSize / 2) + "px";
-            div.style.textAlign = "center";
-            div.style.color = this.getContrastingColor(this.colorScore);
-            div.title = this.getStringM('js_grade');
-            if (num === 1) {
-                this.labelScore = div;
-            } else {
-                this.labelScore2 = div;
-            }
-
-            let h = this.iconSize / 3;
-            div = this.createDiv(this.body, left, top, this.iconSize, h);
-            div.style.textAlign = "center";
-            div.style.color = this.getContrastingColor(this.colorScore);
-            button.disabled = true;
-            if (num === 1) {
-                this.labelScoreRank = div;
-            } else {
-                this.labelScoreRank2 = div;
-            }
-
-            this.createAddScore(left, top + this.iconSize - h, this.iconSize, h, num);
-        }
-
-        createDivScorePercent(left, top, num) {
-            let button = this.createDivButton(left, top);
-
-            button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
-            button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
-            if (num === 1) {
-                button.style.background = this.getColorHex(this.colorScore);
-                button.style.color = this.getContrastingColor(this.colorScore);
-                button.title = this.getStringM('js_grade');
-            } else {
-                button.style.background = this.getColorHex(this.colorScore2);
-                button.style.color = this.getContrastingColor(this.colorScore2);
-            }
-
-            this.body.appendChild(button);
-
-            button.innerHTML = '';
-            button.disabled = true;
-
-            let div = this.createDiv(this.body, left, top + this.iconSize / 4, this.iconSize / 2, this.iconSize / 2);
-            div.style.lineHeight = (this.iconSize / 2) + "px";
-            div.style.textAlign = "center";
-            div.style.color = this.getContrastingColor(this.colorScore);
-            if (num === 1) {
-                this.labelScore = div;
-                div.title = this.getStringM('js_grade');
-            } else {
-                this.labelScore2 = div;
-                div.title = this.getStringM('js_grade_opponent');
-            }
-
-            let h = this.iconSize / 3;
-            div = this.createDiv(this.body, left, top, this.iconSize / 2, h);
-            div.style.textAlign = "center";
-            div.style.color = this.getContrastingColor(this.colorScore);
-            div.title = this.getStringM('js_ranking_grade');
-            if (num === 1) {
-                this.labelScoreRank = div;
-            } else {
-                this.labelScoreRank2 = div;
-            }
-
-            this.createAddScore(left, top + this.iconSize - h, this.iconSize / 2, h, num);
-
-            let label = num === 1 ? this.labelScoreRank : this.labelScoreRank2;
-
-            div = this.createDiv(this.body, left + this.iconSize / 2, top, this.iconSize / 2, h);
-            div.style.textAlign = "center";
-            div.style.fontFamily = label.style.fontFamily;
-            div.style.fontSize = h + "px";
-            div.style.lineHeight = h + "px";
-            div.style.color = label.style.color;
-            div.title = this.getStringM('js_ranking_percent');
-            if (num === 1) {
-                this.labelScoreRankB = div;
-            }
-
-            label = num === 1 ? this.labelAddScore : this.labelAddScore2;
-            div = this.createDiv(this.body, left + this.iconSize / 2, parseFloat(this.labelScore.style.top), this.iconSize / 2,
-                this.iconSize / 2);
-            div.style.textAlign = "center";
-            div.style.lineHeight = Math.round(this.iconSize / 2) + "px";
-            div.style.fontFamily = label.style.fontFamily;
-            div.style.fontSize = label.style.fontSize;
-            div.style.fontWeight = 'bold';
-            div.style.color = label.style.color;
-            div.title = this.getStringM('js_percent');
-            this.autoResizeText(div, this.iconSize / 2, this.iconSize / 2, false);
-            if (num === 1) {
-                this.labelScoreB = div;
-            }
-        }
-
-        createDivTimer(left, top, sizeIcon) {
-            let div = document.createElement("div");
-            div.style.position = "absolute";
-            div.style.left = left + "px";
-            div.style.top = top + "px";
-            div.style.width = sizeIcon + "px";
-            div.style.height = sizeIcon + "px";
-            div.style.whiteSpace = "nowrap";
-            div.style.lineHeight = sizeIcon + "px";
-            div.style.textAlign = "center";
-            div.style.background = this.getColorHex(this.colorBackground); // "#234025"
-            div.style.color = this.getContrastingColor(this.colorBackground); // "#DCBFDA"
-            div.name = "timer";
-            this.body.appendChild(div);
-            this.labelTimer = div;
-
-            div.innerHTML = '23:59';
-            this.autoResizeText(div, sizeIcon, sizeIcon, false, 0, 0, 1);
-            div.innerHTML = '';
-            div.title = this.getStringM('js_question_time');
-        }
-
-        onClickSound(btn) {
-            window.title = btn.src;
-            this.kindSound = (this.kindSound + 1) % 2;
-            window.localStorage.setItem("kindSound", toString(this.kindSound));
-            btn.src = this.getMuteFile();
-        }
-
+        /**
+         * Creates a help button.
+         * @param {number} left - Left position in pixels.
+         * @param {number} top - Top position in pixels.
+         */
         createButtonHelp(left, top) {
-            this.buttonHelp = this.createImageButton(this.body, left, top, this.iconSize, this.iconSize, "", 'assets/help.svg');
-            this.buttonHelp.alt = this.getStringM('js_help');
+            const helpButton = this.createImage(this.body, 'mmogame-button-helo',
+                left, top, this.iconSize, this.iconSize, 'assets/help.png');
+            helpButton.alt = 'Help';
         }
 
-        findbest(low, up, fn) {
-            if (low < 1) {
-                low = 1;
-            }
-
-            let prevSize;
-            let fitSize = low;
-            let testSize;
-            for (let i = 0; i <= 10; i++) {
-                prevSize = low;
-                testSize = (low + up) / 2;
-
-                let cmp = fn(testSize);
-                if (cmp <= 0) {
-                    fitSize = testSize;
-                    low = testSize;
+        /**
+         * Finds the best value based on a condition.
+         * @param {number} low - The lower bound.
+         * @param {number} high - The upper bound.
+         * @param {function} condition - A condition to evaluate.
+         */
+        findbest(low, high, condition) {
+            let steps = 0;
+            while (high - low > 1) {
+                steps++;
+                const mid = Math.floor((low + high) / 2);
+                if (condition(mid)) {
+                    high = mid;
                 } else {
-                    up = testSize;
-                }
-                if (Math.abs((testSize - prevSize) / testSize) < 0.01) {
-                    break;
+                    low = mid;
                 }
             }
+            console.log("findBest steps=" + steps);
 
-            return fitSize;
-        }
-
-        createDefinition(left, top, width, onlyMetrics, fontSize) {
-
-            width -= 2 * this.padding;
-            let div = document.createElement("div");
-
-            div.style.position = "absolute";
-            div.style.width = width + "px";
-
-            div.style.fontSize = fontSize + "px";
-            // A div.innerHTML = this.repairHTML(this.definition, this.mapFiles, this.mapFilesWidth, this.mapFilesHeight);
-            div.innerHTML = this.definition;
-            div.style.textAlign = "left";
-
-            if (onlyMetrics) {
-                this.body.appendChild(div);
-                let ret = [div.scrollWidth - 1, div.scrollHeight];
-                this.body.removeChild(div);
-                return ret;
-            }
-
-            div.style.background = this.getColorHex(this.colorDefinition);
-            div.style.color = this.getContrastingColor(this.colorDefinition);
-            div.style.left = left + "px";
-            div.style.top = top + "px";
-            div.style.paddingLeft = this.padding + "px";
-            div.style.paddingRight = this.padding + "px";
-            div.id = "definition";
-
-            this.area.appendChild(div);
-            let height = div.scrollHeight + this.padding;
-            div.style.height = height + "px";
-
-            this.definitionHeight = height;
-            this.divDefinition = div;
-
-            return [div.scrollWidth - 1, div.scrollHeight];
-        }
-
-        updateLabelTimer() {
-            if (this.labelTimer === undefined) {
-                return;
-            }
-            if (this.timeclose === 0 || this.timestart === 0) {
-                this.labelTimer.innerHTML = '';
-                return;
-            }
-
-            let dif = Math.round(this.timeclose - ((new Date()).getTime()) / 1000);
-            if (dif <= 0) {
-                dif = 0;
-                this.sendTimeout();
-            }
-            const minutes = Math.floor(Math.abs(dif) / 60);
-            const seconds = Math.abs(dif) % 60;
-            const prefix = dif < 0 ? "-" : "";
-            this.labelTimer.innerHTML = `${prefix}${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-            if (dif === 0) {
-                return;
-            }
-
-            let instance = this;
-            setTimeout(function() {
-                instance.updateLabelTimer();
-            }, 500);
-        }
-
-        createDivMessage(message) {
-            if (this.area !== undefined) {
-                this.body.removeChild(this.area);
-                this.area = undefined;
-            }
-
-            if (this.divMessageHelp !== undefined) {
-                this.body.removeChild(this.divMessageHelp);
-                this.divMessageHelp = undefined;
-            }
-
-            let left = this.padding;
-            let top = this.areaTop;
-            let width = window.innerWidth - 2 * this.padding;
-            let height = window.innerHeight - this.getCopyrightHeight() - this.padding - top;
-
-            this.createDivMessageDo(left, top, width, height, message, height);
-
-            this.divMessage.style.top = (height - this.divMessage.scrollHeight) / 2 + "px";
-        }
-
-        createDivMessageStart(message) {
-            if (this.area !== undefined) {
-                this.body.removeChild(this.area);
-                this.area = undefined;
-            }
-
-            let left = this.padding;
-            let top = this.areaTop;
-            let width = window.innerWidth - 2 * this.padding;
-            let height = window.innerHeight - this.getCopyrightHeight() - this.padding - top;
-
-            let height1 = height / 8;
-
-            this.createDivMessageDo(left, top, width, height, message, height1);
-
-            top += (height1 - this.divMessage.scrollHeight) / 2;
-            this.divMessage.style.top = top + "px";
-
-            if (this.divMessageHelp === undefined) {
-                let div = document.createElement("div");
-                div.style.position = "absolute";
-                div.style.left = left + "px";
-                div.style.textAlign = "left";
-                div.style.width = (width - 2 * this.padding) + "px";
-                div.style.paddingLeft = this.padding + "px";
-                div.style.paddingRight = this.padding + "px";
-
-                div.style.color = this.getContrastingColor(this.colorDefinition);
-                let top = this.iconSize + 3 * this.padding + height1;
-                div.style.top = (top + this.padding) + "px";
-                div.style.height = (height - height1) + "px";
-                this.divMessageHelp = div;
-                this.body.appendChild(this.divMessageHelp);
-
-                this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));
-            }
+            return low;
         }
 
         removeDivMessage() {
@@ -991,41 +688,6 @@ define([''], function() {
             }
 
             return s;
-        }
-
-        showScore(sumscore, rank, name, usercode, addscore, completedrank, percentcompleted) {
-            let s = sumscore === undefined ? '' : '<b>' + sumscore + '</b>';
-            if (this.labelScore.innerHTML !== s) {
-                this.labelScore.innerHTML = s;
-                let w = this.iconSize - 2 * this.padding;
-                this.autoResizeText(this.labelScore, w, this.iconSize / 2, false, 0, 0, 1);
-            }
-
-            if (this.labelScoreRank.innerHTML !== rank) {
-                this.labelScoreRank.innerHTML = rank !== undefined ? rank : '';
-                this.autoResizeText(this.labelScoreRank, this.iconSize, this.iconSize / 3, true, 0, 0, 1);
-            }
-
-            if (name !== undefined) {
-                window.document.title = (usercode !== undefined ? usercode : "") + " " + name;
-            }
-
-            s = addscore === undefined ? '' : addscore;
-            if (this.labelAddScore.innerHTML !== s) {
-                this.labelAddScore.innerHTML = s;
-                this.autoResizeText(this.labelAddScore, this.iconSize - 2 * this.padding, this.iconSize / 3, false, 0, 0, 1);
-            }
-
-            if (this.labelScoreRankB.innerHTML !== completedrank) {
-                this.labelScoreRankB.innerHTML = completedrank !== undefined ? completedrank : '';
-                this.autoResizeText(this.labelScoreRankB, 0.9 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
-            }
-
-            s = percentcompleted !== undefined ? Math.round(100 * percentcompleted) + '%' : '';
-            if (this.labelScoreB.innerHTML !== s) {
-                this.labelScoreB.innerHTML = s;
-                this.autoResizeText(this.labelScoreB, 0.8 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
-            }
         }
 
         showColorPalette(canvas, colors) {
@@ -1117,690 +779,32 @@ define([''], function() {
             return canvas;
         }
 
-        createButtonsAvatar(num, left, widthNickName = 0, heightNickName = 0) {
-            if (widthNickName === 0) {
-                widthNickName = this.iconSize;
-            }
-            if (heightNickName === 0) {
-                heightNickName = this.iconSize - this.buttonAvatarHeight;
-            }
-            if (this.buttonsAvatarLeft === undefined) {
-                this.buttonsAvatarLeft = [];
-            }
-            this.buttonsAvatarLeft[num] = left;
-
-            if (this.buttonsAvatarSrc === undefined) {
-                this.buttonsAvatarSrc = [];
-            }
-            this.buttonsAvatarSrc[num] = "";
-
-            if (this.nicknames === undefined) {
-                this.nicknames = [];
-            }
-            this.nicknames[num] = "";
-
-            if (this.buttonsAvatar === undefined) {
-                this.buttonsAvatar = [];
-            }
-            this.buttonsAvatar[num] = this.createImageButton(this.body, left, this.avatarTop, this.iconSize, this.iconSize, "", "");
-            if (num === 2 && this.avatarTop !== undefined) {
-                this.buttonsAvatar[num].title = this.getStringM('js_opponent');
-            }
-
-            if (this.divNicknames === undefined) {
-                this.divNicknames = [];
-            }
-            if (this.divNicknamesWidth === undefined) {
-                this.divNicknamesWidth = [];
-            }
-            if (this.divNicknamesHeight === undefined) {
-                this.divNicknamesHeight = [];
-            }
-            this.divNicknamesWidth[num] = widthNickName;
-            this.divNicknamesHeight[num] = heightNickName;
-
-            this.divNicknames[num] = this.createDiv(this.body, left, this.padding, widthNickName, heightNickName);
+        createImageButton(parent, classnames, left, top, width, height, filename, wrap, alt) {
+            const imgButton = this.createImage(parent, classnames, left, top, width, height, filename);
+            imgButton.style.cursor = 'pointer';
+            return imgButton;
         }
 
-        updateButtonsAvatar(num, avatar, nickname) {
-            if (avatar === undefined) {
-                avatar = "";
-            }
-            if (nickname === undefined) {
-                nickname = "";
-            }
-
-            if (avatar === "" && nickname === "") {
-                this.buttonsAvatar[num].style.visibility = 'hidden';
-                this.divNicknames[num].style.visibility = 'hidden';
-                return;
-            }
-
-            if (this.nicknames[num] !== nickname || nickname === "") {
-                this.nicknames[num] = nickname;
-                let s = nickname;
-
-                if (nickname.length === 0) {
-                    s = avatar;
-                    let pos = s.lastIndexOf("/");
-                    if (pos >= 0) {
-                        s = s.slice(pos + 1);
-                    }
-                    pos = s.lastIndexOf(".");
-                    if (pos >= 0) {
-                        s = s.slice(0, pos);
-                    }
-                    const filenameWithExt = avatar.split('/').pop(); // Extract the file name with its extension
-                    s = filenameWithExt.split('.').slice(0, -1).join('.'); // Remove the extension from the file name
-                }
-                s = this.repairNickname(s);
-                if (this.divNicknames[num] !== undefined && this.divNicknames[num].innerHTML !== s) {
-                    this.divNicknames[num].innerHTML = s;
-                    this.divNicknames[num].style.textAlign = "center";
-                    this.divNicknames[num].style.color = this.getContrastingColor(this.colorsBackground);
-                    this.autoResizeText(this.divNicknames[num], this.divNicknamesWidth[num], this.divNicknamesHeight[num], true,
-                        0, 0, 1);
-                }
-            }
-
-            if (avatar !== this.buttonsAvatarSrc[num]) {
-                this.updateImageButton(this.buttonsAvatar[num], this.buttonsAvatarLeft[num], this.buttonAvatarTop, this.iconSize,
-                    this.buttonAvatarHeight, avatar !== "" ? "assets/avatars/" + avatar : "");
-                this.buttonsAvatarSrc[num] = avatar;
-            }
-
-            this.buttonsAvatar[num].alt = this.divNicknames[num].innerHTML;
-
-            this.buttonsAvatar[num].style.visibility = 'visible';
-            this.divNicknames[num].style.visibility = 'visible';
+        createDivColor(parent, classnames, left, top, width, height, color) {
+            const colorDiv = this.createDiv(parent, classnames, left, top, width, height);
+            colorDiv.style.backgroundColor = color;
+            colorDiv.style.border = '1px solid #000';
+            return colorDiv;
         }
 
-        gateOpen(mmogameid, pin, kinduser, user, url) {
-            this.url = url;
-            this.minFontSize *= 2;
-            this.maxFontSize *= 2;
-
-            // Saves parameters to class variables.
-            this.mmogameid = mmogameid;
-            this.pin = pin;
-            this.kinduser = kinduser;
-            this.user = user;
-            this.gateComputeSizes();
-
-            this.areaTop = this.padding;
-            this.areaWidth = Math.round(window.innerWidth - 2 * this.padding);
-            this.areaHeight = Math.round(window.innerHeight - this.areaTop) - this.padding;
-
-            let instance = this;
-            this.getOptions().then(function(options) {
-                if (!options.hasOwnProperty('kindsound')) {
-                    options.kindsound = 0;
-                }
-                instance.kindSound = options.kindSound === 1 || options.kindSound === 2 ? options.kindSound : 0;
-
-                if (!options.hasOwnProperty('nickname')) {
-                    options.nickname = '';
-                }
-                options.avatarid = options.hasOwnProperty('avatarid') && options.avatarid !== undefined ? options.avatarid : 0;
-                options.paletteid = options.hasOwnProperty('paletteid') ? options.paletteid : 0;
-
-                switch (kinduser) {
-                    case 'moodle':
-                        if (options.nickname !== '' && options.avatarid !== 0 && options.paletteid !== 0) {
-                            instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
-                            return true;
-                        }
-                        break;
-                    case 'guid':
-                        if (!options.hasOwnProperty('userGUID')) {
-                            options.userGUID = '';
-                        }
-                        if (options.userGUID.length >= 10 && options.nickname !== '' && options.avatarid !== 0 &&
-                            options.paletteid !== 0) {
-                            instance.user = options.userGUID;
-                            instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
-                            return true;
-                        }
-                        break;
-                }
-                // Call gateCreateScren to ask user for nickname, colors, avatar.
-                instance.gateCreateScreen();
-                return true;
-            }).catch(error => {
-                instance.showError(error.message);
-                return false;
-            });
-        }
-
-        gatePlayGame(save, nickname, paletteid, avatarid) {
-            if (this.kinduser === 'guid') {
-                if (this.user === '') {
-                    this.uuid4();
-                }
-            }
-
-            if (!save) {
-                this.nickname = nickname;
-                this.paletteid = paletteid;
-                this.avatarid = avatarid;
-                this.callGetAttempt({nickname: nickname, colorpaletteid: paletteid, avatarid: avatarid});
-                return;
-            }
-
-            let options = {nickname: nickname, avatarid: avatarid, paletteid: paletteid};
-
-            let instance = this;
-            this.saveOptions(options)
-                .then(function() {
-                    instance.nickname = nickname;
-                    instance.paletteid = paletteid;
-                    instance.avatarid = avatarid;
-                    instance.callGetAttempt();
-                    return true;
-                })
-                .catch(error => {
-                    instance.showError(error.message);
-                    return false;
-                });
-        }
-
-        callGetAttempt(extraparams) {
-            let instance = this;
-            require(['core/ajax'], function(Ajax) {
-                let params = {
-                    mmogameid: instance.mmogameid,
-                    kinduser: instance.kinduser,
-                    user: instance.user,
-                    nickname: null,
-                    colorpaletteid: null,
-                    avatarid: null,
-                };
-                if (extraparams !== undefined) {
-                    params = {...params, ...extraparams};
-                }
-                // Calling the service through the Moodle AJAX API
-                let getAttempt = Ajax.call([{
-                    methodname: 'mmogametype_quiz_get_attempt',
-                    args: params,
-                }]);
-
-                // Handling the response
-                getAttempt[0].done(function(response) {
-                    if (extraparams !== undefined && extraparams.colorpaletteid !== undefined) {
-                        instance.openGame();
-                        instance.colors = undefined;
-                    }
-                    instance.processGetAttempt(JSON.parse(response));
-                }).fail(function(error) {
-                    instance.createDivMessage(error.message);
-                    return error;
-                });
-            });
-        }
-
-        gateCreateScreen() {
-            this.vertical = window.innerWidth < window.innerHeight;
-
-            this.createArea();
-
-            if (this.vertical) {
-                this.gateCreateScreenVertical();
-            } else {
-                this.gateCreateScreenHorizontal();
-            }
-        }
-
-        gateCreateScreenVertical() {
-            let maxHeight = this.areaHeight - 5 * this.padding - this.iconSize;
-            let maxWidth = this.areaWidth;
-            let instance = this;
-            let size;
-
-            const labels = [this.getStringM('js_name') + ": ", this.getStringM('js_code'), this.getStringM('js_palette')];
-            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, function(fontSize) {
-                size = instance.gateComputeLabelSize(fontSize, labels);
-
-                if (size[0] >= maxWidth) {
-                    return 1;
-                }
-                let heightCode = instance.kinduser !== 'guid' && instance.kinduser !== 'moodle' ? size[1] + instance.padding : 0;
-
-                let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
-                let n = Math.floor(heightColors / instance.iconSize);
-                if (n === 0) {
-                    return 1;
-                }
-                let heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
-                let computedHeight = heightCode + 3 * size[1] + 8 * instance.padding + heightColors + heightAvatars;
-
-                return computedHeight < maxHeight ? -1 : 1;
-            });
-
-            let gridWidthColors = maxWidth - this.padding;
-            let gridWidthAvatars = maxWidth - this.padding;
-            let gridHeightColors = (maxHeight - 4 * this.fontSize) * 2 / 5;
-            let newHeight = Math.floor(gridHeightColors / instance.iconSize) * instance.iconSize;
-            let newWidth = Math.floor(gridWidthColors / instance.iconSize) * instance.iconSize;
-            let rest = gridHeightColors - newHeight;
-            gridHeightColors = newHeight;
-            let gridHeightAvatars = (maxHeight - 4 * this.fontSize + rest) * 3 / 5;
-
-            let bottom;
-            if (this.kinduser !== 'guid' && this.kinduser !== 'moodle') {
-                // A bottom = this.gateCreateCode(0, 0, maxWidth, this.fontSize, size[0]);
-                bottom = this.gateCreateLabelEditVertical(0, 0, maxWidth, this.fontSize, size[0],
-                    this.getStringM('js_code') + ": ") + 2 * this.padding;
-                this.edtCode = this.edt;
-                this.edtCode.addEventListener("keyup", function() {
-                    instance.gateUpdateSubmit();
-                });
-            } else {
-                bottom = 0;
-            }
-
-            bottom = this.gateCreateLabelEditVertical(0, bottom, newWidth - 2 * this.padding, this.fontSize, size[0],
-                this.getStringM('js_name') + ": ") + 2 * this.padding;
-            this.edtNickname = this.edt;
-            this.edtNickname.addEventListener("keyup", function() {
-                instance.gateUpdateSubmit();
-            });
-
-            this.gateCreateScreenPalette(bottom, gridWidthColors, gridHeightColors,
-                gridWidthAvatars, gridHeightAvatars);
-
-            bottom += this.fontSize + this.padding;
-
-            // Vertical
-            this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
-                0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars,
-                gridHeightAvatars);
-
-            let bottom2 = bottom + gridHeightColors + this.fontSize + this.padding + gridHeightAvatars;
-
-            this.gateCreateButtonSubmit(maxWidth, bottom2);
-        }
-
-        gateCreateScreenHorizontal() {
-            let maxHeight = this.areaHeight - 7 * this.padding - this.iconSize;
-            let maxWidth = this.areaWidth;
-            let instance = this;
-            let size;
-
-            const sName = this.getStringM('js_name') + ": ";
-            let labels = [this.getStringM('js_code'), sName, this.getStringM('js_palette')];
-
-            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, function(fontSize) {
-                size = instance.gateComputeLabelSize(fontSize, labels);
-
-                if (size[0] >= maxWidth) {
-                    return 1;
-                }
-                let heightCode = instance.kinduser !== 'guid' && instance.kinduser !== 'moodle' ? size[1] + instance.padding : 0;
-
-                let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
-                let n = Math.floor(heightColors / instance.iconSize);
-                if (n === 0) {
-                    return 1;
-                }
-                let heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
-                let computedHeight = heightCode + 2 * size[1] + 7 * instance.padding + heightColors + heightAvatars;
-
-                return computedHeight < maxHeight ? -1 : 1;
-            });
-
-            let gridWidthColors = maxWidth - this.padding;
-            let gridWidthAvatars = maxWidth - this.padding;
-            let gridHeightColors = (maxHeight - 4 * this.fontSize) * 2 / 5;
-            let newHeight = Math.floor(gridHeightColors / instance.iconSize) * instance.iconSize;
-            let newWidth = Math.floor(gridWidthColors / instance.iconSize) * instance.iconSize;
-            let rest = gridHeightColors - newHeight;
-            gridHeightColors = newHeight;
-            let gridHeightAvatars = Math.floor((maxHeight - 4 * this.fontSize) * 3 / 5 + rest);
-
-            let bottom;
-            if (this.kinduser !== 'guid' && this.kinduser !== 'moodle') {
-                // B bottom = this.gateCreateCode(0, 0, maxWidth, this.fontSize, size[0]);
-                bottom = this.gateCreateLabelEditVertical(0, 0, maxWidth, this.fontSize, size[0],
-                    this.getStringM('js_code')) + 2 * this.padding;
-                this.edtCode = this.edt;
-                this.edtCode.addEventListener("keyup", function() {
-                    instance.gateUpdateSubmit();
-                });
-            } else {
-                bottom = 0;
-            }
-            let sizeLabel = this.gateComputeLabelSize(this.fontSize, [sName]);
-            bottom = this.gateCreateLabelEditHorizontal(0, bottom, newWidth - 2 * this.padding,
-                this.fontSize, sizeLabel[0], this.getStringM('js_name') + ": ");
-
-            this.edtNickname = this.edt;
-
-            this.edtNickname.addEventListener("keyup", function() {
-                instance.gateUpdateSubmit();
-            });
-
-            let label1 = document.createElement("label");
-            label1.style.position = "absolute";
-            label1.innerHTML = this.getStringM('js_palette');
-            label1.style.font = "FontAwesome";
-            label1.style.fontSize = this.fontSize + "px";
-            label1.style.width = "0px";
-            label1.style.whiteSpace = "nowrap";
-            this.area.appendChild(label1);
-
-            // Button refresh color palettes
-            let btn = this.createImageButton(this.area, label1.scrollWidth + this.padding, bottom,
-                this.iconSize, this.fontSize,
-                '', 'assets/refresh.svg', false, 'refresh');
-            this.addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors,
-                gridWidthAvatars, gridHeightAvatars, true, false);
-
-            label1.style.left = 0;
-            label1.style.color = this.getContrastingColor(this.colorBackground);
-            label1.style.top = bottom + "px";
-            bottom += this.fontSize + this.padding;
-
-            let label = document.createElement("label");
-            label.style.position = "absolute";
-            label.innerHTML = this.getStringM('js_avatars');
-            label.style.font = "FontAwesome";
-            label.style.fontSize = this.fontSize + "px";
-            label.style.width = "0 px";
-            label.style.whiteSpace = "nowrap";
-            this.area.appendChild(label);
-
-            // Button refresh avatars
-            btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize,
-                this.fontSize, '', 'assets/refresh.svg', false, 'refresh');
-            btn.addEventListener("click",
-                function() {
-                    let elements = instance.area.getElementsByClassName("mmogame_avatar");
-
-                    while (elements[0]) {
-                        elements[0].parentNode.removeChild(elements[0]);
-                    }
-
-                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors, 0,
-                        bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
-                        false, true);
-                }
-            );
-
-            // Avatar
-            label.style.left = "0 px";
-            label.style.color = this.getContrastingColor(this.colorBackground);
-            label.style.top = (bottom + gridHeightColors) + "px";
-
-            // Horizontal
-            this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
-                0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars,
-                gridHeightAvatars);
-
-            let bottom2 = bottom + gridHeightColors + this.fontSize + this.padding + gridHeightAvatars;
-            this.btnSubmit = this.createImageButton(this.area, (maxWidth - this.iconSize) / 2, bottom2, 0,
-                this.iconSize, "", 'assets/submit.svg', false, 'submit');
-            this.btnSubmit.style.visibility = 'hidden';
-            this.btnSubmit.addEventListener("click",
-                function() {
-                    if (instance.edtCode !== undefined) {
-                        instance.user = instance.edtCode.value;
-                    }
-                    instance.gatePlayGame(true, instance.edtNickname.value, instance.paletteid, instance.avatarid);
-                });
-        }
-
-        gateComputeLabelSize(fontSize, aLabel) {
-            let maxWidth = 0;
-            let maxHeight = 0;
-
-            for (let i = 0; i < aLabel.length; i++) {
-                const label = document.createElement("label");
-                label.style.position = "absolute";
-                label.innerHTML = aLabel[i];
-                label.style.whiteSpace = "nowrap";
-                label.style.font = "FontAwesome";
-                label.style.fontSize = fontSize + "px";
-                label.style.width = "0px";
-                label.style.height = "0px";
-                this.area.appendChild(label);
-
-                if (label.scrollWidth > maxWidth) {
-                    maxWidth = label.scrollWidth;
-                }
-
-                if (label.scrollHeight > maxHeight) {
-                    maxHeight = label.scrollHeight;
-                }
-                this.area.removeChild(label);
-            }
-
-            return [maxWidth, maxHeight];
-        }
-
-        gateCreateLabel(left, top, labelWidth, fontSize, title) {
-            const label = document.createElement('label');
-            label.style.position = "absolute";
-
-            label.innerHTML = title;
-
-            label.style.font = "FontAwesome";
-            label.style.fontSize = fontSize + "px";
-
-            this.area.appendChild(label);
-
-            label.style.position = "absolute";
-            label.style.left = left + "px";
-            label.style.top = top + "px";
-            label.style.width = labelWidth + "px";
-            label.style.align = "left";
-            label.style.color = this.getContrastingColor(this.colorBackground);
-
-            return label;
-        }
-        gateCreateLabelEditVertical(left, top, width, fontSize, labelWidth, title) {
-            const label = this.gateCreateLabel(left, top, labelWidth, fontSize, title);
-
-            top += label.scrollHeight;
-
-            this.edt = this.gateCreateInput(left, top, width, fontSize);
-
-            return top + fontSize + this.padding;
-        }
-
-        gateShowAvatars(left, top, width, height, countX, avatarids, avatars) {
-            if (!avatars || avatars.length === 0) {
-                return; // Exit early if no avatars exist
-            }
-
-            this.avatar = undefined;
-            const count = avatars.length;
-            let leftOriginal = left;
-            let w = Math.round(this.padding / 2) + "px";
-            for (let i = 0; i < count; i++) {
-                let avatarImagePath = 'assets/avatars/' + avatars[i];
-                let btn = this.createCenterImageButton(
-                    this.area,
-                    left, top,
-                    this.iconSize - this.padding, this.iconSize - this.padding,
-                    "",
-                    avatarImagePath
-                );
-                btn.classList.add("mmogame_avatar");
-                let id = avatarids[i];
-                btn.addEventListener("click", () => {
-                    this.gateUpdateAvatar(btn, id, w);
-                });
-
-                // Move left position after placing the button
-                left += this.iconSize;
-
-                // Reset left and move to the next row after filling countX buttons
-                if ((i + 1) % countX === 0) {
-                    top += this.iconSize;
-                    left = leftOriginal;
-                }
-            }
-        }
-
-        gateSendGetColorsAvatars(leftColors, topColors, gridWidthColors, gridHeightColors, leftAvatars, topAvatars,
-                                         gridWidthAvatars, gridHeightAvatars, updateColors = true, updateAvatars = true) {
-
-            let countXcolors = Math.floor(gridWidthColors / this.iconSize);
-            let countYcolors = Math.floor(gridHeightColors / this.iconSize);
-
-            let countXavatars = Math.floor(gridWidthAvatars / this.iconSize);
-            let countYavatars = Math.floor((gridHeightAvatars + 2 * this.padding) / this.iconSize);
-
-            if (!updateColors) {
-                countXcolors = countXcolors = 0;
-            }
-            if (!updateAvatars) {
-                countXavatars = countYavatars = 0;
-            }
-
-            let instance = this;
-            require(['core/ajax'], function(Ajax) {
-                // Defining the parameters to be passed to the service
-                let params = {
-                    mmogameid: instance.mmogameid,
-                    kinduser: instance.kinduser,
-                    user: instance.user,
-                    avatars: countXavatars * countYavatars,
-                    colorpalettes: countXcolors * countYcolors,
-                };
-
-                // Calling the service through the Moodle AJAX API
-                let getAssets = Ajax.call([{
-                    methodname: 'mod_mmogame_get_assets',
-                    args: params
-                }]);
-
-                // Handling the response
-                getAssets[0].done(function(response) {
-                    if (updateColors) {
-                        instance.gateShowColorPalettes(leftColors, topColors, gridWidthColors,
-                            gridHeightColors, countXcolors, countYcolors, response.colorpaletteids, response.colorpalettes);
-                    }
-                    if (updateAvatars) {
-                        instance.gateShowAvatars(leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars,
-                            response.avatarids, response.avatars);
-                    }
-                }).fail(function(error) {
-                    return error;
-                });
-            });
-        }
-
-        gateShowColorPalettes(left, top, width, height, countX, countY, colorpaletteids, colorpalettes) {
-            let i = 0; // Counter for color palettes
-            const count = colorpalettes.length;
-            this.canvasColor = undefined;
-            const canvasSize = this.iconSize - this.padding * 3 / 2;
-            const parsedPalettes = colorpalettes.map(palette =>
-                palette.split(",").map(value => parseInt(value, 10) || 0)
-            );
-            for (let iy = 0; iy < countY; iy++) {
-                for (let ix = 0; ix < countX; ix++) {
-                    // Check if we exceed available palettes or encounter invalid data
-                    if (i >= count || !parsedPalettes[i] || !colorpaletteids[i]) {
-                        i++; // Increment and continue if invalid
-                        continue;
-                    }
-
-                    // Create a new canvas element
-                    let canvas = document.createElement('canvas');
-                    canvas.style.position = "absolute";
-                    canvas.style.left = `${left + ix * this.iconSize}px`;
-                    canvas.style.top = `${top + iy * this.iconSize}px`;
-                    canvas.width = canvasSize;
-                    canvas.height = canvasSize;
-                    canvas.style.cursor = 'pointer';
-                    canvas.classList.add("mmogame_color");
-
-                    // Append canvas to the area
-                    this.area.appendChild(canvas);
-
-                    // Render the color palette on the canvas
-                    this.showColorPalette(canvas, parsedPalettes[i]);
-
-                    // Get the palette ID and attach a click event listener
-                    let id = colorpaletteids[i];
-                    canvas.addEventListener("click", () => {
-                        this.gateUpdateColorPalette(canvas, id);
-                    });
-
-                    i++;
-                }
-            }
-            this.area.classList.add("palette");
-        }
-
-        gateUpdateColorPalette(canvas, id) {
-            if (this.canvasColor !== undefined) {
-                this.canvasColor.style.borderStyle = "none";
-            }
-            this.canvasColor = canvas;
-            canvas.style.borderStyle = "outset";
-            let w = Math.round(this.padding / 2) + "px";
-            canvas.style.borderLeftWidth = w;
-            canvas.style.borderTopWidth = w;
-            canvas.style.borderRightWidth = w;
-            canvas.style.borderBottomWidth = w;
-
-            this.paletteid = id;
-
-            this.gateUpdateSubmit();
-        }
-
-        gateUpdateAvatar(avatar, id, w) {
-            if (this.avatar !== undefined) {
-                this.avatar.style.borderStyle = "none";
-            }
-            this.avatar = avatar;
-            avatar.style.borderStyle = "outset";
-
-            avatar.style.borderLeftWidth = w;
-            avatar.style.borderTopWidth = w;
-            avatar.style.borderRightWidth = w;
-            avatar.style.borderBottomWidth = w;
-
-            this.avatarid = id;
-
-            this.gateUpdateSubmit();
-        }
-
-        gateUpdateSubmit() {
-            let hasCode = this.edtCode === undefined ? true : parseInt(this.edtCode.value) > 0;
-            let visible = this.avatarid !== undefined && this.paletteid !== undefined && hasCode
-                && this.edtNickname.value.length > 0;
-
-            this.btnSubmit.style.visibility = visible ? 'visible' : 'hidden';
-        }
-
-        gateComputeSizes() {
-            this.computeSizes();
-            this.iconSize = Math.round(0.8 * this.iconSize);
-            this.padding = Math.round(0.8 * this.padding);
-        }
-
+        /**
+         * Retrieves localized strings.
+         * @param {string} name - The name of the string.
+         * @returns {string} The localized string.
+         */
         getStringM(name) {
             return M.util.get_string(name, 'mmogame');
         }
 
-        gateCreateLabelEditHorizontal(left, top, width, fontSize, labelWidth, title) {
-            const label = this.gateCreateLabel(left, top, labelWidth, fontSize, title);
 
-            let ret = top + Math.max(label.scrollHeight, fontSize) + this.padding;
-
-            let leftEdit = (left + labelWidth + this.padding);
-            this.edt = this.gateCreateInput(leftEdit, top, width - leftEdit - this.padding, fontSize);
-
-            return ret;
-        }
-
-        createDivMessageDo(left, top, width, height, message, heightmessage) {
+        createDivMessageDo(classnames, left, top, width, height, message, heightmessage) {
             if (this.divMessageBackground === undefined) {
-                let div = this.createDiv(this.body, left, top, width, height);
+                let div = this.createDiv(this.body, classnames, left, top, width, height);
                 div.style.background = this.getColorHex(this.colorDefinition);
                 this.divMessageBackground = div;
             }
@@ -1822,190 +826,90 @@ define([''], function() {
             this.body.appendChild(this.divMessage);
             this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
         }
-
+        /**
+         * Retrieves user options from IndexedDB.
+         * @returns {Promise<Object>} A promise that resolves with the options.
+         */
         getOptions() {
             return new Promise((resolve, reject) => {
-                let request = indexedDB.open("PreferencesDB", 4); // Άνοιγμα της βάσης δεδομένων
+                const request = indexedDB.open('mmoGameDB', 1);
 
                 request.onupgradeneeded = function(event) {
-                    let db = event.target.result;
-                    // Δημιουργία του object store "options" αν δεν υπάρχει
-                    if (!db.objectStoreNames.contains("options")) {
-                        db.createObjectStore("options", {keyPath: "name"});
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('options')) {
+                        db.createObjectStore('options', {keyPath: 'name'});
                     }
                 };
 
                 request.onsuccess = function(event) {
-                    let db = event.target.result;
+                    const db = event.target.result;
+                    const transaction = db.transaction(['options'], 'readonly');
+                    const store = transaction.objectStore('options');
 
-                    let transaction = db.transaction(["options"], "readonly"); // Δημιουργία συναλλαγής ανάγνωσης
-                    let store = transaction.objectStore("options");
-
-                    let getAllRequest = store.getAll(); // Διαβάζει όλες τις εγγραφές από το object store
+                    const getAllRequest = store.getAll();
 
                     getAllRequest.onsuccess = function(event) {
-                        let records = event.target.result; // Όλες οι εγγραφές από το object store
-                        if (records.length > 0) {
-                            // Μετατροπή σε object με τα name ως κλειδιά
-                            let optionsObject = {};
-                            records.forEach(record => {
-                                optionsObject[record.name] = record.value;
-                            });
-                            resolve(optionsObject); // Επιστροφή του αντικειμένου
-                        } else {
-                            resolve({}); // Επιστροφή άδειου αντικειμένου αν δεν υπάρχουν εγγραφές
-                        }
+                        resolve(event.target.result.reduce((acc, item) => {
+                            acc[item.name] = item.value;
+                            return acc;
+                        }, {}));
                     };
 
                     getAllRequest.onerror = function() {
-                        reject(new Error("Failed to read options"));
+                        reject(new Error('Failed to retrieve options'));
                     };
                 };
 
                 request.onerror = function() {
-                    resolve({});
+                    reject(new Error('Failed to open database'));
                 };
             });
         }
 
-        saveOptions(optionsObject) {
+        /**
+         * Saves user options to IndexedDB.
+         * @param {Object} options - The options to save.
+         * @returns {Promise<void>} A promise that resolves when the save is complete.
+         */
+        setOptions(options) {
             return new Promise((resolve, reject) => {
-                let request = indexedDB.open("PreferencesDB", 4);
+                const request = indexedDB.open('mmoGameDB', 1);
 
                 request.onsuccess = function(event) {
-                    let db = event.target.result;
+                    const db = event.target.result;
+                    const transaction = db.transaction(['options'], 'readwrite');
+                    const store = transaction.objectStore('options');
 
-                    let transaction = db.transaction(["options"], "readwrite"); // Δημιουργία συναλλαγής για εγγραφή
-                    let store = transaction.objectStore("options");
+                    Object.entries(options).forEach(([key, value]) => {
+                        store.put({name: key, value});
+                    });
 
-                    // Για κάθε ζεύγος name-value στο αντικείμενο, το αποθηκεύουμε στην IndexedDB
-                    for (let name in optionsObject) {
-                        if (optionsObject.hasOwnProperty(name)) {
-                            let value = optionsObject[name];
-                            store.put({name: name, value: value});
-                        }
-                    }
-
-                    // Επιτυχής ολοκλήρωση της συναλλαγής
                     transaction.oncomplete = function() {
                         resolve();
                     };
 
                     transaction.onerror = function() {
-                        reject(new Error("Failed to save options"));
+                        reject(new Error('Failed to save options'));
                     };
                 };
 
                 request.onerror = function() {
-                    reject(new Error("Failed to open database"));
+                    reject(new Error('Failed to open database'));
                 };
             });
         }
 
-        showError(message) {
-            this.createDivMessage(message);
-        }
-
-        createArea() {
-            if (this.area !== undefined) {
-                this.body.removeChild(this.area);
-                this.area = undefined;
-            }
-            this.removeDivMessage();
-
-            this.area = this.createDiv(this.body, this.padding, this.areaTop, this.areaWidth, this.areaHeight);
-        }
-
-        clearDB(url) {
-            let options = {nickname: ''};
-            this.saveOptions(options)
-                .then(function() {
-                    window.location.href = url;
-                    return true;
-                })
-                .catch(() => {
-                    return false;
-                });
-
-        }
-
-        gateCreateInput(left, top, width, fontSize) {
-            const div = document.createElement("input");
-            div.style.position = "absolute";
-            div.style.width = width + "px";
-            div.style.type = "text";
-            div.style.fontSize = fontSize + "px";
-
-            div.style.left = left + "px";
-            div.style.top = top + "px";
-            div.autofocus = true;
-
-            this.area.appendChild(div);
-            this.edt = div;
-
-            return div;
-        }
-
-        createAddScore(left, top, width, height, num) {
-            const div = this.createDiv(this.body, left, top, width, height);
-            div.style.textAlign = "center";
-            div.style.color = this.getContrastingColor(this.colorScore);
-            div.title = this.getStringM('js_grade_last_question');
-            if (num === 1) {
-                this.labelAddScore = div;
-            } else {
-                this.labelAddScore2 = div;
-            }
-        }
-
-        gateCreateScreenPalette(bottom, gridWidthColors, gridHeightColors, gridWidthAvatars, gridHeightAvatars) {
-            const label = document.createElement("label");
-            label.style.position = "absolute";
-            label.innerHTML = this.getStringM('js_palette');
-            label.style.font = "FontAwesome";
-            label.style.fontSize = this.fontSize + "px";
-            label.style.width = "0px";
-            label.style.whiteSpace = "nowrap";
-            this.area.appendChild(label);
-
-            let btn = this.createImageButton(this.area, label.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
-                '', 'assets/refresh.svg', false, 'refresh');
-            this.addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors, gridWidthAvatars, gridHeightAvatars);
-
-            label.style.left = 0;
-            label.style.color = this.getContrastingColor(this.colorBackground);
-            label.style.top = bottom + "px";
-        }
-
-        gateCreateButtonSubmit = (maxWidth, bottom2) => {
-            this.btnSubmit = this.createImageButton(this.area, (maxWidth - this.iconSize) / 2, bottom2, 0,
-                this.iconSize, "", 'assets/submit.svg', false, 'submit');
-            this.btnSubmit.style.visibility = 'hidden';
-            const instance = this;
-            this.btnSubmit.addEventListener("click", function() {
-                if (instance.edtCode !== undefined) {
-                    instance.user = instance.edtCode.value;
-                }
-                instance.gatePlayGame(true, instance.edtNickname.value, instance.paletteid, instance.avatarid);
+    clearDB(url) {
+        let options = {nickname: ''};
+        this.setOptions(options)
+            .then(function() {
+                window.location.href = url;
+                return true;
+            })
+            .catch(() => {
+                return false;
             });
-        };
-
-        addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors, gridWidthAvatars, gridHeightAvatars,
-                                updateColors, updateAvatars) {
-            const instance = this;
-            btn.addEventListener("click",
-                function() {
-                    let elements = instance.area.getElementsByClassName("mmogame_color");
-
-                    while (elements[0]) {
-                        elements[0].parentNode.removeChild(elements[0]);
-                    }
-
-                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
-                        0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
-                        updateColors, updateAvatars);
-                }
-            );
         }
+
     };
 });

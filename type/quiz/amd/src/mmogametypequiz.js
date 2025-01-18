@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-define(['mod_mmogame/mmogame'], function(MmoGame) {
-    return class MmoGameTypeQuiz extends MmoGame {
+define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
+    return class MmoGameTypeQuiz extends MmoGameUI {
         mmogameid;
         kinduser;
         user;
@@ -22,6 +22,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         pin;
         labelTimer;
         timeForSendAnswer;
+        divDefinition;
+        definitionHeight;
 
         /**
          * Base class for Quiz mmmogame
@@ -37,13 +39,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.timeForSendAnswer = 10000;
         }
 
-        setColors(colors, nameLoad) {
-            let c = this.repairColors(colors, nameLoad);
+        setColors(colors) {
+            this.repairColors(colors);
 
-            this.colorDefinition = c[1];
-            this.colorScore = c[2];
-            this.colorCopyright = c[3];
-            this.colorScore2 = c[4];
+            this.colorDefinition = this.colors[1];
+            this.colorScore = this.colors[2];
+            this.colorCopyright = this.colors[3];
+            this.colorScore2 = this.colors[4];
         }
 
         openGame() {
@@ -54,6 +56,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.audioNo = new Audio('assets/no1.mp3');
             this.audioNo.load();
         }
+
         processGetAttempt(json) {
             this.computeDifClock(json.time, json.timestart, json.timeclose);
 
@@ -71,7 +74,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             }
 
             if (json.errorcode !== undefined) {
-                this.createDivMessage(json.errorcode);
+                this.createDivMessage('mmogame-error', json.errorcode);
                 return;
             }
 
@@ -145,7 +148,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.createArea();
 
             if (this.endofgame) {
-                this.createDivMessage(this.getStringM('js_game_over'));
+                this.createDivMessage('mmogame-endofgame', this.getStringM('js_game_over'));
                 this.showScore(json);
                 return;
             }
@@ -193,8 +196,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             if (this.hideSubmit === false) {
                 let space = (this.areaWidth - this.iconSize) / 2;
-                this.btnSubmit = this.createImageButton(this.body, space, this.nextTop, 0, this.iconSize,
-                    "", 'assets/submit.svg', false, 'submit');
+                this.btnSubmit = this.createImageButton(this.body, 'mmogame-quiz-submit',
+                    space, this.nextTop, 0, this.iconSize,
+                   'assets/submit.svg', false, 'submit');
                 this.btnSubmit.addEventListener("click",
                     function() {
                         if (instance.btnSubmit !== undefined) {
@@ -250,7 +254,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 return;
             }
 
-            this.btnSubmit = this.createImageButton(this.body, width + (width - this.iconSize) / 2, this.nextTop, 0, this.iconSize,
+            this.btnSubmit = this.createImageButton(this.body, 'mmogame-quiz-submit',
+                width + (width - this.iconSize) / 2, this.nextTop, 0, this.iconSize,
                 "", 'assets/submit.svg', false, 'submit');
             this.btnSubmit.addEventListener("click", function() {
                 instance.sendAnswer();
@@ -433,8 +438,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.btnSubmit = undefined;
             }
 
-            let btn = super.createImageButton(this.area, this.nextLeft, this.nextTop, 0, this.iconSize, "", 'assets/next.svg',
-                false, 'alt');
+            let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
+                this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
             let instance = this;
             btn.addEventListener("click", function() {
                 instance.callGetAttempt();
@@ -477,12 +482,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 label.style.left = (parseInt(label.style.left) + this.radioSize) + "px";
                 label.style.width = width + "px";
                 if (iscorrect) {
-                    label.innerHTML = '<b><u>' + label.innerHTML + '</u></b>';
+                    label.innerHTML = '<b>' + label.innerHTML + '</b>';
                 }
                 this.autoResizeText(label, width, height, true, this.minFontSize, this.maxFontSize, 0.9);
 
                 let t = parseInt(this.aItemAnswer[i].style.top);
-                let div = this.createDiv(this.area, this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
+                let div = this.createDiv(this.area, 'mmogame-quiz-correct',
+                    this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
                 div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect, this.colorScore, this.colorScore);
             }
         }
@@ -528,8 +534,211 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             }
         }
 
-        getStringG(name) {
+        getStringT(name) {
             return M.util.get_string(name, 'mmogametype_quiz');
+        }
+
+        /**
+         * Creates a percentage-based score display using createDOMElement.
+         *
+         * @param {number} left - The left position in pixels.
+         * @param {number} top - The top position in pixels.
+         * @param {number} num - Identifier for the score (1 or 2).
+         */
+        createDivScorePercent(left, top, num) {
+            // Create the main button container
+            const button = this.createDOMElement('div', {
+                parent: this.body,
+                classnames: 'score-button',
+                styles: {
+                    position: 'absolute',
+                    left: `${left}px`,
+                    top: `${top}px`,
+                    width: `${this.iconSize}px`,
+                    height: `${this.iconSize}px`,
+                    border: "0px solid " + this.getColorHex(0xFFFFFF),
+                    boxShadow: "inset 0 0 0.125em rgba(255, 255, 255, 0.75)",
+                    background: num === 1 ? this.getColorHex(this.colorScore) : this.getColorHex(this.colorScore2),
+                    color: num === 1 ? this.getContrastingColor(this.colorScore) : this.getContrastingColor(this.colorScore2),
+                },
+                attributes: {
+                    title: num === 1 ? this.getStringM('js_grade') : this.getStringM('js_grade_opponent'),
+                    disabled: true,
+                },
+            });
+
+            button.innerHTML = '';
+
+            // Create the main score label
+            const scoreLabel = this.createDOMElement('div', {
+                parent: this.body,
+                classnames: 'score-label',
+                styles: {
+                    position: 'absolute',
+                    left: `${left}px`,
+                    top: `${top + this.iconSize / 4}px`,
+                    width: `${this.iconSize / 2}px`,
+                    height: `${this.iconSize / 2}px`,
+                    lineHeight: `${this.iconSize / 2}px`,
+                    textAlign: 'center',
+                    color: this.getContrastingColor(this.colorScore),
+                },
+                attributes: {
+                    title: num === 1 ? this.getStringM('js_grade') : this.getStringM('js_grade_opponent'),
+                },
+            });
+
+            if (num === 1) {
+                this.labelScore = scoreLabel;
+            } else {
+                this.labelScore2 = scoreLabel;
+            }
+
+            // Create the ranking grade label
+            const rankLabel = this.createDOMElement('div', {
+                parent: this.body,
+                classnames: 'ranking-label',
+                styles: {
+                    position: 'absolute',
+                    left: `${left}px`,
+                    top: `${top}px`,
+                    width: `${this.iconSize / 2}px`,
+                    height: `${this.iconSize / 3}px`,
+                    textAlign: 'center',
+                    color: this.getContrastingColor(this.colorScore),
+                },
+                attributes: {
+                    title: this.getStringM('js_ranking_grade'),
+                },
+            });
+
+            if (num === 1) {
+                this.labelScoreRank = rankLabel;
+            } else {
+                this.labelScoreRank2 = rankLabel;
+            }
+
+            this.createAddScore('mmogame_addscore', left, top + this.iconSize - this.iconSize / 3,
+                this.iconSize / 2, this.iconSize / 3, num);
+
+            // Create the percentage label
+            const percentLabel = this.createDOMElement('div', {
+                parent: this.body,
+                classnames: 'percent-label',
+                styles: {
+                    position: 'absolute',
+                    left: `${left + this.iconSize / 2}px`,
+                    top: `${top}px`,
+                    width: `${this.iconSize / 2}px`,
+                    height: `${this.iconSize / 3}px`,
+                    textAlign: 'center',
+                    fontSize: `${this.iconSize / 3}px`,
+                    lineHeight: `${this.iconSize / 3}px`,
+                    color: rankLabel.style.color,
+                },
+                attributes: {
+                    title: this.getStringM('js_ranking_percent'),
+                },
+            });
+
+            if (num === 1) {
+                this.labelScoreRankB = percentLabel;
+            }
+
+            // Create the additional score label
+            const addScoreLabel = this.createDOMElement('div', {
+                parent: this.body,
+                classnames: 'addscore-label',
+                styles: {
+                    position: 'absolute',
+                    left: `${left + this.iconSize / 2}px`,
+                    top: `${parseFloat(this.labelScore.style.top)}px`,
+                    width: `${this.iconSize / 2}px`,
+                    height: `${this.iconSize / 2}px`,
+                    textAlign: 'center',
+                    lineHeight: `${Math.round(this.iconSize / 2)}px`,
+                    fontWeight: 'bold',
+                    color: rankLabel.style.color,
+                },
+                attributes: {
+                    title: this.getStringM('js_percent'),
+                },
+            });
+
+            if (num === 1) {
+                this.labelScoreB = addScoreLabel;
+            }
+        }
+
+        createDefinition(left, top, width, onlyMetrics, fontSize) {
+            width -= 2 * this.padding;
+            let div = document.createElement("div");
+
+            div.style.position = "absolute";
+            div.style.width = width + "px";
+
+            div.style.fontSize = fontSize + "px";
+            div.innerHTML = this.definition;
+            div.style.textAlign = "left";
+
+            if (onlyMetrics) {
+                this.body.appendChild(div);
+                let ret = [div.scrollWidth - 1, div.scrollHeight];
+                this.body.removeChild(div);
+                return ret;
+            }
+
+            div.style.background = this.getColorHex(this.colorDefinition);
+            div.style.color = this.getContrastingColor(this.colorDefinition);
+            div.style.left = left + "px";
+            div.style.top = top + "px";
+            div.style.paddingLeft = this.padding + "px";
+            div.style.paddingRight = this.padding + "px";
+            div.id = "definition";
+
+            this.area.appendChild(div);
+            let height = div.scrollHeight + this.padding;
+            div.style.height = height + "px";
+
+            this.definitionHeight = height;
+            this.divDefinition = div;
+
+            return [div.scrollWidth - 1, div.scrollHeight];
+        }
+
+        showScore({addscore, completedrank, percentcompleted, rank, sumscore, usercode}) {
+            let s = sumscore === undefined ? '' : '<b>' + sumscore + '</b>';
+            if (this.labelScore.innerHTML !== s) {
+                this.labelScore.innerHTML = s;
+                let w = this.iconSize - 2 * this.padding;
+                this.autoResizeText(this.labelScore, w, this.iconSize / 2, false, 0, 0, 1);
+            }
+
+            if (this.labelScoreRank.innerHTML !== rank) {
+                this.labelScoreRank.innerHTML = rank !== undefined ? rank : '';
+                this.autoResizeText(this.labelScoreRank, this.iconSize, this.iconSize / 3, true, 0, 0, 1);
+            }
+
+            if (name !== undefined) {
+                window.document.title = (usercode !== undefined ? usercode : "") + " " + name;
+            }
+
+            s = addscore === undefined ? '' : addscore;
+            if (this.labelAddScore.innerHTML !== s) {
+                this.labelAddScore.innerHTML = s;
+                this.autoResizeText(this.labelAddScore, this.iconSize - 2 * this.padding, this.iconSize / 3, false, 0, 0, 1);
+            }
+
+            if (this.labelScoreRankB.innerHTML !== completedrank) {
+                this.labelScoreRankB.innerHTML = completedrank !== undefined ? completedrank : '';
+                this.autoResizeText(this.labelScoreRankB, 0.9 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
+            }
+
+            s = percentcompleted !== undefined ? Math.round(100 * percentcompleted) + '%' : '';
+            if (this.labelScoreB.innerHTML !== s) {
+                this.labelScoreB.innerHTML = s;
+                this.autoResizeText(this.labelScoreB, 0.8 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
+            }
         }
     };
     });

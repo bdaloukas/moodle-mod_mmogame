@@ -35,12 +35,11 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.createButtonsAvatar(1, Math.round(this.padding + (i++) * (this.iconSize + this.padding)));
             this.buttonsAvatar[1].style.top = (this.padding + this.nickNameHeight) + "px";
 
-            this.createDiv(this.body, this.buttonAvatarLeft, this.padding, this.iconSize, this.buttonAvatarTop);
-
             this.createDivScorePercent(this.padding + (i++) * (this.iconSize + this.padding),
                 this.padding + this.nickNameHeight, 1);
 
-            this.createButtonSound(this.padding + (i++) * (this.iconSize + this.padding), this.padding + this.nickNameHeight);
+            this.createButtonSound(this.padding + (i++) * (this.iconSize + this.padding),
+                this.padding + this.nickNameHeight);
             let instance = this;
             if (this.hasHelp()) {
                 this.createButtonHelp(this.padding + (i++) * (this.iconSize + this.padding), this.padding);
@@ -56,7 +55,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             this.areaHeight = Math.round(window.innerHeight - this.areaTop - copyrightHeight);
 
-            this.createDivColor(this.body, 0, window.innerHeight - copyrightHeight - 1, window.innerWidth - 1, copyrightHeight,
+            this.createDivColor(this.body, 'mmogame-quiz-alone-color',
+                0, window.innerHeight - copyrightHeight - 1, window.innerWidth - 1, copyrightHeight,
                 this.getColorGray(this.colorCopyright));
             this.vertical = this.areaHeight > this.areaWidth;
         }
@@ -90,7 +90,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 ret[0].done(function(response) {
                     instance.processSetAnswer(JSON.parse(response)); // Trigger further action
                 }).fail(function(error) {
-                    instance.createDivMessage(error.message);
+                    instance.showError(error);
                     // Return the error if the call fails
                     return error;
                 });
@@ -135,21 +135,21 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
         }
 
-        showScore(sumcorrect, rank, name, usercode, addscore, completedrank, percentcompleted, rankc, sumscore) {
-            if (rank !== undefined && rankc !== undefined) {
-                if (parseInt(rank) < parseInt(rankc)) {
+        showScore(json) {
+            if (json.rank !== undefined && json.rankc !== undefined) {
+                if (parseInt(json.rank) < parseInt(json.rankc)) {
                     this.completedrank = '';
-                    this.rank = '# ' + rank;
+                    this.rank = '# ' + json.rank;
                 } else {
                     this.rank = '';
-                    this.completedrank = '# ' + rankc;
+                    this.completedrank = '# ' + json.rankc;
                 }
             }
 
-            let s = sumscore;
-            super.showScore(sumcorrect, rank, name, usercode, addscore, completedrank, percentcompleted);
-            sumscore = s;
-            s = sumscore === undefined ? '' : '<b>' + sumscore + '</b>';
+            let s = json.sumscore;
+            super.showScore(json);
+            json.sumscore = s;
+            s = json.sumscore === undefined ? '' : '<b>' + json.sumscore + '</b>';
             if (this.labelScore.innerHTML !== s) {
                 this.labelScore.innerHTML = s;
                 this.autoResizeText(this.labelScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0, 1);
