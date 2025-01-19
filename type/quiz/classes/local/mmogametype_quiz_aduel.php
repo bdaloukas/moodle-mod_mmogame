@@ -303,6 +303,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             }
         }
 
+        $ret['time'] = round( 1000 * microtime( true));
         $ret['timestart'] = $attempt != null ? $attempt->timestart : 0;
         $ret['timeclose'] = $attempt != null ? $attempt->timeclose : 0;
         $ret['aduelAttempt'] = $attempt != null ? $attempt->numattempt : 0;

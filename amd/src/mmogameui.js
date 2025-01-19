@@ -33,12 +33,19 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         vertical;
         kindSound; // Type: Number (0 = on, 1 = off, 2 = speak)
         buttonSound;
+        colorDefinition = 0;
+        colorScore;
 
         // Other
         definition;
         buttonAvatarHeight;
         buttonAvatarTop;
-        colorBackground;
+        colorBackground = 0xFFFFFF;
+
+        url;
+        mmogameid;
+        pin;
+        user;
 
         constructor() {
             super();
@@ -89,6 +96,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.setOptions({kindSound: this.kindSound});
         }
 
+        /**
+         * Opens the gate UI, computes sizes, and initializes settings based on the user type.
+         * @param {number} mmogameid - The game ID.
+         * @param {string} pin - The game PIN.
+         * @param {string} kinduser - The type of user (e.g., "moodle" or "guid").
+         * @param {string} user - The user identifier.
+         * @param {string} url - The game URL.
+         */
         gateOpen(mmogameid, pin, kinduser, user, url) {
             this.url = url;
             this.minFontSize *= 2;
@@ -107,45 +122,37 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             let instance = this;
             this.getOptions().then(function(options) {
-                if (!options.hasOwnProperty('kindsound')) {
-                    options.kindsound = 0;
-                }
-                instance.kindSound = options.kindSound === 1 || options.kindSound === 2 ? options.kindSound : 0;
+                options.kindsound = options.kindsound || 0;
+                options.nickname = options.nickname || '';
+                options.avatarid = options.avatarid || 0;
+                options.paletteid = options.paletteid || 0;
+                instance.kindSound = [1, 2].includes(options.kindSound) ? options.kindSound : 0;
 
-                if (!options.hasOwnProperty('nickname')) {
-                    options.nickname = '';
-                }
-                options.avatarid = options.hasOwnProperty('avatarid') && options.avatarid !== undefined ? options.avatarid : 0;
-                options.paletteid = options.hasOwnProperty('paletteid') ? options.paletteid : 0;
+                const isReady =
+                    options.nickname &&
+                    options.avatarid !== 0 &&
+                    options.paletteid !== 0;
 
-                switch (kinduser) {
-                    case 'moodle':
-                        if (options.nickname !== '' && options.avatarid !== 0 && options.paletteid !== 0) {
-                            instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
-                            return true;
-                        }
-                        break;
-                    case 'guid':
-                        if (!options.hasOwnProperty('userGUID')) {
-                            options.userGUID = '';
-                        }
-                        if (options.userGUID.length >= 10 && options.nickname !== '' && options.avatarid !== 0 &&
-                            options.paletteid !== 0) {
-                            instance.user = options.userGUID;
-                            instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
-                            return true;
-                        }
-                        break;
+                if (kinduser === 'moodle' && isReady) {
+                    instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
+                    return;
                 }
-                // Call gateCreateScreen to ask user for nickname, colors, avatar.
+
+                if (kinduser === 'guid') {
+                    options.userGUID = options.userGUID || '';
+
+                    if (options.userGUID.length >= 10 && isReady) {
+                        instance.user = options.userGUID;
+                        instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
+                        return;
+                    }
+                }
                 instance.gateCreateScreen();
-                return true;
-            }).catch(error => {
-                instance.showError('gateOpen', error);
-                return false;
-            });
+            })
+            /*.catch((error) => {
+                this.showError('gateOpen', error);
+            }) */;
         }
-
 
         gatePlayGame(save, nickname, paletteid, avatarid) {
             if (this.kinduser === 'guid') {
@@ -606,27 +613,17 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
         /**
          * Updates the visibility of the submit button based on form input validation.
-         *
-         * The method checks the following conditions:
-         * - `avatarid` and `paletteid` must be defined.
-         * - If `edtCode` is defined, its value (parsed as an integer) must be greater than 0.
-         * - The `edtNickname` field must not be empty.
-         *
-         * If all conditions are met, the submit button is made visible; otherwise, it is hidden.
          */
         gateUpdateSubmit() {
-            // Check if a valid code exists.
-            const hasCode = this.edtCode?.value ? Number(this.edtCode.value) > 0 : true;
+            const isCodeValid = this.edtCode?.value ? Number(this.edtCode.value) > 0 : true;
+            const hasAvatar = this.avatarid !== undefined;
+            const hasPalette = this.paletteid !== undefined;
+            const hasNickname = this.edtNickname?.value?.length > 0;
 
-            // Check if all required fields are valid.
-            const hasValidAvatar = this.avatarid !== undefined;
-            const hasValidPalette = this.paletteid !== undefined;
-            const hasValidNickname = this.edtNickname?.value?.length > 0;
-            // Determine button visibility.
-            const isVisible = hasValidAvatar && hasValidPalette && hasCode && hasValidNickname;
-
-            // Update the visibility of the submit button.
-            this.btnSubmit.style.visibility = isVisible ? 'visible' : 'hidden';
+            this.btnSubmit.style.visibility =
+                isCodeValid && hasAvatar && hasPalette && hasNickname
+                    ? 'visible'
+                    : 'hidden';
         }
 
         gateComputeSizes() {
@@ -634,7 +631,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.iconSize = Math.round(0.8 * this.iconSize);
             this.padding = Math.round(0.8 * this.padding);
         }
-
 
         gateCreateLabelEditHorizontal(left, top, width, fontSize, labelWidth, title, classnamesLabel, classnamesEdit) {
             const label = this.createLabel(this.area, classnamesLabel, left, top, labelWidth, fontSize, title);
@@ -741,16 +737,23 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             );
         }
 
+        /**
+         * Creates the main game area.
+         */
         createArea() {
-            if (this.area !== undefined) {
+            if (this.area) {
                 this.body.removeChild(this.area);
-                this.area = undefined;
             }
-            this.removeDivMessage();
 
-            this.area = this.createDiv(this.body, 'mmogame-area', this.padding, this.areaTop, this.areaWidth, this.areaHeight);
+            this.area = this.createDiv(
+                this.body,
+                'mmogame-area',
+                this.padding,
+                this.areaTop,
+                this.areaWidth,
+                this.areaHeight
+            );
         }
-
 
         /**
          * Creates a modal dialog.
@@ -1029,14 +1032,38 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         /**
-         * Displays an error message.
-         * @param {string} name
-         * @param {object} error - The error message to display.
+         * Displays an error message on the screen.
+         * @param {string} name - The name of the error context.
+         * @param {Error} [error] - The error object to display.
          */
-        showError(name, error = null) {
-            if (error !== null) {
-                this.createDivMessage('mmogame-error', error.message);
+        showError(name, error) {
+            const message = error?.message || 'An unknown error occurred.';
+            this.createDivMessage('mmogame-error', message);
+        }
+
+        createDivMessageDo(classnames, left, top, width, height, message, heightmessage) {
+            if (this.divMessageBackground === undefined) {
+                let div = this.createDiv(this.body, classnames, left, top, width, height);
+                div.style.background = this.getColorHex(this.colorDefinition);
+                this.divMessageBackground = div;
             }
+
+            if (this.divMessage === undefined) {
+                let div = document.createElement("div");
+                div.style.position = "absolute";
+                div.style.left = left + "px";
+                div.style.textAlign = "center";
+                div.style.width = (width - 2 * this.padding) + "px";
+                div.style.paddingLeft = this.padding + "px";
+                div.style.paddingRight = this.padding + "px";
+
+                div.style.background = this.getColorHex(this.colorDefinition);
+                div.style.color = this.getContrastingColor(this.colorDefinition);
+                this.divMessage = div;
+            }
+            this.divMessage.innerHTML = message;
+            this.body.appendChild(this.divMessage);
+            this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
         }
 };
 });

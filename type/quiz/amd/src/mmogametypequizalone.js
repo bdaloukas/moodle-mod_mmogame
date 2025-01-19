@@ -61,46 +61,32 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.vertical = this.areaHeight > this.areaWidth;
         }
 
-        callSetAnswer() {
-            // Clear any existing timeout to prevent duplicate calls
-            if (this.timerTimeout !== undefined) {
-                clearTimeout(this.timerTimeout);
-            }
-            this.timerTimeout = undefined;
-
-            let instance = this;
-            require(['core/ajax'], function(Ajax) {
-                // Define the parameters to be passed to the service
-                let params = {
-                    mmogameid: instance.mmogameid,
-                    kinduser: instance.kinduser,
-                    user: instance.user,
-                    attempt: instance.attempt,
-                    answer: instance.answer !== undefined ? instance.answer : null,
-                    answerid: instance.answerid !== undefined ? instance.answerid : null,
-                    subcommand: '',
-                };
-                // Call the service through the Moodle AJAX API
-                let ret = Ajax.call([{
-                    methodname: 'mmogametype_quiz_set_answer', // Service method name
-                    args: params // Parameters to pass
-                }]);
-
-                // Handle the server response
-                ret[0].done(function(response) {
-                    instance.processSetAnswer(JSON.parse(response)); // Trigger further action
-                }).fail(function(error) {
-                    instance.showError(error);
-                    // Return the error if the call fails
-                    return error;
-                });
-            });
-        }
-
         processSetAnswer(json) {
             this.correct = json.correct;
 
-            this.updateScreenAfterAnswer(json);
+            this.playAudio(json.iscorrect !== 0 ? this.audioYes : this.audioNo);
+
+            if (json.correct !== undefined) {
+                if (this.qtype === "multichoice") {
+                    this.updateScreenAfterAnswerMultichoice();
+                }
+            }
+            this.disableInput();
+
+            if (this.btnSubmit !== undefined) {
+                this.body.removeChild(this.btnSubmit);
+                this.btnSubmit = undefined;
+            }
+
+            let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
+                this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
+            let instance = this;
+            btn.addEventListener("click", function() {
+                instance.callGetAttempt();
+                instance.area.removeChild(btn);
+            });
+
+            this.showScore(json);
         }
 
         onServerFastJson(response) {

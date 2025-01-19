@@ -45,10 +45,11 @@ define([''], function() {
         area;
 
         // Colors
-        colorScore;
-        colorScore2;
-        colorDefinition;
         colorsBackground;
+
+        // Timer variables
+        timestart = 0;
+        timeclose = 0;
 
         /**
          * Initialize game properties and compute initial sizes.
@@ -309,13 +310,6 @@ define([''], function() {
                 'button');
         }
 
-
-        // Game Logic
-
-        // Utility Functions
-
-        // Other
-
         hasHelp() {
             return false;
         }
@@ -529,7 +523,6 @@ define([''], function() {
                     return true;
                 })
                 .catch(error => {
-                    console.log(error);
                     instance.showError(error.message);
                     return false;
                 });
@@ -632,9 +625,7 @@ define([''], function() {
          * @param {function} condition - A condition to evaluate.
          */
         findbest(low, high, condition) {
-            let steps = 0;
             while (high - low > 1) {
-                steps++;
                 const mid = Math.floor((low + high) / 2);
                 if (condition(mid)) {
                     high = mid;
@@ -642,7 +633,6 @@ define([''], function() {
                     low = mid;
                 }
             }
-            console.log("findBest steps=" + steps);
 
             return low;
         }
@@ -779,7 +769,7 @@ define([''], function() {
             return canvas;
         }
 
-        createImageButton(parent, classnames, left, top, width, height, filename, wrap, alt) {
+        createImageButton(parent, classnames, left, top, width, height, filename) {
             const imgButton = this.createImage(parent, classnames, left, top, width, height, filename);
             imgButton.style.cursor = 'pointer';
             return imgButton;
@@ -801,31 +791,6 @@ define([''], function() {
             return M.util.get_string(name, 'mmogame');
         }
 
-
-        createDivMessageDo(classnames, left, top, width, height, message, heightmessage) {
-            if (this.divMessageBackground === undefined) {
-                let div = this.createDiv(this.body, classnames, left, top, width, height);
-                div.style.background = this.getColorHex(this.colorDefinition);
-                this.divMessageBackground = div;
-            }
-
-            if (this.divMessage === undefined) {
-                let div = document.createElement("div");
-                div.style.position = "absolute";
-                div.style.left = left + "px";
-                div.style.textAlign = "center";
-                div.style.width = (width - 2 * this.padding) + "px";
-                div.style.paddingLeft = this.padding + "px";
-                div.style.paddingRight = this.padding + "px";
-
-                div.style.background = this.getColorHex(this.colorDefinition);
-                div.style.color = this.getContrastingColor(this.colorDefinition);
-                this.divMessage = div;
-            }
-            this.divMessage.innerHTML = message;
-            this.body.appendChild(this.divMessage);
-            this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
-        }
         /**
          * Retrieves user options from IndexedDB.
          * @returns {Promise<Object>} A promise that resolves with the options.

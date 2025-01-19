@@ -87,10 +87,13 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             this.qtype = json.qtype;
             if (json.qtype === 'multichoice') {
-                this.answers = json.answers;
+                this.answers = [];
                 this.answersID = json.answerids;
+                json.answers.forEach((answer, index) => {
+                    this.answers[index] = this.repairP(answer);
+                });
             }
-            this.answer = json.answer !== undefined ? json.answer : undefined;
+           this.answer = json.answer !== undefined ? json.answer : undefined;
 
             this.endofgame = json.endofgame !== undefined && json.endofgame !== 0;
             this.definition = this.repairP(json.definition);
@@ -196,7 +199,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             if (this.hideSubmit === false) {
                 let space = (this.areaWidth - this.iconSize) / 2;
-                this.btnSubmit = this.createImageButton(this.body, 'mmogame-quiz-submit',
+                this.btnSubmit = this.createImageButton(this.area, 'mmogame-quiz-submit',
                     space, this.nextTop, 0, this.iconSize,
                    'assets/submit.svg', false, 'submit');
                 this.btnSubmit.addEventListener("click",
@@ -273,9 +276,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled) {
             let n = this.answers === undefined ? 0 : this.answers.length;
             let instance = this;
-
             let aChecked = [];
-            if (this.answer !== undefined) {
+            if (this.answer !== undefined && this.answer !== null) {
                 aChecked = this.answer.split(",");
             }
             if (aChecked.length > 0) {
@@ -373,7 +375,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     this.nextTop += move / 2;
                     let defTop = parseInt(this.divDefinition.style.top);
                     if (defTop + move + this.definitionHeight + this.padding < this.areaHeight) {
-                        this.divDefinition.style.top = this.aItemLabel[0].style.top;
+                        this.divDefinition.style.top = this.aItemLabel.length >= 1 ? this.aItemLabel[0].style.top : 0;
                         this.divDefinition.style.height = Math.max(heightControls, this.definitionHeight) + "px";
                     }
                     top += move;
@@ -421,32 +423,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 "user": this.user, "attempt": this.attempt
             });
             xmlhttp.send(data);
-        }
-
-        updateScreenAfterAnswer(json) {
-            this.playAudio(json.iscorrect !== 0 ? this.audioYes : this.audioNo);
-
-            if (json.correct !== undefined) {
-                if (this.qtype === "multichoice") {
-                    this.updateScreenAfterAnswerMultichoice();
-                }
-            }
-            this.disableInput();
-
-            if (this.btnSubmit !== undefined) {
-                this.body.removeChild(this.btnSubmit);
-                this.btnSubmit = undefined;
-            }
-
-            let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
-                this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
-            let instance = this;
-            btn.addEventListener("click", function() {
-                instance.callGetAttempt();
-                instance.area.removeChild(btn);
-            });
-
-            this.showScore(json);
         }
 
         getSVGcorrect(size, iscorrect, colorCorrect, colorError) {
@@ -740,5 +716,42 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.autoResizeText(this.labelScoreB, 0.8 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
             }
         }
+
+        callSetAnswer() {
+            // Clear any existing timeout to prevent duplicate calls
+            if (this.timerTimeout !== undefined) {
+                clearTimeout(this.timerTimeout);
+            }
+            this.timerTimeout = undefined;
+
+            let instance = this;
+            require(['core/ajax'], function(Ajax) {
+                // Define the parameters to be passed to the service
+                let params = {
+                    mmogameid: instance.mmogameid,
+                    kinduser: instance.kinduser,
+                    user: instance.user,
+                    attempt: instance.attempt,
+                    answer: instance.answer !== undefined ? instance.answer : null,
+                    answerid: instance.answerid !== undefined ? instance.answerid : null,
+                    subcommand: '',
+                };
+                // Call the service through the Moodle AJAX API
+                let ret = Ajax.call([{
+                    methodname: 'mmogametype_quiz_set_answer', // Service method name
+                    args: params // Parameters to pass
+                }]);
+
+                // Handle the server response
+                ret[0].done(function(response) {
+                    instance.processSetAnswer(JSON.parse(response)); // Trigger further action
+                }).fail(function(error) {
+                    instance.showError(error);
+                    // Return the error if the call fails
+                    return error;
+                });
+            });
+        }
+
     };
     });
