@@ -129,7 +129,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             instance.sendGetAttempt(false, "tool3");
         });
         this.buttonWizard.style.visibility = 'hidden';
-        this.buttonWizard.title = '[LANG_WIZARD]';
+        this.buttonWizard.title = this.getStringT('js_aduel_wizarg');
 
         if (this.hasHelp()) {
             if (this.hasBasBottom === false) {
@@ -154,7 +154,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
              * @param {number} num - Identifier for score type (1 for primary score, 2 for secondary/opponent score).
              */
             createDivScore(left, top, num) {
-                let button = this.createDivButton('mmogame-score', left, top);
+                let button = this.createDiv(this.area, 'mmogame-score', left, top, this.iconSize, this.iconSize);
 
                 button.style.borderRadius = this.iconSize + "px";
                 button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
@@ -329,10 +329,11 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         this.answer = '';
+        this.answerid = 0;
         this.callSetAnswer();
 
         let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
-            this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg', false, 'alt');
+            this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
         btn.title = this.getStringM('js_next_question');
         let instance = this;
         btn.addEventListener("click", function() {
@@ -347,7 +348,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
         this.updateButtonsAvatar(2, "", "");
         this.createDivMessage('mmomgame-quiz-aduel-wait-opponent',
-            this.getLangT('js_aduel_wait_opponent'));
+            this.getStringT('js_aduel_wait_opponent'));
         if (this.labelTimer !== undefined) {
             this.labelTimer.innerHTML = "";
         }
@@ -390,12 +391,11 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.showCorrectAnswer(json);
 
         let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
-            this.nextLeft, this.nextTop, 0, this.iconSize, "", 'assets/next.svg',
-            false, 'alt');
+            this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
         btn.title = this.getStringM('js_next_question');
         let instance = this;
         btn.addEventListener("click", function() {
-            instance.sendGetAttempt(false);
+            instance.callGetAttempt();
             instance.area.removeChild(btn);
         });
 
@@ -483,7 +483,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         if (iscorrect1 !== undefined) {
             let t = parseInt(this.aItemAnswer[i].style.top);
-            let div = this.createDiv(this.area, this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
+            let div = this.createDiv(this.area, 'mmogame-quiz-aduel-correct-answer',
+                this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
             div.title = iscorrect1 ? this.getStringT('js_correct_answer') : this.getStringT('js_wrong_answer');
             div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorScore, this.colorScore);
         }
@@ -492,7 +493,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             let t = parseInt(this.aItemAnswer[i].style.top);
             let div = this.createDiv(this.area, this.aItemCorrectX[i] + this.radioSize, t, this.radioSize, this.radioSize);
             div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect2, this.colorScore2, this.colorScore2);
-            div.title = iscorrect2 ? '[LANG_CORRECT_ANSWER]' : '[LANG_WRONG_ANSWER]';
+            div.title = iscorrect2 ? this.getStringM('js_correct_answer') : this.getStringM('js_wrong_answer');
         }
     }
 
@@ -699,9 +700,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
     drawHighScore1(json, ctx, fontSize) {
         ctx.textAlign = "center";
-        let text1 = ctx.measureText("[LANG_RANKING_ORDER]");
+        let text1 = ctx.measureText(this.getStringT('js_ranking_order'));
         let width1 = text1.width;
-        let text = ctx.measureText("[LANG_GRADE]");
+        let text = ctx.measureText(this.getStringM('js_grade'));
         let width2 = text.width;
 
         let col1 = 0;
@@ -715,12 +716,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         let y = Math.round(fontSize * 1.2);
         ctx.textAlign = "center";
-        ctx.fillText("[LANG_RANKING_ORDER]", col1 + width1 / 2, y);
+        ctx.fillText(this.getStringT('js_ranking_order'), col1 + width1 / 2, y);
 
-        ctx.fillText("[LANG_GRADE]", col2 + width2 / 2, y);
+        ctx.fillText(this.getStringM('js_grade'), col2 + width2 / 2, y);
 
         ctx.textAlign = "left";
-        ctx.fillText("[LANGM_NAME]", col3, y);
+        ctx.fillText(this.getStringM('js_name'), col3, y);
 
         results.forEach(player => {
             y += row / 2 + this.padding;
@@ -733,7 +734,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
             ctx.textAlign = "left";
             ctx.fillText(player.name, col3 + row - this.padding, y);
 
-            this.createImage(this.highScore, col3, y - row / 2, row - this.padding, row - this.padding,
+            this.createImage(this.highScore, 'mmogame-quiz-aduel-player-avatars',
+                col3, y - row / 2, row - this.padding, row - this.padding,
                 'assets/avatars/' + player.avatar);
 
             y += row / 2 - this.padding;
@@ -785,6 +787,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     createDivTimer(left, top, size) {
         const timerDiv = this.createDiv(this.body, 'mmogame-timer', left, top, size, size);
         timerDiv.style.textAlign = 'center';
+        timerDiv.style.color = this.getContrastingColor(this.colorBackground);
 
         timerDiv.innerHTML = '23:59';
         this.autoResizeText(timerDiv, size, size, false, 0, 0, 1);

@@ -149,9 +149,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }
                 instance.gateCreateScreen();
             })
-            /*.catch((error) => {
+            .catch((error) => {
                 this.showError('gateOpen', error);
-            }) */;
+            });
         }
 
         gatePlayGame(save, nickname, paletteid, avatarid) {

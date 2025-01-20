@@ -206,11 +206,11 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             if ($data->rank1 != 0 && $data->rank1 < $data->rank2) {
                 $kind = 1;
                 $rank = $data->rank1;
-                $score = $data->score1;
+                $score = $data->sumscore;
             } else if ($data->rank2 != 0 && $data->rank2 < $data->rank1) {
                 $kind = 2;
                 $rank = $data->rank2;
-                $score = $data->score2 . ' %';
+                $score = $data->percentcompleted . ' %';
             } else if ($data->rank1 != 0 && $data->rank2 != 0 && $data->rank1 == $data->rank2) {
                 $kind = 12;
                 $rank = $data->rank1;
@@ -265,7 +265,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                 $data->nickname = $rec->nickname;
                 $data->avatar = $rec->directory . '/' . $rec->filename;
                 $data->rank1 = $data->rank2 = 0;
-                $data->sumscore = $data->percentcopleted = 0;
+                $data->sumscore = $data->percentcompleted = 0;
             }
 
             // Calculate the score and cap it to the maximum score if necessary.
