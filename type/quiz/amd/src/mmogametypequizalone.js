@@ -26,24 +26,25 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         createIconBar() {
             let i = 0;
+            const step = this.iconSize + this.padding;
 
             this.nickNameHeight = Math.round(this.iconSize / 3);
 
-            this.buttonAvatarLeft = this.padding + i * (this.iconSize + this.padding);
+            // Α this.buttonAvatarLeft = this.padding + i * step;
             this.buttonAvatarHeight = Math.round(this.iconSize - this.iconSize / 3);
-            this.buttonAvatarTop = this.iconSize - this.buttonAvatarHeight + this.padding;
-            this.createButtonsAvatar(1, Math.round(this.padding + (i++) * (this.iconSize + this.padding)));
+            // Α this.buttonAvatarTop = this.iconSize - this.buttonAvatarHeight + this.padding;
+            this.createButtonsAvatar(1, Math.round(this.padding + (i++) * step));
             this.buttonsAvatar[1].style.top = (this.padding + this.nickNameHeight) + "px";
 
-            this.createDivScorePercent(this.padding + (i++) * (this.iconSize + this.padding),
+            this.createDivScorePercent(this.padding + (i++) * step,
                 this.padding + this.nickNameHeight, 1);
 
-            this.createButtonSound(this.padding + (i++) * (this.iconSize + this.padding),
+            this.createButtonSound(this.padding + (i++) * step,
                 this.padding + this.nickNameHeight);
             let instance = this;
             if (this.hasHelp()) {
-                this.createButtonHelp(this.padding + (i++) * (this.iconSize + this.padding), this.padding);
-                this.buttonHelp.addEventListener("click", function() {
+                this.createButtonHelp(this.padding + (i++) * step, this.padding);
+                this.buttonHelp.addEventListener("click", () => {
                     instance.onClickHelp(instance.buttonHelp);
                 });
             }
@@ -55,9 +56,16 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             this.areaHeight = Math.round(window.innerHeight - this.areaTop - copyrightHeight);
 
-            this.createDivColor(this.body, 'mmogame-quiz-alone-color',
-                0, window.innerHeight - copyrightHeight - 1, window.innerWidth - 1, copyrightHeight,
-                this.getColorGray(this.colorCopyright));
+            this.createDivColor(
+                this.body,
+                'mmogame-quiz-alone-color',
+                0,
+                window.innerHeight - copyrightHeight - 1,
+                window.innerWidth - 1,
+                copyrightHeight,
+                this.getColorGray(this.colorCopyright)
+            );
+
             this.vertical = this.areaHeight > this.areaWidth;
         }
 
@@ -66,38 +74,39 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             this.playAudio(json.iscorrect !== 0 ? this.audioYes : this.audioNo);
 
-            if (json.correct !== undefined) {
-                if (this.qtype === "multichoice") {
-                    this.updateScreenAfterAnswerMultichoice();
-                }
+            if (json.correct !== undefined && this.qtype === "multichoice") {
+                this.updateScreenAfterAnswerMultichoice();
             }
+
             this.disableInput();
 
-            if (this.btnSubmit !== undefined) {
+            if (this.btnSubmit) {
                 this.body.removeChild(this.btnSubmit);
                 this.btnSubmit = undefined;
             }
 
-            let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
-                this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
-            let instance = this;
-            btn.addEventListener("click", function() {
-                instance.callGetAttempt();
-                instance.area.removeChild(btn);
+            const btn = super.createImageButton(
+                this.area,
+                'mmogame-quiz-next',
+                this.nextLeft,
+                this.nextTop,
+                0,
+                this.iconSize,
+                'assets/next.svg'
+            );
+            btn.addEventListener("click", () => {
+                this.callGetAttempt();
+                this.area.removeChild(btn);
             });
 
             this.showScore(json);
         }
 
         onServerFastJson(response) {
-            let pos = response.indexOf("-");
-            if (pos >= 0) {
-                let state = parseInt(response.slice(0, pos));
-                let timefastjson = parseInt(response.slice(pos + 1));
-                if (timefastjson !== this.timefastjson || state !== this.state) {
-                    this.sendGetAttempt({mmogameid: this.mmogameid, kinduser: this.kinduser, user: this.user});
-                    return;
-                }
+            const [state, timefastjson] = response.split("-").map(Number);
+            if (timefastjson !== this.timefastjson || state !== this.state) {
+                this.sendGetAttempt({mmogameid: this.mmogameid, kinduser: this.kinduser, user: this.user});
+                return;
             }
 
             this.sendFastJSON();
@@ -106,7 +115,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         processGetAttempt(json) {
             if (parseInt(json.state) === 0) {
                 json.qtype = '';
-                if (json.colors !== undefined) {
+                if (json.colors) {
                     this.setColorsString(json.colors);
                     this.createIconBar();
                 }
@@ -116,26 +125,23 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
 
             super.processGetAttempt(json);
-            if (this.btnSubmit !== undefined) {
+            if (this.btnSubmit) {
                 this.btnSubmit.style.visibility = "hidden";
             }
         }
 
-        showScore(json) {
-            if (json.rank !== undefined && json.rankc !== undefined) {
-                if (parseInt(json.rank) < parseInt(json.rankc)) {
+        showScore({rank, rankc, sumscore}) {
+            if (rank !== undefined && rankc !== undefined) {
+                if (parseInt(rank) < parseInt(rankc)) {
                     this.completedrank = '';
-                    this.rank = '# ' + json.rank;
+                    this.rank = `# ${rank}`;
                 } else {
                     this.rank = '';
-                    this.completedrank = '# ' + json.rankc;
+                    this.completedrank = `# ${rankc}`;
                 }
             }
 
-            let s = json.sumscore;
-            super.showScore(json);
-            json.sumscore = s;
-            s = json.sumscore === undefined ? '' : '<b>' + json.sumscore + '</b>';
+            const s = sumscore === undefined ? '' : `<b>${sumscore}</b>`;
             if (this.labelScore.innerHTML !== s) {
                 this.labelScore.innerHTML = s;
                 this.autoResizeText(this.labelScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0, 1);
@@ -143,16 +149,17 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         showHelpScreen(div) {
-            div.innerHTML = `<br>
-<div>` + this.getStringG('js_alone_help') + `</div><br>
+            div.innerHTML = `
+                <br>
+                <div>${this.getStringG('js_alone_help')}</div><br>
 
-<table border=1>
-    <tr>
-        <td><img height="83" src="assets/aduel/example2.png" alt="" /></td>
-        <td>` + this.getStringG('js_aduel_example2') + `</td>
-    </tr>
-</table>
-        `;
+                <table border=1>
+                    <tr>
+                        <td><img height="83" src="assets/aduel/example2.png" alt="" /></td>
+                        <td>${this.getStringG('js_aduel_example2')}</td>
+                    </tr>
+                </table>
+            `;
         }
     };
 });
