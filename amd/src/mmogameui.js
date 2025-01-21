@@ -240,9 +240,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     size[0], this.getStringM('js_code') + ": ",
                     'mmogame-gate-code-label', 'mmogame-gate-code') + 2 * this.padding;
                 this.edtCode = this.edt;
-                this.edtCode.addEventListener("keyup", function() {
-                    instance.gateUpdateSubmit();
-                });
+                this.edtCode.addEventListener("keyup", this.debounce(() => instance.gateUpdateSubmit(), 300));
             } else {
                 bottom = 0;
             }
@@ -252,9 +250,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.getStringM('js_name') + ": ",
                 'mmogame-gate-name-label', 'mmogame-gate-name') + 2 * this.padding;
             this.edtNickname = this.edt;
-            this.edtNickname.addEventListener("keyup", function() {
-                instance.gateUpdateSubmit();
-            });
+            this.edtNickname.addEventListener("keyup", this.debounce(() => instance.gateUpdateSubmit(), 300));
 
             this.gateCreateScreenPalette(bottom, gridWidthColors, gridHeightColors,
                 gridWidthAvatars, gridHeightAvatars);
@@ -316,9 +312,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 bottom = this.gateCreateLabelEditVertical(0, 0, maxWidth, this.fontSize, size[0],
                     this.getStringM('js_code')) + 2 * this.padding;
                 this.edtCode = this.edt;
-                this.edtCode.addEventListener("keyup", function() {
-                    instance.gateUpdateSubmit();
-                });
+                this.edtCode.addEventListener("keyup", this.debounce(() => instance.gateUpdateSubmit(), 300));
             } else {
                 bottom = 0;
             }
@@ -332,9 +326,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             this.edtNickname = this.edt;
 
-            this.edtNickname.addEventListener("keyup", function() {
-                instance.gateUpdateSubmit();
-            });
+            this.edtNickname.addEventListener("keyup", this.debounce(() => instance.gateUpdateSubmit(), 300));
 
             let label1 = document.createElement("label");
             label1.style.position = "absolute";
@@ -454,6 +446,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 return; // Exit early if no avatars exist
             }
 
+            const fragment = document.createDocumentFragment();
+
             this.avatar = undefined;
             const count = avatars.length;
             let leftOriginal = left;
@@ -461,7 +455,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             for (let i = 0; i < count; i++) {
                 let avatarImagePath = 'assets/avatars/' + avatars[i];
                 let btn = this.createCenterImageButton(
-                    this.area,
+                    fragment,
                     left, top,
                     this.iconSize - this.padding, this.iconSize - this.padding,
                     'mmogame-avatar',
@@ -482,6 +476,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     left = leftOriginal;
                 }
             }
+            this.area.appendChild(fragment);
         }
 
         gateSendGetColorsAvatars(leftColors, topColors, gridWidthColors, gridHeightColors, leftAvatars, topAvatars,
@@ -541,6 +536,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             const parsedPalettes = colorpalettes.map(palette =>
                 palette.split(",").map(value => parseInt(value, 10) || 0)
             );
+            const fragment = document.createDocumentFragment();
             for (let iy = 0; iy < countY; iy++) {
                 for (let ix = 0; ix < countX; ix++) {
                     // Check if we exceed available palettes or encounter invalid data
@@ -560,7 +556,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     canvas.classList.add("mmogame_color");
 
                     // Append canvas to the area
-                    this.area.appendChild(canvas);
+                    fragment.appendChild(canvas);
 
                     // Render the color palette on the canvas
                     this.showColorPalette(canvas, parsedPalettes[i]);
@@ -574,7 +570,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     i++;
                 }
             }
-            this.area.classList.add("palette");
+            this.area.appendChild(fragment);
         }
 
         gateUpdateColorPalette(canvas, id) {
@@ -582,13 +578,15 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.canvasColor.style.borderStyle = "none";
             }
             this.canvasColor = canvas;
-            canvas.style.borderStyle = "outset";
             let w = Math.round(this.padding / 2) + "px";
-            canvas.style.borderLeftWidth = w;
-            canvas.style.borderTopWidth = w;
-            canvas.style.borderRightWidth = w;
-            canvas.style.borderBottomWidth = w;
 
+            Object.assign(canvas.style, {
+                borderStyle: "outset",
+                borderLeftWidth: w,
+                borderTopWidth: w,
+                borderRightWidth: w,
+                borderBottomWidth: w,
+            });
             this.paletteid = id;
 
             this.gateUpdateSubmit();
@@ -724,11 +722,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             const instance = this;
             btn.addEventListener("click",
                 function() {
-                    let elements = instance.area.getElementsByClassName("mmogame_color");
-
-                    while (elements[0]) {
-                        elements[0].parentNode.removeChild(elements[0]);
-                    }
+                    const elements = Array.from(instance.area.getElementsByClassName("mmogame_color"));
+                    elements.forEach(element => element.remove());
 
                     instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
                         0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,

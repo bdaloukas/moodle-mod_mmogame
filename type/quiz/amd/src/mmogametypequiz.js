@@ -39,62 +39,85 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.timeForSendAnswer = 10000;
         }
 
+        /**
+         * Sets the colors for different UI elements and repairs them if necessary.
+         *
+         * @param {Array} colors - Array of color codes to be applied.
+         */
         setColors(colors) {
-            this.repairColors(colors);
+            this.repairColors(colors); // Ensure colors are valid
 
+            // Assign specific colors to UI elements
             this.colorDefinition = this.colors[1];
             this.colorScore = this.colors[2];
             this.colorCopyright = this.colors[3];
             this.colorScore2 = this.colors[4];
         }
 
+        /**
+         * Initializes the game by loading required audio assets.
+         */
         openGame() {
-            super.openGame();
+            super.openGame(); // Call the parent class method
 
+            // Load sound effects
             this.audioYes = new Audio('assets/yes1.mp3');
             this.audioYes.load();
             this.audioNo = new Audio('assets/no1.mp3');
             this.audioNo.load();
         }
 
+        /**
+         * Processes the response for a game attempt, updating the state and UI.
+         *
+         * @param {Object} json - The server response containing attempt data.
+         */
         processGetAttempt(json) {
+            // Calculate time difference and set up the clock
             this.computeDifClock(json.time, json.timestart, json.timeclose);
 
-            if (json.colors !== undefined) {
+            // Set colors if provided
+            if (json.colors) {
                 this.setColorsString(json.colors);
-                this.createIconBar();
+                this.createIconBar(); // Initialize the top bar with icons
             }
 
-            if (name !== undefined) {
-                window.document.title = name;
+            // Update the window title if a name is provided
+            if (json.name) {
+                document.title = json.name;
             }
 
-            if (json.helpurl !== undefined) {
+            // Set help URL if available
+            if (json.helpurl) {
                 this.helpUrl = json.helpurl;
             }
 
-            if (json.errorcode !== undefined) {
+            // Handle error messages from the server
+            if (json.errorcode) {
                 this.createDivMessage('mmogame-error', json.errorcode);
                 return;
             }
 
-            this.state = parseInt(json.state);
+            // Update game state and user-related data
+            this.state = parseInt(json.state, 10);
             this.fastjson = json.fastjson;
-            this.timefastjson = parseInt(json.timefastjson);
+            this.timefastjson = parseInt(json.timefastjson, 10);
             this.updateButtonsAvatar(1, json.avatar, json.nickname);
 
             this.attempt = json.attempt;
 
+            // Process question type and answers
             this.qtype = json.qtype;
-            if (json.qtype === 'multichoice') {
+            if (this.qtype === 'multichoice') {
                 this.answers = [];
                 this.answersID = json.answerids;
                 json.answers.forEach((answer, index) => {
-                    this.answers[index] = this.repairP(answer);
+                    this.answers[index] = this.repairP(answer); // Process each answer
                 });
             }
-           this.answer = json.answer !== undefined ? json.answer : undefined;
+            this.answer = json.answer ?? undefined;
 
+            // Handle end-of-game scenarios
             this.endofgame = json.endofgame !== undefined && json.endofgame !== 0;
             this.definition = this.repairP(json.definition);
             this.errorcode = json.errorcode;
@@ -103,129 +126,144 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.createScreen(json, false);
             }
 
-            this.updateLabelTimer();
-
-            this.sendFastJSON();
+            this.updateLabelTimer(); // Start or update the timer
+            this.sendFastJSON(); // Send fast JSON updates
         }
 
         updateLabelTimer() {
-            if (this.labelTimer === undefined || this.timeclose === undefined) {
+            // Exit if labelTimer or timeclose are undefined
+            if (!this.labelTimer || !this.timeclose) {
                 return;
             }
-            if (this.timeclose === 0) {
-                this.labelTimer.innerHTML = '';
-                return;
-            }
-            let time = (new Date()).getTime();
-            let dif = this.timeclose - time / 1000;
 
-            if (dif <= 0) {
-                dif = 0;
-            }
-            dif = Math.round(dif);
-            if (dif <= 0) {
+            // Calculate the remaining time in seconds
+            const now = Date.now() / 1000; // Get current time in seconds
+            let remainingTime = Math.max(0, this.timeclose - now);
+
+            // If no time is remaining, clear the label and handle timeout
+            if (remainingTime === 0) {
                 this.labelTimer.innerHTML = '';
                 this.onTimeout();
-            } else {
-                let s = (dif < 0 ? "-" : "") + Math.floor(dif / 60.0);
-                this.labelTimer.innerHTML = s + ":" + ("0" + (dif % 60)).slice(-2);
-            }
-
-            if (dif <= 0 && this.timeclose !== 0) {
                 return;
             }
 
-            let instance = this;
-            this.timerTimeout = setTimeout(function() {
-                instance.updateLabelTimer();
-            }, 500);
+            // Format the remaining time as mm:ss
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = String(Math.floor(remainingTime % 60)).padStart(2, '0');
+            this.labelTimer.innerHTML = `${minutes}:${seconds}`;
+
+            // Set a timeout to update the timer every 500ms
+            this.timerTimeout = setTimeout(() => this.updateLabelTimer(), 500);
         }
 
+        /**
+         * Handles the timeout scenario by disabling inputs and sending timeout data.
+         */
         onTimeout() {
-            this.labelTimer.innerHTML = '';
-            this.disableInput();
-            this.sendTimeout();
+            this.labelTimer.innerHTML = ''; // Clear the timer display
+            this.disableInput(); // Prevent further user input
+            this.sendTimeout(); // Notify the server about the timeout
         }
-
+        /**
+         * Creates the game screen layout based on the current state.
+         *
+         * @param {Object} json - The game data used to build the screen.
+         * @param {boolean} disabled - Determines whether user input should be disabled.
+         */
         createScreen(json, disabled) {
-            this.createArea();
+            this.createArea(); // Prepare the main game area
 
             if (this.endofgame) {
+                // Display end-of-game message and final score
                 this.createDivMessage('mmogame-endofgame', this.getStringM('js_game_over'));
                 this.showScore(json);
                 return;
             }
 
+            // Render the screen layout based on orientation (vertical or horizontal)
             if (this.vertical) {
                 this.createScreenVertical(disabled);
             } else {
                 this.createScreenHorizontal(disabled);
             }
+
+            // Display the current score
             this.showScore(json);
         }
 
+        /**
+         * Creates a vertical layout for the quiz screen.
+         *
+         * @param {boolean} disabled - Whether user input should be disabled.
+         */
         createScreenVertical(disabled) {
-            let nickNameHeight = Math.round(this.iconSize / 3) + this.padding;
+            const nickNameHeight = Math.round(this.iconSize / 3) + this.padding;
             let maxHeight = this.areaHeight - 4 * this.padding - nickNameHeight;
 
-            if (this.hideSubmit === false) {
-                maxHeight -= this.iconSize;
+            if (!this.hideSubmit) {
+                maxHeight -= this.iconSize; // Reserve space for the submit button
             }
-            let instance = this;
-            let maxWidth = this.areaWidth;
-            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, function(fontSize) {
-                    let defSize = instance.createDefinition(0, 0, maxWidth - 1, true, fontSize);
 
-                    if (defSize[0] >= maxWidth) {
-                        return 1;
-                    }
-                    let ansSize = instance.createAnswer(0, 0, maxWidth - 1, true, fontSize, disabled);
-                    if (ansSize[0] >= maxWidth) {
-                        return 1;
-                    }
-                    return defSize[1] + ansSize[1] < maxHeight ? -1 : 1;
+            const maxWidth = this.areaWidth;
+
+            // Dynamically adjust font size to fit content within constraints
+            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, (fontSize) => {
+                const defSize = this.createDefinition(0, 0, maxWidth - 1, true, fontSize);
+                if (defSize[0] >= maxWidth) {
+                    return 1;
                 }
-            );
+
+                const ansSize = this.createAnswer(0, 0, maxWidth - 1, true, fontSize, disabled);
+                return defSize[1] + ansSize[1] < maxHeight ? -1 : 1;
+            });
 
             this.radioSize = Math.round(this.fontSize);
-            let defSize = this.createDefinition(0, 0, maxWidth, false, this.fontSize);
+            const defSize = this.createDefinition(0, 0, maxWidth, false, this.fontSize);
 
-            this.nextTop = instance.createAnswer(0, defSize[1] + this.padding, maxWidth, false, this.fontSize, disabled);
-            this.nextLeft = this.areaWidth - this.iconSize - this.padding;
+            // Position answers below the definition
+            this.nextTop = this.createAnswer(0, defSize[1] + this.padding, maxWidth, false, this.fontSize, disabled);
 
-            if (this.nextTop + this.padding >= this.areaHeight) {
-                this.nextTop = this.areaHeight - this.padding;
-            }
-
-            if (this.hideSubmit === false) {
-                let space = (this.areaWidth - this.iconSize) / 2;
-                this.btnSubmit = this.createImageButton(this.area, 'mmogame-quiz-submit',
-                    space, this.nextTop, 0, this.iconSize,
-                   'assets/submit.svg', false, 'submit');
-                this.btnSubmit.addEventListener("click",
-                    function() {
-                        if (instance.btnSubmit !== undefined) {
-                            instance.area.removeChild(instance.btnSubmit);
-                            instance.btnSubmit = undefined;
-                        }
-                        instance.sendAnswer();
-                    }
+            if (!this.hideSubmit) {
+                // Create and position the submit button
+                const space = (this.areaWidth - this.iconSize) / 2;
+                this.btnSubmit = this.createImageButton(
+                    this.area,
+                    'mmogame-quiz-submit',
+                    space,
+                    this.nextTop,
+                    0,
+                    this.iconSize,
+                    'assets/submit.svg',
+                    false,
+                    'submit'
                 );
+                this.btnSubmit.addEventListener('click', () => {
+                    this.area.removeChild(this.btnSubmit);
+                    this.btnSubmit = undefined;
+                    this.sendAnswer();
+                });
             }
 
+            // Adjust strip dimensions
             this.stripLeft = this.padding;
             this.stripWidth = 2 * this.iconSize;
             this.stripHeight = this.iconSize;
         }
 
+        /**
+         * Creates a horizontal layout for the quiz screen.
+         *
+         * @param {boolean} disabled - Whether user input should be disabled.
+         */
         createScreenHorizontal(disabled) {
             let maxHeight = this.areaHeight - 2 * this.padding;
 
-            if (this.hideSubmit === false) {
-                maxHeight -= this.iconSize + this.padding;
+            if (!this.hideSubmit) {
+                maxHeight -= this.iconSize + this.padding; // Reserve space for submit button
             }
-            let width = Math.round((this.areaWidth - this.padding) / 2);
-            let instance = this;
+
+            const width = Math.round((this.areaWidth - this.padding) / 2);
+            const instance = this;
             for (let step = 1; step <= 2; step++) {
                 let defSize;
                 this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
@@ -250,20 +288,27 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.radioSize = Math.round(this.fontSize);
             this.createDefinition(0, 0, width - this.padding, false, this.fontSize);
 
-            this.nextTop = instance.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled) + this.padding;
-            this.nextLeft = width + Math.min(3 * this.iconSize + 2 * this.padding, width - this.iconSize);
+            this.nextTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled) + this.padding;
 
-            if (this.hideSubmit) {
-                return;
+            if (!this.hideSubmit) {
+                // Create and position the submit button
+                this.btnSubmit = this.createImageButton(
+                    this.body,
+                    'mmogame-quiz-submit',
+                    width + (width - this.iconSize) / 2,
+                    this.nextTop,
+                    0,
+                    this.iconSize,
+                    'assets/submit.svg',
+                    false,
+                    'submit'
+                );
+                this.btnSubmit.addEventListener('click', () => {
+                    this.sendAnswer();
+                });
             }
 
-            this.btnSubmit = this.createImageButton(this.body, 'mmogame-quiz-submit',
-                width + (width - this.iconSize) / 2, this.nextTop, 0, this.iconSize,
-                "", 'assets/submit.svg', false, 'submit');
-            this.btnSubmit.addEventListener("click", function() {
-                instance.sendAnswer();
-            });
-
+            // Adjust strip dimensions
             this.stripLeft = width + this.padding;
             this.stripWidth = 2 * this.iconSize;
             this.stripHeight = this.iconSize;
@@ -273,135 +318,111 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             return this.createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled);
         }
 
+        /**
+         * Creates multiple-choice answer options.
+         *
+         * @param {number} left - The left position in pixels.
+         * @param {number} top - The top position in pixels.
+         * @param {number} width - The maximum width available for answers.
+         * @param {boolean} onlyMetrics - Whether to only calculate size metrics.
+         * @param {number} fontSize - The font size for answer text.
+         * @param {boolean} disabled - Whether the answers are disabled.
+         * @returns {number} The total height used by the answer options.
+         */
         createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled) {
-            let n = this.answers === undefined ? 0 : this.answers.length;
-            let instance = this;
-            let aChecked = [];
-            if (this.answer !== undefined && this.answer !== null) {
-                aChecked = this.answer.split(",");
-            }
-            if (aChecked.length > 0) {
-                if (aChecked[0] === "") {
-                    aChecked.pop();
-                }
-            }
-
-            this.aItemAnswer = new Array(n);
-            this.aItemLabel = new Array(n);
+            const n = this.answers ? this.answers.length : 0;
+            const aChecked = this.answer?.split(",").filter(Boolean) || [];
+            const retSize = [0, 0];
+            const checkboxSize = Math.round(fontSize);
+            this.aItemAnswer = Array(n);
+            this.aItemLabel = Array(n);
             this.aItemCorrectX = new Array(n);
-            let retSize = [0, 0];
-            this.labelWidth = Math.round(width - fontSize - this.padding);
-            let checkboxSize = Math.round(fontSize);
-            let top1 = top;
-            let offsetLabel = 0;
+
+            // Iterate over each answer
             for (let i = 0; i < n; i++) {
-                let label = document.createElement("label");
+                const label = document.createElement("label");
                 label.style.position = "absolute";
-                label.style.width = this.labelWidth + "px";
-
+                label.style.width = `${width}px`;
+                label.style.fontSize = `${fontSize}px`;
+                label.style.color = this.getContrastingColor(this.colorBackground);
                 label.innerHTML = this.answers[i];
-
-                label.style.font = "FontAwesome";
-                label.style.fontSize = fontSize + "px";
-                this.aItemLabel[i] = label;
+                label.classList.add('mmogame-quiz-multichoice-label');
 
                 if (onlyMetrics) {
-                    this.body.appendChild(label);
-                    let newSize = label.scrollWidth + fontSize + this.padding;
-                    if (newSize > retSize[0]) {
-                        retSize[0] = newSize;
-                    }
+                    this.area.appendChild(label);
+                    const newSize = label.scrollWidth + fontSize + this.padding;
+                    retSize[0] = Math.max(retSize[0], newSize);
                     retSize[1] += Math.max(label.scrollHeight, fontSize) + this.padding;
-
-                    this.body.removeChild(label);
+                    this.area.removeChild(label);
                     continue;
                 }
 
-                label.htmlFor = "input" + i;
-                label.style.left = (left + fontSize + this.padding + offsetLabel) + "px";
+                label.htmlFor = "mmogame_quiz_input" + i;
+                label.style.left = (left + fontSize + this.padding) + "px";
                 label.style.top = top + "px";
                 label.style.align = "left";
                 label.style.color = this.getContrastingColor(this.colorBackground);
 
-                let checked = aChecked.includes(this.answersID[i]);
-                let item = this.createRadiobox(this.body, checkboxSize, this.colorDefinition, this.colorScore, checked, disabled);
+                // Create the checkbox
+                const checked = aChecked.includes(this.answersID[i]);
+                const item = this.createRadiobox(this.body, checkboxSize, this.colorDefinition, this.colorScore, checked, disabled);
                 item.style.position = "absolute";
-                item.style.left = left + "px";
-                let topRadio = top;
-                item.style.top = topRadio + "px";
+                item.style.left = `${left}px`;
+                item.style.top = `${top}px`;
+                item.id = "mmogame_quiz_input" + i;
 
+                // Event listeners for interactions
                 item.addEventListener('click', () => {
                     if (!item.classList.contains("disabled")) {
-                        instance.onClickRadio(i, this.colorDefinition, this.colorScore, true);
+                        this.onClickRadio(i, this.colorDefinition, this.colorScore, true);
                     }
                 });
 
                 label.addEventListener('click', () => {
-                    instance.onClickRadio(i, instance.colorDefinition, instance.colorScore, true);
+                    this.onClickRadio(i, this.colorDefinition, this.colorScore, true);
                 });
 
                 this.area.appendChild(item);
                 this.area.appendChild(label);
-                if (label.scrollHeight > fontSize) {
-                    topRadio = Math.round(top + (label.scrollHeight - fontSize) / 2);
-                    item.style.top = topRadio + "px";
-                }
-
-                if (this.answersID[i] === '') {
-                    item.style.visibility = 'hidden';
-                    label.style.visibility = 'hidden';
-                }
 
                 this.aItemAnswer[i] = item;
                 this.aItemCorrectX[i] = left + fontSize + this.padding;
+                this.aItemLabel[i] = label;
 
+                // Adjust positioning
                 top += Math.max(label.scrollHeight, fontSize) + this.padding;
             }
 
-            if (onlyMetrics) {
-                return retSize;
-            }
-
-            let heightControls = top - top1;
-            let vspace;
-            if (this.vertical === false) {
-                vspace = this.areaHeight - heightControls - this.iconSize;
-                if (vspace > this.padding) {
-                    let move = Math.round(vspace / 3);
-                    for (let i = 0; i < n; i++) {
-                        this.aItemAnswer[i].style.top = (parseInt(this.aItemAnswer[i].style.top) + move) + "px";
-                        this.aItemLabel[i].style.top = (parseInt(this.aItemLabel[i].style.top) + move) + "px";
-                    }
-                    this.nextTop += move / 2;
-                    let defTop = parseInt(this.divDefinition.style.top);
-                    if (defTop + move + this.definitionHeight + this.padding < this.areaHeight) {
-                        this.divDefinition.style.top = this.aItemLabel.length >= 1 ? this.aItemLabel[0].style.top : 0;
-                        this.divDefinition.style.height = Math.max(heightControls, this.definitionHeight) + "px";
-                    }
-                    top += move;
-                }
-            }
-
-            return top;
+            return onlyMetrics ? retSize : top;
         }
 
-        onClickRadio(i, colorBack, color, callSendAnswer) {
-            if (this.aItemAnswer[i].classList.contains("disabled")) {
+        /**
+         * Handles radio button click events for answers.
+         *
+         * @param {number} index - The index of the clicked radio button.
+         * @param {string} colorBack - The background color for the radio button.
+         * @param {string} color - The color for the radio button when selected.
+         * @param {boolean} callSendAnswer - Whether to send the answer immediately.
+         */
+        onClickRadio(index, colorBack, color, callSendAnswer) {
+            if (this.aItemAnswer[index].classList.contains("disabled")) {
                 return;
             }
-            for (let j = 0; j < this.aItemAnswer.length; j++) {
-                let item = this.aItemAnswer[j];
-                let disabled = item.classList.contains("disabled");
 
-                if (i === j) {
+            // Update the selected radio button and deselect others
+            this.aItemAnswer.forEach((item, i) => {
+                const isDisabled = item.classList.contains("disabled");
+                if (i === index) {
                     item.classList.add("checked");
                     this.answerid = this.answersID[i];
-                } else if (item.classList.contains("checked")) {
+                } else {
                     item.classList.remove("checked");
                 }
 
-                this.drawRadio(item, disabled ? colorBack : 0xFFFFFF, color);
-            }
+                this.drawRadio(item, isDisabled ? colorBack : 0xFFFFFF, color);
+            });
+
+            // Send the answer if autosave is enabled
             if (this.autosave && callSendAnswer) {
                 this.callSetAnswer();
             }
@@ -425,6 +446,15 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             xmlhttp.send(data);
         }
 
+        /**
+         * Generates an SVG for a correct or incorrect icon.
+         *
+         * @param {number} size - The size of the SVG.
+         * @param {boolean} iscorrect - Whether the answer is correct.
+         * @param {int} colorCorrect - Color for correct answers.
+         * @param {int} colorError - Color for incorrect answers.
+         * @returns {string} The SVG markup as a string.
+         */
         getSVGcorrect(size, iscorrect, colorCorrect, colorError) {
             if (iscorrect) {
                 let c = colorCorrect !== undefined ? this.getColorHex(colorCorrect) : '#398439';
@@ -439,70 +469,81 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }
         }
 
-        updateScreenAfterAnswerMultichoice() {
-            let aCorrect = this.correct.split(",");
-            for (let i = 0; i < this.answersID.length; i++) {
-                let label = this.aItemLabel[i];
-                let checked = this.aItemAnswer[i].classList.contains("checked");
-                let iscorrect;
 
-                if (aCorrect.includes(this.answersID[i])) {
-                    iscorrect = true;
-                } else if (checked) {
-                    iscorrect = false;
-                } else {
+        /**
+         * Updates the screen to show the correctness of the user's answers.
+         */
+        updateScreenAfterAnswerMultichoice() {
+            const correctAnswers = this.correct.split(","); // Split correct answer IDs into an array
+
+            for (let i = 0; i < this.answersID.length; i++) {
+                const label = this.aItemLabel[i];
+                const isChecked = this.aItemAnswer[i].classList.contains("checked");
+                const isCorrect = correctAnswers.includes(this.answersID[i]);
+
+                // Skip answers that are neither checked nor correct
+                if (!isCorrect && !isChecked) {
                     continue;
                 }
-                let height = label.scrollHeight;
-                let width = label.scrollWidth - this.radioSize;
-                label.style.left = (parseInt(label.style.left) + this.radioSize) + "px";
-                label.style.width = width + "px";
-                if (iscorrect) {
-                    label.innerHTML = '<b>' + label.innerHTML + '</b>';
-                }
-                this.autoResizeText(label, width, height, true, this.minFontSize, this.maxFontSize, 0.9);
 
-                let t = parseInt(this.aItemAnswer[i].style.top);
-                let div = this.createDiv(this.area, 'mmogame-quiz-correct',
-                    this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
-                div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect, this.colorScore, this.colorScore);
+                // Adjust label styling and add correct/incorrect icon
+                const labelWidth = label.scrollWidth - this.radioSize;
+                label.style.left = `${parseInt(label.style.left) + this.radioSize}px`;
+                label.style.width = `${labelWidth}px`;
+
+                if (isCorrect) {
+                    label.innerHTML = `<b>${label.innerHTML}</b>`;
+                }
+
+                const top = parseInt(this.aItemAnswer[i].style.top);
+                const feedbackDiv = this.createDiv(this.area, 'mmogame-quiz-correct',
+                    this.aItemCorrectX[i], top, this.radioSize, this.radioSize);
+                feedbackDiv.innerHTML = this.getSVGcorrect(this.radioSize, isCorrect, this.colorScore, this.colorScore);
             }
         }
 
+        /**
+         * Disables all answer inputs to prevent further interaction.
+         */
         disableInput() {
-            if (this.aItemAnswer !== undefined) {
-                for (let i = 0; i < this.aItemAnswer.length; i++) {
-                    this.aItemAnswer[i].classList.add("disabled");
-                    this.drawRadio(this.aItemAnswer[i], this.colorScore, this.colorDefinition);
-                }
+            if (!this.aItemAnswer) {
+                return;
+            }
+
+            for (const item of this.aItemAnswer) {
+                item.classList.add("disabled"); // Add 'disabled' class to each input
+                this.drawRadio(item, this.colorScore, this.colorDefinition); // Update styling
             }
         }
-
+        /**
+         * Sends periodic fast JSON updates to the server.
+         */
         sendFastJSON() {
+            // Clear existing timeout if any
             if (this.timeoutFastJSON !== undefined) {
                 clearTimeout(this.timeoutFastJSON);
             }
-            let instance = this;
-            this.timeoutFastJSON = setTimeout(function() {
-                let xmlhttp = new XMLHttpRequest();
-                xmlhttp.onreadystatechange = function() {
+
+            this.timeoutFastJSON = setTimeout(() => {
+                const xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = () => {
                     this.timeoutFastJSON = undefined;
-                    if (this.readyState === 4 && this.status === 200) {
-                        instance.onServerFastJson(this.response);
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        this.onServerFastJson(xhr.response);
                     }
                 };
 
-                let url = instance.url + "/state.php";
+                const url = `${this.url}/state.php`;
+                xhr.open("POST", url, true);
 
-                xmlhttp.open("POST", url, true);
+                const data = new FormData();
+                data.set('fastjson', this.fastjson);
+                data.set('type', this.type);
 
-                let data = new FormData();
-                data.set('fastjson', instance.fastjson);
-                data.set('type', instance.type);
-
-                xmlhttp.send(data);
+                xhr.send(data); // Send the fast JSON data
             }, this.timeForSendAnswer);
         }
+
 
         onClickHelp() {
             if (this.helpUrl !== '') {
@@ -646,109 +687,131 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }
         }
 
+        /**
+         * Creates and displays the definition area for the question.
+         *
+         * @param {number} left - The left position in pixels.
+         * @param {number} top - The top position in pixels.
+         * @param {number} width - The width of the definition area.
+         * @param {boolean} onlyMetrics - Whether to only measure size.
+         * @param {number} fontSize - The font size for the definition text.
+         * @returns {Array} The width and height of the definition area.
+         */
         createDefinition(left, top, width, onlyMetrics, fontSize) {
             width -= 2 * this.padding;
-            let div = document.createElement("div");
 
-            div.style.position = "absolute";
-            div.style.width = width + "px";
-
-            div.style.fontSize = fontSize + "px";
-            div.innerHTML = this.definition;
-            div.style.textAlign = "left";
+            const definitionDiv = document.createElement("div");
+            definitionDiv.style.position = "absolute";
+            definitionDiv.style.width = `${width}px`;
+            definitionDiv.style.fontSize = `${fontSize}px`;
+            definitionDiv.innerHTML = this.definition;
 
             if (onlyMetrics) {
-                this.body.appendChild(div);
-                let ret = [div.scrollWidth - 1, div.scrollHeight];
-                this.body.removeChild(div);
-                return ret;
+                this.body.appendChild(definitionDiv);
+                const size = [definitionDiv.scrollWidth, definitionDiv.scrollHeight];
+                this.body.removeChild(definitionDiv);
+                return size;
             }
 
-            div.style.background = this.getColorHex(this.colorDefinition);
-            div.style.color = this.getContrastingColor(this.colorDefinition);
-            div.style.left = left + "px";
-            div.style.top = top + "px";
-            div.style.paddingLeft = this.padding + "px";
-            div.style.paddingRight = this.padding + "px";
-            div.id = "definition";
+            // Apply styling and position
+            definitionDiv.style.background = this.getColorHex(this.colorDefinition);
+            definitionDiv.style.color = this.getContrastingColor(this.colorDefinition);
+            definitionDiv.style.left = `${left}px`;
+            definitionDiv.style.top = `${top}px`;
+            definitionDiv.style.paddingLeft = `${this.padding}px`;
+            definitionDiv.style.paddingRight = `${this.padding}px`;
 
-            this.area.appendChild(div);
-            let height = div.scrollHeight + this.padding;
-            div.style.height = height + "px";
+            this.area.appendChild(definitionDiv);
+
+            const height = definitionDiv.scrollHeight + this.padding;
+            definitionDiv.style.height = `${height}px`;
 
             this.definitionHeight = height;
-            this.divDefinition = div;
+            this.divDefinition = definitionDiv;
 
-            return [div.scrollWidth - 1, div.scrollHeight];
+            return [definitionDiv.scrollWidth, definitionDiv.scrollHeight];
         }
 
+        /**
+         * Displays the current score and ranking on the screen.
+         *
+         * @param {Object} scoreData - The data containing score, rank, and percentages.
+         * @param {string} scoreData.addscore
+         * @param {int} scoreData.completedrank
+         * @param {int} scoreData.percentcompleted
+         * @param {int} scoreData.rank
+         * @param {int} scoreData.sumscore
+         * @param {string} scoreData.usercode
+         */
         showScore({addscore, completedrank, percentcompleted, rank, sumscore, usercode}) {
-            let s = sumscore === undefined ? '' : '<b>' + sumscore + '</b>';
-            if (this.labelScore.innerHTML !== s) {
-                this.labelScore.innerHTML = s;
-                let w = this.iconSize - 2 * this.padding;
-                this.autoResizeText(this.labelScore, w, this.iconSize / 2, false, 0, 0, 1);
+            // Update total score display
+            const scoreText = sumscore !== undefined ? `<b>${sumscore}</b>` : '';
+            if (this.labelScore.innerHTML !== scoreText) {
+                this.labelScore.innerHTML = scoreText;
+                this.autoResizeText(this.labelScore, this.iconSize - 2 * this.padding, this.iconSize / 2, false, 0, 0, 1);
             }
 
+            // Update rank display
             if (this.labelScoreRank.innerHTML !== rank) {
-                this.labelScoreRank.innerHTML = rank !== undefined ? rank : '';
+                this.labelScoreRank.innerHTML = rank || '';
                 this.autoResizeText(this.labelScoreRank, this.iconSize, this.iconSize / 3, true, 0, 0, 1);
             }
 
-            if (name !== undefined) {
-                window.document.title = (usercode !== undefined ? usercode : "") + " " + name;
+            // Update document title if applicable
+            if (usercode !== undefined) {
+                document.title = `${usercode} ${name || ''}`;
             }
 
-            s = addscore === undefined ? '' : addscore;
-            if (this.labelAddScore.innerHTML !== s) {
-                this.labelAddScore.innerHTML = s;
+            // Update additional score
+            const addScoreText = addscore !== undefined ? addscore : '';
+            if (this.labelAddScore.innerHTML !== addScoreText) {
+                this.labelAddScore.innerHTML = addScoreText;
                 this.autoResizeText(this.labelAddScore, this.iconSize - 2 * this.padding, this.iconSize / 3, false, 0, 0, 1);
             }
 
+            // Update completed rank display
             if (this.labelScoreRankB.innerHTML !== completedrank) {
-                this.labelScoreRankB.innerHTML = completedrank !== undefined ? completedrank : '';
+                this.labelScoreRankB.innerHTML = completedrank || '';
                 this.autoResizeText(this.labelScoreRankB, 0.9 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
             }
 
-            s = percentcompleted !== undefined ? Math.round(100 * percentcompleted) + '%' : '';
-            if (this.labelScoreB.innerHTML !== s) {
-                this.labelScoreB.innerHTML = s;
+            // Update percentage completed
+            const percentageText = percentcompleted !== undefined ? `${Math.round(100 * percentcompleted)}%` : '';
+            if (this.labelScoreB.innerHTML !== percentageText) {
+                this.labelScoreB.innerHTML = percentageText;
                 this.autoResizeText(this.labelScoreB, 0.8 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
             }
         }
 
+        /**
+         * Sends the selected answer to the server using Moodle's AJAX API.
+         */
         callSetAnswer() {
-            // Clear any existing timeout to prevent duplicate calls
+            // Clear existing timeout
             if (this.timerTimeout !== undefined) {
                 clearTimeout(this.timerTimeout);
             }
+
             this.timerTimeout = undefined;
 
-            let instance = this;
-            require(['core/ajax'], function(Ajax) {
-                // Define the parameters to be passed to the service
-                let params = {
-                    mmogameid: instance.mmogameid,
-                    kinduser: instance.kinduser,
-                    user: instance.user,
-                    attempt: instance.attempt,
-                    answer: instance.answer !== undefined ? instance.answer : null,
-                    answerid: instance.answerid !== undefined ? instance.answerid : null,
+            require(['core/ajax'], (Ajax) => {
+                const params = {
+                    mmogameid: this.mmogameid,
+                    kinduser: this.kinduser,
+                    user: this.user,
+                    attempt: this.attempt,
+                    answer: this.answer || null,
+                    answerid: this.answerid || null,
                     subcommand: '',
                 };
-                // Call the service through the Moodle AJAX API
-                let ret = Ajax.call([{
-                    methodname: 'mmogametype_quiz_set_answer', // Service method name
-                    args: params // Parameters to pass
-                }]);
 
-                // Handle the server response
-                ret[0].done(function(response) {
-                    instance.processSetAnswer(JSON.parse(response)); // Trigger further action
-                }).fail(function(error) {
-                    instance.showError(error);
-                    // Return the error if the call fails
-                    return error;
+                Ajax.call([{
+                    methodname: 'mmogametype_quiz_set_answer', // API endpoint
+                    args: params,
+                }])[0].done((response) => {
+                    this.processSetAnswer(JSON.parse(response)); // Process the server's response
+                }).fail((error) => {
+                    this.showError(error); // Handle errors
                 });
             });
         }

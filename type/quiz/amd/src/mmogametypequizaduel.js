@@ -129,7 +129,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             instance.sendGetAttempt(false, "tool3");
         });
         this.buttonWizard.style.visibility = 'hidden';
-        this.buttonWizard.title = this.getStringT('js_aduel_wizarg');
+        this.buttonWizard.title = this.getStringT('js_wizarg');
 
         if (this.hasHelp()) {
             if (this.hasBasBottom === false) {
