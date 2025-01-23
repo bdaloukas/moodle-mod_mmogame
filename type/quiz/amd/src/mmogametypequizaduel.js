@@ -18,14 +18,13 @@ define(['mmogametype_quiz/mmogametypequiz'],
         return class MmoGameTypeQuizAduel extends MmoGameTypeQuiz {
     constructor() {
         super();
-        this.cIcons = 8;
-        this.hasBasBottom = false;
-        if (window.innerWidth < window.innerHeight) {
-            this.cIcons -= 3;
-            this.hasBasBottom = true;
-        } else {
-             this.cIcons += (this.hasHelp() ? 1 : 0);
-        }
+        const isVertical = window.innerWidth < window.innerHeight;
+        const hasHelp = this.hasHelp();
+
+        // Initialize core properties
+        this.cIcons = isVertical ? 5 : 8 + (hasHelp ? 1 : 0);
+        this.hasBasBottom = isVertical;
+
         this.isWaitOponent = false;
         this.autosubmit = true;
         this.type = 'aduel';
@@ -47,9 +46,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.areaHeight -= this.iconSize + 2 * this.padding;
         }
 
-        this.buttonAvatarLeft = this.padding + i * (this.iconSize + this.padding);
         this.buttonAvatarHeight = this.iconSize + this.nickNameHeight;
-        this.buttonAvatarTop = this.nickNameHeight + this.iconSize - this.buttonAvatarHeight + this.padding;
         this.createButtonsAvatar(1, Math.round(this.padding + (i++) * (this.iconSize + this.padding)),
             2 * this.iconSize + this.padding, this.nickNameHeight);
         this.buttonsAvatar[1].style.top = (this.padding + this.nickNameHeight) + "px";
@@ -142,65 +139,67 @@ define(['mmogametype_quiz/mmogametypequiz'],
              });
         }
 
-        this.createDivColor(this.body, 0, window.innerHeight - copyrightHeight - 1, window.innerWidth - 1, copyrightHeight,
+        this.createDivColor(this.body, 'mmogame-aduel-copyright',
+            0, window.innerHeight - copyrightHeight - 1, window.innerWidth - 1, copyrightHeight,
             this.getColorGray(this.colorScore2));
         this.vertical = this.areaHeight > this.areaWidth;
     }
-            /**
-             * Creates a percentage-based score display with labels for score, rank, and additional information.
-             *
-             * @param {number} left - The horizontal position (in pixels) of the score container.
-             * @param {number} top - The vertical position (in pixels) of the score container.
-             * @param {number} num - Identifier for score type (1 for primary score, 2 for secondary/opponent score).
-             */
-            createDivScore(left, top, num) {
-                let button = this.createDiv(this.area, 'mmogame-score', left, top, this.iconSize, this.iconSize);
 
-                button.style.borderRadius = this.iconSize + "px";
-                button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
-                button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
-                button.title = this.getStringM('js_grade');
-                button.alt = this.getStringM('js_grade');
-                if (num === 1) {
-                    button.style.background = this.getColorHex(this.colorScore);
-                    button.style.color = this.getContrastingColor(this.colorScore);
-                } else {
-                    this.buttonScore2 = button;
-                    button.style.background = this.getColorHex(this.colorScore2);
-                    button.style.color = this.getContrastingColor(this.colorScore2);
-                }
+    /**
+     * Creates a percentage-based score display with labels for score, rank, and additional information.
+     *
+     * @param {number} left - The horizontal position (in pixels) of the score container.
+     * @param {number} top - The vertical position (in pixels) of the score container.
+     * @param {number} num - Identifier for score type (1 for primary score, 2 for secondary/opponent score).
+     */
+    createDivScore(left, top, num) {
+        let button = this.createDiv(this.area, 'mmogame-score', left, top, this.iconSize, this.iconSize);
 
-                this.body.appendChild(button);
+        button.style.borderRadius = this.iconSize + "px";
+        button.style.border = "0px solid " + this.getColorHex(0xFFFFFF);
+        button.style.boxShadow = "inset 0 0 0.125em rgba(255, 255, 255, 0.75)";
+        button.title = this.getStringM('js_grade');
+        button.alt = this.getStringM('js_grade');
+        if (num === 1) {
+            button.style.background = this.getColorHex(this.colorScore);
+            button.style.color = this.getContrastingColor(this.colorScore);
+        } else {
+            this.buttonScore2 = button;
+            button.style.background = this.getColorHex(this.colorScore2);
+            button.style.color = this.getContrastingColor(this.colorScore2);
+        }
 
-                button.innerHTML = '100 %';
-                this.autoResizeText(button, this.iconSize, this.iconSize, false, 0, 0, 1);
-                button.innerHTML = '';
+        this.body.appendChild(button);
 
-                let div = this.createDiv(this.body, "mmogame-score", left,
-                    top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
-                div.style.lineHeight = (this.iconSize / 2) + "px";
-                div.style.textAlign = "center";
-                div.style.color = this.getContrastingColor(this.colorScore);
-                div.title = this.getStringM('js_grade');
-                if (num === 1) {
-                    this.labelScore = div;
-                } else {
-                    this.labelScore2 = div;
-                }
+        button.innerHTML = '100 %';
+        this.autoResizeText(button, this.iconSize, this.iconSize, false, 0, 0, 1);
+        button.innerHTML = '';
 
-                let h = this.iconSize / 3;
-                div = this.createDiv(this.body, 'mmogame-score', left, top, this.iconSize, h);
-                div.style.textAlign = "center";
-                div.style.color = this.getContrastingColor(this.colorScore);
-                button.disabled = true;
-                if (num === 1) {
-                    this.labelScoreRank = div;
-                } else {
-                    this.labelScoreRank2 = div;
-                }
+        let div = this.createDiv(this.body, "mmogame-score", left,
+            top + this.iconSize / 4, this.iconSize, this.iconSize / 2);
+        div.style.lineHeight = (this.iconSize / 2) + "px";
+        div.style.textAlign = "center";
+        div.style.color = this.getContrastingColor(this.colorScore);
+        div.title = this.getStringM('js_grade');
+        if (num === 1) {
+            this.labelScore = div;
+        } else {
+            this.labelScore2 = div;
+        }
 
-                this.createAddScore('mmogame-addscore', left, top + this.iconSize - h, this.iconSize, h, num);
-            }
+        let h = this.iconSize / 3;
+        div = this.createDiv(this.body, 'mmogame-score', left, top, this.iconSize, h);
+        div.style.textAlign = "center";
+        div.style.color = this.getContrastingColor(this.colorScore);
+        button.disabled = true;
+        if (num === 1) {
+            this.labelScoreRank = div;
+        } else {
+            this.labelScoreRank2 = div;
+        }
+
+        this.createAddScore('mmogame-addscore', left, top + this.iconSize - h, this.iconSize, h, num);
+    }
 
     updateButtonTool(btn, tool) {
         btn.style.visibility = tool !== undefined && tool !== 0 ? "hidden" : "visible";
@@ -301,16 +300,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.updateLabelTimer();
         this.sendFastJSON();
     }
-
-/*
-    onServerGetAttemptRetry() {
-        let instance = this;
-        this.timeout = setTimeout(function() {
-            instance.sendGetAttempt(true);
-        }, this.timeoutMSEC);
-    }
-*/
-
 
     onServerGetAttemptHideButtons() {
         this.button5050.style.visibility = 'hidden';
@@ -491,7 +480,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         if (iscorrect2 !== undefined) {
             let t = parseInt(this.aItemAnswer[i].style.top);
-            let div = this.createDiv(this.area, this.aItemCorrectX[i] + this.radioSize, t, this.radioSize, this.radioSize);
+            let div = this.createDiv(this.area, 'mmogame-aduel-opponent-correct',
+                this.aItemCorrectX[i] + this.radioSize, t, this.radioSize, this.radioSize);
             div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect2, this.colorScore2, this.colorScore2);
             div.title = iscorrect2 ? this.getStringM('js_correct_answer') : this.getStringM('js_wrong_answer');
         }

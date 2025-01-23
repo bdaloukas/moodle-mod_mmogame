@@ -105,53 +105,59 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {string} url - The game URL.
          */
         gateOpen(mmogameid, pin, kinduser, user, url) {
-            this.url = url;
-            this.minFontSize *= 2;
-            this.maxFontSize *= 2;
+            try {
+                // Initialize class variables
+                this.url = url;
+                this.mmogameid = mmogameid;
+                this.pin = pin;
+                this.kinduser = kinduser;
+                this.user = user;
 
-            // Saves parameters to class variables.
-            this.mmogameid = mmogameid;
-            this.pin = pin;
-            this.kinduser = kinduser;
-            this.user = user;
-            this.gateComputeSizes();
+                // Adjust font sizes
+                this.minFontSize *= 2;
+                this.maxFontSize *= 2;
 
-            this.areaTop = this.padding;
-            this.areaWidth = Math.round(window.innerWidth - 2 * this.padding);
-            this.areaHeight = Math.round(window.innerHeight - this.areaTop) - this.padding;
+                // Compute sizes and layout
+                this.gateComputeSizes();
+                this.areaTop = this.padding;
+                this.areaWidth = Math.round(window.innerWidth - 2 * this.padding);
+                this.areaHeight = Math.round(window.innerHeight - this.areaTop - this.padding);
 
-            let instance = this;
-            this.getOptions().then(function(options) {
-                options.kindsound = options.kindsound || 0;
-                options.nickname = options.nickname || '';
-                options.avatarid = options.avatarid || 0;
-                options.paletteid = options.paletteid || 0;
-                instance.kindSound = [1, 2].includes(options.kindSound) ? options.kindSound : 0;
+                // Load options and initialize UI
+                this.getOptions()
+                    .then((options) => {
+                        // Set default options if undefined
+                        options.kindsound = options.kindsound || 0;
+                        options.nickname = options.nickname || '';
+                        options.avatarid = options.avatarid || 0;
+                        options.paletteid = options.paletteid || 0;
 
-                const isReady =
-                    options.nickname &&
-                    options.avatarid !== 0 &&
-                    options.paletteid !== 0;
+                        // Assign kindSound within valid range
+                        this.kindSound = [1, 2].includes(options.kindSound) ? options.kindSound : 0;
 
-                if (kinduser === 'moodle' && isReady) {
-                    instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
-                    return;
-                }
+                        const isReady = options.nickname && options.avatarid && options.paletteid;
 
-                if (kinduser === 'guid') {
-                    options.userGUID = options.userGUID || '';
+                        if (kinduser === 'moodle' && isReady) {
+                            this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
+                        } else if (kinduser === 'guid') {
+                            options.userGUID = options.userGUID || '';
 
-                    if (options.userGUID.length >= 10 && isReady) {
-                        instance.user = options.userGUID;
-                        instance.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
-                        return;
-                    }
-                }
-                instance.gateCreateScreen();
-            })
-            .catch((error) => {
+                            if (options.userGUID.length >= 10 && isReady) {
+                                this.user = options.userGUID;
+                                this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
+                            } else {
+                                this.gateCreateScreen();
+                            }
+                        } else {
+                            this.gateCreateScreen();
+                        }
+                    })
+                    .catch((error) => {
+                        this.showError('gateOpen unexpected', error);
+                    });
+            } catch (error) {
                 this.showError('gateOpen', error);
-            });
+            }
         }
 
         gatePlayGame(save, nickname, paletteid, avatarid) {
