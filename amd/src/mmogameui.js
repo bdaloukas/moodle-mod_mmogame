@@ -39,7 +39,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
         // Other
         definition;
-        gate = {};
+        nickname;
+        user;
+        paletteid;
+        avatarid;
+
+        // Form fields
+        edtCode;
+        edtNickname;
 
         constructor() {
             super();
@@ -69,7 +76,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
         createButtonSound(left, top, size) {
             this.buttonSound = this.createDOMElement('img', {
-                parent,
+                parent: this.body,
                 classnames: 'mmogame-button-sound',
                 styles: {
                     position: 'absolute',
@@ -106,15 +113,15 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {string} url - The game URL.
          */
         gateOpen(mmogameid, pin, kinduser, user, url) {
+            const instance = this;
+
             try {
                 // Initialize class variables
-                this.gate = {
-                    url: url,
-                    mmogameid: mmogameid,
-                    pin: pin,
-                    kinduser: kinduser,
-                    user: user,
-                };
+                this.url = url;
+                this.mmogameid = mmogameid;
+                this.pin = pin;
+                this.kinduser = kinduser;
+                instance.user = user;
 
                 // Adjust font sizes
                 this.minFontSize *= 2;
@@ -148,7 +155,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                             options.userGUID = options.userGUID || '';
 
                             if (options.userGUID.length >= 10 && isReady) {
-                                this.user = options.userGUID;
+                                instance.user = options.userGUID;
                                 this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
                             } else {
                                 this.gateCreateScreen();
@@ -168,17 +175,17 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gatePlayGame(save, nickname, paletteid, avatarid) {
-            if (this.gate.kinduser === 'guid') {
-                if (this.gate.user === '') {
-                    this.uuid4();
-                }
+            let instance = this;
+
+            if (instance.kinduser === 'guid' && instance.user === '') {
+                this.uuid4();
             }
 
             if (!save) {
-                this.gate.nickname = nickname;
-                this.gate.paletteid = paletteid;
-                this.gate.avatarid = avatarid;
-                this.callGetAttempt({nickname: nickname, colorpaletteid: paletteid, avatarid: avatarid});
+                instance.nickname = nickname;
+                instance.paletteid = paletteid;
+                instance.avatarid = avatarid;
+                instance.callGetAttempt({nickname: nickname, colorpaletteid: paletteid, avatarid: avatarid});
                 return;
             }
 
@@ -186,9 +193,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             this.setOptions(options)
                 .then(() => {
-                    this.gate.nickname = nickname;
-                    this.gate.paletteid = paletteid;
-                    this.gate.avatarid = avatarid;
+                    this.nickname = nickname;
+                    this.paletteid = paletteid;
+                    this.avatarid = avatarid;
                     this.callGetAttempt();
                     return true;
                 })
@@ -209,217 +216,225 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateCreateScreenVertical() {
-            let maxHeight = this.areaRect.height - 5 * this.padding - this.iconSize;
-            let maxWidth = this.areaRect.width;
+            const instance = this;
+
+            let maxHeight = instance.areaRect.height - 5 * instance.padding - instance.iconSize;
+            let maxWidth = instance.areaRect.width;
             let size;
 
             const labels = [
-                `${this.getStringM('js_name')}: `,
-                this.getStringM('js_code'),
-                this.getStringM('js_palette')
+                `${instance.getStringM('js_name')}: `,
+                instance.getStringM('js_code'),
+                instance.getStringM('js_palette')
             ];
 
-            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, (fontSize) => {
-                size = this.gateComputeLabelSize(fontSize, labels);
+            instance.fontSize = instance.findbest(instance.minFontSize, instance.maxFontSize, (fontSize) => {
+                size = instance.gateComputeLabelSize(fontSize, labels);
 
                 if (size[0] >= maxWidth) {
                     return 1;
                 }
-                const heightCode = this.gate.kinduser !== 'guid' && this.gate.kinduser !== 'moodle' ?
-                    size[1] + this.padding : 0;
+                const heightCode = instance.kinduser !== 'guid' && instance.kinduser !== 'moodle' ?
+                    size[1] + instance.padding : 0;
 
                 const heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
-                let n = Math.floor(heightColors / this.iconSize);
+                let n = Math.floor(heightColors / instance.iconSize);
                 if (n === 0) {
                     return 1;
                 }
                 const heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
-                const computedHeight = heightCode + 3 * size[1] + 8 * this.padding + heightColors + heightAvatars;
+                const computedHeight = heightCode + 3 * size[1] + 8 * instance.padding + heightColors + heightAvatars;
 
                 return computedHeight < maxHeight ? -1 : 1;
             });
 
-            this.gateCreateScreenVerticalDo(maxWidth, maxHeight, size);
+            instance.gateCreateScreenVerticalDo(maxWidth, maxHeight, size);
         }
 
         gateCreateScreenVerticalDo(maxWidth, maxHeight, size) {
-            let gridWidthColors = maxWidth - this.padding;
-            let gridWidthAvatars = maxWidth - this.padding;
-            let gridHeightColors = (maxHeight - 4 * this.fontSize) * 2 / 5;
-            let newHeight = Math.floor(gridHeightColors / this.iconSize) * this.iconSize;
-            let newWidth = Math.floor(gridWidthColors / this.iconSize) * this.iconSize;
+            const instance = this;
+
+            let gridWidthColors = maxWidth - instance.padding;
+            let gridWidthAvatars = maxWidth - instance.padding;
+            let gridHeightColors = (maxHeight - 4 * instance.fontSize) * 2 / 5;
+            let newHeight = Math.floor(gridHeightColors / instance.iconSize) * instance.iconSize;
+            let newWidth = Math.floor(gridWidthColors / instance.iconSize) * instance.iconSize;
             let rest = gridHeightColors - newHeight;
             gridHeightColors = newHeight;
-            let gridHeightAvatars = (maxHeight - 4 * this.fontSize + rest) * 3 / 5;
+            let gridHeightAvatars = (maxHeight - 4 * instance.fontSize + rest) * 3 / 5;
 
             // Creates the "Code" field.
             let bottom;
-            if (this.gate.kinduser !== 'guid' && this.gate.kinduser !== 'moodle') {
+            if (instance.kinduser !== 'guid' && instance.kinduser !== 'moodle') {
                 // A bottom = this.gateCreateCode(0, 0, maxWidth, this.fontSize, size[0]);
-                bottom = this.gateCreateLabelEditVertical(0, 0, maxWidth, this.fontSize,
-                    size[0], this.getStringM('js_code') + ": ",
+                bottom = instance.gateCreateLabelEditVertical(0, 0, maxWidth, instance.fontSize,
+                    size[0], instance.getStringM('js_code') + ": ",
                     'mmogame-gate-code-label', 'mmogame-gate-code') + 2 * this.padding;
-                this.edtCode = this.edt;
-                this.edtCode.addEventListener("keyup", this.debounce(() => this.gateUpdateSubmit(), 300));
+                instance.edtCode = instance.edt;
+                instance.edtCode.addEventListener("keyup", instance.debounce(() => instance.gateUpdateSubmit(), 300));
             } else {
                 bottom = 0;
             }
 
-            bottom = this.gateCreateLabelEditVertical(0, bottom,
-                newWidth - 2 * this.padding, this.fontSize, size[0],
-                this.getStringM('js_name') + ": ",
-                'mmogame-gate-name-label', 'mmogame-gate-name') + 2 * this.padding;
-            this.edtNickname = this.edt;
-            this.edtNickname.addEventListener("keyup", this.debounce(() => this.gateUpdateSubmit(), 300));
+            bottom = instance.gateCreateLabelEditVertical(0, bottom,
+                newWidth - 2 * instance.padding, instance.fontSize, size[0],
+                instance.getStringM('js_name') + ": ",
+                'mmogame-gate-name-label', 'mmogame-gate-name') + 2 * instance.padding;
+            instance.edtNickname = instance.edt;
+            instance.edtNickname.addEventListener("keyup", instance.debounce(() => instance.gateUpdateSubmit(), 300));
 
-            this.gateCreateScreenPalette(bottom, gridWidthColors, gridHeightColors,
+            instance.gateCreateScreenPalette(bottom, gridWidthColors, gridHeightColors,
                 gridWidthAvatars, gridHeightAvatars);
 
-            bottom += this.fontSize + this.padding;
+            bottom += this.fontSize + instance.padding;
 
             // Vertical
-            this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
-                0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars,
+            instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
+                0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars,
                 gridHeightAvatars);
 
-            let bottom2 = bottom + gridHeightColors + this.fontSize + this.padding + gridHeightAvatars;
+            const bottom2 = bottom + gridHeightColors + instance.fontSize + instance.padding + gridHeightAvatars;
 
-            this.gateCreateButtonSubmit(maxWidth, bottom2);
+            instance.gateCreateButtonSubmit(maxWidth, bottom2);
         }
 
         gateCreateScreenHorizontal() {
-            let maxHeight = this.areaHeight - 7 * this.padding - this.iconSize;
-            let maxWidth = this.areaWidth;
+            const instance = this;
+
+            let maxHeight = instance.areaHeight - 7 * instance.padding - instance.iconSize;
+            let maxWidth = instance.areaWidth;
             let size;
 
-            const sName = this.getStringM('js_name') + ": ";
-            let labels = [this.getStringM('js_code'), sName, this.getStringM('js_palette')];
+            const sName = instance.getStringM('js_name') + ": ";
+            let labels = [instance.getStringM('js_code'), sName, instance.getStringM('js_palette')];
 
-            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, (fontSize) => {
-                size = this.gateComputeLabelSize(fontSize, labels);
+            instance.fontSize = instance.findbest(instance.minFontSize, instance.maxFontSize, (fontSize) => {
+                size = instance.gateComputeLabelSize(fontSize, labels);
 
                 if (size[0] >= maxWidth) {
                     return 1;
                 }
-                let heightCode = this.kinduser !== 'guid' && this.kinduser !== 'moodle' ? size[1] + this.padding : 0;
+                let heightCode = instance.kinduser !== 'guid' && instance.kinduser !== 'moodle' ? size[1] + instance.padding : 0;
 
                 let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
-                let n = Math.floor(heightColors / this.iconSize);
+                let n = Math.floor(heightColors / instance.iconSize);
                 if (n === 0) {
                     return 1;
                 }
                 let heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
-                let computedHeight = heightCode + 2 * size[1] + 7 * this.padding + heightColors + heightAvatars;
+                let computedHeight = heightCode + 2 * size[1] + 7 * instance.padding + heightColors + heightAvatars;
 
                 return computedHeight < maxHeight ? -1 : 1;
             });
 
-            this.gateCreateScreenHorizontalDo(maxWidth, maxHeight, size, sName);
+            instance.gateCreateScreenHorizontalDo(maxWidth, maxHeight, size, sName);
         }
 
         gateCreateScreenHorizontalDo(maxWidth, maxHeight, size, sName) {
-            const gridWidthColors = maxWidth - this.padding;
-            const gridWidthAvatars = maxWidth - this.padding;
-            let gridHeightColors = (maxHeight - 4 * this.fontSize) * 2 / 5;
-            const newHeight = Math.floor(gridHeightColors / this.iconSize) * this.iconSize;
-            const newWidth = Math.floor(gridWidthColors / this.iconSize) * this.iconSize;
+            const instance = this;
+
+            const gridWidthColors = maxWidth - instance.padding;
+            const gridWidthAvatars = maxWidth - instance.padding;
+            let gridHeightColors = (maxHeight - 4 * instance.fontSize) * 2 / 5;
+            const newHeight = Math.floor(gridHeightColors / instance.iconSize) * instance.iconSize;
+            const newWidth = Math.floor(gridWidthColors / instance.iconSize) * instance.iconSize;
             let rest = gridHeightColors - newHeight;
             gridHeightColors = newHeight;
-            const gridHeightAvatars = Math.floor((maxHeight - 4 * this.fontSize) * 3 / 5 + rest);
+            const gridHeightAvatars = Math.floor((maxHeight - 4 * instance.fontSize) * 3 / 5 + rest);
 
             // Creates the "Code" field.
             let bottom;
-            if (this.gate.kinduser !== 'guid' && this.gate.kinduser !== 'moodle') {
-                bottom = this.gateCreateLabelEditVertical(0, 0, maxWidth, this.fontSize, size[0],
-                    this.getStringM('js_code')) + 2 * this.padding;
-                this.edtCode = this.edt;
-                this.edtCode.addEventListener("keyup", this.debounce(() => this.gateUpdateSubmit(), 300));
+            if (instance.kinduser !== 'guid' && instance.kinduser !== 'moodle') {
+                bottom = instance.gateCreateLabelEditVertical(0, 0, maxWidth, instance.fontSize, size[0],
+                    instance.getStringM('js_code')) + 2 * instance.padding;
+                instance.edtCode = instance.edt;
+                instance.edtCode.addEventListener("keyup", instance.debounce(() => instance.gateUpdateSubmit(), 300));
             } else {
                 bottom = 0;
             }
 
             // Creates the "nickname" field.
-            let sizeLabel = this.gateComputeLabelSize(this.fontSize, [sName]);
+            let sizeLabel = instance.gateComputeLabelSize(instance.fontSize, [sName]);
             bottom = this.gateCreateLabelEditHorizontal(0, bottom,
-                newWidth - 2 * this.padding, this.fontSize,
-                sizeLabel[0], this.getStringM('js_name') + ": ",
+                newWidth - 2 * instance.padding, instance.fontSize,
+                sizeLabel[0], instance.getStringM('js_name') + ": ",
                 'mmogame-gate-name-label', 'mmogame-gate-name');
 
-            this.edtNickname = this.edt;
-            this.edtNickname.addEventListener("keyup", this.debounce(() => this.gateUpdateSubmit(), 300));
+            instance.edtNickname = this.edt;
+            instance.edtNickname.addEventListener("keyup", instance.debounce(() => instance.gateUpdateSubmit(), 300));
 
             let label1 = document.createElement("label");
             label1.style.position = "absolute";
-            label1.style.color = this.getContrastingColor(this.colorBackground);
-            label1.innerHTML = this.getStringM('js_palette');
+            label1.style.color = instance.getContrastingColor(instance.colorBackground);
+            label1.innerHTML = instance.getStringM('js_palette');
             label1.style.font = "FontAwesome";
-            label1.style.fontSize = this.fontSize + "px";
+            label1.style.fontSize = instance.fontSize + "px";
             label1.style.width = "0px";
             label1.style.whiteSpace = "nowrap";
-            this.area.appendChild(label1);
+            instance.area.appendChild(label1);
 
             // Button refresh color palettes
-            let btn = this.createImageButton(this.area, 'mmogame-button-gate-refresh',
-                label1.scrollWidth + this.padding, bottom, this.iconSize, this.fontSize,
+            let btn = instance.createImageButton(instance.area, 'mmogame-button-gate-refresh',
+                label1.scrollWidth + instance.padding, bottom, instance.iconSize, instance.fontSize,
                 'assets/refresh.svg', false, 'refresh');
-            this.addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors,
+            instance.addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors,
                 gridWidthAvatars, gridHeightAvatars, true, false);
 
             label1.style.left = 0;
-            label1.style.color = this.getContrastingColor(this.colorBackground);
+            label1.style.color = instance.getContrastingColor(instance.colorBackground);
             label1.style.top = bottom + "px";
-            bottom += this.fontSize + this.padding;
+            bottom += instance.fontSize + instance.padding;
 
             let label = document.createElement("label");
             label.style.position = "absolute";
-            label.innerHTML = this.getStringM('js_avatars');
+            label.innerHTML = instance.getStringM('js_avatars');
             label.style.font = "FontAwesome";
-            label.style.fontSize = this.fontSize + "px";
+            label.style.fontSize = instance.fontSize + "px";
             label.style.width = "0 px";
             label.style.whiteSpace = "nowrap";
-            this.area.appendChild(label);
+            instance.area.appendChild(label);
 
             // Button refresh avatars
-            btn = this.createImageButton(this.area, 'mmogame-button-gate-refresh-avatars',
-                label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize,
-                this.fontSize, 'assets/refresh.svg', false, 'refresh');
+            btn = instance.createImageButton(instance.area, 'mmogame-button-gate-refresh-avatars',
+                label.scrollWidth + instance.padding, bottom + gridHeightColors, instance.iconSize,
+                instance.fontSize, 'assets/refresh.svg', false, 'refresh');
             btn.addEventListener("click", () => {
-                let elements = this.area.getElementsByClassName("mmogame_avatar");
+                let elements = instance.area.getElementsByClassName("mmogame_avatar");
 
                 while (elements[0]) {
                     elements[0].parentNode.removeChild(elements[0]);
                 }
 
-                this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors, 0,
-                    bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars, gridHeightAvatars,
+                instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors, 0,
+                    bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
                     false, true);
             });
 
             // Avatar
             label.style.left = "0 px";
-            label.style.color = this.getContrastingColor(this.colorBackground);
+            label.style.color = instance.getContrastingColor(instance.colorBackground);
             label.style.top = (bottom + gridHeightColors) + "px";
 
             // Horizontal
-            this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
-                0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars,
+            instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
+                0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars,
                 gridHeightAvatars);
 
-            let bottom2 = bottom + gridHeightColors + this.fontSize + this.padding + gridHeightAvatars;
-            this.btnSubmit = this.createImageButton(this.area, 'mmogame-button-gate-submit',
-                (maxWidth - this.iconSize) / 2, bottom2, 0, this.iconSize,
+            let bottom2 = bottom + gridHeightColors + instance.fontSize + instance.padding + gridHeightAvatars;
+            instance.btnSubmit = instance.createImageButton(instance.area, 'mmogame-button-gate-submit',
+                (maxWidth - instance.iconSize) / 2, bottom2, 0, instance.iconSize,
                 'assets/submit.svg', false, 'submit');
-            this.btnSubmit.style.visibility = 'hidden';
-            this.btnSubmit.addEventListener("click", () => {
-                if (this.edtCode !== undefined) {
-                    this.user = this.edtCode.value;
+            instance.btnSubmit.style.visibility = 'hidden';
+            instance.btnSubmit.addEventListener("click", () => {
+                if (instance.edtCode !== undefined) {
+                    instance.user = instance.edtCode.value;
                 }
-                this.gatePlayGame(true, this.gate.edtNickname.value, this.gate.paletteid, this.gate.avatarid);
-                }
-            );
+                instance.gatePlayGame(true, this.edtNickname.value, this.paletteid, this.avatarid);
+            });
         }
 
         gateComputeLabelSize(fontSize, aLabel) {
+            const instance = this;
             let maxWidth = 0;
             let maxHeight = 0;
 
@@ -432,7 +447,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 label.style.fontSize = fontSize + "px";
                 label.style.width = "0px";
                 label.style.height = "0px";
-                this.area.appendChild(label);
+                instance.area.appendChild(label);
 
                 if (label.scrollWidth > maxWidth) {
                     maxWidth = label.scrollWidth;
@@ -441,69 +456,73 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 if (label.scrollHeight > maxHeight) {
                     maxHeight = label.scrollHeight;
                 }
-                this.area.removeChild(label);
+                instance.area.removeChild(label);
             }
 
             return [maxWidth, maxHeight];
         }
 
         gateCreateLabelEditVertical(left, top, width, fontSize, labelWidth, title, classnamesLabel, classnamesEdit) {
-            const label = this.createLabel(this.area, classnamesLabel, left, top, labelWidth, fontSize, title);
-            label.style.color = this.getContrastingColor(this.colorBackground);
+            const instance = this;
+
+            const label = instance.createLabel(instance.area, classnamesLabel, left, top, labelWidth, fontSize, title);
+            label.style.color = this.getContrastingColor(instance.colorBackground);
 
             top += label.scrollHeight;
 
-            this.edt = this.gateCreateInput(classnamesEdit, left, top, width, fontSize);
+            instance.edt = instance.gateCreateInput(classnamesEdit, left, top, width, fontSize);
 
-            return top + fontSize + this.padding;
+            return top + fontSize + instance.padding;
         }
 
         gateShowAvatars(left, top, width, height, countX, avatarids, avatars) {
+            const instance = this;
             if (!avatars || avatars.length === 0) {
                 return; // Exit early if no avatars exist
             }
 
             const fragment = document.createDocumentFragment();
 
-            this.avatar = undefined;
+            instance.avatar = undefined;
             const count = avatars.length;
             let leftOriginal = left;
             let w = Math.round(this.padding / 2) + "px";
             for (let i = 0; i < count; i++) {
                 let avatarImagePath = 'assets/avatars/' + avatars[i];
-                let btn = this.createCenterImageButton(
+                let btn = instance.createCenterImageButton(
                     fragment,
                     left, top,
-                    this.iconSize - this.padding, this.iconSize - this.padding,
+                    instance.iconSize - instance.padding, instance.iconSize - instance.padding,
                     'mmogame-avatar',
                     avatarImagePath
                 );
                 btn.classList.add("mmogame_avatar");
                 let id = avatarids[i];
                 btn.addEventListener("click", () => {
-                    this.gateUpdateAvatar(btn, id, w);
+                    instance.gateUpdateAvatar(btn, id, w);
                 });
 
                 // Move left position after placing the button
-                left += this.iconSize;
+                left += instance.iconSize;
 
                 // Reset left and move to the next row after filling countX buttons
                 if ((i + 1) % countX === 0) {
-                    top += this.iconSize;
+                    top += instance.iconSize;
                     left = leftOriginal;
                 }
             }
-            this.area.appendChild(fragment);
+            instance.area.appendChild(fragment);
         }
 
         gateSendGetColorsAvatars(leftColors, topColors, gridWidthColors, gridHeightColors, leftAvatars, topAvatars,
                                  gridWidthAvatars, gridHeightAvatars, updateColors = true, updateAvatars = true) {
+            const instance = this;
 
-            let countXcolors = Math.floor(gridWidthColors / this.iconSize);
-            let countYcolors = Math.floor(gridHeightColors / this.iconSize);
+            let countXcolors = Math.floor(gridWidthColors / instance.iconSize);
+            let countYcolors = Math.floor(gridHeightColors / instance.iconSize);
 
-            let countXavatars = Math.floor(gridWidthAvatars / this.iconSize);
-            let countYavatars = Math.floor((gridHeightAvatars + 2 * this.padding) / this.iconSize);
+            let countXavatars = Math.floor(gridWidthAvatars / instance.iconSize);
+            let countYavatars = Math.floor((gridHeightAvatars + 2 * instance.padding) / instance.iconSize);
 
             if (!updateColors) {
                 countXcolors = countYcolors = 0;
@@ -515,9 +534,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
-                    mmogameid: this.mmogameid,
-                    kinduser: this.gate.kinduser,
-                    user: this.gate.user,
+                    mmogameid: instance.mmogameid,
+                    kinduser: instance.kinduser,
+                    user: instance.user,
                     avatars: countXavatars * countYavatars,
                     colorpalettes: countXcolors * countYcolors,
                 };
@@ -529,13 +548,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }]);
 
                 // Handling the response
-                getAssets[0].done(({ avatarids, avatars, colorpaletteids, colorpalettes }) => {
+                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes}) => {
                     if (updateColors) {
-                        this.gateShowColorPalettes(leftColors, topColors, gridWidthColors,
+                        instance.gateShowColorPalettes(leftColors, topColors, gridWidthColors,
                             gridHeightColors, countXcolors, countYcolors, colorpaletteids, colorpalettes);
                     }
                     if (updateAvatars) {
-                        this.gateShowAvatars(leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars,
+                        instance.gateShowAvatars(leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars,
                             avatarids, avatars);
                     }
                 }).fail((error) => {
@@ -545,10 +564,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateShowColorPalettes(left, top, width, height, countX, countY, colorpaletteids, colorpalettes) {
+            const instance = this;
+
             let i = 0; // Counter for color palettes
             const count = colorpalettes.length;
             this.canvasColor = undefined;
-            const canvasSize = this.iconSize - this.padding * 3 / 2;
+            const canvasSize = instance.iconSize - instance.padding * 3 / 2;
             const parsedPalettes = colorpalettes.map(palette =>
                 palette.split(",").map(value => parseInt(value, 10) || 0)
             );
@@ -564,8 +585,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     // Create a new canvas element
                     let canvas = document.createElement('canvas');
                     canvas.style.position = "absolute";
-                    canvas.style.left = `${left + ix * this.iconSize}px`;
-                    canvas.style.top = `${top + iy * this.iconSize}px`;
+                    canvas.style.left = `${left + ix * instance.iconSize}px`;
+                    canvas.style.top = `${top + iy * instance.iconSize}px`;
                     canvas.width = canvasSize;
                     canvas.height = canvasSize;
                     canvas.style.cursor = 'pointer';
@@ -575,26 +596,28 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     fragment.appendChild(canvas);
 
                     // Render the color palette on the canvas
-                    this.showColorPalette(canvas, parsedPalettes[i]);
+                    instance.showColorPalette(canvas, parsedPalettes[i]);
 
                     // Get the palette ID and attach a click event listener
                     let id = colorpaletteids[i];
                     canvas.addEventListener("click", () => {
-                        this.gateUpdateColorPalette(canvas, id);
+                        instance.gateUpdateColorPalette(canvas, id);
                     });
 
                     i++;
                 }
             }
-            this.area.appendChild(fragment);
+            instance.area.appendChild(fragment);
         }
 
         gateUpdateColorPalette(canvas, id) {
-            if (this.canvasColor !== undefined) {
-                this.canvasColor.style.borderStyle = "none";
+            const instance = this;
+
+            if (instance.canvasColor !== undefined) {
+                instance.canvasColor.style.borderStyle = "none";
             }
             this.canvasColor = canvas;
-            let w = Math.round(this.padding / 2) + "px";
+            let w = Math.round(instance.padding / 2) + "px";
 
             Object.assign(canvas.style, {
                 borderStyle: "outset",
@@ -603,16 +626,18 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 borderRightWidth: w,
                 borderBottomWidth: w,
             });
-            this.paletteid = id;
+            instance.paletteid = id;
 
-            this.gateUpdateSubmit();
+            instance.gateUpdateSubmit();
         }
 
         gateUpdateAvatar(avatar, id, w) {
-            if (this.avatar !== undefined) {
-                this.avatar.style.borderStyle = "none";
+            const instance = this;
+
+            if (instance.avatar !== undefined) {
+                instance.avatar.style.borderStyle = "none";
             }
-            this.avatar = avatar;
+            instance.avatar = avatar;
             avatar.style.borderStyle = "outset";
 
             avatar.style.borderLeftWidth = w;
@@ -620,45 +645,53 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             avatar.style.borderRightWidth = w;
             avatar.style.borderBottomWidth = w;
 
-            this.avatarid = id;
+            instance.avatarid = id;
 
-            this.gateUpdateSubmit();
+            instance.gateUpdateSubmit();
         }
 
         /**
          * Updates the visibility of the submit button based on form input validation.
          */
         gateUpdateSubmit() {
-            const isCodeValid = this.edtCode?.value ? Number(this.edtCode.value) > 0 : true;
-            const hasAvatar = this.avatarid !== undefined;
-            const hasPalette = this.paletteid !== undefined;
-            const hasNickname = this.edtNickname?.value?.length > 0;
+            const instance = this;
 
-            this.btnSubmit.style.visibility =
+            const isCodeValid = instance.edtCode?.value ? Number(instance.edtCode.value) > 0 : true;
+            const hasAvatar = instance.avatarid !== undefined;
+            const hasPalette = instance.paletteid !== undefined;
+            const hasNickname = instance.edtNickname?.value?.length > 0;
+
+            instance.btnSubmit.style.visibility =
                 isCodeValid && hasAvatar && hasPalette && hasNickname
                     ? 'visible'
                     : 'hidden';
         }
 
         gateComputeSizes() {
-            this.computeSizes();
-            this.iconSize = Math.round(0.8 * this.iconSize);
-            this.padding = Math.round(0.8 * this.padding);
+            const instance = this;
+
+            instance.computeSizes();
+            instance.iconSize = Math.round(0.8 * instance.iconSize);
+            instance.padding = Math.round(0.8 * instance.padding);
         }
 
         gateCreateLabelEditHorizontal(left, top, width, fontSize, labelWidth, title, classnamesLabel, classnamesEdit) {
-            const label = this.createLabel(this.area, classnamesLabel, left, top, labelWidth, fontSize, title);
-            label.style.color = this.getContrastingColor(this.colorBackground);
+            const instance = this;
 
-            let ret = top + Math.max(label.scrollHeight, fontSize) + this.padding;
+            const label = this.createLabel(instance.area, classnamesLabel, left, top, labelWidth, fontSize, title);
+            label.style.color = this.getContrastingColor(instance.colorBackground);
+
+            let ret = top + Math.max(label.scrollHeight, fontSize) + instance.padding;
 
             let leftEdit = (left + labelWidth + this.padding);
-            this.edt = this.gateCreateInput(classnamesEdit, leftEdit, top, width - leftEdit - this.padding, fontSize);
+            this.edt = instance.gateCreateInput(classnamesEdit, leftEdit, top, width - leftEdit - this.padding, fontSize);
 
             return ret;
         }
 
         gateCreateInput(classnames, left, top, width, fontSize) {
+            const instance = this;
+
             const div = document.createElement("input");
             div.style.position = "absolute";
             div.style.width = width + "px";
@@ -671,8 +704,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             div.classList.add(...classnames.split(/\s+/));
 
-            this.area.appendChild(div);
-            this.edt = div;
+            instance.area.appendChild(div);
 
             return div;
         }
@@ -686,36 +718,39 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {number} gridHeightAvatars - The height of the avatar grid in pixels.
          */
         gateCreateScreenPalette(bottom, gridWidthColors, gridHeightColors, gridWidthAvatars, gridHeightAvatars) {
+            const instance = this;
+
             // Create and configure the label
-            const label = this.createDOMElement('label', {
-                parent: this.area,
+            const label = instance.createDOMElement('label', {
+                parent: instance.area,
                 styles: {
                     position: 'absolute',
                     font: 'FontAwesome',
-                    fontSize: `${this.fontSize}px`,
+                    fontSize: `${instance.fontSize}px`,
                     width: '0px',
                     whiteSpace: 'nowrap',
-                    color: this.getContrastingColor(this.colorBackground),
+                    color: instance.getContrastingColor(instance.colorBackground),
                     top: `${bottom}px`,
                     left: '0px',
                 },
                 attributes: {
-                    innerHTML: this.getStringM('js_palette'),
+                    innerHTML: instance.getStringM('js_palette'),
                 },
             });
 
             // Create the refresh button
-            const btn = this.createImageButton(
-                this.area,
+            const btn = instance.createImageButton(
+                instance.area,
                 'mmogame-gate-palette',
-                label.scrollWidth + this.padding, bottom,
-                this.iconSize, this.fontSize,
+                label.scrollWidth + instance.padding, bottom,
+                instance.iconSize, instance.fontSize,
                 'assets/refresh.svg',
                 false, 'refresh'
             );
 
             // Add event listener to refresh button
-            this.addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors, gridWidthAvatars, gridHeightAvatars);
+            this.addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors,
+                gridWidthAvatars, gridHeightAvatars, true, false);
         }
 
         gateCreateButtonSubmit = (maxWidth, bottom2) => {
@@ -725,7 +760,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.btnSubmit.style.visibility = 'hidden';
             this.btnSubmit.addEventListener("click", () => {
                 if (this.edtCode !== undefined) {
-                    this.gate.user = this.gate.edtCode.value;
+                    this.user = this.edtCode.value;
                 }
                 this.gatePlayGame(true, this.edtNickname.value, this.paletteid, this.avatarid);
             });
@@ -760,17 +795,19 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * Creates the main game area.
          */
         createArea() {
-            if (this.area) {
-                this.body.removeChild(this.area);
+            const instance = this;
+
+            if (instance.area) {
+                instance.body.removeChild(instance.area);
             }
 
-            this.area = this.createDiv(
-                this.body,
+            instance.area = this.createDiv(
+                instance.body,
                 'mmogame-area',
-                this.padding,
-                this.areaTop,
-                this.areaWidth,
-                this.areaHeight
+                instance.padding,
+                instance.areaTop,
+                instance.areaWidth,
+                instance.areaHeight
             );
         }
 
@@ -835,37 +872,40 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
 
         createDivMessage(classnames, message) {
-            if (this.area !== undefined) {
-                this.body.removeChild(this.area);
-                this.area = undefined;
+            const instance = this;
+
+            if (instance.area !== undefined) {
+                instance.body.removeChild(instance.area);
+                instance.area = undefined;
             }
 
-            if (this.divMessageHelp !== undefined) {
-                this.body.removeChild(this.divMessageHelp);
-                this.divMessageHelp = undefined;
+            if (instance.divMessageHelp !== undefined) {
+                instance.body.removeChild(instance.divMessageHelp);
+                instance.divMessageHelp = undefined;
             }
 
-            let left = this.padding;
-            let top = this.areaTop;
-            let width = window.innerWidth - 2 * this.padding;
-            let height = window.innerHeight - this.getCopyrightHeight() - this.padding - top;
+            let left = instance.padding;
+            let top = instance.areaTop;
+            let width = window.innerWidth - 2 * instance.padding;
+            let height = window.innerHeight - instance.getCopyrightHeight() - instance.padding - top;
 
-            this.createDivMessageDo(classnames, left, top, width, height, message, height);
+            instance.createDivMessageDo(classnames, left, top, width, height, message, height);
 
-            this.divMessage.style.top = (height - this.divMessage.scrollHeight) / 2 + "px";
+            instance.divMessage.style.top = (height - instance.divMessage.scrollHeight) / 2 + "px";
         }
-
 
         createButtonAvatar(prefixclassname, left, topNickName, widthNickName, heightNickName, topAvatar, widthAvatar, title) {
             const nickname = this.createDOMElement('div', {
                 classname: `${prefixclassname}-nickname`,
                 parent: this.body,
-            }, {
-                left: left,
-                top: topNickName,
-                width: widthNickName
-            }, {
-                title: title
+                styles: {
+                    left: left,
+                    top: topNickName,
+                    width: widthNickName
+                },
+                attributes: {
+                    title: title
+                }
             });
 
             const avatar = this.createDOMElement('img', {
@@ -887,24 +927,26 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
 
         createDivMessageStart(message) {
-            if (this.area !== undefined) {
-                this.body.removeChild(this.area);
-                this.area = undefined;
+            const instance = this;
+
+            if (instance.area !== undefined) {
+                instance.body.removeChild(instance.area);
+                instance.area = undefined;
             }
 
-            let left = this.padding;
-            let top = this.areaTop;
-            let width = window.innerWidth - 2 * this.padding;
-            let height = window.innerHeight - this.getCopyrightHeight() - this.padding - top;
+            let left = instance.padding;
+            let top = instance.areaTop;
+            let width = window.innerWidth - 2 * instance.padding;
+            let height = window.innerHeight - instance.getCopyrightHeight() - instance.padding - top;
 
             let height1 = height / 8;
 
-            this.createDivMessageDo('mmogame-message-start', left, top, width, height, message, height1);
+            instance.createDivMessageDo('mmogame-message-start', left, top, width, height, message, height1);
 
-            top += (height1 - this.divMessage.scrollHeight) / 2;
-            this.divMessage.style.top = top + "px";
+            top += (height1 - instance.divMessage.scrollHeight) / 2;
+            instance.divMessage.style.top = top + "px";
 
-            if (this.divMessageHelp === undefined) {
+            if (instance.divMessageHelp === undefined) {
                 let div = document.createElement("div");
                 div.style.position = "absolute";
                 div.style.left = left + "px";
@@ -913,14 +955,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 div.style.paddingLeft = this.padding + "px";
                 div.style.paddingRight = this.padding + "px";
 
-                div.style.color = this.getContrastingColor(this.colorDefinition);
-                let top = this.iconSize + 3 * this.padding + height1;
-                div.style.top = (top + this.padding) + "px";
+                div.style.color = instance.getContrastingColor(instance.colorDefinition);
+                let top = instance.iconSize + 3 * instance.padding + height1;
+                div.style.top = (top + instance.padding) + "px";
                 div.style.height = (height - height1) + "px";
-                this.divMessageHelp = div;
-                this.body.appendChild(this.divMessageHelp);
+                instance.divMessageHelp = div;
+                instance.body.appendChild(instance.divMessageHelp);
 
-                this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));
+                instance.showHelpScreen(div, (width - 2 * instance.padding), (height - height1));
             }
         }
 
@@ -981,12 +1023,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          *
          * @param {Object} extraparams - Additional parameters to override default ones.
          */
-        callGetAttempt(extraparams) {
+        callGetAttempt(extraparams = undefined) {
             require(['core/ajax'], (Ajax) => {
                 let params = {
-                    mmogameid: this.gate.mmogameid,
-                    kinduser: this.gate.kinduser,
-                    user: this.gate.user,
+                    mmogameid: this.mmogameid,
+                    kinduser: this.kinduser,
+                    user: this.user,
                     nickname: null,
                     colorpaletteid: null,
                     avatarid: null,
@@ -1014,16 +1056,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             });
         }
 
-        /**
-         * Displays an error message on the screen.
-         * @param {string} name - The name of the error context.
-         * @param {Error} [error] - The error object to display.
-         */
-        showError(name, error) {
-            const message = error?.message || 'An unknown error occurred.';
-            this.createDivMessage('mmogame-error', message);
-        }
-
         createDivMessageDo(classnames, left, top, width, height, message, heightmessage) {
             if (this.divMessageBackground === undefined) {
                 let div = this.createDiv(this.body, classnames, left, top, width, height);
@@ -1047,6 +1079,16 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.divMessage.innerHTML = message;
             this.body.appendChild(this.divMessage);
             this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
+        }
+
+        /**
+         * Displays an error message on the screen.
+         * @param {string} name - The name of the error context.
+         * @param {Error} [error] - The error object to display.
+         */
+        showError(name, error) {
+            const message = error?.message || 'An unknown error occurred.';
+            this.createDivMessage('mmogame-error', message);
         }
 };
 });

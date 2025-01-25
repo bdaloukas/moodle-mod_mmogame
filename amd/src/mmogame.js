@@ -309,15 +309,6 @@ define([''], function() {
             this.computeSizes();
         }
 
-        /**
-         * Updates an image button's properties.
-         * @param {HTMLImageElement} button - The button element to update.
-         * @param {string} src - The new source for the image.
-         */
-        updateImageButton(button, src) {
-            button.src = src;
-        }
-
         autoResizeText(item, width, height, wrap, minFontSize, maxFontSize) {
             const text = item.innerHTML.toString();
 
@@ -342,7 +333,7 @@ define([''], function() {
 
             let step = 1;
             let fontSize;
-            for (;step <= 10; step++) {
+            for (; step <= 10; step++) {
                 fontSize = (low + up) / 2;
                 tempDiv.style.fontSize = `${fontSize}px`;
                 tempDiv.style.width = `${width}px`;
@@ -351,8 +342,8 @@ define([''], function() {
 
                 newHeight = tempDiv.scrollHeight;
                 newWidth = tempDiv.scrollWidth - 1;
-console.log("fontSize=" + fontSize + " newWidth=" + newWidth + " newHeight=" + newHeight
-    + " width=" + width + " height=" + height + " text=" + text);
+                console.log("* fontSize=" + fontSize + " newWidth=" + newWidth + " newHeight=" + newHeight
+                    + " width=" + width + " height=" + height + " text=" + text);
                 if (newWidth > width || newHeight > height) {
                     up = fontSize;
                 } else {
@@ -367,33 +358,6 @@ console.log("fontSize=" + fontSize + " newWidth=" + newWidth + " newHeight=" + n
             console.log("autoResizeText step=" + step + " fontSize=" + fontSize + " fitSize=" + fitSize);
             item.style.fontSize = `${fitSize}px`;
             this.body.removeChild(tempDiv);
-
-/* A
-            if (newWidth > width || newHeight > height) {
-                this.autoResizeTextBr(item);
-                newWidth = item.scrollWidth;
-                newHeight = item.scrollHeight;
-                this.autoResizeTextImage(item, newWidth > width ? newWidth - width : 0,
-                    newHeight > height ? newHeight - height : 0, minRatio);
-            } else {
-                return [item.scrollWidth - 1, item.scrollHeight];
-            }
-
-            let el = document.createElement("div");
-            el.style.width = width + "px";
-            el.style.height = 0;
-            el.visibility = "hidden";
-            if (!wrap) {
-                el.style.whiteSpace = "nowrap";
-            }
-            el.innerHTML = text;
-            this.body.appendChild(el);
-            el.style.fontSize = item.style.fontSize;
-            let size = [el.scrollWidth - 1, el.scrollHeight];
-            this.body.removeChild(el);
-
-            return size;
- */
         }
 
         pad(num, size) {
@@ -500,17 +464,6 @@ console.log("fontSize=" + fontSize + " newWidth=" + newWidth + " newHeight=" + n
                 return '';
             }
             return text.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '<br>').trim();
-        }
-
-        /**
-         * Creates a help button.
-         * @param {number} left - Left position in pixels.
-         * @param {number} top - Top position in pixels.
-         */
-        createButtonHelp(left, top) {
-            const helpButton = this.createImage(this.body, 'mmogame-button-helo',
-                left, top, this.iconSize, this.iconSize, 'assets/help.png');
-            helpButton.alt = 'Help';
         }
 
         /**
@@ -730,44 +683,44 @@ console.log("fontSize=" + fontSize + " newWidth=" + newWidth + " newHeight=" + n
          * @param {Object} options - The options to save.
          * @returns {Promise<void>} A promise that resolves when the save is complete.
          */
-        setOptions(options) {
+        async setOptions(options) {
+            try {
+                const db = await this.openDatabase();
+                const transaction = db.transaction('options', 'readwrite');
+                const store = transaction.objectStore('options');
+                Object.entries(options).forEach(([key, value]) => store.put({name: key, value}));
+                await transaction.complete;
+            } catch (error) {
+                this.showError('Failed to save options:', error);
+            }
+        }
+
+        // Open IndexedDB connection
+        openDatabase() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('mmoGameDB', 1);
 
-                request.onsuccess = function(event) {
+                request.onupgradeneeded = (event) => {
                     const db = event.target.result;
-                    const transaction = db.transaction(['options'], 'readwrite');
-                    const store = transaction.objectStore('options');
-
-                    Object.entries(options).forEach(([key, value]) => {
-                        store.put({name: key, value});
-                    });
-
-                    transaction.oncomplete = function() {
-                        resolve();
-                    };
-
-                    transaction.onerror = function() {
-                        reject(new Error('Failed to save options'));
-                    };
+                    if (!db.objectStoreNames.contains('options')) {
+                        db.createObjectStore('options', {keyPath: 'name'});
+                    }
                 };
 
-                request.onerror = function() {
-                    reject(new Error('Failed to open database'));
-                };
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = (event) => reject(event.target.error);
             });
         }
-
-    clearDB(url) {
-        let options = {nickname: ''};
-        this.setOptions(options)
-            .then(function() {
-                window.location.href = url;
-                return true;
-            })
-            .catch(() => {
-                return false;
-            });
+        clearDB(url) {
+            let options = {nickname: ''};
+            this.setOptions(options)
+                .then(function() {
+                    window.location.href = url;
+                    return true;
+                })
+                .catch(() => {
+                    return false;
+                });
         }
 
         debounce(func, delay) {
@@ -776,6 +729,19 @@ console.log("fontSize=" + fontSize + " newWidth=" + newWidth + " newHeight=" + n
                 clearTimeout(timer);
                 timer = setTimeout(() => func.apply(this, args), delay);
             };
+        }
+
+        /**
+         * Displays an error message on the screen.
+         * @param {string} name - The name of the error context.
+         * @param {Error} [error] - The error object to display.
+         */
+        showError(name, error) {
+            return name + error;
+        }
+
+        setColors(a) {
+            return a;
         }
     };
 });
