@@ -342,8 +342,6 @@ define([''], function() {
 
                 newHeight = tempDiv.scrollHeight;
                 newWidth = tempDiv.scrollWidth - 1;
-                console.log("* fontSize=" + fontSize + " newWidth=" + newWidth + " newHeight=" + newHeight
-                    + " width=" + width + " height=" + height + " text=" + text);
                 if (newWidth > width || newHeight > height) {
                     up = fontSize;
                 } else {
@@ -355,7 +353,6 @@ define([''], function() {
                     fitHeight = newHeight;
                 }
             }
-            console.log("autoResizeText step=" + step + " fontSize=" + fontSize + " fitSize=" + fitSize);
             item.style.fontSize = `${fitSize}px`;
             this.body.removeChild(tempDiv);
         }
