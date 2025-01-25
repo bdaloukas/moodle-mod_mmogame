@@ -496,7 +496,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     'mmogame-avatar',
                     avatarImagePath
                 );
-                btn.classList.add("mmogame_avatar");
+                btn.classList.add("mmogame-avatar");
                 let id = avatarids[i];
                 btn.addEventListener("click", () => {
                     instance.gateUpdateAvatar(btn, id, w);

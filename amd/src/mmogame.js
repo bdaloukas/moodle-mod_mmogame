@@ -137,7 +137,6 @@ define([''], function() {
             });
         }
 
-
         /**
          * Creates an <img> element.
          *
