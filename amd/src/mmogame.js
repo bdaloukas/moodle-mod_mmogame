@@ -35,7 +35,6 @@ define([''], function() {
         minFontSize;
         maxFontSize;
         fontSize;
-        avatarTop;
         colors = {};
         iconSize;
         padding;
@@ -65,7 +64,6 @@ define([''], function() {
             this.minFontSize = 0;
             this.maxFontSize = 0;
             this.fontSize = 0;
-            this.avatarTop = 0;
             this.iconSize = 0;
             this.padding = 0;
             this.body = document.getElementsByTagName("body")[0];
@@ -227,16 +225,6 @@ define([''], function() {
             }, text);
         }
 
-        createInput(parent, classnames, left, top, width, fontSize, placeholder) {
-            return this.createTextElement(parent, 'input', classnames, {
-                position: 'absolute',
-                left: `${left}px`,
-                top: `${top}px`,
-                width: `${width}px`,
-                fontSize: `${fontSize}px`,
-            }, placeholder);
-        }
-
         // Game logic and utility methods
 
         /**
@@ -297,19 +285,6 @@ define([''], function() {
             return button;
         }
 
-        createDivButton(classnames, left, top) {
-            return this.createButton(
-                this.body,
-                classnames,
-                left,
-                top,
-                this.iconSize,
-                this.iconSize,
-                '',
-                '',
-                'button');
-        }
-
         hasHelp() {
             return false;
         }
@@ -319,9 +294,9 @@ define([''], function() {
          */
         clearBodyChildren() {
             this.removeDivMessage();
-
-            while (this.body.firstChild) {
-                this.body.removeChild(this.body.firstChild);
+            let child;
+            while ((child = this.body.firstChild)) {
+                this.body.removeChild(child);
             }
             this.area = undefined;
         }
@@ -343,45 +318,41 @@ define([''], function() {
             button.src = src;
         }
 
-        autoResizeText(item, width, height, wrap, minFontSize, maxFontSize, minRatio) {
+        autoResizeText(item, width, height, wrap, minFontSize, maxFontSize) {
             const text = item.innerHTML.toString();
 
             if (text.length === 0) {
-                return false;
+                return;
             }
 
+            const tempDiv = document.createElement("div");
+            tempDiv.style.visibility = "hidden";
+            tempDiv.style.position = "absolute";
+            tempDiv.style.whiteSpace = wrap ? "normal" : "nowrap";
+
+            this.body.appendChild(tempDiv);
+
             let low = Math.max(1, minFontSize);
-            width = Math.round(width);
-            height = Math.round(height);
-            let up = maxFontSize === 0 || maxFontSize === undefined ? Math.min(width, height) : maxFontSize;
+            let up = maxFontSize || Math.min(width, height);
 
             let fitSize = low;
             let fitHeight = 0;
             let newHeight = 0;
             let newWidth = 0;
 
-            let i = 1;
-            for (;i <= 10; i++) {
-                let el = document.createElement("div");
-                el.style.left = 0;
-                el.style.top = 0;
-                el.style.width = width + "px";
-                el.style.height = 0;
-                el.visibility = "visible";
-                if (!wrap) {
-                    el.style.whiteSpace = "nowrap";
-                }
-                el.innerHTML = text;
-                this.body.appendChild(el);
+            let step = 1;
+            let fontSize;
+            for (;step <= 10; step++) {
+                fontSize = (low + up) / 2;
+                tempDiv.style.fontSize = `${fontSize}px`;
+                tempDiv.style.width = `${width}px`;
+                tempDiv.style.height = `0`;
+                tempDiv.innerHTML = text;
 
-                let fontSize = (low + up) / 2;
-
-                el.style.fontSize = fontSize + "px";
-                newHeight = el.scrollHeight;
-                newWidth = el.scrollWidth - 1;
-
-                this.body.removeChild(el);
-
+                newHeight = tempDiv.scrollHeight;
+                newWidth = tempDiv.scrollWidth - 1;
+console.log("fontSize=" + fontSize + " newWidth=" + newWidth + " newHeight=" + newHeight
+    + " width=" + width + " height=" + height + " text=" + text);
                 if (newWidth > width || newHeight > height) {
                     up = fontSize;
                 } else {
@@ -389,12 +360,15 @@ define([''], function() {
                     if (Math.abs(fitHeight - newHeight) <= 2) {
                         break;
                     }
-                    fitHeight = newHeight;
                     fitSize = fontSize;
+                    fitHeight = newHeight;
                 }
             }
-            item.style.fontSize = fitSize + "px";
+            console.log("autoResizeText step=" + step + " fontSize=" + fontSize + " fitSize=" + fitSize);
+            item.style.fontSize = `${fitSize}px`;
+            this.body.removeChild(tempDiv);
 
+/* A
             if (newWidth > width || newHeight > height) {
                 this.autoResizeTextBr(item);
                 newWidth = item.scrollWidth;
@@ -419,83 +393,7 @@ define([''], function() {
             this.body.removeChild(el);
 
             return size;
-        }
-
-        autoResizeTextBr(item) {
-            let s = item.innerHTML;
-            let change = false;
-            while (s.startsWith('<br>')) {
-                s = s.substring(4);
-                change = true;
-            }
-            let pos1 = s.indexOf('<br>');
-            for (; ;) {
-                let pos = s.indexOf('<br>', pos1 + 4);
-                if (pos < 0) {
-                    break;
-                }
-                let s2 = s.substring(pos1 + 4, pos);
-                if (!s2.trim()) {
-                    s = s.substring(0, pos1 + 4) + s.substring(pos + 4);
-                    change = true;
-                    pos = pos1;
-                }
-                pos1 = pos;
-            }
-
-            if (change) {
-                item.innerHTML = s;
-            }
-        }
-
-        autoResizeTextImage(item, subwidth, subheight, minRatio) {
-            if (subwidth === 0 && subheight === 0) {
-                return;
-            }
-            let s = item.innerHTML;
-
-            for (let pos = 0; ;) {
-                let pos2 = s.indexOf("<img ", pos);
-                if (pos2 < 0) {
-                    break;
-                }
-                let pos3 = s.indexOf(">", pos2);
-                if (pos3 < 0) {
-                    break;
-                }
-                let s2 = s.substring(pos2, pos3) + " ";
-
-                let width = 0;
-                let height = 0;
-                let posw = s2.indexOf("width=");
-                if (posw >= 0) {
-                    let posw2 = s2.indexOf(" ", posw);
-                    if (posw2 >= 0) {
-                        let num = s2.slice(posw + 6, posw2).replace(/"/g, "");
-                        width = parseInt(num);
-                        s2 = s2.slice(0, posw) + s2.slice(posw2);
-                    }
-                }
-
-                posw = s2.indexOf("height=");
-                if (posw >= 0) {
-                    let posw2 = s2.indexOf(" ", posw);
-                    if (posw2 >= 0) {
-                        let num = s2.slice(posw + 7, posw2).replace(/"/g, "");
-                        height = parseInt(num);
-                        s2 = s2.slice(0, posw) + s2.slice(posw2);
-                    }
-                }
-                if (width > 0 && height > 0) {
-                    let newWidth = width - subwidth > 0 ? width - subwidth : width / 2;
-                    let newHeight = height - subheight > 0 ? height - subheight : height / 2;
-                    let ratio = Math.max(minRatio, Math.min(newWidth / width, newHeight / height));
-                    s2 = s2 + " width=\"" + Math.round(ratio * width) + "\" height=\"" + Math.round(height * ratio) + "\" ";
-                }
-                s = s.slice(0, pos2) + s2 + s.slice(pos3);
-                pos = pos3;
-            }
-            item.innerHTML = s;
+ */
         }
 
         pad(num, size) {
@@ -517,13 +415,10 @@ define([''], function() {
             this.user = uuid.join('');
 
             let options = {userGUID: this.user};
-            let instance = this;
             this.setOptions(options)
-                .then(function() {
-                    return true;
-                })
-                .catch(error => {
-                    instance.showError(error.message);
+                .then(() => true) // Arrow function for resolving promise
+                .catch(error => { // Arrow function for handling errors
+                    this.showError(error.message);
                     return false;
                 });
         }
@@ -685,11 +580,10 @@ define([''], function() {
             let width = canvas.width;
             let height = canvas.height;
             let strip = width / 5;
-            let instance = this;
 
-            colors.sort(function(a, b) {
-                return instance.getContrast(a) - instance.getContrast(b);
-            });
+            // Sort colors based on their contrast value using an arrow function
+            colors.sort((a, b) => this.getContrast(a) - this.getContrast(b));
+
             for (let i = 0; i < 5; i++) {
                 ctx.fillStyle = this.getColorHex(colors[i]);
                 ctx.fillRect(i * strip, 0, (i + 1) * strip, height);

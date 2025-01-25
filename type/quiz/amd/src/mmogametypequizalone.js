@@ -36,17 +36,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.createButtonsAvatar(1, Math.round(this.padding + (i++) * step));
             this.buttonsAvatar[1].style.top = (this.padding + this.nickNameHeight) + "px";
 
-            this.createDivScorePercent(this.padding + (i++) * step,
-                this.padding + this.nickNameHeight, 1);
+            this.createDivScorePercent('mmogame-quiz-alone', this.padding + (i++) * step,
+                this.padding + this.nickNameHeight, this.getConstrastingColor(this.color), true);
 
             this.createButtonSound(this.padding + (i++) * step,
                 this.padding + this.nickNameHeight);
-            let instance = this;
             if (this.hasHelp()) {
                 this.createButtonHelp(this.padding + (i++) * step, this.padding);
-                this.buttonHelp.addEventListener("click", () => {
-                    instance.onClickHelp(instance.buttonHelp);
-                });
+                this.buttonHelp.addEventListener("click", () => this.onClickHelp(this.buttonHelp));
             }
 
             let copyrightHeight = this.getCopyrightHeight();

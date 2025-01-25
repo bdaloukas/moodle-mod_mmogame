@@ -30,25 +30,20 @@
 define(['mod_mmogame/mmogame'], function(MmoGame) {
     return class MmoGameUI extends MmoGame {
 
-        vertical;
+        isVertical;
         kindSound; // Type: Number (0 = on, 1 = off, 2 = speak)
         buttonSound;
-        colorDefinition = 0;
+        colorBackground = 0xFFFFFF;
+        colorDefinition;
         colorScore;
 
         // Other
         definition;
-        buttonAvatarHeight;
-        buttonAvatarTop;
-        colorBackground = 0xFFFFFF;
-
-        url;
-        mmogameid;
-        pin;
-        user;
+        gate = {};
 
         constructor() {
             super();
+            this.isVertical = window.innerWidth < window.innerHeight;
         }
 
         /**
@@ -72,17 +67,23 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             }
         }
 
-        createButtonSound(left, top) {
-            this.buttonSound = this.createButton(
-                this.body,
-                'mmogame-button-sound',
-                left,
-                top,
-                this.iconSize,
-                this.iconSize,
-                this.getMuteFile(),
-                this.getStringM('js_sound')
-            );
+        createButtonSound(left, top, size) {
+            this.buttonSound = this.createDOMElement('img', {
+                parent,
+                classnames: 'mmogame-button-sound',
+                styles: {
+                    position: 'absolute',
+                    left: `${left}px`,
+                    top: `${top}px`,
+                    width: `${size}px`,
+                    height: `${size}px`,
+                },
+                attributes: {
+                    src: this.getMuteFile(),
+                    alt: this.getStringM('js_sound'),
+                    role: 'button',
+                },
+            });
             this.buttonSound.addEventListener("click", () => this.onClickSound(this.buttonSound));
         }
 
@@ -107,11 +108,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         gateOpen(mmogameid, pin, kinduser, user, url) {
             try {
                 // Initialize class variables
-                this.url = url;
-                this.mmogameid = mmogameid;
-                this.pin = pin;
-                this.kinduser = kinduser;
-                this.user = user;
+                this.gate = {
+                    url: url,
+                    mmogameid: mmogameid,
+                    pin: pin,
+                    kinduser: kinduser,
+                    user: user,
+                };
 
                 // Adjust font sizes
                 this.minFontSize *= 2;
@@ -119,9 +122,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 // Compute sizes and layout
                 this.gateComputeSizes();
-                this.areaTop = this.padding;
-                this.areaWidth = Math.round(window.innerWidth - 2 * this.padding);
-                this.areaHeight = Math.round(window.innerHeight - this.areaTop - this.padding);
+                this.areaRect = {
+                    top: this.padding,
+                    width: Math.round(window.innerWidth - 2 * this.padding),
+                    height: Math.round(window.innerHeight - this.areaTop - this.padding),
+                };
 
                 // Load options and initialize UI
                 this.getOptions()
@@ -151,6 +156,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                         } else {
                             this.gateCreateScreen();
                         }
+
+                        return true;
                     })
                     .catch((error) => {
                         this.showError('gateOpen unexpected', error);
@@ -161,42 +168,40 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gatePlayGame(save, nickname, paletteid, avatarid) {
-            if (this.kinduser === 'guid') {
-                if (this.user === '') {
+            if (this.gate.kinduser === 'guid') {
+                if (this.gate.user === '') {
                     this.uuid4();
                 }
             }
 
             if (!save) {
-                this.nickname = nickname;
-                this.paletteid = paletteid;
-                this.avatarid = avatarid;
+                this.gate.nickname = nickname;
+                this.gate.paletteid = paletteid;
+                this.gate.avatarid = avatarid;
                 this.callGetAttempt({nickname: nickname, colorpaletteid: paletteid, avatarid: avatarid});
                 return;
             }
 
             let options = {nickname: nickname, avatarid: avatarid, paletteid: paletteid};
 
-            let instance = this;
             this.setOptions(options)
-                .then(function() {
-                    instance.nickname = nickname;
-                    instance.paletteid = paletteid;
-                    instance.avatarid = avatarid;
-                    instance.callGetAttempt();
+                .then(() => {
+                    this.gate.nickname = nickname;
+                    this.gate.paletteid = paletteid;
+                    this.gate.avatarid = avatarid;
+                    this.callGetAttempt();
                     return true;
                 })
                 .catch(error => {
-                    instance.showError(error.message);
+                    this.showError(error.message);
                     return false;
                 });
         }
 
         gateCreateScreen() {
-            this.vertical = window.innerWidth < window.innerHeight;
             this.createArea();
 
-            if (this.vertical) {
+            if (this.isVertical) {
                 this.gateCreateScreenVertical();
             } else {
                 this.gateCreateScreenHorizontal();
@@ -204,49 +209,58 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateCreateScreenVertical() {
-            let maxHeight = this.areaHeight - 5 * this.padding - this.iconSize;
-            let maxWidth = this.areaWidth;
-            let instance = this;
+            let maxHeight = this.areaRect.height - 5 * this.padding - this.iconSize;
+            let maxWidth = this.areaRect.width;
             let size;
 
-            const labels = [this.getStringM('js_name') + ": ", this.getStringM('js_code'), this.getStringM('js_palette')];
-            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, function(fontSize) {
-                size = instance.gateComputeLabelSize(fontSize, labels);
+            const labels = [
+                `${this.getStringM('js_name')}: `,
+                this.getStringM('js_code'),
+                this.getStringM('js_palette')
+            ];
+
+            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, (fontSize) => {
+                size = this.gateComputeLabelSize(fontSize, labels);
 
                 if (size[0] >= maxWidth) {
                     return 1;
                 }
-                let heightCode = instance.kinduser !== 'guid' && instance.kinduser !== 'moodle' ? size[1] + instance.padding : 0;
+                const heightCode = this.gate.kinduser !== 'guid' && this.gate.kinduser !== 'moodle' ?
+                    size[1] + this.padding : 0;
 
-                let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
-                let n = Math.floor(heightColors / instance.iconSize);
+                const heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
+                let n = Math.floor(heightColors / this.iconSize);
                 if (n === 0) {
                     return 1;
                 }
-                let heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
-                let computedHeight = heightCode + 3 * size[1] + 8 * instance.padding + heightColors + heightAvatars;
+                const heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
+                const computedHeight = heightCode + 3 * size[1] + 8 * this.padding + heightColors + heightAvatars;
 
                 return computedHeight < maxHeight ? -1 : 1;
             });
 
+            this.gateCreateScreenVerticalDo(maxWidth, maxHeight, size);
+        }
+
+        gateCreateScreenVerticalDo(maxWidth, maxHeight, size) {
             let gridWidthColors = maxWidth - this.padding;
             let gridWidthAvatars = maxWidth - this.padding;
             let gridHeightColors = (maxHeight - 4 * this.fontSize) * 2 / 5;
-            let newHeight = Math.floor(gridHeightColors / instance.iconSize) * instance.iconSize;
-            let newWidth = Math.floor(gridWidthColors / instance.iconSize) * instance.iconSize;
+            let newHeight = Math.floor(gridHeightColors / this.iconSize) * this.iconSize;
+            let newWidth = Math.floor(gridWidthColors / this.iconSize) * this.iconSize;
             let rest = gridHeightColors - newHeight;
             gridHeightColors = newHeight;
             let gridHeightAvatars = (maxHeight - 4 * this.fontSize + rest) * 3 / 5;
 
             // Creates the "Code" field.
             let bottom;
-            if (this.kinduser !== 'guid' && this.kinduser !== 'moodle') {
+            if (this.gate.kinduser !== 'guid' && this.gate.kinduser !== 'moodle') {
                 // A bottom = this.gateCreateCode(0, 0, maxWidth, this.fontSize, size[0]);
                 bottom = this.gateCreateLabelEditVertical(0, 0, maxWidth, this.fontSize,
                     size[0], this.getStringM('js_code') + ": ",
                     'mmogame-gate-code-label', 'mmogame-gate-code') + 2 * this.padding;
                 this.edtCode = this.edt;
-                this.edtCode.addEventListener("keyup", this.debounce(() => instance.gateUpdateSubmit(), 300));
+                this.edtCode.addEventListener("keyup", this.debounce(() => this.gateUpdateSubmit(), 300));
             } else {
                 bottom = 0;
             }
@@ -256,7 +270,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.getStringM('js_name') + ": ",
                 'mmogame-gate-name-label', 'mmogame-gate-name') + 2 * this.padding;
             this.edtNickname = this.edt;
-            this.edtNickname.addEventListener("keyup", this.debounce(() => instance.gateUpdateSubmit(), 300));
+            this.edtNickname.addEventListener("keyup", this.debounce(() => this.gateUpdateSubmit(), 300));
 
             this.gateCreateScreenPalette(bottom, gridWidthColors, gridHeightColors,
                 gridWidthAvatars, gridHeightAvatars);
@@ -276,49 +290,50 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         gateCreateScreenHorizontal() {
             let maxHeight = this.areaHeight - 7 * this.padding - this.iconSize;
             let maxWidth = this.areaWidth;
-            let instance = this;
             let size;
 
             const sName = this.getStringM('js_name') + ": ";
             let labels = [this.getStringM('js_code'), sName, this.getStringM('js_palette')];
 
-            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize,
-                function(fontSize) {
-                size = instance.gateComputeLabelSize(fontSize, labels);
+            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, (fontSize) => {
+                size = this.gateComputeLabelSize(fontSize, labels);
 
                 if (size[0] >= maxWidth) {
                     return 1;
                 }
-                let heightCode = instance.kinduser !== 'guid' && instance.kinduser !== 'moodle' ? size[1] + instance.padding : 0;
+                let heightCode = this.kinduser !== 'guid' && this.kinduser !== 'moodle' ? size[1] + this.padding : 0;
 
                 let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
-                let n = Math.floor(heightColors / instance.iconSize);
+                let n = Math.floor(heightColors / this.iconSize);
                 if (n === 0) {
                     return 1;
                 }
                 let heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
-                let computedHeight = heightCode + 2 * size[1] + 7 * instance.padding + heightColors + heightAvatars;
+                let computedHeight = heightCode + 2 * size[1] + 7 * this.padding + heightColors + heightAvatars;
 
                 return computedHeight < maxHeight ? -1 : 1;
             });
 
-            let gridWidthColors = maxWidth - this.padding;
-            let gridWidthAvatars = maxWidth - this.padding;
+            this.gateCreateScreenHorizontalDo(maxWidth, maxHeight, size, sName);
+        }
+
+        gateCreateScreenHorizontalDo(maxWidth, maxHeight, size, sName) {
+            const gridWidthColors = maxWidth - this.padding;
+            const gridWidthAvatars = maxWidth - this.padding;
             let gridHeightColors = (maxHeight - 4 * this.fontSize) * 2 / 5;
-            let newHeight = Math.floor(gridHeightColors / instance.iconSize) * instance.iconSize;
-            let newWidth = Math.floor(gridWidthColors / instance.iconSize) * instance.iconSize;
+            const newHeight = Math.floor(gridHeightColors / this.iconSize) * this.iconSize;
+            const newWidth = Math.floor(gridWidthColors / this.iconSize) * this.iconSize;
             let rest = gridHeightColors - newHeight;
             gridHeightColors = newHeight;
-            let gridHeightAvatars = Math.floor((maxHeight - 4 * this.fontSize) * 3 / 5 + rest);
+            const gridHeightAvatars = Math.floor((maxHeight - 4 * this.fontSize) * 3 / 5 + rest);
 
             // Creates the "Code" field.
             let bottom;
-            if (this.kinduser !== 'guid' && this.kinduser !== 'moodle') {
-                // B bottom = this.gateCreateCode(0, 0, maxWidth, this.fontSize, size[0]);
+            if (this.gate.kinduser !== 'guid' && this.gate.kinduser !== 'moodle') {
                 bottom = this.gateCreateLabelEditVertical(0, 0, maxWidth, this.fontSize, size[0],
                     this.getStringM('js_code')) + 2 * this.padding;
                 this.edtCode = this.edt;
-                this.edtCode.addEventListener("keyup", this.debounce(() => instance.gateUpdateSubmit(), 300));
+                this.edtCode.addEventListener("keyup", this.debounce(() => this.gateUpdateSubmit(), 300));
             } else {
                 bottom = 0;
             }
@@ -331,8 +346,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 'mmogame-gate-name-label', 'mmogame-gate-name');
 
             this.edtNickname = this.edt;
-
-            this.edtNickname.addEventListener("keyup", this.debounce(() => instance.gateUpdateSubmit(), 300));
+            this.edtNickname.addEventListener("keyup", this.debounce(() => this.gateUpdateSubmit(), 300));
 
             let label1 = document.createElement("label");
             label1.style.position = "absolute";
@@ -369,19 +383,17 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             btn = this.createImageButton(this.area, 'mmogame-button-gate-refresh-avatars',
                 label.scrollWidth + this.padding, bottom + gridHeightColors, this.iconSize,
                 this.fontSize, 'assets/refresh.svg', false, 'refresh');
-            btn.addEventListener("click",
-                function() {
-                    let elements = instance.area.getElementsByClassName("mmogame_avatar");
+            btn.addEventListener("click", () => {
+                let elements = this.area.getElementsByClassName("mmogame_avatar");
 
-                    while (elements[0]) {
-                        elements[0].parentNode.removeChild(elements[0]);
-                    }
-
-                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors, 0,
-                        bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
-                        false, true);
+                while (elements[0]) {
+                    elements[0].parentNode.removeChild(elements[0]);
                 }
-            );
+
+                this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors, 0,
+                    bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars, gridHeightAvatars,
+                    false, true);
+            });
 
             // Avatar
             label.style.left = "0 px";
@@ -398,12 +410,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 (maxWidth - this.iconSize) / 2, bottom2, 0, this.iconSize,
                 'assets/submit.svg', false, 'submit');
             this.btnSubmit.style.visibility = 'hidden';
-            this.btnSubmit.addEventListener("click",
-                function() {
-                    if (instance.edtCode !== undefined) {
-                        instance.user = instance.edtCode.value;
-                    }
-                    instance.gatePlayGame(true, instance.edtNickname.value, instance.paletteid, instance.avatarid);
+            this.btnSubmit.addEventListener("click", () => {
+                if (this.edtCode !== undefined) {
+                    this.user = this.edtCode.value;
+                }
+                this.gatePlayGame(true, this.gate.edtNickname.value, this.gate.paletteid, this.gate.avatarid);
                 }
             );
         }
@@ -495,19 +506,18 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             let countYavatars = Math.floor((gridHeightAvatars + 2 * this.padding) / this.iconSize);
 
             if (!updateColors) {
-                countXcolors = countXcolors = 0;
+                countXcolors = countYcolors = 0;
             }
             if (!updateAvatars) {
                 countXavatars = countYavatars = 0;
             }
 
-            let instance = this;
-            require(['core/ajax'], function(Ajax) {
+            require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
-                    mmogameid: instance.mmogameid,
-                    kinduser: instance.kinduser,
-                    user: instance.user,
+                    mmogameid: this.mmogameid,
+                    kinduser: this.gate.kinduser,
+                    user: this.gate.user,
                     avatars: countXavatars * countYavatars,
                     colorpalettes: countXcolors * countYcolors,
                 };
@@ -519,16 +529,16 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }]);
 
                 // Handling the response
-                getAssets[0].done(function({avatarids, avatars, colorpaletteids, colorpalettes}) {
+                getAssets[0].done(({ avatarids, avatars, colorpaletteids, colorpalettes }) => {
                     if (updateColors) {
-                        instance.gateShowColorPalettes(leftColors, topColors, gridWidthColors,
+                        this.gateShowColorPalettes(leftColors, topColors, gridWidthColors,
                             gridHeightColors, countXcolors, countYcolors, colorpaletteids, colorpalettes);
                     }
                     if (updateAvatars) {
-                        instance.gateShowAvatars(leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars,
+                        this.gateShowAvatars(leftAvatars, topAvatars, gridWidthAvatars, gridHeightAvatars, countXavatars,
                             avatarids, avatars);
                     }
-                }).fail(function(error) {
+                }).fail((error) => {
                     return error;
                 });
             });
@@ -713,29 +723,37 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 (maxWidth - this.iconSize) / 2, bottom2, 0, this.iconSize,
                 'assets/submit.svg', false, 'submit');
             this.btnSubmit.style.visibility = 'hidden';
-            const instance = this;
-            this.btnSubmit.addEventListener("click", function() {
-                if (instance.edtCode !== undefined) {
-                    instance.user = instance.edtCode.value;
+            this.btnSubmit.addEventListener("click", () => {
+                if (this.edtCode !== undefined) {
+                    this.gate.user = this.gate.edtCode.value;
                 }
-                instance.gatePlayGame(true, instance.edtNickname.value, instance.paletteid, instance.avatarid);
+                this.gatePlayGame(true, this.edtNickname.value, this.paletteid, this.avatarid);
             });
         };
 
 
+        /**
+         * Adds an event listener to refresh colors and avatars.
+         *
+         * @param {HTMLElement} btn - The button to attach the event listener to.
+         * @param {number} bottom - The Y-coordinate offset for grid positioning.
+         * @param {number} gridWidthColors - Width of the color grid.
+         * @param {number} gridHeightColors - Height of the color grid.
+         * @param {number} gridWidthAvatars - Width of the avatar grid.
+         * @param {number} gridHeightAvatars - Height of the avatar grid.
+         * @param {boolean} updateColors - Callback to update colors.
+         * @param {boolean} updateAvatars - Callback to update avatars.
+         */
         addEventListenerRefresh(btn, bottom, gridWidthColors, gridHeightColors, gridWidthAvatars, gridHeightAvatars,
                                 updateColors, updateAvatars) {
-            const instance = this;
-            btn.addEventListener("click",
-                function() {
-                    const elements = Array.from(instance.area.getElementsByClassName("mmogame_color"));
-                    elements.forEach(element => element.remove());
+            btn.addEventListener("click", () => {
+                const elements = Array.from(this.area.getElementsByClassName("mmogame_color"));
+                elements.forEach(element => element.remove());
 
-                    instance.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
-                        0, bottom + gridHeightColors + instance.fontSize + instance.padding, gridWidthAvatars, gridHeightAvatars,
-                        updateColors, updateAvatars);
-                }
-            );
+                this.gateSendGetColorsAvatars(0, bottom, gridWidthColors, gridHeightColors,
+                    0, bottom + gridHeightColors + this.fontSize + this.padding, gridWidthAvatars, gridHeightAvatars,
+                    updateColors, updateAvatars);
+            });
         }
 
         /**
@@ -838,51 +856,33 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
 
-        createButtonsAvatar(num, left, widthNickName = 0, heightNickName = 0) {
-            if (widthNickName === 0) {
-                widthNickName = this.iconSize;
-            }
-            if (heightNickName === 0) {
-                heightNickName = this.iconSize - this.buttonAvatarHeight;
-            }
-            if (this.buttonsAvatarLeft === undefined) {
-                this.buttonsAvatarLeft = [];
-            }
-            this.buttonsAvatarLeft[num] = left;
+        createButtonAvatar(prefixclassname, left, topNickName, widthNickName, heightNickName, topAvatar, widthAvatar, title) {
+            const nickname = this.createDOMElement('div', {
+                classname: `${prefixclassname}-nickname`,
+                parent: this.body,
+            }, {
+                left: left,
+                top: topNickName,
+                width: widthNickName
+            }, {
+                title: title
+            });
 
-            if (this.buttonsAvatarSrc === undefined) {
-                this.buttonsAvatarSrc = [];
-            }
-            this.buttonsAvatarSrc[num] = "";
+            const avatar = this.createDOMElement('img', {
+                classname: `${prefixclassname}-avatar`,
+                parent: this.body,
+                styles: {
+                    left: left,
+                    top: topAvatar,
+                    width: widthAvatar,
+                },
+                attributes: {
+                    title: title
+                }
+            });
 
-            if (this.nicknames === undefined) {
-                this.nicknames = [];
-            }
-            this.nicknames[num] = "";
 
-            if (this.buttonsAvatar === undefined) {
-                this.buttonsAvatar = [];
-            }
-            this.buttonsAvatar[num] = this.createImageButton(this.body, 'mmogame-avatar' + num,
-                left, this.avatarTop, this.iconSize, this.iconSize);
-            if (num === 2 && this.avatarTop !== undefined) {
-                this.buttonsAvatar[num].title = this.getStringM('js_opponent');
-            }
-
-            if (this.divNicknames === undefined) {
-                this.divNicknames = [];
-            }
-            if (this.divNicknamesWidth === undefined) {
-                this.divNicknamesWidth = [];
-            }
-            if (this.divNicknamesHeight === undefined) {
-                this.divNicknamesHeight = [];
-            }
-            this.divNicknamesWidth[num] = widthNickName;
-            this.divNicknamesHeight[num] = heightNickName;
-
-            this.divNicknames[num] = this.createDiv(this.body, 'mmogame-gate-nickname',
-                left, this.padding, widthNickName, heightNickName);
+            return {nickname: nickname, avatar: avatar};
         }
 
 
@@ -921,28 +921,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.body.appendChild(this.divMessageHelp);
 
                 this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));
-            }
-        }
-
-
-        /**
-         * Creates a score display element.
-         * @param {string} classnames - The list of classes.
-         * @param {number} left - The left position in pixels.
-         * @param {number} top - The top position in pixels.
-         * @param {number} width - The width of the score element in pixels.
-         * @param {number} height - The height of the score element in pixels.
-         * @param {number} num - Identifier for the score element.
-         */
-        createAddScore(classnames, left, top, width, height, num) {
-            const div = this.createDiv(this.body, classnames, left, top, width, height);
-            div.style.textAlign = "center";
-            div.style.color = this.getContrastingColor(this.colorScore);
-            div.title = this.getStringM('js_grade_last_question');
-            if (num === 1) {
-                this.labelAddScore = div;
-            } else {
-                this.labelAddScore2 = div;
             }
         }
 
@@ -998,13 +976,17 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.divNicknames[num].style.visibility = 'visible';
         }
 
+        /**
+         * Calls the Moodle Web Service 'mmogametype_quiz_get_attempt' and processes the response.
+         *
+         * @param {Object} extraparams - Additional parameters to override default ones.
+         */
         callGetAttempt(extraparams) {
-            let instance = this;
-            require(['core/ajax'], function(Ajax) {
+            require(['core/ajax'], (Ajax) => {
                 let params = {
-                    mmogameid: instance.mmogameid,
-                    kinduser: instance.kinduser,
-                    user: instance.user,
+                    mmogameid: this.gate.mmogameid,
+                    kinduser: this.gate.kinduser,
+                    user: this.gate.user,
                     nickname: null,
                     colorpaletteid: null,
                     avatarid: null,
@@ -1019,14 +1001,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }]);
 
                 // Handling the response
-                getAttempt[0].done(function(response) {
+                getAttempt[0].done((response) => {
                     if (extraparams !== undefined && extraparams.colorpaletteid !== undefined) {
-                        instance.openGame();
-                        instance.colors = undefined;
+                        this.openGame();
+                        this.colors = undefined;
                     }
-                    instance.processGetAttempt(JSON.parse(response));
-                }).fail(function(error) {
-                    instance.createDivMessage('mmogame-error', error.message);
+                    this.processGetAttempt(JSON.parse(response));
+                }).fail((error) => {
+                    this.createDivMessage('mmogame-error', error.message);
                     return error;
                 });
             });
