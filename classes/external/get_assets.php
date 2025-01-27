@@ -16,6 +16,7 @@
 
 namespace mod_mmogame\external;
 
+use coding_exception;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
@@ -58,7 +59,7 @@ class get_assets extends external_api {
      * @param int $avatars
      * @param int $colorpalettes
      * @return array
-     * @throws \coding_exception
+     * @throws coding_exception
      * @throws invalid_parameter_exception
      */
     public static function execute(int $mmogameid, string $kinduser, string $user, int $avatars = 0,
@@ -129,7 +130,7 @@ class get_assets extends external_api {
      * @param array $result
      * @return void
      */
-    private static function compute_avatars(mmogame $mmogame, int $auserid, int $count, array &$result) {
+    private static function compute_avatars(mmogame $mmogame, int $auserid, int $count, array &$result): void {
         $info = $mmogame->get_avatar_info( $auserid);
 
         $a = $mmogame->get_avatars( $auserid);
@@ -143,10 +144,10 @@ class get_assets extends external_api {
             $count--;
         }
         if ($count == 1) {
-            $ids[] = $id = array_rand( $a, $count);
+            $ids[] = $id = array_rand( $a, min($count, count($a)));
             $avatars[] = $a[$id];
         } else if ($count > 1) {
-            $keys = array_rand( $a, $count);
+            $keys = array_rand( $a, min($count, count($a)));
             shuffle( $keys);
             foreach ($keys as $key) {
                 $ids[] = $key;
@@ -166,7 +167,7 @@ class get_assets extends external_api {
      * @param array $result
      * @return void
      */
-    private static function compute_colorpalettes(mmogame $mmogame, int $count, array &$result) {
+    private static function compute_colorpalettes(mmogame $mmogame, int $count, array &$result): void {
         $pals = $mmogame->get_palettes();
 
         while (count( $pals) > $count) {

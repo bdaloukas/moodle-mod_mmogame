@@ -72,8 +72,8 @@ $classname = "MmoGameType".ucfirst( $rgame->type).ucfirst( $rgame->model);
 $PAGE->requires->js_call_amd('mmogametype_'.$rgame->type.'/'.strtolower( $classname));
 $PAGE->requires->js_init_code("
     require(['mmogametype_" . $rgame->type."/" . strtolower( $classname)."'], function(".$classname.") {
-        var obj = new ".$classname."();
-        obj.repairColors( $colors);
+        const obj = new ".$classname."();
+        obj.setColors( obj.sortColors( $colors));
         obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$user', '$url');
     });
 ");

@@ -35,7 +35,6 @@ define([''], function() {
         minFontSize;
         maxFontSize;
         fontSize;
-        colors = {};
         iconSize;
         padding;
         cIcons;
@@ -44,7 +43,7 @@ define([''], function() {
         area;
 
         // Colors
-        colorsBackground;
+        colorBackground;
 
         // Timer variables
         timestart = 0;
@@ -67,6 +66,7 @@ define([''], function() {
             this.iconSize = 0;
             this.padding = 0;
             this.body = document.getElementsByTagName("body")[0];
+            this.setColorsString();
 
             // Compute and set font size properties.
             let size = parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue('font-size'));
@@ -193,35 +193,6 @@ define([''], function() {
                 },
                 attributes: {src, alt, role},
             });
-        }
-
-        /**
-         * Generic method to create styled text or input fields.
-         * @param {HTMLElement} parent - Parent element where the new element will be appended.
-         * @param {string} type - Type of the element ('label' or 'input').
-         * @param {string} classnames - CSS class names.
-         * @param {Object} styles - Inline styles.
-         * @param {string} text - Inner text or placeholder.
-         * @returns {HTMLElement} - The created element.
-         */
-        createTextElement(parent, type, classnames, styles, text = '') {
-            const attributes = type === 'input' ? {type: 'text', placeholder: text} : {};
-            const element = this.createDOMElement(type, {parent, classnames, styles, attributes});
-            if (type === 'label') {
-                element.innerText = text;
-            }
-            return element;
-        }
-
-        createLabel(parent, classnames, left, top, width, fontSize, text) {
-            return this.createTextElement(parent, 'label', classnames, {
-                position: 'absolute',
-                left: `${left}px`,
-                top: `${top}px`,
-                width: `${width}px`,
-                fontSize: `${fontSize}px`,
-                textAlign: 'left',
-            }, text);
         }
 
         // Game logic and utility methods
@@ -441,16 +412,6 @@ define([''], function() {
         }
 
         /**
-         * Repairs colors by sorting and assigning contrasting background colors.
-         * @param {Array} colors - Array of color codes.
-         */
-        repairColors(colors) {
-            this.colors = colors.sort((a, b) => this.getContrast(a) - this.getContrast(b));
-            this.colorBackground = this.colors[0];
-            this.body.style.backgroundColor = this.getColorHex(this.colorBackground);
-        }
-
-        /**
          * Repairs <p> tags in a string by cleaning up unnecessary tags.
          * @param {string} text - The input string with potential <p> tags.
          * @returns {string} The cleaned-up string.
@@ -544,17 +505,22 @@ define([''], function() {
         }
 
         setColorsString(s) {
-            let a = [0x9B7ED9, 0x79F2F2, 0x67BF5A, 0xD0F252, 0xBF5B21];
+            let colors = [0x9B7ED9, 0x79F2F2, 0x67BF5A, 0xD0F252, 0xBF5B21];
             if (s !== undefined && s.length >= 0) {
                 let b = s.split(",");
                 if (b.length === 5) {
-                    a = b;
+                    colors = [];
                     for (let i = 0; i < 5; i++) {
-                        a[i] = parseInt(a[i]);
+                        colors[i] = parseInt(b[i]);
                     }
                 }
             }
-            this.setColors(a);
+
+            this.setColors(this.sortColors(colors));
+        }
+
+        sortColors(colors) {
+            return colors.sort((a, b) => this.getContrast(a) - this.getContrast(b));
         }
 
         computeDifClock(time, timeStart, timeClose) {
@@ -736,8 +702,9 @@ define([''], function() {
             return name + error;
         }
 
-        setColors(a) {
-            return a;
+        setColors(colors) {
+            this.colorBackground = colors[0];
+            this.body.style.backgroundColor = this.getColorHex(this.colorBackground);
         }
     };
 });

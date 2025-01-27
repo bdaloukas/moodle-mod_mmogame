@@ -40,21 +40,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         }
 
         /**
-         * Sets the colors for different UI elements and repairs them if necessary.
-         *
-         * @param {Array} colors - Array of color codes to be applied.
-         */
-        setColors(colors) {
-            this.repairColors(colors); // Ensure colors are valid
-
-            // Assign specific colors to UI elements
-            this.colorDefinition = this.colors[1];
-            this.colorScore = this.colors[2];
-            this.colorCopyright = this.colors[3];
-            this.colorScore2 = this.colors[4];
-        }
-
-        /**
          * Initializes the game by loading required audio assets.
          */
         openGame() {
@@ -364,7 +349,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
                 // Create the checkbox
                 const checked = aChecked.includes(this.answersID[i]);
-                const item = this.createRadiobox(this.body, checkboxSize, this.colorDefinition, this.colorScore, checked, disabled);
+                const item = this.createRadiobox(this.body, checkboxSize, this.colorBackground2, this.colorScore,
+                    checked, disabled);
                 item.style.position = "absolute";
                 item.style.left = `${left}px`;
                 item.style.top = `${top}px`;
@@ -373,12 +359,12 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 // Event listeners for interactions
                 item.addEventListener('click', () => {
                     if (!item.classList.contains("disabled")) {
-                        this.onClickRadio(i, this.colorDefinition, this.colorScore, true);
+                        this.onClickRadio(i, this.colorBackground2, this.colorScore, true);
                     }
                 });
 
                 label.addEventListener('click', () => {
-                    this.onClickRadio(i, this.colorDefinition, this.colorScore, true);
+                    this.onClickRadio(i, this.colorBackground2, this.colorScore, true);
                 });
 
                 this.area.appendChild(item);
@@ -510,7 +496,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             for (const item of this.aItemAnswer) {
                 item.classList.add("disabled"); // Add 'disabled' class to each input
-                this.drawRadio(item, this.colorScore, this.colorDefinition); // Update styling
+                this.drawRadio(item, this.colorScore, this.colorBackground2); // Update styling
             }
         }
         /**
@@ -692,8 +678,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }
 
             // Apply styling and position
-            definitionDiv.style.background = this.getColorHex(this.colorDefinition);
-            definitionDiv.style.color = this.getContrastingColor(this.colorDefinition);
+            definitionDiv.style.background = this.getColorHex(this.colorBackground2);
+            definitionDiv.style.color = this.getContrastingColor(this.colorBackground2);
             definitionDiv.style.left = `${left}px`;
             definitionDiv.style.top = `${top}px`;
             definitionDiv.style.paddingLeft = `${this.padding}px`;
@@ -794,5 +780,18 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             });
         }
 
+        /**
+         * Sets the colors for different UI elements and repairs them if necessary.
+         *
+         * @param {Array} colors - Array of color codes to be applied.
+         */
+        setColors(colors) {
+            super.setColors(colors);
+
+            // Assign specific colors to UI elements
+            this.colorScore = colors[2];
+            this.colorCopyright = colors[3];
+            this.colorScore2 = colors[4];
+        }
     };
     });
