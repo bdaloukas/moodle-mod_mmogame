@@ -112,7 +112,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         gateOpen(mmogameid, pin, kinduser, user, url) {
             const instance = this;
 
-            //try {
+            try {
                 // Initialize class variables
                 this.url = url;
                 this.mmogameid = mmogameid;
@@ -163,13 +163,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                         }
 
                         return true;
+                    })
+                    .catch((error) => {
+                        this.showError('gateOpen unexpected', error);
                     });
-                    //.catch((error) => {
-                    //    this.showError('gateOpen unexpected', error);
-                    //});
-            //};//catch (error) {
-               // this.showError('gateOpen', error);
-            //}
+            } catch (error) {
+               this.showError('gateOpen', error);
+            }
         }
 
         gatePlayGame(save, nickname, paletteid, avatarid) {
@@ -196,11 +196,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     this.avatarid = avatarid;
                     this.callGetAttempt();
                     return true;
+                })
+                .catch(error => {
+                    this.showError(error.message);
+                    return false;
                 });
-                //.catch(error => {
-                //    this.showError(error.message);
-                //    return false;
-                //});
         }
 
         gateCreateScreen() {
@@ -606,7 +606,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             return [label, button];
         }
-/*
+/* B
         gateCreateButtonSubmit = (maxWidth, bottom2) => {
             this.btnSubmit = this.createImageButton(this.area, 'mmogame-gate-submit',
                 (maxWidth - this.iconSize) / 2, bottom2, 0, this.iconSize,
