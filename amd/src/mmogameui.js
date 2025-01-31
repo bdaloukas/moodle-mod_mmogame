@@ -40,9 +40,16 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         user;
         paletteid;
         avatarid;
+        iconSize;
+        padding;
+        avatarsSrc = [];
+        nickNames = [];
 
         // Form fields
         edtNickname;
+
+        // Gate variables
+        mmogameid;
 
         constructor() {
             super();
@@ -661,17 +668,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             instance.divMessage.style.top = (height - instance.divMessage.scrollHeight) / 2 + "px";
         }
 
-        createButtonAvatar(prefixclassname, left, topNickName, widthNickName, heightNickName, topAvatar, widthAvatar, title) {
+        createNicknameAvatar(prefixclassname, left, topNickName, widthNickname, heightNickname, topAvatar, widthAvatar) {
             const nickname = this.createDOMElement('div', {
-                classname: `${prefixclassname}-nickname`,
                 parent: this.body,
+                classname: `${prefixclassname}-nickname`,
                 styles: {
-                    left: left,
-                    top: topNickName,
-                    width: widthNickName
-                },
-                attributes: {
-                    title: title
+                    left: `${left}`,
+                    top: `${topNickName}`,
+                    width: `${widthNickname}px`,
                 }
             });
 
@@ -679,17 +683,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 classname: `${prefixclassname}-avatar`,
                 parent: this.body,
                 styles: {
-                    left: left,
-                    top: topAvatar,
-                    width: widthAvatar,
-                },
-                attributes: {
-                    title: title
+                    left: `${left}`,
+                    top: `${topAvatar}`,
+                    width: `${widthAvatar}px`,
                 }
             });
 
 
-            return {nickname: nickname, avatar: avatar};
+            return [nickname, avatar];
         }
 
 
@@ -733,56 +734,45 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             }
         }
 
-        updateButtonsAvatar(num, avatar, nickname) {
-            if (avatar === undefined) {
-                avatar = "";
+        updateButtonsAvatar(num, avatarElement, nickNameElement, avatarSrc, nickname, nicknameWidth, nicknameHeight) {
+            if (avatarSrc === undefined) {
+                avatarSrc = "";
             }
             if (nickname === undefined) {
                 nickname = "";
             }
 
-            if (avatar === "" && nickname === "") {
-                this.buttonsAvatar[num].style.visibility = 'hidden';
-                this.divNicknames[num].style.visibility = 'hidden';
+            if (avatarSrc === "" && nickname === "") {
+                avatarElement.style.visibility = 'hidden';
+                nickNameElement.style.visibility = 'hidden';
                 return;
             }
 
-            if (this.nicknames[num] !== nickname || nickname === "") {
-                this.nicknames[num] = nickname;
+            if (this.nickNames[num] !== nickname || nickname === "") {
+                this.nickNames[num] = nickname;
                 let s = nickname;
 
                 if (nickname.length === 0) {
-                    s = avatar;
-                    let pos = s.lastIndexOf("/");
-                    if (pos >= 0) {
-                        s = s.slice(pos + 1);
-                    }
-                    pos = s.lastIndexOf(".");
-                    if (pos >= 0) {
-                        s = s.slice(0, pos);
-                    }
-                    const filenameWithExt = avatar.split('/').pop(); // Extract the file name with its extension
-                    s = filenameWithExt.split('.').slice(0, -1).join('.'); // Remove the extension from the file name
+                    const filenameWithExt = avatarSrc.split('/').pop(); // Extract file name
+                    // Remove extension, fallback if no extension
+                    s = filenameWithExt.split('.').slice(0, -1).join('.') || filenameWithExt;
                 }
                 s = this.repairNickname(s);
-                if (this.divNicknames[num] !== undefined && this.divNicknames[num].innerHTML !== s) {
-                    this.divNicknames[num].innerHTML = s;
-                    this.divNicknames[num].style.textAlign = "center";
-                    this.divNicknames[num].style.color = this.getContrastingColor(this.colorsBackground);
-                    this.autoResizeText(this.divNicknames[num], this.divNicknamesWidth[num], this.divNicknamesHeight[num], true,
-                        0, 0, 1);
-                }
+                nickNameElement.innerHTML = s;
+                nickNameElement.style.textAlign = "center";
+                nickNameElement.style.color = this.getContrastingColor(this.colorBackground);
+                this.autoResizeText(nickNameElement, nicknameWidth, nicknameHeight, true, 0, 0);
             }
 
-            if (avatar !== this.buttonsAvatarSrc[num]) {
-                this.updateImageButton(this.buttonsAvatar[num], avatar !== "" ? "assets/avatars/" + avatar : "");
-                this.buttonsAvatarSrc[num] = avatar;
+            if (avatarSrc !== this.avatarsSrc[num]) {
+                avatarElement.src = avatarSrc !== "" ? "assets/avatars/" + avatarSrc : "";
+                this.avatarsSrc[num] = avatarSrc;
             }
 
-            this.buttonsAvatar[num].alt = this.divNicknames[num].innerHTML;
+            avatarElement.alt = nickNameElement.innerHTML;
+            avatarElement.style.visibility = 'visible';
 
-            this.buttonsAvatar[num].style.visibility = 'visible';
-            this.divNicknames[num].style.visibility = 'visible';
+            nickNameElement.style.visibility = 'visible';
         }
 
         /**

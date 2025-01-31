@@ -15,7 +15,6 @@
 
 define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
     return class MmoGameTypeQuiz extends MmoGameUI {
-        mmogameid;
         kinduser;
         user;
         url;
@@ -57,6 +56,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          *
          * @param {Object} json - The server response containing attempt data.
          */
+        /*
         processGetAttempt(json) {
             // Calculate time difference and set up the clock
             this.computeDifClock(json.time, json.timestart, json.timeclose);
@@ -87,7 +87,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.state = parseInt(json.state, 10);
             this.fastjson = json.fastjson;
             this.timefastjson = parseInt(json.timefastjson, 10);
-            this.updateButtonsAvatar(1, json.avatar, json.nickname);
+            this.updateButtonsAvatar(1, this.avatarElement, this.nicknameElement, json.avatar, json.nickname, this.iconSize,
+                Math.round(this.iconSize / 3));
 
             this.attempt = json.attempt;
 
@@ -113,7 +114,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             this.updateLabelTimer(); // Start or update the timer
             this.sendFastJSON(); // Send fast JSON updates
-        }
+        }*/
 
         updateLabelTimer() {
             // Exit if labelTimer or timeclose are undefined

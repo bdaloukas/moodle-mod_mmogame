@@ -17,13 +17,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
     function(MmoGameTypeQuiz) {
         return class MmoGameTypeQuizAduel extends MmoGameTypeQuiz {
 
-    isVertical; // If height > width
     player1; // Stores all info for player1
     player2; // Stores all info for player2
-    cIcons; // How many icons there are
     isWaitOpponent; // True if wait someone to answer a set of questions
     nickNameHeight; // Height of nickname
-    iconSize;
 
     constructor() {
         super();
@@ -33,8 +30,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
         // B this.hasBasBottom = this.isVertical;
 
         this.isWaitOpponent = false;
-        // this.autosubmit = true;
-        // this.type = 'aduel';
+        // This.autosubmit = true;
+        // This.type = 'aduel';
     }
 
     createIconBar() {
@@ -168,10 +165,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         if (json.name !== undefined) {
             window.document.title = json.name;
-        }
-
-        if (json.helpurl !== undefined) {
-            this.helpUrl = json.helpurl;
         }
 
         this.correct = undefined;
