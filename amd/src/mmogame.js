@@ -653,7 +653,7 @@ define([''], function() {
                 Object.entries(options).forEach(([key, value]) => store.put({name: key, value}));
                 await transaction.complete;
             } catch (error) {
-                this.showError('Failed to save options:', error);
+                this.showError('setOption.Failed to save options:', error);
             }
         }
 

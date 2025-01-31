@@ -42,7 +42,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         avatarid;
 
         // Form fields
-        edtCode;
         edtNickname;
 
         constructor() {
@@ -191,16 +190,17 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             this.setOptions(options)
                 .then(() => {
-                    this.nickname = nickname;
-                    this.paletteid = paletteid;
-                    this.avatarid = avatarid;
-                    this.callGetAttempt();
                     return true;
                 })
                 .catch(error => {
                     this.showError(error.message);
                     return false;
                 });
+
+            this.nickname = nickname;
+            this.paletteid = paletteid;
+            this.avatarid = avatarid;
+            this.callGetAttempt();
         }
 
         gateCreateScreen() {
@@ -241,6 +241,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             const instance = this;
 
             let top = this.gateCreateNickName(0, maxWidth) + this.padding;
+            this.edtNickname.focus();
             // Creates the "nickname" field.
 
             // Palette
@@ -259,8 +260,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             top += lblAvatars.scrollHeight + instance.padding;
 
-            const gridHeightAvatars = Math.floor(maxHeight - top - this.padding);
-            const countYavatars = Math.floor(gridHeightAvatars / this.iconSize);
+            const countYavatars = Math.floor(Math.floor(maxHeight - top - this.padding) / this.iconSize);
+            const gridHeightAvatars = countYavatars * this.iconSize;
 
             instance.addEventListenerRefresh(btnPalette, topGridPalette, countX, countYpalette,
                 top, countX, countYavatars, true, false);
@@ -271,9 +272,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             // Horizontal
             instance.gateSendGetColorsAvatars(0, topGridPalette, countX, countYpalette,
                 0, top, countX, countYavatars, true, true);
-            top += gridHeightPalette + instance.fontSize + instance.padding + gridHeightAvatars;
 
-            this.gateCreateSubmit(top);
+            this.gateCreateSubmit(top + gridHeightAvatars + 2 * this.padding, maxWidth);
         }
 
         gateCreateNickName(top, maxWidth) {
@@ -323,8 +323,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     fontSize: `${this.fontSize}px`,
                     left: `${(maxWidth - this.iconSize) / 2}px`,
                     top: `${top}px`,
-                    width: `0`,
-                    height: `${this.iconSize}`,
+                    height: `${this.iconSize}px`,
                     color: this.getContrastingColor(this.colorBackground),
                     cursor: 'pointer',
                     visibility: 'hidden',
@@ -334,9 +333,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }
             });
             this.btnSubmit.addEventListener("click", () => {
-                if (this.edtCode !== undefined) {
-                    this.user = this.edtCode.value;
-                }
                 this.gatePlayGame(true, this.edtNickname.value, this.paletteid, this.avatarid);
             });
         }
@@ -496,13 +492,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateUpdateColorPalette(canvas, id) {
-            const instance = this;
-
-            if (instance.canvasColor !== undefined) {
-                instance.canvasColor.style.borderStyle = "none";
+            if (this.canvasColor !== undefined) {
+                this.canvasColor.style.borderStyle = "none";
             }
             this.canvasColor = canvas;
-            let w = Math.round(instance.padding / 2) + "px";
+            let w = Math.round(this.padding / 2) + "px";
 
             Object.assign(canvas.style, {
                 borderStyle: "outset",
@@ -511,9 +505,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 borderRightWidth: w,
                 borderBottomWidth: w,
             });
-            instance.paletteid = id;
+            this.paletteid = id;
 
-            instance.gateUpdateSubmit();
+            this.gateUpdateSubmit();
         }
 
         gateUpdateAvatar(avatar, id, w) {
@@ -539,17 +533,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * Updates the visibility of the submit button based on form input validation.
          */
         gateUpdateSubmit() {
-            const instance = this;
+            const hasAvatar = this.avatarid !== undefined;
+            const hasPalette = this.paletteid !== undefined;
+            const hasNickname = this.edtNickname?.value?.length > 0;
 
-            const isCodeValid = instance.edtCode?.value ? Number(instance.edtCode.value) > 0 : true;
-            const hasAvatar = instance.avatarid !== undefined;
-            const hasPalette = instance.paletteid !== undefined;
-            const hasNickname = instance.edtNickname?.value?.length > 0;
-
-            instance.btnSubmit.style.visibility =
-                isCodeValid && hasAvatar && hasPalette && hasNickname
-                    ? 'visible'
-                    : 'hidden';
+            this.btnSubmit.style.visibility = hasAvatar && hasPalette && hasNickname ? 'visible' : 'hidden';
         }
 
         gateComputeSizes() {
@@ -606,20 +594,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             return [label, button];
         }
-/* B
-        gateCreateButtonSubmit = (maxWidth, bottom2) => {
-            this.btnSubmit = this.createImageButton(this.area, 'mmogame-gate-submit',
-                (maxWidth - this.iconSize) / 2, bottom2, 0, this.iconSize,
-                'assets/submit.svg', false, 'submit');
-            this.btnSubmit.style.visibility = 'hidden';
-            this.btnSubmit.addEventListener("click", () => {
-                if (this.edtCode !== undefined) {
-                    this.user = this.edtCode.value;
-                }
-                this.gatePlayGame(true, this.edtNickname.value, this.paletteid, this.avatarid);
-            });
-        };
-*/
 
         /**
          * Adds an event listener to refresh colors and avatars.
