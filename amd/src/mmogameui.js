@@ -635,7 +635,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             if (this.area) {
                 this.body.removeChild(this.area);
             }
-console.log( this.areaRect);
+
             this.area = this.createDiv(
                 this.body,
                 'mmogame-area',

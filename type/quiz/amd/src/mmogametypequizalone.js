@@ -159,6 +159,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         /**
          * Creates a horizontal layout for the quiz screen.
          *
+         * @param {object} json
          * @param {boolean} disabled - Whether user input should be disabled.
          */
         createScreenHorizontal(json, disabled) {
