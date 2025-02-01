@@ -630,11 +630,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         /**
          * Creates the main game area.
          */
+
         createArea() {
             if (this.area) {
                 this.body.removeChild(this.area);
             }
-
+console.log( this.areaRect);
             this.area = this.createDiv(
                 this.body,
                 'mmogame-area',
@@ -673,8 +674,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 parent: this.body,
                 classname: `${prefixclassname}-nickname`,
                 styles: {
-                    left: `${left}`,
-                    top: `${topNickName}`,
+                    left: `${left}px`,
+                    top: `${topNickName}pc`,
                     width: `${widthNickname}px`,
                 }
             });
@@ -683,8 +684,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 classname: `${prefixclassname}-avatar`,
                 parent: this.body,
                 styles: {
-                    left: `${left}`,
-                    top: `${topAvatar}`,
+                    left: `${left}px`,
+                    top: `${topAvatar}px`,
                     width: `${widthAvatar}px`,
                 }
             });

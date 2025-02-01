@@ -210,6 +210,7 @@ define([''], function() {
             this.iconSize = Math.round(this.iconSize - adjustment);
             this.padding = Math.round(this.iconSize / 10);
             this.iconSize -= this.padding;
+console.log("computeSizes padding=" + this.padding);
         }
 
         /**

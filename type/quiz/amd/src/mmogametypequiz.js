@@ -21,8 +21,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         pin;
         labelTimer;
         timeForSendAnswer;
-        divDefinition;
-        definitionHeight;
+        // DivDefinition;
+        // DefinitionHeight;
 
         /**
          * Base class for Quiz mmmogame
@@ -115,7 +115,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.updateLabelTimer(); // Start or update the timer
             this.sendFastJSON(); // Send fast JSON updates
         }*/
-
+/*
         updateLabelTimer() {
             // Exit if labelTimer or timeclose are undefined
             if (!this.labelTimer || !this.timeclose) {
@@ -141,7 +141,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             // Set a timeout to update the timer every 500ms
             this.timerTimeout = setTimeout(() => this.updateLabelTimer(), 500);
         }
-
+*/
         /**
          * Handles the timeout scenario by disabling inputs and sending timeout data.
          */
@@ -149,32 +149,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.labelTimer.innerHTML = ''; // Clear the timer display
             this.disableInput(); // Prevent further user input
             this.sendTimeout(); // Notify the server about the timeout
-        }
-        /**
-         * Creates the game screen layout based on the current state.
-         *
-         * @param {Object} json - The game data used to build the screen.
-         * @param {boolean} disabled - Determines whether user input should be disabled.
-         */
-        createScreen(json, disabled) {
-            this.createArea(); // Prepare the main game area
-
-            if (this.endofgame) {
-                // Display end-of-game message and final score
-                this.createDivMessage('mmogame-endofgame', this.getStringM('js_game_over'));
-                this.showScore(json);
-                return;
-            }
-
-            // Render the screen layout based on orientation (vertical or horizontal)
-            if (this.vertical) {
-                this.createScreenVertical(disabled);
-            } else {
-                this.createScreenHorizontal(disabled);
-            }
-
-            // Display the current score
-            this.showScore(json);
         }
 
         /**
@@ -232,69 +206,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             // Adjust strip dimensions
             this.stripLeft = this.padding;
-            this.stripWidth = 2 * this.iconSize;
-            this.stripHeight = this.iconSize;
-        }
-
-        /**
-         * Creates a horizontal layout for the quiz screen.
-         *
-         * @param {boolean} disabled - Whether user input should be disabled.
-         */
-        createScreenHorizontal(disabled) {
-            let maxHeight = this.areaHeight - 2 * this.padding;
-
-            if (!this.hideSubmit) {
-                maxHeight -= this.iconSize + this.padding; // Reserve space for submit button
-            }
-
-            const width = Math.round((this.areaWidth - this.padding) / 2);
-            for (let step = 1; step <= 2; step++) {
-                let defSize;
-                this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
-                    (fontSize) => {
-                        defSize = this.createDefinition(0, 0, width - this.padding, true, fontSize);
-
-                        if (defSize[0] >= width) {
-                            return 1;
-                        }
-                        let ansSize = this.createAnswer(0, 0, width - this.padding, true, fontSize, disabled);
-                        if (ansSize[0] >= width) {
-                            return 1;
-                        }
-                        return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
-                    }
-                );
-                if (defSize[0] <= width && defSize[1] <= this.areaHeight) {
-                    break;
-                }
-            }
-
-            this.radioSize = Math.round(this.fontSize);
-            this.createDefinition(0, 0, width - this.padding, false, this.fontSize);
-
-            this.nextTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled) + this.padding;
-
-            if (!this.hideSubmit) {
-                // Create and position the submit button
-                this.btnSubmit = this.createImageButton(
-                    this.body,
-                    'mmogame-quiz-submit',
-                    width + (width - this.iconSize) / 2,
-                    this.nextTop,
-                    0,
-                    this.iconSize,
-                    'assets/submit.svg',
-                    false,
-                    'submit'
-                );
-                this.btnSubmit.addEventListener('click', () => {
-                    this.sendAnswer();
-                });
-            }
-
-            // Adjust strip dimensions
-            this.stripLeft = width + this.padding;
             this.stripWidth = 2 * this.iconSize;
             this.stripHeight = this.iconSize;
         }
@@ -529,7 +440,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }, this.timeForSendAnswer);
         }
 
-
         onClickHelp() {
             if (this.helpUrl !== '') {
                 window.open(this.helpUrl, "_blank");
@@ -551,7 +461,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          */
         createDivScorePercent(prefixclassname, left, top, color, createAddScore) {
             // Create the main button container
-            const main = this.createDOMElement('div', {
+            this.createDOMElement('div', {
                 parent: this.body,
                 classnames: `${prefixclassname}-main`,
                 styles: {
@@ -649,7 +559,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 });
             }
 
-            return {main, scoreLabel, rankLabel, percentLabel, addScoreLabel};
+            return [scoreLabel, rankLabel, percentLabel, addScoreLabel];
         }
 
         /**
@@ -660,21 +570,36 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @param {number} width - The width of the definition area.
          * @param {boolean} onlyMetrics - Whether to only measure size.
          * @param {number} fontSize - The font size for the definition text.
+         * @param {string} definition
          * @returns {Array} The width and height of the definition area.
          */
-        createDefinition(left, top, width, onlyMetrics, fontSize) {
-            width -= 2 * this.padding;
+        createDefinition(left, top, width, onlyMetrics, fontSize, definition) {
+            const adjustedWidth = width - 2 * this.padding;
 
-            const definitionDiv = document.createElement("div");
+            const definitionDiv = this.createDOMElement(
+                'div',
+                {
+                    classnames: 'mmogame-quiz-definition',
+                    styles: {
+                        position: 'absolute',
+                        width: `${adjustedWidth}px`,
+                        fontSize: `${fontSize}px`,
+                    }
+                }
+            );
+            definitionDiv.innerHTML = definition;
+
+/* A            document.createElement("div");
             definitionDiv.style.position = "absolute";
-            definitionDiv.style.width = `${width}px`;
+            definitionDiv.style.width = `${adjustedWidth}px`;
             definitionDiv.style.fontSize = `${fontSize}px`;
-            definitionDiv.innerHTML = this.definition;
-
+*/
             if (onlyMetrics) {
-                this.body.appendChild(definitionDiv);
+                document.body.appendChild(definitionDiv);
+
                 const size = [definitionDiv.scrollWidth, definitionDiv.scrollHeight];
-                this.body.removeChild(definitionDiv);
+
+                document.body.removeChild(definitionDiv);
                 return size;
             }
 
@@ -683,19 +608,16 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             definitionDiv.style.color = this.getContrastingColor(this.colorBackground2);
             definitionDiv.style.left = `${left}px`;
             definitionDiv.style.top = `${top}px`;
-            definitionDiv.style.paddingLeft = `${this.padding}px`;
-            definitionDiv.style.paddingRight = `${this.padding}px`;
+            definitionDiv.style.padding = `0 ${this.padding}px`;
 
             this.area.appendChild(definitionDiv);
 
-            const height = definitionDiv.scrollHeight + this.padding;
-            definitionDiv.style.height = `${height}px`;
-
-            this.definitionHeight = height;
-            this.divDefinition = definitionDiv;
+            // Const height = definitionDiv.scrollHeight + this.padding;
+            // DefinitionDiv.style.height = `${height}px`;
 
             return [definitionDiv.scrollWidth, definitionDiv.scrollHeight];
         }
+
 
         /**
          * Displays the current score and ranking on the screen.
@@ -708,6 +630,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @param {int} scoreData.sumscore
          * @param {string} scoreData.usercode
          */
+/* A
         showScore({addscore, completedrank, percentcompleted, rank, sumscore, usercode}) {
             // Update total score display
             const scoreText = sumscore !== undefined ? `<b>${sumscore}</b>` : '';
@@ -747,7 +670,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.autoResizeText(this.labelScoreB, 0.8 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
             }
         }
-
+*/
         /**
          * Sends the selected answer to the server using Moodle's AJAX API.
          */

@@ -22,6 +22,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
         avatarElement;
         nicknameElement;
 
+        // Score variables.
+        lblScore;
+        lblRank;
+        lblPercent;
+        lblAddScore;
+
         constructor() {
             super();
             this.cIcons = this.hasHelp() ? 5 : 4;
@@ -41,10 +47,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 nicknameHeight,
                 this.padding + nicknameHeight,
                 this.iconSize);
-/* A
-            this.createDivScorePercent('mmogame-quiz-alone', this.padding + (i++) * step,
-                this.padding + this.nickNameHeight, this.getConstrastingColor(this.color), true);
 
+            [this.lblScore, this.lblRank, this.lblPercent, this.lblAddScore] = this.createDivScorePercent(
+                'mmogame-quiz-alone',
+                this.padding + (i++) * step,
+                this.padding + nicknameHeight,
+                this.getContrastingColor(this.color),
+                true);
+/* B
             this.createButtonSound(this.padding + (i++) * step,
                 this.padding + this.nickNameHeight);
             if (this.hasHelp()) {
@@ -52,15 +62,17 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.buttonHelp.addEventListener("click", () => this.onClickHelp(this.buttonHelp));
             }
 
+*/
+
             let copyrightHeight = this.getCopyrightHeight();
 
             this.areaRect = {
-                // Left: this.padding,
-                top: 2 * this.padding + this.iconSize + this.nickNameHeight,
+                left: this.padding,
+                top: 2 * this.padding + this.iconSize + nicknameHeight,
                 width: Math.round(window.innerWidth - 2 * this.padding),
-                height: Math.round(window.innerHeight - this.areaTop - copyrightHeight),
+                height: Math.round(window.innerHeight - 2 * this.padding - nicknameHeight - this.iconSize - copyrightHeight),
             };
-
+/* N
             this.createDivColor(
                 this.body,
                 'mmogame-quiz-alone-color',
@@ -114,6 +126,98 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
 
             this.sendFastJSON();
+        }
+
+        /**
+         * Creates the game screen layout based on the current state.
+         *
+         * @param {Object} json - The game data used to build the screen.
+         * @param {boolean} disabled - Determines whether user input should be disabled.
+         */
+        createScreen(json, disabled) {
+            this.createArea(); // Prepare the main game area
+
+            if (this.endofgame) {
+                // Display end-of-game message and final score
+                this.createDivMessage('mmogame-endofgame', this.getStringM('js_game_over'));
+                this.showScore(json);
+                return;
+            }
+
+            // Render the screen layout based on orientation (vertical or horizontal)
+            if (this.vertical) {
+                this.createScreenVertical(disabled);
+            } else {
+                this.createScreenHorizontal(json, disabled);
+            }
+
+            // Display the current score
+            this.showScore(json);
+        }
+
+
+        /**
+         * Creates a horizontal layout for the quiz screen.
+         *
+         * @param {boolean} disabled - Whether user input should be disabled.
+         */
+        createScreenHorizontal(json, disabled) {
+            let maxHeight = this.areaHeight - 2 * this.padding;
+
+            if (!this.hideSubmit) {
+                maxHeight -= this.iconSize + this.padding; // Reserve space for submit button
+            }
+
+            const width = Math.round((this.areaWidth - this.padding) / 2);
+            for (let step = 1; step <= 2; step++) {
+                let defSize;
+                this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
+                    (fontSize) => {
+                        defSize = this.createDefinition(0, 0, width - this.padding, true, fontSize,
+                            json.definition);
+
+                        if (defSize[0] >= width) {
+                            return 1;
+                        }
+                        let ansSize = this.createAnswer(0, 0, width - this.padding, true, fontSize, disabled);
+                        if (ansSize[0] >= width) {
+                            return 1;
+                        }
+                        return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
+                    }
+                );
+                if (defSize[0] <= width && defSize[1] <= this.areaHeight) {
+                    break;
+                }
+            }
+
+            this.radioSize = Math.round(this.fontSize);
+            this.createDefinition(0, 0, width - this.padding, false, this.fontSize, json.definition);
+
+            this.nextTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled) + this.padding;
+
+            if (!this.hideSubmit) {
+                // Create and position the submit button
+                this.btnSubmit = this.createImageButton(
+                    this.body,
+                    'mmogame-quiz-submit',
+                    width + (width - this.iconSize) / 2,
+                    this.nextTop,
+                    0,
+                    this.iconSize,
+                    'assets/submit.svg',
+                    false,
+                    'submit'
+                );
+                this.btnSubmit.addEventListener('click', () => {
+                    this.sendAnswer();
+                });
+            }
+
+            // Adjust strip dimensions
+            this.stripLeft = width + this.padding;
+            this.stripWidth = 2 * this.iconSize;
+            this.stripHeight = this.iconSize;
         }
 
         processGetAttempt(json) {
@@ -175,14 +279,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             // Handle end-of-game scenarios
             this.endofgame = json.endofgame !== undefined && json.endofgame !== 0;
-            this.definition = this.repairP(json.definition);
+            json.definition = this.repairP(json.definition);
             this.errorcode = json.errorcode;
 
             if (json.state !== 0) {
                 this.createScreen(json, false);
             }
 
-            this.updateLabelTimer(); // Start or update the timer
+            // A this.updateLabelTimer(); // Start or update the timer
             this.sendFastJSON(); // Send fast JSON updates
 
             if (this.btnSubmit) {
@@ -191,7 +295,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         showScore({rank, rankc, sumscore}) {
-return;
             if (rank !== undefined && rankc !== undefined) {
                 if (parseInt(rank) < parseInt(rankc)) {
                     this.completedrank = '';
@@ -205,23 +308,27 @@ return;
             const s = sumscore === undefined ? '' : `<b>${sumscore}</b>`;
             if (this.cacheScore !== s) {
                 this.cacheScore = s;
-                this.labelScore.innerHTML = s;
-                this.autoResizeText(this.labelScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0, 1);
+                this.lblScore.innerHTML = s;
+                this.autoResizeText(this.lblScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0);
             }
         }
 
         showHelpScreen(div) {
             div.innerHTML = `
                 <br>
-                <div>${this.getStringG('js_alone_help')}</div><br>
+                <div>${this.getStringT('js_alone_help')}</div><br>
 
                 <table border=1>
                     <tr>
                         <td><img height="83" src="assets/aduel/example2.png" alt="" /></td>
-                        <td>${this.getStringG('js_aduel_example2')}</td>
+                        <td>${this.getStringT('js_aduel_example2')}</td>
                     </tr>
                 </table>
             `;
+        }
+
+        getCopyrightHeight() {
+            return 0;
         }
     };
 });
