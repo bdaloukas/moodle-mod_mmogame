@@ -42,8 +42,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         avatarid;
         iconSize;
         padding;
-        avatarsSrc = [];
-        nickNames = [];
 
         // Form fields
         edtNickname;
@@ -669,13 +667,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             instance.divMessage.style.top = (height - instance.divMessage.scrollHeight) / 2 + "px";
         }
 
-        createNicknameAvatar(prefixclassname, left, topNickName, widthNickname, heightNickname, topAvatar, widthAvatar) {
+        createNicknameAvatar(prefixclassname, left, topNickname, widthNickname, heightNickname, topAvatar, widthAvatar) {
             const nickname = this.createDOMElement('div', {
                 parent: this.body,
                 classname: `${prefixclassname}-nickname`,
                 styles: {
+                    position: 'absolute',
                     left: `${left}px`,
-                    top: `${topNickName}pc`,
+                    top: `${topNickname}px`,
                     width: `${widthNickname}px`,
                 }
             });
@@ -684,6 +683,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 classname: `${prefixclassname}-avatar`,
                 parent: this.body,
                 styles: {
+                    position: 'absolute',
                     left: `${left}px`,
                     top: `${topAvatar}px`,
                     width: `${widthAvatar}px`,
@@ -733,47 +733,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 instance.showHelpScreen(div, (width - 2 * instance.padding), (height - height1));
             }
-        }
-
-        updateButtonsAvatar(num, avatarElement, nickNameElement, avatarSrc, nickname, nicknameWidth, nicknameHeight) {
-            if (avatarSrc === undefined) {
-                avatarSrc = "";
-            }
-            if (nickname === undefined) {
-                nickname = "";
-            }
-
-            if (avatarSrc === "" && nickname === "") {
-                avatarElement.style.visibility = 'hidden';
-                nickNameElement.style.visibility = 'hidden';
-                return;
-            }
-
-            if (this.nickNames[num] !== nickname || nickname === "") {
-                this.nickNames[num] = nickname;
-                let s = nickname;
-
-                if (nickname.length === 0) {
-                    const filenameWithExt = avatarSrc.split('/').pop(); // Extract file name
-                    // Remove extension, fallback if no extension
-                    s = filenameWithExt.split('.').slice(0, -1).join('.') || filenameWithExt;
-                }
-                s = this.repairNickname(s);
-                nickNameElement.innerHTML = s;
-                nickNameElement.style.textAlign = "center";
-                nickNameElement.style.color = this.getContrastingColor(this.colorBackground);
-                this.autoResizeText(nickNameElement, nicknameWidth, nicknameHeight, true, 0, 0);
-            }
-
-            if (avatarSrc !== this.avatarsSrc[num]) {
-                avatarElement.src = avatarSrc !== "" ? "assets/avatars/" + avatarSrc : "";
-                this.avatarsSrc[num] = avatarSrc;
-            }
-
-            avatarElement.alt = nickNameElement.innerHTML;
-            avatarElement.style.visibility = 'visible';
-
-            nickNameElement.style.visibility = 'visible';
         }
 
         /**

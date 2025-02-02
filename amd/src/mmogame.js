@@ -39,9 +39,6 @@ define([''], function() {
         padding;
         cIcons;
 
-        // UI element placeholders
-        area;
-
         // Colors
         colorBackground;
 
@@ -268,7 +265,6 @@ define([''], function() {
             while ((child = this.body.firstChild)) {
                 this.body.removeChild(child);
             }
-            this.area = undefined;
         }
 
         /**

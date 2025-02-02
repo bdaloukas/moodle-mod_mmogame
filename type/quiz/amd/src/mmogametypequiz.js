@@ -21,8 +21,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         pin;
         labelTimer;
         timeForSendAnswer;
-        // DivDefinition;
-        // DefinitionHeight;
 
         /**
          * Base class for Quiz mmmogame
@@ -51,71 +49,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.audioNo.load();
         }
 
-        /**
-         * Processes the response for a game attempt, updating the state and UI.
-         *
-         * @param {Object} json - The server response containing attempt data.
-         */
-        /*
-        processGetAttempt(json) {
-            // Calculate time difference and set up the clock
-            this.computeDifClock(json.time, json.timestart, json.timeclose);
-
-            // Set colors if provided
-            if (json.colors) {
-                this.setColorsString(json.colors);
-                this.createIconBar(); // Initialize the top bar with icons
-            }
-
-            // Update the window title if a name is provided
-            if (json.name) {
-                document.title = json.name;
-            }
-
-            // Set help URL if available
-            if (json.helpurl) {
-                this.helpUrl = json.helpurl;
-            }
-
-            // Handle error messages from the server
-            if (json.errorcode) {
-                this.createDivMessage('mmogame-error', json.errorcode);
-                return;
-            }
-
-            // Update game state and user-related data
-            this.state = parseInt(json.state, 10);
-            this.fastjson = json.fastjson;
-            this.timefastjson = parseInt(json.timefastjson, 10);
-            this.updateButtonsAvatar(1, this.avatarElement, this.nicknameElement, json.avatar, json.nickname, this.iconSize,
-                Math.round(this.iconSize / 3));
-
-            this.attempt = json.attempt;
-
-            // Process question type and answers
-            this.qtype = json.qtype;
-            if (this.qtype === 'multichoice') {
-                this.answers = [];
-                this.answersID = json.answerids;
-                json.answers.forEach((answer, index) => {
-                    this.answers[index] = this.repairP(answer); // Process each answer
-                });
-            }
-            this.answer = json.answer ?? undefined;
-
-            // Handle end-of-game scenarios
-            this.endofgame = json.endofgame !== undefined && json.endofgame !== 0;
-            this.definition = this.repairP(json.definition);
-            this.errorcode = json.errorcode;
-
-            if (json.state !== 0) {
-                this.createScreen(json, false);
-            }
-
-            this.updateLabelTimer(); // Start or update the timer
-            this.sendFastJSON(); // Send fast JSON updates
-        }*/
-/*
+/* B
         updateLabelTimer() {
             // Exit if labelTimer or timeclose are undefined
             if (!this.labelTimer || !this.timeclose) {
@@ -145,17 +79,20 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         /**
          * Handles the timeout scenario by disabling inputs and sending timeout data.
          */
+/* B
         onTimeout() {
             this.labelTimer.innerHTML = ''; // Clear the timer display
             this.disableInput(); // Prevent further user input
             this.sendTimeout(); // Notify the server about the timeout
         }
+*/
 
         /**
          * Creates a vertical layout for the quiz screen.
          *
          * @param {boolean} disabled - Whether user input should be disabled.
          */
+/* B
         createScreenVertical(disabled) {
             const nickNameHeight = Math.round(this.iconSize / 3) + this.padding;
             let maxHeight = this.areaHeight - 4 * this.padding - nickNameHeight;
@@ -209,7 +146,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.stripWidth = 2 * this.iconSize;
             this.stripHeight = this.iconSize;
         }
-
+*/
         createAnswer(left, top, width, onlyMetrics, fontSize, disabled) {
             return this.createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled);
         }
@@ -236,13 +173,17 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             // Iterate over each answer
             for (let i = 0; i < n; i++) {
-                const label = document.createElement("label");
-                label.style.position = "absolute";
-                label.style.width = `${width}px`;
-                label.style.fontSize = `${fontSize}px`;
-                label.style.color = this.getContrastingColor(this.colorBackground);
+                const label = this.createDOMElement('label', {
+                    parent: null,
+                    classname: 'mmogame-quiz-label' + i,
+                    styles: {
+                        position: 'absolute',
+                        width: `${width}px`,
+                        fontSize: `${fontSize}px`,
+                        color: this.getContrastingColor(this.colorBackground),
+                    }
+                });
                 label.innerHTML = this.answers[i];
-                label.classList.add('mmogame-quiz-multichoice-label');
 
                 if (onlyMetrics) {
                     this.area.appendChild(label);
@@ -324,7 +265,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.callSetAnswer();
             }
         }
-
+/* C
         sendTimeout() {
             let xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = () => {
@@ -341,7 +282,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             });
             xmlhttp.send(data);
         }
-
+*/
         /**
          * Generates an SVG for a correct or incorrect icon.
          *
@@ -579,6 +520,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             const definitionDiv = this.createDOMElement(
                 'div',
                 {
+                    parent: null,
                     classnames: 'mmogame-quiz-definition',
                     styles: {
                         position: 'absolute',
@@ -589,11 +531,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             );
             definitionDiv.innerHTML = definition;
 
-/* A            document.createElement("div");
-            definitionDiv.style.position = "absolute";
-            definitionDiv.style.width = `${adjustedWidth}px`;
-            definitionDiv.style.fontSize = `${fontSize}px`;
-*/
             if (onlyMetrics) {
                 document.body.appendChild(definitionDiv);
 
@@ -612,65 +549,10 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             this.area.appendChild(definitionDiv);
 
-            // Const height = definitionDiv.scrollHeight + this.padding;
-            // DefinitionDiv.style.height = `${height}px`;
-
             return [definitionDiv.scrollWidth, definitionDiv.scrollHeight];
         }
 
 
-        /**
-         * Displays the current score and ranking on the screen.
-         *
-         * @param {Object} scoreData - The data containing score, rank, and percentages.
-         * @param {string} scoreData.addscore
-         * @param {int} scoreData.completedrank
-         * @param {int} scoreData.percentcompleted
-         * @param {int} scoreData.rank
-         * @param {int} scoreData.sumscore
-         * @param {string} scoreData.usercode
-         */
-/* A
-        showScore({addscore, completedrank, percentcompleted, rank, sumscore, usercode}) {
-            // Update total score display
-            const scoreText = sumscore !== undefined ? `<b>${sumscore}</b>` : '';
-            if (this.labelScore.innerHTML !== scoreText) {
-                this.labelScore.innerHTML = scoreText;
-                this.autoResizeText(this.labelScore, this.iconSize - 2 * this.padding, this.iconSize / 2, false, 0, 0, 1);
-            }
-
-            // Update rank display
-            if (this.labelScoreRank.innerHTML !== rank) {
-                this.labelScoreRank.innerHTML = rank || '';
-                this.autoResizeText(this.labelScoreRank, this.iconSize, this.iconSize / 3, true, 0, 0, 1);
-            }
-
-            // Update document title if applicable
-            if (usercode !== undefined) {
-                document.title = `${usercode} ${name || ''}`;
-            }
-
-            // Update additional score
-            const addScoreText = addscore !== undefined ? addscore : '';
-            if (this.labelAddScore.innerHTML !== addScoreText) {
-                this.labelAddScore.innerHTML = addScoreText;
-                this.autoResizeText(this.labelAddScore, this.iconSize - 2 * this.padding, this.iconSize / 3, false, 0, 0, 1);
-            }
-
-            // Update completed rank display
-            if (this.labelScoreRankB.innerHTML !== completedrank) {
-                this.labelScoreRankB.innerHTML = completedrank || '';
-                this.autoResizeText(this.labelScoreRankB, 0.9 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
-            }
-
-            // Update percentage completed
-            const percentageText = percentcompleted !== undefined ? `${Math.round(100 * percentcompleted)}%` : '';
-            if (this.labelScoreB.innerHTML !== percentageText) {
-                this.labelScoreB.innerHTML = percentageText;
-                this.autoResizeText(this.labelScoreB, 0.8 * this.iconSize / 2, this.iconSize / 3, true, 0, 0, 1);
-            }
-        }
-*/
         /**
          * Sends the selected answer to the server using Moodle's AJAX API.
          */
@@ -714,8 +596,50 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             // Assign specific colors to UI elements
             this.colorScore = colors[2];
-            this.colorCopyright = colors[3];
             this.colorScore2 = colors[4];
         }
+
+        updateAvatarNickname(player, avatarSrc, nickname, nicknameWidth, nicknameHeight) {
+            if (avatarSrc === undefined) {
+                avatarSrc = "";
+            }
+            if (nickname === undefined) {
+                nickname = "";
+            }
+
+            if (avatarSrc === "" && nickname === "") {
+                player.avatarElement.style.visibility = 'hidden';
+                player.nicknameElement.style.visibility = 'hidden';
+                return;
+            }
+
+            if (player.cacheNickname !== nickname || nickname === "") {
+                player.cacheNickname = nickname;
+                let s = nickname;
+
+                if (nickname.length === 0) {
+                    const filenameWithExt = avatarSrc.split('/').pop(); // Extract file name
+                    // Remove extension, fallback if no extension
+                    s = filenameWithExt.split('.').slice(0, -1).join('.') || filenameWithExt;
+                }
+
+                s = this.repairNickname(s);
+                player.nicknameElement.innerHTML = s;
+                player.nicknameElement.style.textAlign = "center";
+                player.nicknameElement.style.color = this.getContrastingColor(this.colorBackground);
+                this.autoResizeText(player.nicknameElement, nicknameWidth, nicknameHeight, true, 0, 0);
+            }
+
+            if (avatarSrc !== player.cacheAvatar) {
+                player.avatarElement.src = avatarSrc !== "" ? "assets/avatars/" + avatarSrc : "";
+                player.cacheAvatar = avatarSrc;
+            }
+
+            player.avatarElement.alt = player.cacheNickname;
+            player.avatarElement.style.visibility = 'visible';
+
+            player.nicknameElement.style.visibility = 'visible';
+        }
+
     };
     });
