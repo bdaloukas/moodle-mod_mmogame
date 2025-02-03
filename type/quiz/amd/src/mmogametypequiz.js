@@ -500,7 +500,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 });
             }
 
-            return [scoreLabel, rankLabel, percentLabel, addScoreLabel];
+            return {lblScore: scoreLabel, lblRank: rankLabel, lblPercent: percentLabel, lblAddScore: addScoreLabel};
         }
 
         /**

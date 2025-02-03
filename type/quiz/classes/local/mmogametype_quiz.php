@@ -109,8 +109,8 @@ abstract class mmogametype_quiz extends mmogame {
         $ret['rank'] = $this->get_rank( $auserid, 'sumscore');
         $ret['sumscore'] = $info->sumscore;
         $ret['timefastjson'] = $this->rgame->timefastjson;
-        $ret['percentcompleted'] = $info->percentcompleted;
-        $ret['completedrank'] = $this->get_rank( $auserid, 'percentcompleted');
+        $ret['percent'] = $info->percentcompleted;
+        $ret['percentrank'] = $this->get_rank( $auserid, 'percentcompleted');
 
         if ($attempt === null) {
             $attempt = new stdClass();

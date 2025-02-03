@@ -17,18 +17,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
     function(MmoGameTypeQuiz) {
     return class MmoGameTypeQuizAlone extends MmoGameTypeQuiz {
 
-        cacheScore;
-
-        avatarElement;
-        nicknameElement;
-
         // Score variables.
         player;
-        lblScore;
+/* A        lblScore;
+        cacheScore;
         lblRank;
         lblPercent;
         lblAddScore;
-
+*/
         constructor() {
             super();
             this.cIcons = this.hasHelp() ? 5 : 4;
@@ -41,7 +37,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             const nicknameHeight = Math.round(this.iconSize / 3);
 
-            [this.nicknameElement, this.avatarElement] = this.createNicknameAvatar('mmogame-quiz-alone',
+            let nickname, avatar;
+            [nickname, avatar] = this.createNicknameAvatar('mmogame-quiz-alone',
                 Math.round(this.padding + (i++) * step),
                 this.padding,
                 2 * this.iconSize + this.padding,
@@ -49,15 +46,17 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.padding + nicknameHeight,
                 this.iconSize);
 
-            [this.lblScore, this.lblRank, this.lblPercent, this.lblAddScore] = this.createDivScorePercent(
+            this.player = this.createDivScorePercent(
                 'mmogame-quiz-alone',
                 this.padding + (i++) * step,
                 this.padding + nicknameHeight,
                 this.getContrastingColor(this.color),
                 true);
+            this.player.nicknameElement = nickname;
+            this.player.avatarElement = avatar;
 
             this.createButtonSound(this.padding + (i++) * step,
-                this.padding + this.nickNameHeight);
+                this.padding + nicknameHeight, this.iconSize);
             if (this.hasHelp()) {
                 this.createButtonHelp(this.padding + (i++) * step, this.padding);
                 this.buttonHelp.addEventListener("click", () => this.onClickHelp(this.buttonHelp));
@@ -140,7 +139,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             // Display the current score
             this.showScore(json);
         }
-
 
         /**
          * Creates a horizontal layout for the quiz screen.
@@ -248,7 +246,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.state = parseInt(json.state, 10);
             this.fastjson = json.fastjson;
             this.timefastjson = parseInt(json.timefastjson, 10);
-            this.updateButtonsAvatar(this.player, json.avatar, json.nickname);
+            this.updateAvatarNickname(this.player, json.avatar, json.nickname);
 
             this.attempt = json.attempt;
 
@@ -280,23 +278,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
         }
 
-        showScore({rank, rankc, sumscore}) {
-            if (rank !== undefined && rankc !== undefined) {
-                if (parseInt(rank) < parseInt(rankc)) {
-                    this.completedrank = '';
-                    this.rank = `# ${rank}`;
-                } else {
-                    this.rank = '';
-                    this.completedrank = `# ${rankc}`;
-                }
-            }
-
-            const s = sumscore === undefined ? '' : `<b>${sumscore}</b>`;
-            if (this.cacheScore !== s) {
-                this.cacheScore = s;
-                this.lblScore.innerHTML = s;
-                this.autoResizeText(this.lblScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0);
-            }
+        showScore({sumscore, rank, percent, percentrank}) {
+            super.showScore(this.player, sumscore, rank, percent, percentrank, true);
         }
 
         showHelpScreen(div) {

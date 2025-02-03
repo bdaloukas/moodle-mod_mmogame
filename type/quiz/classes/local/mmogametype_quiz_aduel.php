@@ -317,8 +317,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $ret['aduelAvatar'] = $info->avatar;
             $ret['aduelNickname'] = $info->nickname;
             $ret['aduelRank'] = $this->get_rank( $this->aduel->auserid1, 'sumscore');
-            $ret['aduelPercent'] = $info->percentcompleted;  // TOCHECK if used.
-            $ret['colors'] = implode( ',', $info->colors);     // Get the colors of oposite.
+            $ret['aduelPercent'] = $info->percentcompleted;
+            $ret['aduelPercentRank'] = $this->get_rank($info->percentcompleted, 'percentcompleted');
+            $ret['colors'] = implode( ',', $info->colors);     // Get the colors of opossite.
             $ret['tool1numattempt'] = $this->aduel->tool1numattempt2;
             $ret['tool2numattempt'] = $this->aduel->tool2numattempt2;
             $ret['tool3numattempt'] = $this->aduel->tool3numattempt2;

@@ -690,7 +690,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }
             });
 
-
             return [nickname, avatar];
         }
 
@@ -813,5 +812,39 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             const message = error?.message || 'An unknown error occurred.';
             this.createDivMessage('mmogame-error', message);
         }
-};
+
+        createScreen(json) {
+            if (this.vertical) {
+                this.createScreenVertical(json);
+            } else {
+                this.createScreenHorizontal(json);
+            }
+        }
+
+        showScore(player, score, rank, percent, rankpercent, showPercent) {
+            let showScore = true;
+            if (rank !== undefined && rankpercent !== undefined) {
+                if (parseInt(rankpercent) < parseInt(rank)) {
+                    showScore = false;
+                }
+            }
+
+            let s = showScore ? `<b>${score}</b>` : '';
+            if (player.cacheScore !== s) {
+                player.cacheScore = s;
+                player.lblScore.innerHTML = s;
+                this.autoResizeText(player.lblScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0);
+            }
+
+            s = !showScore || showPercent ? `<b>${percent} %</b>` : '';
+            if (player.cachePercent !== s) {
+                player.cachePercent = s;
+                player.lblPercent.innerHTML = s;
+                this.autoResizeText(player.lblPercent, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0);
+            }
+
+            player.lblRank.innerHTML = `# ${rank}`;
+            this.autoResizeText(player.lblRank, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0);
+        }
+    };
 });
