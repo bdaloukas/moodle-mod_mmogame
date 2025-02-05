@@ -231,11 +231,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 document.title = json.name;
             }
 
-            // Set help URL if available
-            if (json.helpurl) {
-                this.helpUrl = json.helpurl;
-            }
-
             // Handle error messages from the server
             if (json.errorcode) {
                 this.createDivMessage('mmogame-error', json.errorcode);

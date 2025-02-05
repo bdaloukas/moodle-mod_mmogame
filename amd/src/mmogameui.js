@@ -75,7 +75,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             }
         }
 
-        createButtonSound(left, top, size) {
+        createButtonSound(left, top) {
             this.buttonSound = this.createDOMElement('img', {
                 parent: this.body,
                 classnames: 'mmogame-button-sound',
@@ -83,8 +83,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     position: 'absolute',
                     left: `${left}px`,
                     top: `${top}px`,
-                    width: `${size}px`,
-                    height: `${size}px`,
+                    width: `${this.iconSize}px`,
+                    height: `${this.iconSize}px`,
                 },
                 attributes: {
                     src: this.getMuteFile(),
@@ -660,7 +660,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             let left = instance.padding;
             let top = instance.areaRect !== undefined ? instance.areaRect.top : 0;
             let width = window.innerWidth - 2 * instance.padding;
-            let height = window.innerHeight - instance.getCopyrightHeight() - instance.padding - top;
+            let height = window.innerHeight - instance.padding - top;
 
             instance.createDivMessageDo(classnames, left, top, width, height, message, height);
 
@@ -679,14 +679,17 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }
             });
 
+            let leftAvatar = Math.round(left + this.iconSize / 2);
             const avatar = this.createDOMElement('img', {
                 classname: `${prefixclassname}-avatar`,
                 parent: this.body,
                 styles: {
                     position: 'absolute',
-                    left: `${left}px`,
+                    left: `${leftAvatar}px`,
                     top: `${topAvatar}px`,
-                    width: `${widthAvatar}px`,
+                    height: `${widthAvatar}px`,
+                    maxWidth: `${widthAvatar}px`,
+                    transform: 'translateX(-50%)',
                 }
             });
 
@@ -705,7 +708,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             let left = instance.padding;
             let top = instance.areaRect.top;
             let width = window.innerWidth - 2 * instance.padding;
-            let height = window.innerHeight - instance.getCopyrightHeight() - instance.padding - top;
+            let height = window.innerHeight - instance.padding - top;
 
             let height1 = height / 8;
 
@@ -813,38 +816,28 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.createDivMessage('mmogame-error', message);
         }
 
-        createScreen(json) {
-            if (this.vertical) {
-                this.createScreenVertical(json);
-            } else {
-                this.createScreenHorizontal(json);
-            }
+        createButtonHelp(left, top) {
+            this.buttonSound = this.createDOMElement('img', {
+                parent: this.body,
+                classnames: 'mmogame-button-sound',
+                styles: {
+                    position: 'absolute',
+                    left: `${left}px`,
+                    top: `${top}px`,
+                    width: `${this.iconSize}px`,
+                    height: `${this.iconSize}px`,
+                },
+                attributes: {
+                    src: this.getMuteFile(),
+                    alt: this.getStringM('js_help'),
+                    role: 'button',
+                },
+            });
+            this.buttonHelp.addEventListener("click", () => this.onClickHelp());
         }
 
-        showScore(player, score, rank, percent, rankpercent, showPercent) {
-            let showScore = true;
-            if (rank !== undefined && rankpercent !== undefined) {
-                if (parseInt(rankpercent) < parseInt(rank)) {
-                    showScore = false;
-                }
-            }
-
-            let s = showScore ? `<b>${score}</b>` : '';
-            if (player.cacheScore !== s) {
-                player.cacheScore = s;
-                player.lblScore.innerHTML = s;
-                this.autoResizeText(player.lblScore, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0);
-            }
-
-            s = !showScore || showPercent ? `<b>${percent} %</b>` : '';
-            if (player.cachePercent !== s) {
-                player.cachePercent = s;
-                player.lblPercent.innerHTML = s;
-                this.autoResizeText(player.lblPercent, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0);
-            }
-
-            player.lblRank.innerHTML = `# ${rank}`;
-            this.autoResizeText(player.lblRank, 0.8 * this.iconSize / 2, this.iconSize / 2, false, 0, 0);
+        onClickHelp() {
+            this.createDivMessageStart('test');
         }
     };
 });

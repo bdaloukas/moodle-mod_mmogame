@@ -350,10 +350,6 @@ define([''], function() {
                 });
         }
 
-        getCopyrightHeight() {
-            return Math.round(this.iconSize / 3);
-        }
-
         /**
          * Returns the hex color string for a given color code.
          *

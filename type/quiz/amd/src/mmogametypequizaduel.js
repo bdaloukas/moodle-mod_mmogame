@@ -20,13 +20,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
     player1; // Stores all info for player1
     player2; // Stores all info for player2
     isWaitOpponent; // True if wait someone to answer a set of questions
-    nickNameHeight; // Height of nickname
 
     constructor() {
         super();
 
         // Initialize core properties
-        this.cIcons = this.isVertical ? 5 : 8 + (this.hasHelp() ? 1 : 0);
+        this.cIcons = this.isVertical ? 5 : 8;
 
         this.isWaitOpponent = false;
     }
@@ -74,13 +73,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.player2.lblScore.title = this.getStringM('js_percent_opponent');
         this.player2.lblRank.title = this.getStringM('js_position_percent');
 
-        this.createButtonSound(this.padding + (i++) * step,
-            this.padding + nicknameHeight, this.iconSize);
-        if (this.hasHelp()) {
-            this.createButtonHelp(this.padding + (i++) * step, this.padding);
-            this.buttonHelp.addEventListener("click", () => this.onClickHelp(this.buttonHelp));
-        }
-
         this.areaRect = {
             left: this.padding,
             top: 2 * this.padding + this.iconSize + nicknameHeight,
@@ -91,24 +83,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
         if (this.isVertical) {
             this.areaRect.height -= this.iconSize + 2 * this.padding;
         }
-/* B
-        this.buttonAvatarHeight = this.iconSize + nicknameHeight;
-        this.createButtonsAvatar(1, Math.round(this.padding + (i++) * (this.iconSize + this.padding)),
-            2 * this.iconSize + this.padding, nicknameHeight);
-        this.buttonsAvatar[1].style.top = (this.padding + nicknameHeight) + "px";
-*/
 
-/* A
-        this.createButtonsAvatar(2, Math.round(this.padding + (i++) * (this.iconSize + this.padding)),
-            2 * this.iconSize + this.padding, nicknameHeight);
-        this.buttonsAvatar[2].style.top = (this.padding + nicknameHeight) + "px";
-*/
         this.createDivTimer(this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight,
             this.iconSize);
+
         if (this.isVertical) {
             this.createButtonSound(this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
         } else {
-            this.createButtonSound(this.padding, this.areaRect.top + this.areaRect.height);
+            this.createButtonSound(this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
         }
 
         if (this.hasBasBottom === false) {
@@ -167,6 +149,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
         });
         this.buttonWizard.style.visibility = 'hidden';
         this.buttonWizard.title = this.getStringT('js_wizarg');
+        this.buttonWizard.addEventListener("click", () => {
+            this.sendGetAttempt(false, "tool3");
+        });
 
         if (this.hasHelp()) {
             if (!this.isVertical) {
@@ -174,9 +159,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             } else {
                 this.createButtonHelp(this.padding + 3 * (this.iconSize + this.padding), this.areaRect.top + this.areaRect.height);
             }
-            this.buttonWizard.addEventListener("click", () => {
-                this.sendGetAttempt(false, "tool3");
-            });
         }
     }
 
@@ -223,9 +205,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
         const nicknameHeight = this.iconSize / 3;
         this.updateAvatarNickname(this.player1, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
         this.updateAvatarNickname(this.player2, json.aduelAvatar, json.aduelNickname, nicknameWidth, nicknameHeight);
-
-        // This.updateButtonsAvatar(1, json.avatar, json.nickname);
-        // This.updateButtonsAvatar(2, json.aduelAvatar, json.aduelNickname);
 
         this.updateButtonTool(this.button5050, json.tool1numattempt);
         if (json.tool3 !== undefined) {
@@ -498,64 +477,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     showScore(json) {
-        let rankc = json.completedrank;
-        if (json.rank !== undefined && rankc !== undefined) {
-            if (parseInt(json.rank) < parseInt(rankc)) {
-                json.completedrank = '';
-                json.rank = '# ' + json.rank;
-            } else {
-                json.rank = '';
-                json.completedrank = '# ' + rankc;
-            }
-        }
+        super.showScore(this.player1, json.sumscore, json.rank, json.percent, json.percentRank, true);
+        this.player1.lblAddScore.innerHTML = json.addscore === undefined ? '' : json.addscore;
+        this.autoResizeText(this.player1.lblAddScore, this.iconSize, this.player1.heightLine3, true, 0, 0, 1);
 
-        // Super.showScore(this.player1, json.rank, json.rankc, json.sumscore);
-
-        if (json.aduelPlayer === 1 || json.aduelPlayer === undefined) {
-            // Plays alone
-          /*  This.labelScore2.style.visibility = "hidden";
-            this.labelScoreRank2.style.visibility = "hidden";
-            this.buttonScore2.style.visibility = "hidden";
-            this.labelAddScore2.style.visibility = "hidden"; */
+        if (json.aduelPlayer === 2) {
+            super.showScore(this.player2, json.aduelScore, json.aduelRank, json.aduelPercent, json.aduelPercentRank, true);
         } else {
-/*            This.labelScore2.style.visibility = "visible";
-            this.labelScoreRank2.style.visibility = "visible";
-            this.buttonScore2.style.visibility = "visible";
-            this.labelAddScore2.style.visibility = "visible";
-*/
-            // Super.showScore(this.player1, json.aduelScore, json.aduelRank, json.aduelPercent, json.aduelPercentRank, true);
-/* A
-            if (json.aduelRank !== undefined && json.aduelCompletedrank !== undefined) {
-                let rank1 = parseInt(json.aduelRank);
-                let rank2 = parseInt(json.aduelCompletedrank);
-                if (rank1 <= rank2) {
-                    json.aduelRank = rank1;
-                } else {
-                    json.aduelRank = rank2;
-                    json.aduelScore = Math.round(100 * json.aduelCompletedrank) + "%";
-                }
-            }*/
-            // Super.showScore(this.player2, json.aduelScore, json.aduelRank, json.aduelPercent, json.aduelPercentRank, false);
-/* B
-            let s = '<b>' + score + '</b>';
-            if (this.labelScore2.innerHTML !== s) {
-                this.labelScore2.innerHTML = s;
-                this.autoResizeText(this.labelScore2, this.iconSize - 2 * this.padding, this.iconSize / 2, false, 0, 0, 1);
-            }
-            this.labelScoreRank2.innerHTML = rank;
-            this.labelScoreRank2.style.lineHeight = (this.iconSize / 3) + "px";
-            this.autoResizeText(this.labelScoreRank2, 0.5 * this.iconSize, this.iconSize / 3, true, 0, 0, 1);
-*/
-
-            super.showScore(this.player1, json.aduelScore, json.aduelRank, json.aduelPercent, json.aduelPercentRank, true);
-            if (json.aduelPlayer === 2) {
-                super.showScore(this.player2, json.aduelScore, json.aduelRank, json.aduelPercent, json.aduelPercentRank, true);
-            } else {
-                super.showScore(this.player2, '', 1, '', '', true);
-            }
-
-            this.player1.lblAddScore.innerHTML = json.addscore === undefined ? '' : json.addscore;
-            this.autoResizeText(this.player1.lblAddScore, this.iconSize, this.iconSize / 3, true, 0, 0, 1);
+            super.showScore(this.player2, '', 1, '', '', true);
         }
     }
 
