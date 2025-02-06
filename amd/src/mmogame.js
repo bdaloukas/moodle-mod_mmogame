@@ -423,10 +423,10 @@ define([''], function() {
         findbest(low, high, condition) {
             while (high - low > 1) {
                 const mid = Math.floor((low + high) / 2);
-                if (condition(mid)) {
-                    high = mid;
-                } else {
+                if (condition(mid) < 0) {
                     low = mid;
+                } else {
+                    high = mid;
                 }
             }
 

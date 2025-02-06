@@ -62,12 +62,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.buttonHelp.addEventListener("click", () => this.onClickHelp(this.buttonHelp));
             }
 
-            this.areaRect = {
-                left: this.padding,
-                top: 2 * this.padding + this.iconSize + nicknameHeight,
-                width: Math.round(window.innerWidth - 2 * this.padding),
-                height: Math.round(window.innerHeight - 2 * this.padding - nicknameHeight - this.iconSize),
-            };
+            this.createArea(2 * this.padding + this.iconSize);
         }
 
         processSetAnswer(json) {
@@ -120,8 +115,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
          * @param {boolean} disabled - Determines whether user input should be disabled.
          */
         createScreen(json, disabled) {
-            //this.createArea(); // Prepare the main game area
-
             if (this.endofgame) {
                 // Display end-of-game message and final score
                 this.createDivMessage('mmogame-endofgame', this.getStringM('js_game_over'));
@@ -241,7 +234,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.state = parseInt(json.state, 10);
             this.fastjson = json.fastjson;
             this.timefastjson = parseInt(json.timefastjson, 10);
-            this.updateAvatarNickname(this.player, json.avatar, json.nickname);
+            this.updateNicknameAvatar(this.player, json.avatar, json.nickname);
 
             this.attempt = json.attempt;
 

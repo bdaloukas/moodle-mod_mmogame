@@ -182,7 +182,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     classname: 'mmogame-quiz-label' + i,
                     styles: {
                         position: 'absolute',
-                        width: `${width}px`,
+                        width: `${width - fontSize - this.padding}px`,
                         fontSize: `${fontSize}px`,
                         color: this.getContrastingColor(this.colorBackground),
                     }

@@ -815,6 +815,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {Error} [error] - The error object to display.
          */
         showError(name, error) {
+            console.log(error)
             const message = error?.message || 'An unknown error occurred.';
             this.createDivMessage('mmogame-error', message);
         }

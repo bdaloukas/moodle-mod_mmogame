@@ -195,7 +195,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.colors = undefined;
         }
 
-        if (this.colors === undefined) {
+        if (this.player1 === undefined) {
             this.setColorsString(json.colors);
             this.createIconBar();
         }
@@ -545,7 +545,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         this.removeDivMessage();
 
-        this.clearBodyChildren();
+        let child;
+        while ((child = this.area.firstChild)) {
+            this.area.removeChild(child);
+        }
 
         if (this.vertical) {
             this.createScreenVerticalHighScore(json);
@@ -727,13 +730,16 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.timerTimeout = setTimeout(() => this.updateDivTimer(), 500);
     }
     createScreen(json, disabled) {
-        //this.createArea(); // Prepare the main game area
-
         if (this.endofgame) {
             // Display end-of-game message and final score
             this.createDivMessage('mmogame-endofgame', this.getStringM('js_game_over'));
             this.showScore(json);
             return;
+        }
+
+        let child;
+        while ((child = this.area.firstChild)) {
+            this.area.removeChild(child);
         }
 
         // Render the screen layout based on orientation (vertical or horizontal)
@@ -753,7 +759,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
         if (!this.hideSubmit) {
             maxHeight -= this.iconSize + this.padding; // Reserve space for submit button
         }
-
         const width = Math.round((this.areaRect.width - this.padding) / 2);
         for (let step = 1; step <= 2; step++) {
             let defSize;
@@ -769,42 +774,42 @@ define(['mmogametype_quiz/mmogametypequiz'],
                         return 1;
                     }
                     return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
-                });
-                if (defSize[0] <= width && defSize[1] <= this.areaRect.height) {
-                    break;
-                }
+            });
+            if (defSize[0] <= width && defSize[1] <= this.areaRect.height) {
+                break;
             }
-
-            this.radioSize = Math.round(this.fontSize);
-            const heightAnswer = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
-
-            this.createDefinition(0, 0, width - this.padding, heightAnswer, false, this.fontSize, json.definition);
-
-            this.nextTop = heightAnswer + this.padding;
-
-            if (!this.hideSubmit) {
-                // Create and position the submit button
-                this.btnSubmit = this.createImageButton(
-                    this.body,
-                    'mmogame-quiz-submit',
-                    width + (width - this.iconSize) / 2,
-                    this.nextTop,
-                    0,
-                    this.iconSize,
-                    'assets/submit.svg',
-                    false,
-                    'submit'
-                );
-                this.btnSubmit.addEventListener('click', () => {
-                    this.sendAnswer();
-                });
-            }
-
-            // Adjust strip dimensions
-            this.stripLeft = width + this.padding;
-            this.stripWidth = 2 * this.iconSize;
-            this.stripHeight = this.iconSize;
         }
+
+        this.radioSize = Math.round(this.fontSize);
+        const heightAnswer = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
+
+        this.createDefinition(0, 0, width - this.padding, heightAnswer, false, this.fontSize, json.definition);
+
+        this.nextTop = heightAnswer + this.padding;
+
+        if (!this.hideSubmit) {
+            // Create and position the submit button
+            this.btnSubmit = this.createImageButton(
+                this.body,
+                'mmogame-quiz-submit',
+                width + (width - this.iconSize) / 2,
+                this.nextTop,
+                0,
+                this.iconSize,
+                'assets/submit.svg',
+                false,
+                'submit'
+            );
+            this.btnSubmit.addEventListener('click', () => {
+                this.sendAnswer();
+            });
+        }
+
+        // Adjust strip dimensions
+        this.stripLeft = width + this.padding;
+        this.stripWidth = 2 * this.iconSize;
+        this.stripHeight = this.iconSize;
+    }
 
         };
 });
