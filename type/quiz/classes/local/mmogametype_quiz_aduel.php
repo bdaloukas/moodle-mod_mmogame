@@ -228,8 +228,8 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                     $this->qbank->update_grades( $attempt->auserid, $attempt->score, 0, 0);
                 }
             } else if ($attempt->iscorrect == 0) {
-                // Check the answer of oposite. If is right duplicate other points.
-                if ($opposite->iscorrect == 0) {
+                // Check the answer of opposite. If is right duplicate other points.
+                if ($opposite->iscorrect) {
                     $this->db->update_record( 'mmogame_quiz_attempts',
                         ['id' => $opposite->id, 'score' => 2 * $opposite->score]);
                     $this->qbank->update_grades( $opposite->auserid, $opposite->score, 0, 0);
@@ -247,8 +247,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $recs = $this->db->get_record_select( 'mmogame_quiz_attempts',
             'mmogameid =? AND numgame=? AND numteam=? AND timeanswer = 0 AND auserid=?',
             [$attempt->mmogameid, $attempt->numgame, $this->aduel->id, $this->aduel->auserid2], 'id');
-        $rec = reset( $recs);
-        if ($rec === false) {
+        if ($recs === null) {
             // We finished.
             $this->db->update_record( 'mmogame_am_aduel_pairs', ['id' => $this->aduel->id, 'isclosed2' => 1]);
         }

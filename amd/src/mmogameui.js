@@ -43,6 +43,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         iconSize;
         padding;
 
+        // Area
+        area;
+        areaRect;
+
         // Form fields
         edtNickname;
 
@@ -52,6 +56,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         constructor() {
             super();
             this.isVertical = window.innerWidth < window.innerHeight;
+            this.area = undefined;
         }
 
         /**
@@ -123,19 +128,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.pin = pin;
                 this.kinduser = kinduser;
                 instance.user = user;
-
-                // Adjust font sizes
-                this.minFontSize *= 2;
-                this.maxFontSize *= 2;
-
-                // Compute sizes and layout
-                this.gateComputeSizes();
-                this.areaRect = {
-                    left: this.padding,
-                    top: this.padding,
-                    width: Math.round(window.innerWidth - 2 * this.padding),
-                    height: Math.round(window.innerHeight - 2 * this.padding),
-                };
 
                 // Load options and initialize UI
                 this.getOptions()
@@ -209,7 +201,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateCreateScreen() {
-            this.createArea();
+            this.gateCompute();
 
             let maxHeight = this.areaRect.height - 5 * this.padding - this.iconSize;
             let maxWidth = this.areaRect.width;
@@ -629,19 +621,30 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * Creates the main game area.
          */
 
-        createArea() {
-            if (this.area) {
+        createArea(top) {
+            if (this.area !== undefined) {
                 this.body.removeChild(this.area);
             }
 
-            this.area = this.createDiv(
-                this.body,
-                'mmogame-area',
-                this.padding,
-                this.areaRect.top,
-                this.areaRect.width,
-                this.areaRect.height
-            );
+            this.area = this.createDOMElement('div', {
+                parent: this.body,
+                classnames: 'mmogame-area',
+                styles: {
+                    position: 'absolute',
+                    left: `${this.padding}px`,
+                    top: `${top}px`,
+                    right: `${this.padding}px`,
+                    bottom: `${this.padding}px`,
+                    overflow: 'hidden',
+                }
+            });
+
+            this.areaRect = {
+                left: this.padding,
+                top: top,
+                width: this.area.offsetWidth,
+                height: this.area.offsetHeight,
+            };
         }
 
         createDivMessage(classnames, message) {
@@ -838,6 +841,16 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
         onClickHelp() {
             this.createDivMessageStart('test');
+        }
+
+        gateCompute() {
+            // Adjust font sizes
+            this.minFontSize *= 2;
+            this.maxFontSize *= 2;
+
+            // Compute sizes and layout
+            this.gateComputeSizes();
+            this.createArea(this.padding);
         }
     };
 });

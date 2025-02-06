@@ -120,7 +120,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
          * @param {boolean} disabled - Determines whether user input should be disabled.
          */
         createScreen(json, disabled) {
-            this.createArea(); // Prepare the main game area
+            //this.createArea(); // Prepare the main game area
 
             if (this.endofgame) {
                 // Display end-of-game message and final score
@@ -158,7 +158,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 let defSize;
                 this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
                     (fontSize) => {
-                        defSize = this.createDefinition(0, 0, width - this.padding, true, fontSize,
+                        defSize = this.createDefinition(0, 0, width - this.padding, 0, true, fontSize,
                             json.definition);
 
                         if (defSize[0] >= width) {
@@ -177,7 +177,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
 
             this.radioSize = Math.round(this.fontSize);
-            this.createDefinition(0, 0, width - this.padding, false, this.fontSize, json.definition);
+            this.createDefinition(0, 0, width - this.padding, 0, false, this.fontSize, json.definition);
 
             this.nextTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled) + this.padding;
 

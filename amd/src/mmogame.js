@@ -201,7 +201,6 @@ define([''], function() {
             const cIcons = Math.max(this.cIcons || 5, 5);
             const maxIconWidth = window.innerWidth / cIcons;
             const maxIconHeight = window.innerHeight / 5;
-
             this.iconSize = Math.min(maxIconWidth, maxIconHeight);
             const adjustment = this.iconSize / 10 / cIcons;
             this.iconSize = Math.round(this.iconSize - adjustment);

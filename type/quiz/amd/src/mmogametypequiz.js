@@ -22,6 +22,10 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         labelTimer;
         timeForSendAnswer;
 
+        // Colors.
+        colorScore;
+        colorScore2;
+
         /**
          * Base class for Quiz mmmogame
          *
@@ -550,12 +554,13 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @param {number} left - The left position in pixels.
          * @param {number} top - The top position in pixels.
          * @param {number} width - The width of the definition area.
+         * @param {number} height - The height of the definition area.
          * @param {boolean} onlyMetrics - Whether to only measure size.
          * @param {number} fontSize - The font size for the definition text.
          * @param {string} definition
          * @returns {Array} The width and height of the definition area.
          */
-        createDefinition(left, top, width, onlyMetrics, fontSize, definition) {
+        createDefinition(left, top, width, height, onlyMetrics, fontSize, definition) {
             const adjustedWidth = width - 2 * this.padding;
 
             const definitionDiv = this.createDOMElement(
@@ -586,6 +591,9 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             definitionDiv.style.color = this.getContrastingColor(this.colorBackground2);
             definitionDiv.style.left = `${left}px`;
             definitionDiv.style.top = `${top}px`;
+            if (height !== 0) {
+                definitionDiv.style.height = `${height}px`;
+            }
             definitionDiv.style.padding = `0 ${this.padding}px`;
 
             this.area.appendChild(definitionDiv);
@@ -640,7 +648,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.colorScore2 = colors[4];
         }
 
-        updateAvatarNickname(player, avatarSrc, nickname, nicknameWidth, nicknameHeight) {
+        updateNicknameAvatar(player, avatarSrc, nickname, nicknameWidth, nicknameHeight) {
             if (avatarSrc === undefined) {
                 avatarSrc = "";
             }
