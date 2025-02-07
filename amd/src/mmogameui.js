@@ -74,8 +74,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          */
         playAudio(audioElement) {
             if (this.kindSound !== 0 && audioElement) {
-                if (audioElement.networkState === 1) {
-                    audioElement.play();
+                if (audioElement.readyState >= 2) { // Βεβαιωθείτε ότι ο ήχος έχει φορτωθεί
+                    audioElement.play().catch(error => {
+                        this.showError("Playback failed:", error);
+                    });
+                } else {
+                    this.showError("Audio not ready yet.");
                 }
             }
         }
@@ -815,15 +819,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {Error} [error] - The error object to display.
          */
         showError(name, error) {
-            console.log(error)
             const message = error?.message || 'An unknown error occurred.';
             this.createDivMessage('mmogame-error', message);
         }
 
         createButtonHelp(left, top) {
-            this.buttonSound = this.createDOMElement('img', {
+            return this.createDOMElement('img', {
                 parent: this.body,
-                classnames: 'mmogame-button-sound',
+                classnames: 'mmogame-button-help',
                 styles: {
                     position: 'absolute',
                     left: `${left}px`,
@@ -832,12 +835,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     height: `${this.iconSize}px`,
                 },
                 attributes: {
-                    src: this.getMuteFile(),
+                    src: 'assets/help.svg',
                     alt: this.getStringM('js_help'),
                     role: 'button',
                 },
             });
-            this.buttonHelp.addEventListener("click", () => this.onClickHelp());
         }
 
         onClickHelp() {

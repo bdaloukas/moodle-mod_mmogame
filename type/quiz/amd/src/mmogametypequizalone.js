@@ -19,12 +19,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         // Score variables.
         player;
-/* A        lblScore;
-        cacheScore;
-        lblRank;
-        lblPercent;
-        lblAddScore;
-*/
+
         constructor() {
             super();
             this.cIcons = this.hasHelp() ? 5 : 4;
@@ -52,17 +47,20 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.padding + nicknameHeight,
                 this.getContrastingColor(this.color),
                 true);
-            this.player.nicknameElement = nickname;
             this.player.avatarElement = avatar;
+            this.player.nicknameElement = nickname;
+            this.player.cacheAvatar = '';
+            this.player.cacheNickname = '';
+            this.player.lblScore.title = this.getStringM('js_grade');
+            this.player.lblRank.title = this.getStringM('js_position_grade');
 
             this.createButtonSound(this.padding + (i++) * step,
                 this.padding + nicknameHeight, this.iconSize);
             if (this.hasHelp()) {
-                this.createButtonHelp(this.padding + (i++) * step, this.padding);
-                this.buttonHelp.addEventListener("click", () => this.onClickHelp(this.buttonHelp));
+                const button = this.createButtonHelp(this.padding + (i++) * step, this.padding);
+                button.addEventListener("click", () => this.onClickHelp(this.buttonHelp));
             }
-
-            this.createArea(2 * this.padding + this.iconSize);
+            this.createArea(2 * this.padding + this.iconSize + nicknameHeight);
         }
 
         processSetAnswer(json) {
@@ -213,10 +211,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 return;
             }
 
-            // Set colors if provided
-            if (json.colors) {
+            if (this.player === undefined) {
                 this.setColorsString(json.colors);
-                this.createIconBar(); // Initialize the top bar with icons
+                this.createIconBar();
             }
 
             // Update the window title if a name is provided
@@ -234,8 +231,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.state = parseInt(json.state, 10);
             this.fastjson = json.fastjson;
             this.timefastjson = parseInt(json.timefastjson, 10);
-            this.updateNicknameAvatar(this.player, json.avatar, json.nickname);
 
+            const nicknameWidth = 2 * this.iconSize + this.padding;
+            const nicknameHeight = this.iconSize / 3;
+            this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
             this.attempt = json.attempt;
 
             // Process question type and answers
@@ -275,7 +274,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 <br>
                 <div>${this.getStringT('js_alone_help')}</div><br>
 
-                <table border=1>
+                <table class="mmogame-table-help">
                     <tr>
                         <td><img height="83" src="assets/aduel/example2.png" alt="" /></td>
                         <td>${this.getStringT('js_aduel_example2')}</td>

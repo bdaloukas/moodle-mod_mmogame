@@ -557,8 +557,8 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             [$aduel->mmogameid, $aduel->auserid1, $aduel->id, $attempt->numattempt]);
         if ($attempt1 !== false) {
             if ($aduel->auserid2 == $this->auserid) {
-                $ret['aduel_iscorrect'] = $attempt1->iscorrect;
-                $ret['aduel_useranswer'] = $attempt1->useranswer;
+                $ret['aduelIscorrect'] = $attempt1->iscorrect;
+                $ret['aduelUseranswer'] = $attempt1->useranswer;
             }
 
             $query = $this->qbank->load( $attempt->queryid);
@@ -570,6 +570,8 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $info = $this->get_avatar_info( $aduel->auserid1);
         $ret['aduelScore'] = $info->sumscore;
         $ret['aduelRank'] = $this->get_rank( $aduel->auserid1, 'sumscore');
+        $ret['aduelPercent'] = $info->percentcompleted;
+        $ret['aduelPercentRank'] = $this->get_rank($info->percentcompleted, 'percentcompleted');
 
         return $attempt;
     }

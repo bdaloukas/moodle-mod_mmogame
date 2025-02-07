@@ -43,3 +43,20 @@
 .mmogame_button:active {
     transform: translateY(0.125em);
 }
+
+.mmogame-table-help {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.mmogame-table-help, .mmogame-table-help td {
+    border: 1px solid black;
+}
+
+.mmogame-table-help td {
+    padding: 8px;
+}
+
+.mmogame-td-help-image {
+    text-align: center
+}

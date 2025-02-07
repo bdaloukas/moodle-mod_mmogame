@@ -385,12 +385,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }, this.timeForSendAnswer);
         }
 
-        onClickHelp() {
-            if (this.helpUrl !== '') {
-                window.open(this.helpUrl, "_blank");
-            }
-        }
-
         getStringT(name) {
             return M.util.get_string(name, 'mmogametype_quiz');
         }
@@ -406,7 +400,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          */
         createDivScorePercent(prefixclassname, left, top, color, createAddScore) {
             // Create the main button container
-            this.createDOMElement('div', {
+            const divMain = this.createDOMElement('div', {
                 parent: this.body,
                 classnames: `${prefixclassname}-main`,
                 styles: {
@@ -517,8 +511,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 });
             }
 
-            return {lblRank: rankLabel, lblScore: scoreLabel, lblPercent: percentLabel, lblAddScore: addScoreLabel,
-                heightLine1: heightLine1, heightLine2: heightLine2, heightLine3: heightLine3};
+            return {divMain: divMain, lblRank: rankLabel, lblScore: scoreLabel, lblPercent: percentLabel,
+                lblAddScore: addScoreLabel, heightLine1: heightLine1, heightLine2: heightLine2, heightLine3: heightLine3};
         }
 
 
@@ -530,8 +524,12 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 }
             }
 
-            player.lblRank.innerHTML = `# ${rank}`;
-            this.autoResizeText(player.lblRank, 0.8 * this.iconSize, player.heightLine1, false, 0, 0);
+            if (rank !== '') {
+                player.lblRank.innerHTML = `# ${rank}`;
+                this.autoResizeText(player.lblRank, 0.8 * this.iconSize, player.heightLine1, false, 0, 0);
+            } else {
+                player.lblRank.innerHTML = '';
+            }
 
             let s = showScore ? `<b>${score}</b>` : '';
             if (player.cacheScore !== s) {
@@ -540,7 +538,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.autoResizeText(player.lblScore, 0.9 * this.iconSize / 2, player.heightLine2, false, 0, 0);
             }
 
-            s = !showScore || showPercent ? `<b>${percent} %</b>` : '';
+            s = !showScore || (showPercent && parseInt(percent) !== 0) ? `<b>${percent} %</b>` : '';
             if (player.cachePercent !== s) {
                 player.cachePercent = s;
                 player.lblPercent.innerHTML = s;
@@ -688,14 +686,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             player.avatarElement.style.visibility = 'visible';
 
             player.nicknameElement.style.visibility = 'visible';
-        }
-
-        createScreen(json) {
-            if (this.vertical) {
-                this.createScreenVertical(json);
-            } else {
-                this.createScreenHorizontal(json);
-            }
         }
     };
     });
