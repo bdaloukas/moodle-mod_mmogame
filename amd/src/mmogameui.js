@@ -72,21 +72,19 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          *
          * @param {HTMLAudioElement} audioElement - The audio element to play.
          */
-        playAudio(audioElement) {
+        async playAudio(audioElement) {
             if (this.kindSound !== 0 && audioElement) {
-                if (audioElement.readyState >= 2) { // Βεβαιωθείτε ότι ο ήχος έχει φορτωθεί
-                    audioElement.play().catch(error => {
-                        this.showError("Playback failed:", error);
-                    });
-                } else {
-                    this.showError("Audio not ready yet.");
+                try {
+                    await audioElement.play();
+                } catch (error) {
+                    this.showError("Playback failed:", error);
                 }
             }
         }
 
-        createButtonSound(left, top) {
+        createButtonSound(parent, left, top) {
             this.buttonSound = this.createDOMElement('img', {
-                parent: this.body,
+                parent: parent,
                 classnames: 'mmogame-button-sound',
                 styles: {
                     position: 'absolute',
@@ -122,86 +120,62 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {string} user - The user identifier.
          * @param {string} url - The game URL.
          */
-        gateOpen(mmogameid, pin, kinduser, user, url) {
-            const instance = this;
+        async gateOpen(mmogameid, pin, kinduser, user, url) {
+            this.url = url;
+            this.mmogameid = mmogameid;
+            this.pin = pin;
+            this.kinduser = kinduser;
+            this.user = user;
 
-            try {
-                // Initialize class variables
-                this.url = url;
-                this.mmogameid = mmogameid;
-                this.pin = pin;
-                this.kinduser = kinduser;
-                instance.user = user;
+            const options = await this.getOptions();
+            this.kindSound = [1, 2].includes(options.kindSound) ? options.kindSound : 0;
 
-                // Load options and initialize UI
-                this.getOptions()
-                    .then((options) => {
-                        // Set default options if undefined
-                        options.kindsound = options.kindsound || 0;
-                        options.nickname = options.nickname || '';
-                        options.avatarid = options.avatarid || 0;
-                        options.paletteid = options.paletteid || 0;
+            const isReady = options.nickname && options.avatarid && options.paletteid;
 
-                        // Assign kindSound within valid range
-                        this.kindSound = [1, 2].includes(options.kindSound) ? options.kindSound : 0;
-
-                        const isReady = options.nickname && options.avatarid && options.paletteid;
-
-                        if (kinduser === 'moodle' && isReady) {
-                            this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
-                        } else if (kinduser === 'guid') {
-                            options.userGUID = options.userGUID || '';
-
-                            if (options.userGUID.length >= 10 && isReady) {
-                                instance.user = options.userGUID;
-                                this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
-                            } else {
-                                this.gateCreateScreen();
-                            }
-                        } else {
-                            this.gateCreateScreen();
-                        }
-
-                        return true;
-                    })
-                    .catch((error) => {
-                        this.showError('gateOpen unexpected', error);
-                    });
-            } catch (error) {
-               this.showError('gateOpen', error);
+            if (kinduser === 'moodle' && isReady) {
+                await this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
+            } else if (this.kinduser === 'guid') {
+                if (options.userGUID === undefined) {
+                    options.userGUID = '';
+                }
+                if (options.userGUID.length >= 10 && isReady) {
+                    this.user = options.userGUID;
+                    this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
+                } else {
+                    this.gateCreateScreen();
+                }
+            } else {
+                this.gateCreateScreen();
             }
         }
 
         gatePlayGame(save, nickname, paletteid, avatarid) {
-            let instance = this;
-
-            if (instance.kinduser === 'guid' && instance.user === '') {
-                this.uuid4();
+            let saveGuid = false;
+            if (this.kinduser === 'guid' && this.user === '') {
+                this.user = crypto.randomUUID();
+                saveGuid = true;
             }
 
-            if (!save) {
-                instance.nickname = nickname;
-                instance.paletteid = paletteid;
-                instance.avatarid = avatarid;
-                instance.callGetAttempt({nickname: nickname, colorpaletteid: paletteid, avatarid: avatarid});
-                return;
+            if (save || saveGuid) {
+                let data;
+                if (save) {
+                    data = {user: this.user, nickname, avatarid, paletteid};
+                    if (saveGuid) {
+                        data.userGUID = this.user;
+                    }
+                } else {
+                    data = {userGUID: this.user};
+                }
+                this.setOptions(data);
             }
-
-            let options = {nickname: nickname, avatarid: avatarid, paletteid: paletteid};
-
-            this.setOptions(options)
-                .then(() => {
-                    return true;
-                })
-                .catch(error => {
-                    this.showError(error.message);
-                    return false;
-                });
-
             this.nickname = nickname;
             this.paletteid = paletteid;
             this.avatarid = avatarid;
-            this.callGetAttempt();
+            if (save) {
+                this.callGetAttempt({nickname, colorpaletteid: paletteid, avatarid});
+            } else {
+                this.callGetAttempt();
+            }
         }
 
         gateCreateScreen() {
@@ -674,9 +648,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             instance.divMessage.style.top = (height - instance.divMessage.scrollHeight) / 2 + "px";
         }
 
-        createNicknameAvatar(prefixclassname, left, topNickname, widthNickname, heightNickname, topAvatar, widthAvatar) {
+        createNicknameAvatar(parent, prefixclassname, left, topNickname, widthNickname, heightNickname, topAvatar, widthAvatar) {
             const nickname = this.createDOMElement('div', {
-                parent: this.body,
+                parent: parent,
                 classname: `${prefixclassname}-nickname`,
                 styles: {
                     position: 'absolute',
@@ -770,9 +744,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 // Handling the response
                 getAttempt[0].done((response) => {
-                    if (extraparams !== undefined && extraparams.colorpaletteid !== undefined) {
+                    if (this.iconSize === undefined) {
                         this.openGame();
-                        this.colors = undefined;
                     }
                     this.processGetAttempt(JSON.parse(response));
                 }).fail((error) => {
@@ -823,9 +796,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.createDivMessage('mmogame-error', message);
         }
 
-        createButtonHelp(left, top) {
+        createButtonHelp(parent, left, top) {
             return this.createDOMElement('img', {
-                parent: this.body,
+                parent: parent,
                 classnames: 'mmogame-button-help',
                 styles: {
                     position: 'absolute',

@@ -245,7 +245,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @return true or false
      */
-    protected function is_correct_multichoice_single1(stdClass $query, int $useranswerid, float &$fraction): bool {
+    protected function is_correct_multichoice_single1(stdClass $query, ?int $useranswerid, float &$fraction): bool {
         $fraction = null;
         foreach ($query->answers as $answer) {
             if (intval( $answer->id) == $useranswerid) {

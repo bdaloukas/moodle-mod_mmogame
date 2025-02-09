@@ -32,8 +32,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             const nicknameHeight = Math.round(this.iconSize / 3);
 
-            let nickname, avatar;
-            [nickname, avatar] = this.createNicknameAvatar('mmogame-quiz-alone',
+            const fragment = document.createDocumentFragment(); // Batch DOM updates
+
+            const [nickname, avatar] = this.createNicknameAvatar(fragment,
+                'mmogame-quiz-alone',
                 Math.round(this.padding + (i++) * step),
                 this.padding,
                 2 * this.iconSize + this.padding,
@@ -41,7 +43,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.padding + nicknameHeight,
                 this.iconSize);
 
-            this.player = this.createDivScorePercent(
+            this.player = this.createDivScorePercent(fragment,
                 'mmogame-quiz-alone',
                 this.padding + (i++) * step,
                 this.padding + nicknameHeight,
@@ -52,15 +54,17 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.player.cacheAvatar = '';
             this.player.cacheNickname = '';
             this.player.lblScore.title = this.getStringM('js_grade');
-            this.player.lblRank.title = this.getStringM('js_position_grade');
+            this.player.lblRank.title = this.getStringM('js_ranking_grade');
 
-            this.createButtonSound(this.padding + (i++) * step,
+            this.createButtonSound(fragment, this.padding + (i++) * step,
                 this.padding + nicknameHeight, this.iconSize);
             if (this.hasHelp()) {
-                const button = this.createButtonHelp(this.padding + (i++) * step, this.padding);
-                button.addEventListener("click", () => this.onClickHelp(this.buttonHelp));
+                const button = this.createButtonHelp(fragment, this.padding + (i++) * step, this.padding);
+                button.addEventListener("click", () => this.onClickHelp());
             }
             this.createArea(2 * this.padding + this.iconSize + nicknameHeight);
+
+            this.body.appendChild(fragment); // Batch insert into DOM
         }
 
         processSetAnswer(json) {
@@ -73,11 +77,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
 
             this.disableInput();
-
-            if (this.btnSubmit) {
-                this.body.removeChild(this.btnSubmit);
-                this.btnSubmit = undefined;
-            }
 
             const btn = super.createImageButton(
                 this.area,
@@ -99,7 +98,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         onServerFastJson(response) {
             const [state, timefastjson] = response.split("-").map(Number);
             if (timefastjson !== this.timefastjson || state !== this.state) {
-                this.sendGetAttempt({mmogameid: this.mmogameid, kinduser: this.kinduser, user: this.user});
+                this.callGetAttempt();
                 return;
             }
 
@@ -140,9 +139,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         createScreenHorizontal(json, disabled) {
             let maxHeight = this.areaRect.height - 2 * this.padding;
 
-            if (!this.hideSubmit) {
-                maxHeight -= this.iconSize + this.padding; // Reserve space for submit button
-            }
+            maxHeight -= this.iconSize + this.padding; // Reserve space for next button
 
             const width = Math.round((this.areaRect.width - this.padding) / 2);
             for (let step = 1; step <= 2; step++) {
@@ -171,24 +168,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.createDefinition(0, 0, width - this.padding, 0, false, this.fontSize, json.definition);
 
             this.nextTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled) + this.padding;
-
-            if (!this.hideSubmit) {
-                // Create and position the submit button
-                this.btnSubmit = this.createImageButton(
-                    this.body,
-                    'mmogame-quiz-submit',
-                    width + (width - this.iconSize) / 2,
-                    this.nextTop,
-                    0,
-                    this.iconSize,
-                    'assets/submit.svg',
-                    false,
-                    'submit'
-                );
-                this.btnSubmit.addEventListener('click', () => {
-                    this.sendAnswer();
-                });
-            }
 
             // Adjust strip dimensions
             this.stripLeft = width + this.padding;
@@ -259,10 +238,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             // A this.updateLabelTimer(); // Start or update the timer
             this.sendFastJSON(); // Send fast JSON updates
-
-            if (this.btnSubmit) {
-                this.btnSubmit.style.visibility = "hidden";
-            }
         }
 
         showScore({sumscore, rank, percent, percentrank}) {

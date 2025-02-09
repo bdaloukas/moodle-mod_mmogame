@@ -64,7 +64,8 @@ $PAGE->requires->strings_for_js(
         'js_ranking_grade', 'js_ranking_percent', 'js_sound'],
     'mmogame');
 $PAGE->requires->strings_for_js(
-    ['js_alone_help', 'js_aduel_example2', 'js_ranking_order', 'js_next_question', 'js_wizard'],
+    ['js_alone_help', 'js_aduel_example2', 'js_ranking_order', 'js_next_question', 'js_wizard', 'js_help_5050', 'js_help_skip',
+        'js_wizard'],
     'mmogametype_quiz');
 
 $url = $CFG->wwwroot.'/mod/mmogame';

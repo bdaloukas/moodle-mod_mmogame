@@ -36,7 +36,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
         constructor() {
             super();
-            this.hideSubmit = false;
             this.timeForSendAnswer = 10000;
         }
 
@@ -46,111 +45,23 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         openGame() {
             super.openGame(); // Call the parent class method
 
-            // Load sound effects
+            // Optimized Audio Loading
             this.audioYes = new Audio('assets/yes1.mp3');
             this.audioYes.load();
             this.audioNo = new Audio('assets/no1.mp3');
             this.audioNo.load();
         }
 
-/* B
-        updateLabelTimer() {
-            // Exit if labelTimer or timeclose are undefined
-            if (!this.labelTimer || !this.timeclose) {
-                return;
-            }
-
-            // Calculate the remaining time in seconds
-            const now = Date.now() / 1000; // Get current time in seconds
-            let remainingTime = Math.max(0, this.timeclose - now);
-
-            // If no time is remaining, clear the label and handle timeout
-            if (remainingTime === 0) {
-                this.labelTimer.innerHTML = '';
-                this.onTimeout();
-                return;
-            }
-
-            // Format the remaining time as mm:ss
-            const minutes = Math.floor(remainingTime / 60);
-            const seconds = String(Math.floor(remainingTime % 60)).padStart(2, '0');
-            this.labelTimer.innerHTML = `${minutes}:${seconds}`;
-
-            // Set a timeout to update the timer every 500ms
-            this.timerTimeout = setTimeout(() => this.updateLabelTimer(), 500);
-        }
-*/
-        /**
-         * Handles the timeout scenario by disabling inputs and sending timeout data.
-         */
-/* B
-        onTimeout() {
-            this.labelTimer.innerHTML = ''; // Clear the timer display
-            this.disableInput(); // Prevent further user input
-            this.sendTimeout(); // Notify the server about the timeout
-        }
-*/
-
         /**
          * Creates a vertical layout for the quiz screen.
          *
+         * @param {number}left
+         * @param {number}top
+         * @param {number}width
+         * @param {boolean}onlyMetrics
+         * @param {number}fontSize
          * @param {boolean} disabled - Whether user input should be disabled.
          */
-/* B
-        createScreenVertical(disabled) {
-            const nickNameHeight = Math.round(this.iconSize / 3) + this.padding;
-            let maxHeight = this.areaHeight - 4 * this.padding - nickNameHeight;
-
-            if (!this.hideSubmit) {
-                maxHeight -= this.iconSize; // Reserve space for the submit button
-            }
-
-            const maxWidth = this.areaWidth;
-
-            // Dynamically adjust font size to fit content within constraints
-            this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, (fontSize) => {
-                const defSize = this.createDefinition(0, 0, maxWidth - 1, true, fontSize);
-                if (defSize[0] >= maxWidth) {
-                    return 1;
-                }
-
-                const ansSize = this.createAnswer(0, 0, maxWidth - 1, true, fontSize, disabled);
-                return defSize[1] + ansSize[1] < maxHeight ? -1 : 1;
-            });
-
-            this.radioSize = Math.round(this.fontSize);
-            const defSize = this.createDefinition(0, 0, maxWidth, false, this.fontSize);
-
-            // Position answers below the definition
-            this.nextTop = this.createAnswer(0, defSize[1] + this.padding, maxWidth, false, this.fontSize, disabled);
-
-            if (!this.hideSubmit) {
-                // Create and position the submit button
-                const space = (this.areaWidth - this.iconSize) / 2;
-                this.btnSubmit = this.createImageButton(
-                    this.area,
-                    'mmogame-quiz-submit',
-                    space,
-                    this.nextTop,
-                    0,
-                    this.iconSize,
-                    'assets/submit.svg',
-                    false,
-                    'submit'
-                );
-                this.btnSubmit.addEventListener('click', () => {
-                    this.area.removeChild(this.btnSubmit);
-                    this.btnSubmit = undefined;
-                    this.sendAnswer();
-                });
-            }
-
-            // Adjust strip dimensions
-            this.stripLeft = this.padding;
-            this.stripWidth = 2 * this.iconSize;
-            this.stripHeight = this.iconSize;
-        }
-*/
         createAnswer(left, top, width, onlyMetrics, fontSize, disabled) {
             return this.createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled);
         }
@@ -169,6 +80,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled) {
             const n = this.answers ? this.answers.length : 0;
             const aChecked = this.answer?.split(",").filter(Boolean) || [];
+            const fragment = document.createDocumentFragment(); // ✅ Batch DOM updates
+
             const retSize = [0, 0];
             const checkboxSize = Math.round(fontSize);
             this.aItemAnswer = Array(n);
@@ -179,7 +92,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             for (let i = 0; i < n; i++) {
                 const label = this.createDOMElement('label', {
                     parent: null,
-                    classname: 'mmogame-quiz-label' + i,
+                    classnames: 'mmogame-quiz-label' + i,
                     styles: {
                         position: 'absolute',
                         width: `${width - fontSize - this.padding}px`,
@@ -199,8 +112,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 }
 
                 label.htmlFor = "mmogame_quiz_input" + i;
-                label.style.left = (left + fontSize + this.padding) + "px";
-                label.style.top = top + "px";
+                label.style.left = `${left + fontSize + this.padding}px`;
+                label.style.top = `${top}px`;
                 label.style.align = "left";
                 label.style.color = this.getContrastingColor(this.colorBackground);
 
@@ -224,8 +137,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     this.onClickRadio(i, this.colorBackground2, this.colorScore, true);
                 });
 
-                this.area.appendChild(item);
-                this.area.appendChild(label);
+                fragment.appendChild(item);
+                fragment.appendChild(label);
 
                 this.aItemAnswer[i] = item;
                 this.aItemCorrectX[i] = left + fontSize + this.padding;
@@ -234,6 +147,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 // Adjust positioning
                 top += Math.max(label.scrollHeight, fontSize) + this.padding;
             }
+
+            this.area.appendChild(fragment); // Batch insert into DOM
 
             return onlyMetrics ? retSize : top;
         }
@@ -269,24 +184,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.callSetAnswer();
             }
         }
-/* C
-        sendTimeout() {
-            let xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = () => {
-                if (this.readyState === 4 && this.status === 200) {
-                    this.sendGetAttempt();
-                }
-            };
-            xmlhttp.open("POST", this.url, true);
 
-            xmlhttp.setRequestHeader("Content-Type", "application/json");
-            let data = JSON.stringify({
-                "command": "timeout", "mmogameid": this.mmogameid, "pin": this.pin, 'kinduser': this.kinduser,
-                "user": this.user, "attempt": this.attempt
-            });
-            xmlhttp.send(data);
-        }
-*/
         /**
          * Generates an SVG for a correct or incorrect icon.
          *
@@ -351,37 +249,40 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 return;
             }
 
-            for (const item of this.aItemAnswer) {
-                item.classList.add("disabled"); // Add 'disabled' class to each input
+            this.aItemAnswer.forEach(item => {
+                item.classList.add("disabled");
+                item.setAttribute("disabled", "true"); // Ensuring proper disabling
                 this.drawRadio(item, this.colorScore, this.colorBackground2); // Update styling
-            }
+            });
         }
         /**
          * Sends periodic fast JSON updates to the server.
          */
-        sendFastJSON() {
-            // Clear existing timeout if any
-            if (this.timeoutFastJSON !== undefined) {
+        /**
+         * Improved AJAX request using Fetch API instead of XMLHttpRequest
+         */
+        async sendFastJSON() {
+            if (this.timeoutFastJSON) {
                 clearTimeout(this.timeoutFastJSON);
             }
 
-            this.timeoutFastJSON = setTimeout(() => {
-                const xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = () => {
-                    this.timeoutFastJSON = undefined;
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        this.onServerFastJson(xhr.response);
+            this.timeoutFastJSON = setTimeout(async() => {
+                try {
+                    const response = await fetch(`${this.url}/state.php`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            fastjson: this.fastjson,
+                            type: this.type
+                        }),
+                    });
+
+                    if (response.ok) {
+                        const data = await response.text();
+                        this.onServerFastJson(data);
                     }
-                };
-
-                const url = `${this.url}/state.php`;
-                xhr.open("POST", url, true);
-
-                const data = new FormData();
-                data.set('fastjson', this.fastjson);
-                data.set('type', this.type);
-
-                xhr.send(data); // Send the fast JSON data
+                } catch (error) {
+                    this.showError('Error sending Fast JSON:', error);
+                }
             }, this.timeForSendAnswer);
         }
 
@@ -392,16 +293,17 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         /**
          * Creates a percentage-based score display using createDOMElement.
          *
+         * @param {any} parent
          * @param {string} prefixclassname
          * @param {number} left - The left position in pixels.
          * @param {number} top - The top position in pixels.
          * @param {number} color
          * @param {boolean} createAddScore
          */
-        createDivScorePercent(prefixclassname, left, top, color, createAddScore) {
+        createDivScorePercent(parent, prefixclassname, left, top, color, createAddScore) {
             // Create the main button container
             const divMain = this.createDOMElement('div', {
-                parent: this.body,
+                parent: parent,
                 classnames: `${prefixclassname}-main`,
                 styles: {
                     position: 'absolute',
@@ -434,7 +336,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             // Create the ranking grade label (line1)
             const rankLabel = this.createDOMElement('div', {
-                parent: this.body,
+                parent: parent,
                 classnames: `${prefixclassname}-rank`,
                 styles: {
                     position: 'absolute',
@@ -452,7 +354,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             // Create the main score label (line2)
             const scoreLabel = this.createDOMElement('div', {
-                parent: this.body,
+                parent: parent,
                 classnames: `${prefixclassname}-score`,
                 styles: {
                     position: 'absolute',
@@ -471,7 +373,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             // Create the percentage label (line2)
             const percentLabel = this.createDOMElement('div', {
-                parent: this.body,
+                parent: parent,
                 classnames: `${prefixclassname}-percent`,
                 styles: {
                     position: 'absolute',
@@ -485,7 +387,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     color: rankLabel.style.color,
                 },
                 attributes: {
-                    title: this.getStringM('js_ranking_percent'),
+                    title: this.getStringM('js_percent'),
                 },
             });
 
@@ -493,7 +395,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             let addScoreLabel = null;
             if (createAddScore) {
                 addScoreLabel = this.createDOMElement('div', {
-                    parent: this.body,
+                    parent: parent,
                     classnames: `${prefixclassname}-addscore`,
                     styles: {
                         position: 'absolute',
@@ -602,8 +504,9 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
         /**
          * Sends the selected answer to the server using Moodle's AJAX API.
+         * @param {string} subcommand
          */
-        callSetAnswer() {
+        callSetAnswer(subcommand = '') {
             // Clear existing timeout
             if (this.timerTimeout !== undefined) {
                 clearTimeout(this.timerTimeout);
@@ -619,7 +522,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     attempt: this.attempt,
                     answer: this.answer || null,
                     answerid: this.answerid || null,
-                    subcommand: '',
+                    subcommand: subcommand,
                 };
 
                 Ajax.call([{

@@ -28,6 +28,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
     nextLeft; // Left position of next button.
     nextTop; // Top position of next button.
 
+    timeoutWaitOpponent = 2000;
+
+    // Tools button
+    buttonHighScore;
+    button5050;
+    buttonSkip;
+    buttonWizard;
+
     constructor() {
         super();
 
@@ -42,9 +50,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
         const step = this.iconSize + this.padding;
 
         const nicknameHeight = Math.round(this.iconSize / 3);
+        const fragment = document.createDocumentFragment(); // Batch DOM updates
 
         let nickname, avatar;
-        [nickname, avatar] = this.createNicknameAvatar('mmogame-quiz-alone',
+        [nickname, avatar] = this.createNicknameAvatar(fragment, 'mmogame-quiz-aduel',
             Math.round(this.padding + (i++) * step),
             this.padding,
             2 * this.iconSize + this.padding,
@@ -52,7 +61,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.padding + nicknameHeight,
             this.iconSize);
 
-        this.player1 = this.createDivScorePercent('mmogame-quiz-aduel-player1',
+        this.player1 = this.createDivScorePercent(fragment, 'mmogame-quiz-aduel-player1',
             this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight,
             this.getContrastingColor(this.color), true);
         this.player1.avatarElement = avatar;
@@ -62,7 +71,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.player1.lblScore.title = this.getStringM('js_grade');
         this.player1.lblRank.title = this.getStringM('js_position_grade');
 
-        [nickname, avatar] = this.createNicknameAvatar('mmogame-quiz-alone',
+        [nickname, avatar] = this.createNicknameAvatar(fragment, 'mmogame-quiz-alone',
             Math.round(this.padding + (i++) * step),
             this.padding,
             2 * this.iconSize + this.padding,
@@ -70,7 +79,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.padding + nicknameHeight,
             this.iconSize);
 
-        this.player2 = this.createDivScorePercent('mmogame-quiz-aduel-player2',
+        this.player2 = this.createDivScorePercent(fragment, 'mmogame-quiz-aduel-player2',
             this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight,
             this.getContrastingColor(this.color), false);
         this.player2.avatarElement = avatar;
@@ -86,31 +95,37 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.areaRect.height -= this.iconSize + 2 * this.padding;
         }
 
-        this.createDivTimer(this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight,
+        this.createDivTimer(fragment, this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight,
             this.iconSize);
 
         if (this.isVertical) {
-            this.createButtonSound(this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
+            this.createButtonSound(fragment,
+                this.padding + (i++) * (this.iconSize + this.padding), this.areaRect.top + this.areaRect.height);
         } else {
-            this.createButtonSound(this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
+            this.createButtonSound(fragment, this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
         }
 
-        if (!this.isVertical) {
-            this.buttonHighScore = this.createImageButton(this.body, 'mmogame-quiz-highscore',
-                this.padding + (this.iconSize + this.padding), this.areaRect.top + this.areaRect.height,
+        // High score button and Cut tool are in the same position.
+        let leftButton;
+        if (this.isVertical) {
+            leftButton = this.padding + (this.iconSize + this.padding);
+            this.buttonHighScore = this.createImageButton(fragment, 'mmogame-quiz-highscore',
+                leftButton, this.areaRect.top + this.areaRect.height,
                 this.iconSize, this.iconSize, 'assets/highscore.svg');
 
-            this.button5050 = this.createImageButton(this.body, 'mmogame-quiz-aduel-5050',
-                this.padding + (this.iconSize + this.padding), this.areaRect.top + this.areaRect.height,
-                this.iconSize, this.iconSize, 'assets/cutred.svg');
+            this.button5050 = this.createImageButton(fragment, 'mmogame-quiz-aduel-5050',
+                leftButton, this.areaRect.top + this.areaRect.height, this.iconSize, this.iconSize,
+                'assets/cutred.svg');
         } else {
-            this.buttonHighScore = this.createImageButton(this.body, 'mmogame-quiz-highscore',
-                this.padding + i * (this.iconSize + this.padding),
-                this.padding + nicknameHeight, this.iconSize, this.iconSize, 'assets/highscore.svg');
+            leftButton = this.padding + (i++) * (this.iconSize + this.padding);
 
-            this.button5050 = this.createImageButton(this.body, 'mmogame-quiz-aduel-5050',
-                this.padding + (i++) * (this.iconSize + this.padding),
-                this.padding + nicknameHeight, this.iconSize, this.iconSize, 'assets/cutred.svg');
+            this.buttonHighScore = this.createImageButton(fragment, 'mmogame-quiz-highscore',
+                leftButton, this.padding + nicknameHeight, this.iconSize, this.iconSize,
+                'assets/highscore.svg');
+
+            this.button5050 = this.createImageButton(fragment, 'mmogame-quiz-aduel-5050',
+                leftButton, this.padding + nicknameHeight, this.iconSize, this.iconSize,
+                'assets/cutred.svg');
         }
         this.buttonHighScore.style.visibility = 'hidden';
         this.buttonHighScore.addEventListener("click", () => {
@@ -119,53 +134,58 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.button5050.addEventListener("click", () => {
             this.callGetAttempt({tool1: 1});
         });
-        this.button5050.title = this.getStringM('js_help_5050');
+        this.button5050.title = this.getStringT('js_help_5050');
 
-        let left;
+        leftButton += this.iconSize + this.padding;
+
+        // Skip and wizard tools are in the same position.
         if (this.isVertical) {
-            left = this.padding + (i++) * (this.iconSize + this.padding);
-            this.buttonSkip = this.createImageButton(this.body, 'mmogame-quiz-aduel-skip',
-                left, this.padding + nicknameHeight, this.iconSize,
-                this.iconSize, 'assets/skip.svg');
+            this.buttonSkip = this.createImageButton(fragment, 'mmogame-quiz-aduel-skip',
+                leftButton, this.areaRect.top + this.areaRect.height, this.iconSize, this.iconSize,
+                'assets/skip.svg');
         } else {
-            this.buttonSkip = this.createImageButton(this.body, 'mmogame-quiz-aduel-skip',
-                this.padding + 2 * (this.iconSize + this.padding),
-                this.areaRect.top + this.areaRect.height, this.iconSize, this.iconSize, 'assets/skip.svg');
+            this.buttonSkip = this.createImageButton(fragment, 'mmogame-quiz-aduel-skip',
+                leftButton, this.padding + nicknameHeight, this.iconSize,
+                this.iconSize, 'assets/skip.svg');
         }
         this.buttonSkip.addEventListener("click", () => {
-            this.sendAnswer("tool2");
+            this.callSetAnswer("tool2");
         });
         this.buttonSkip.title = this.getStringT('js_help_skip');
 
-        if (!this.isVertical) {
-            this.buttonWizard = this.createImageButton(this.body, 'mmogame-quiz-aduel-wizard',
-                left, this.padding + nicknameHeight, this.iconSize,
-                this.iconSize, 'assets/wizard.svg');
+        if (this.isVertical) {
+            this.buttonWizard = this.createImageButton(fragment, 'mmogame-quiz-aduel-wizard',
+                leftButton, this.areaRect.top + this.areaRect.height, this.iconSize, this.iconSize,
+                'assets/wizard.svg');
         } else {
-            this.buttonWizard = this.createImageButton(this.body, 'mmogame-quiz-aduel-wizard',
-                this.padding + 2 * (this.iconSize + this.padding),
-                this.areaRect.top + this.areaRect.height, this.iconSize, this.iconSize, 'assets/wizard.svg');
+            this.buttonWizard = this.createImageButton(fragment, 'mmogame-quiz-aduel-wizard',
+                leftButton, this.padding + nicknameHeight, this.iconSize,
+                this.iconSize, 'assets/wizard.svg');
         }
         this.buttonWizard.addEventListener("click", () => {
             this.callGetAttempt({tool3: 1});
         });
         this.buttonWizard.style.visibility = 'hidden';
-        this.buttonWizard.title = this.getStringT('js_wizarg');
+        this.buttonWizard.title = this.getStringT('js_wizard');
         this.buttonWizard.addEventListener("click", () => {
             this.callGetAttempt({tool3: 1});
         });
 
         if (this.hasHelp()) {
             if (!this.isVertical) {
-                this.createButtonHelp(this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
+                this.createButtonHelp(fragment,
+                    this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
             } else {
-                this.createButtonHelp(this.padding + 3 * (this.iconSize + this.padding), this.areaRect.top + this.areaRect.height);
+                this.createButtonHelp(fragment,
+                    this.padding + 3 * (this.iconSize + this.padding), this.areaRect.top + this.areaRect.height);
             }
         }
+
+        this.body.appendChild(fragment); // Batch insert into DOM
     }
 
     updateButtonTool(btn, tool) {
-        btn.style.visibility = tool !== undefined && tool !== 0 ? "hidden" : "visible";
+        btn.style.visibility = tool !== undefined && parseInt(tool) !== 0 ? "hidden" : "visible";
     }
 
     processGetAttempt(json) {
@@ -229,15 +249,17 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         if (json.errorcode !== undefined && json.errorcode === 'aduel_no_rivals' || json.attempt === 0) {
             if (json.param === undefined) {
-                this.waitOponent();
+                this.showWaitOpponent();
             }
             this.hideTools();
             this.showScore(json);
-            this.onServerGetAttemptRetry();
+            this.timeout = setTimeout(() => {
+                this.callGetAttempt();
+            }, this.timeoutWaitOpponent);
             return;
         }
 
-        this.isWaitOponent = false;
+        this.isWaitOpponent = false;
 
         this.qtype = json.qtype;
         if (json.qtype === 'multichoice') {
@@ -259,9 +281,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         // A this.readJsonFiles(json);
         this.createScreen(json, false);
-        if (this.btnSubmit !== undefined) {
-            this.btnSubmit.style.visibility = "hidden";
-        }
         this.updateDivTimer();
         this.sendFastJSON();
     }
@@ -269,37 +288,25 @@ define(['mmogametype_quiz/mmogametypequiz'],
     onServerGetAttemptHideButtons() {
         this.button5050.style.visibility = 'hidden';
         this.buttonSkip.style.visibility = 'hidden';
-        if (this.btnSubmit !== undefined) {
-            this.btnSubmit.style.visibility = "hidden";
-        }
         this.player2.avatarElement.style.visibility = 'hidden';
     }
 
     onTimeout() {
         this.divTimer.innerHTML = '';
         this.disableInput();
-        if (this.btnSubmit !== undefined) {
-            this.btnSubmit.style.display = 'none';
-        }
 
         this.answer = '';
         this.answerid = 0;
         this.callSetAnswer();
 
-        let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
-            this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
-        btn.title = this.getStringM('js_next_question');
-        btn.addEventListener("click", () => {
-            this.sendGetAttempt(false);
-            this.area.removeChild(btn);
-        });
+        this.createNextButton();
     }
 
     waitOpponent() {
-        if (this.isWaitOponent) {
+        if (this.isWaitOpponent) {
             return;
         }
-        this.updateAvatarNickname(this.player2, "", "");
+        this.updateNicknameAvatar(this.player2, "", "");
         this.createDivMessage('mmomgame-quiz-aduel-wait-opponent',
             this.getStringT('js_aduel_wait_opponent'));
         if (this.labelTimer !== undefined) {
@@ -314,10 +321,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     processSetAnswer(json) {
-        if (json.submit === 0) {
-            return;
-        }
-
         this.correct = json.correct;
 
         if (json.correct !== undefined) {
@@ -329,27 +332,15 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.disableInput();
         this.buttonHighScore.style.visibility = 'visible';
 
-        this.isWaitOponent = false;
+        this.isWaitOpponent = false;
         if (this.aItemAnswer !== undefined && json.correct !== undefined) {
             for (let i = 0; i < this.aItemAnswer.length; i++) {
                 this.aItemAnswer[i].classList.add("disabled");
             }
         }
 
-        if (this.btnSubmit !== undefined) {
-            this.body.removeChild(this.btnSubmit);
-            this.btnSubmit = undefined;
-        }
-
         this.showCorrectAnswer(json);
-
-        let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
-            this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
-        btn.title = this.getStringM('js_next_question');
-        btn.addEventListener("click", () => {
-            this.callGetAttempt();
-            this.area.removeChild(btn);
-        });
+        this.createNextButton();
 
         this.showScore(json);
 
@@ -684,13 +675,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
     /**
      * Creates a timer display.
+     * @param {any} parent
      * @param {number} left - Left position in pixels.
      * @param {number} top - Top position in pixels.
      * @param {number} size - Timer size.
      */
-    createDivTimer(left, top, size) {
+    createDivTimer(parent, left, top, size) {
         this.divTimer = this.createDOMElement('div', {
-            parent: this.body,
+            parent: parent,
             classnames: 'mmogame-button-sound',
             styles: {
                 position: 'absolute',
@@ -766,9 +758,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
     createScreenHorizontal(json, disabled) {
         let maxHeight = this.areaRect.height - 2 * this.padding;
 
-        if (!this.hideSubmit) {
-            maxHeight -= this.iconSize + this.padding; // Reserve space for submit button
-        }
+        maxHeight -= this.iconSize + this.padding; // Reserve space for submit button
+
         const width = Math.round((this.areaRect.width - this.padding) / 2);
         for (let step = 1; step <= 2; step++) {
             let defSize;
@@ -797,28 +788,31 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         this.nextTop = heightAnswer + this.padding;
 
-        if (!this.hideSubmit) {
-            // Create and position the submit button
-            this.btnSubmit = this.createImageButton(
-                this.body,
-                'mmogame-quiz-submit',
-                width + (width - this.iconSize) / 2,
-                this.nextTop,
-                0,
-                this.iconSize,
-                'assets/submit.svg',
-                false,
-                'submit'
-            );
-            this.btnSubmit.addEventListener('click', () => {
-                this.sendAnswer();
-            });
-        }
-
         // Adjust strip dimensions
         this.stripLeft = width + this.padding;
         this.stripWidth = 2 * this.iconSize;
         this.stripHeight = this.iconSize;
+    }
+
+    showWaitOpponent() {
+        if (this.isWaitOpponent) {
+            return;
+        }
+        this.updateNicknameAvatar(this.player2, '', '', 0, 0);
+        this.createDivMessage(this.getStringT('js_aduel_wait_opponent'));
+        if (this.divTimer !== undefined) {
+            this.divTimer.innerHTML = "";
+        }
+    }
+
+    createNextButton() {
+        let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
+            this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
+        btn.title = this.getStringM('js_next_question');
+        btn.addEventListener("click", () => {
+            this.callGetAttempt();
+            this.area.removeChild(btn);
+        });
     }
 
         };

@@ -36,6 +36,7 @@ $string['js_aduel_help'] = 'Each player initially answers 4 questions of increas
 Another player then answers the same questions.<br>
 If only one of the two answered a question correctly, he gets an extra 3 points.';
 $string['js_aduel_skip'] = 'Skips the question.';
+$string['js_aduel_wait_opponent'] = 'Waiting to find an opponent.';
 $string['js_aduel_wizard'] = 'It shows the correct answer but the player will earn 1 point less.';
 $string['js_alone_help'] = 'Each player earns 3 points if his answer is correct and loses 1 point for each wrong answer.';
 $string['js_correct_answer'] = 'Correct answer';
@@ -47,7 +48,6 @@ $string['js_percent_oponent'] = "Opponent's percentage of correct answers";
 $string['js_position_grade'] = 'Ranking order based on opponent rating';
 $string['js_position_percent'] = "Ranking order based on opponent's percentage of correct answers";
 $string['js_ranking_order'] = 'Ranking order';
-$string['js_wait_oponent'] = 'Waiting to find an opponent.';
 $string['js_wizard'] = 'Revealing the correct answer will cost you 1 mark';
 $string['js_wrong_answer'] = 'Wrong answer';
 $string['model_aduel'] = 'Quiz - ADuel';

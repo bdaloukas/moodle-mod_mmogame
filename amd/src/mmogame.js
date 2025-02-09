@@ -46,6 +46,8 @@ define([''], function() {
         timestart = 0;
         timeclose = 0;
 
+        keyOptions = 'user';
+
         /**
          * Initialize game properties and compute initial sizes.
          *
@@ -66,7 +68,7 @@ define([''], function() {
             this.setColorsString();
 
             // Compute and set font size properties.
-            let size = parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue('font-size'));
+            const size = parseFloat(getComputedStyle(document.documentElement).fontSize);
             this.minFontSize = size;
             this.maxFontSize = 2 * size;
             this.fontSize = size;
@@ -322,33 +324,6 @@ define([''], function() {
             this.body.removeChild(tempDiv);
         }
 
-        pad(num, size) {
-            let s = num + "";
-            while (s.length < size) {
-                s = "0" + s;
-            }
-            return s;
-        }
-
-        uuid4() {
-            const hexDigits = '0123456789abcdef';
-            const uuid = [...Array(36)].map(() => hexDigits[Math.floor(Math.random() * 16)]);
-            uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
-            uuid[14] = '4';
-            // eslint-disable-next-line no-bitwise
-            uuid[19] = hexDigits[(parseInt(uuid[19], 16) & 0x3) | 0x8];
-
-            this.user = uuid.join('');
-
-            let options = {userGUID: this.user};
-            this.setOptions(options)
-                .then(() => true) // Arrow function for resolving promise
-                .catch(error => { // Arrow function for handling errors
-                    this.showError(error.message);
-                    return false;
-                });
-        }
-
         /**
          * Returns the hex color string for a given color code.
          *
@@ -373,17 +348,6 @@ define([''], function() {
             // eslint-disable-next-line no-bitwise
             const b = colorCode & 0xff;
             return (r * 299 + g * 587 + b * 114) / 1000;
-        }
-
-        getColorGray(x) {
-            let r = Math.floor(x / 0x1000000) % 256, // Red.
-                g = Math.floor(x / 0x10000) % 256, // Green.
-                b = Math.floor(x / 0x100) % 256, // Blue.
-                yiq = (r * 299) + g * 587 + b * 114,
-                m = 255 * 299 + 255 * 587 + 255 * 114,
-                gray = Math.round(yiq * 255 / m);
-
-            return (gray * 0x10000) + (gray * 0x100) + gray;
         }
 
         /**
@@ -633,7 +597,7 @@ define([''], function() {
 
         /**
          * Saves user options to IndexedDB.
-         * @param {Object} options - The options to save.
+         * @param {object} options - The options to save.
          * @returns {Promise<void>} A promise that resolves when the save is complete.
          */
         async setOptions(options) {
@@ -656,7 +620,7 @@ define([''], function() {
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
                     if (!db.objectStoreNames.contains('options')) {
-                        db.createObjectStore('options', {keyPath: 'name'});
+                        db.createObjectStore('options', {keyPath: 'key'});
                     }
                 };
 
