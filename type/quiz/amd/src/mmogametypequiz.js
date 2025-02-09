@@ -461,8 +461,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @returns {Array} The width and height of the definition area.
          */
         createDefinition(left, top, width, height, onlyMetrics, fontSize, definition) {
-            const adjustedWidth = width - 2 * this.padding;
-
             const definitionDiv = this.createDOMElement(
                 'div',
                 {
@@ -470,7 +468,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     classnames: 'mmogame-quiz-definition',
                     styles: {
                         position: 'absolute',
-                        width: `${adjustedWidth}px`,
+                        width: `${width}px`,
                         fontSize: `${fontSize}px`,
                     }
                 }
@@ -590,5 +588,49 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             player.nicknameElement.style.visibility = 'visible';
         }
+
+        computeBestFontSize(json) {
+            let maxHeight, definitionWidth;
+
+            maxHeight = this.areaRect.height - this.iconSize - 3 * this.padding;
+            definitionWidth = this.isVertical ? this.areaRect.width : Math.round((this.areaRect.width - this.padding) / 2);
+
+            for (let step = 1; step <= 2; step++) {
+                let defSize;
+                this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
+                    (fontSize) => {
+                        defSize = this.createDefinition(0, 0, definitionWidth, 0, true, fontSize,
+                            json);
+                        if (defSize[0] >= definitionWidth) {
+                            return 1;
+                        }
+                        let ansSize = this.createAnswer(0, 0, definitionWidth, true, fontSize, false);
+                        if (ansSize[0] >= definitionWidth) {
+                            return 1;
+                        }
+                        if (this.isVertical) {
+                            return defSize[1] + ansSize[1] < maxHeight ? -1 : 1;
+                        } else {
+                            return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
+                        }
+                    });
+                if (defSize[0] <= definitionWidth && defSize[1] <= this.areaRect.height) {
+                    break;
+                }
+            }
+
+            return [definitionWidth];
+        }
+
+        createNextButton(left, top) {
+            let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
+                left, top, 0, this.iconSize, 'assets/next.svg');
+            btn.title = this.getStringM('js_next_question');
+            btn.addEventListener("click", () => {
+                this.callGetAttempt();
+                this.area.removeChild(btn);
+            });
+        }
+
     };
     });

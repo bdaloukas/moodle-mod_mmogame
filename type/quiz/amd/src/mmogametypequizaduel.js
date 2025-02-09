@@ -25,8 +25,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
     divTimer;
     timerTimeout;
 
-    nextLeft; // Left position of next button.
-    nextTop; // Top position of next button.
+    stripLeft; // Left position of next button.
+    stripTop; // Top position of next button.
 
     timeoutWaitOpponent = 2000;
 
@@ -89,22 +89,18 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.player2.lblScore.title = this.getStringM('js_percent_opponent');
         this.player2.lblRank.title = this.getStringM('js_position_percent');
 
-        this.createArea(2 * this.padding + this.iconSize + nicknameHeight);
-
-        if (this.isVertical) {
-            this.areaRect.height -= this.iconSize + 2 * this.padding;
-        }
+        this.createArea(2 * this.padding + this.iconSize + nicknameHeight, this.isVertical ? this.iconSize : 0);
 
         this.createDivTimer(fragment, this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight,
             this.iconSize);
 
         if (this.isVertical) {
+            i = 0;
             this.createButtonSound(fragment,
                 this.padding + (i++) * (this.iconSize + this.padding), this.areaRect.top + this.areaRect.height);
         } else {
             this.createButtonSound(fragment, this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
         }
-
         // High score button and Cut tool are in the same position.
         let leftButton;
         if (this.isVertical) {
@@ -174,7 +170,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         if (this.hasHelp()) {
             if (!this.isVertical) {
                 this.createButtonHelp(fragment,
-                    this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
+                    leftButton + this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
             } else {
                 this.createButtonHelp(fragment,
                     this.padding + 3 * (this.iconSize + this.padding), this.areaRect.top + this.areaRect.height);
@@ -299,7 +295,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.answerid = 0;
         this.callSetAnswer();
 
-        this.createNextButton();
+        this.createNextButton(this.areaRect.width - this.iconSize - this.padding, this.stripTop);
     }
 
     waitOpponent() {
@@ -340,7 +336,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         this.showCorrectAnswer(json);
-        this.createNextButton();
+        this.createNextButton(this.areaRect.width - this.iconSize - this.padding, this.stripTop);
 
         this.showScore(json);
 
@@ -446,23 +442,23 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.updateDivTimer();
 
         this.strip = this.createDiv(this.area, 'mmogame-quiz-aduel-strip',
-            this.stripLeft, this.nextTop, this.stripWidth, this.stripHeight);
+            this.stripLeft, this.stripTop, 2 * this.iconSize + this.padding, this.iconSize);
 
         if (tool2 === undefined || this.aduelPlayer === 2) {
                 const btn = this.createImage(this.area, 'mmogame-quiz-aduel-player1',
-                this.stripLeft + this.iconSize / 2, this.nextTop, this.iconSize,
+                this.stripLeft + this.iconSize / 2, this.stripTop, this.iconSize,
             this.iconSize, "assets/avatars/" + this.player1.cacheAvatar);
             btn.style.transform = 'translateX(-50%)';
         }
 
         if (tool2 === undefined && this.aduelPlayer === 2) {
             const btn = this.createImage(this.area, 'mmogame-quiz-aduel-player2',
-                this.stripLeft + this.iconSize / 2 + this.iconSize, this.nextTop, this.iconSize,
+                this.stripLeft + this.iconSize / 2 + this.iconSize, this.stripTop, this.iconSize,
                 this.iconSize, "assets/avatars/" + this.player2.cacheAvatar);
             btn.style.transform = 'translateX(-50%)';
         }
 
-        this.strip.style.top = this.nextTop + "px";
+        this.strip.style.top = this.stripTop + "px";
         let s = this.getSVGcorrect(this.iconSize, iscorrect !== 0, this.colorScore, this.colorScore);
         if (tool2 !== undefined && this.aduelPlayer === 1) {
             s = '';
@@ -551,7 +547,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.area.removeChild(child);
         }
 
-        if (this.vertical) {
+        if (this.isVertical) {
             this.createScreenVerticalHighScore(json);
         } else {
             this.createScreenHorizontalHighScore(json);
@@ -683,7 +679,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     createDivTimer(parent, left, top, size) {
         this.divTimer = this.createDOMElement('div', {
             parent: parent,
-            classnames: 'mmogame-button-sound',
+            classnames: 'mmogame-quiz-aduel-timer',
             styles: {
                 position: 'absolute',
                 left: `${left}px`,
@@ -694,9 +690,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 color: this.getContrastingColor(this.colorBackground),
             },
             attributes: {
-                src: this.getMuteFile(),
-                alt: this.getStringM('js_sound'),
-                role: 'button',
+                alt: this.getStringM('js_question_time'),
             },
         });
 
@@ -745,7 +739,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         // Render the screen layout based on orientation (vertical or horizontal)
-        if (this.vertical) {
+        if (this.isVertical) {
             this.createScreenVertical(json, disabled);
         } else {
             this.createScreenHorizontal(json, disabled);
@@ -756,42 +750,28 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     createScreenHorizontal(json, disabled) {
-        let maxHeight = this.areaRect.height - 2 * this.padding;
-
-        maxHeight -= this.iconSize + this.padding; // Reserve space for submit button
-
-        const width = Math.round((this.areaRect.width - this.padding) / 2);
-        for (let step = 1; step <= 2; step++) {
-            let defSize;
-            this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
-                (fontSize) => {
-                defSize = this.createDefinition(0, 0, width - this.padding, 0, true, fontSize,
-                    json.definition);
-                if (defSize[0] >= width) {
-                    return 1;
-                }
-                let ansSize = this.createAnswer(0, 0, width - this.padding, true, fontSize, disabled);
-                    if (ansSize[0] >= width) {
-                        return 1;
-                    }
-                    return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
-            });
-            if (defSize[0] <= width && defSize[1] <= this.areaRect.height) {
-                break;
-            }
-        }
+        const [width] = this.computeBestFontSize(json);
 
         this.radioSize = Math.round(this.fontSize);
-        const heightAnswer = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
+        this.stripTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
 
-        this.createDefinition(0, 0, width - this.padding, heightAnswer, false, this.fontSize, json.definition);
-
-        this.nextTop = heightAnswer + this.padding;
+        this.createDefinition(0, 0, width - this.padding, this.stripTop - this.padding,
+            false, this.fontSize, json.definition);
 
         // Adjust strip dimensions
         this.stripLeft = width + this.padding;
-        this.stripWidth = 2 * this.iconSize;
-        this.stripHeight = this.iconSize;
+    }
+
+    createScreenVertical(json, disabled) {
+        this.computeBestFontSize(json);
+
+        this.radioSize = Math.round(this.fontSize);
+
+        const defSize = this.createDefinition(0, 0, this.areaRect.width, 0, false, this.fontSize, json.definition);
+        this.stripTop = this.createAnswer(0, defSize[1] + this.padding, this.areaRect.width, false, this.fontSize, disabled);
+
+        // Adjust strip position
+        this.stripLeft = 0;
     }
 
     showWaitOpponent() {
@@ -805,15 +785,5 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
     }
 
-    createNextButton() {
-        let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
-            this.nextLeft, this.nextTop, 0, this.iconSize, 'assets/next.svg');
-        btn.title = this.getStringM('js_next_question');
-        btn.addEventListener("click", () => {
-            this.callGetAttempt();
-            this.area.removeChild(btn);
-        });
-    }
-
-        };
+    };
 });

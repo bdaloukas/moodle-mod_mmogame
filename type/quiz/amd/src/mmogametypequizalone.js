@@ -120,8 +120,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
 
             // Render the screen layout based on orientation (vertical or horizontal)
-            if (this.vertical) {
-                this.createScreenVertical(disabled);
+            if (this.isVertical) {
+                this.createScreenVertical(json, disabled);
             } else {
                 this.createScreenHorizontal(json, disabled);
             }
@@ -137,11 +137,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
          * @param {boolean} disabled - Whether user input should be disabled.
          */
         createScreenHorizontal(json, disabled) {
-            let maxHeight = this.areaRect.height - 2 * this.padding;
+            // Reserve space for next button
+            let maxHeight = this.areaRect.height - 2 * this.padding - this.iconSize;
 
-            maxHeight -= this.iconSize + this.padding; // Reserve space for next button
-
-            const width = Math.round((this.areaRect.width - this.padding) / 2);
+            const width = Math.round((this.areaRect.width - this.padding) / 2 - this.padding);
             for (let step = 1; step <= 2; step++) {
                 let defSize;
                 this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
@@ -159,18 +158,54 @@ define(['mmogametype_quiz/mmogametypequiz'],
                         return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
                     }
                 );
-                if (defSize[0] <= width && defSize[1] <= this.areaRect.height) {
+                if (defSize[0] <= width && defSize[1] <= maxHeight) {
                     break;
                 }
             }
 
             this.radioSize = Math.round(this.fontSize);
-            this.createDefinition(0, 0, width - this.padding, 0, false, this.fontSize, json.definition);
+            const heightAnswer = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
 
-            this.nextTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled) + this.padding;
+            this.createDefinition(0, 0, width - this.padding, heightAnswer, false, this.fontSize, json.definition);
+
+            this.nextTop = heightAnswer + this.padding;
 
             // Adjust strip dimensions
             this.stripLeft = width + this.padding;
+            this.stripWidth = 2 * this.iconSize;
+            this.stripHeight = this.iconSize;
+        }
+
+        createScreenVertical(json, disabled) {
+            let maxHeight = this.areaRect.height - 2 * this.padding - this.iconSize;
+
+            for (let step = 1; step <= 2; step++) {
+                let defSize, ansSize;
+                this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
+                    (fontSize) => {
+                        defSize = this.createDefinition(0, 0, this.areaRect.width, 0, true, fontSize,
+                            json.definition);
+                        ansSize = this.createAnswer(0, 0, this.areaRect.width, true, fontSize, disabled);
+
+                        if (defSize[0] >= this.areaRect.width || ansSize[0] >= this.areaRect.width) {
+                            return 1;
+                        }
+                        return defSize[1] + ansSize[1] < maxHeight ? -1 : 1;
+                    }
+                );
+                if (defSize[0] <= this.areaRect.width && defSize[1] + ansSize[1] <= maxHeight) {
+                    break;
+                }
+            }
+
+            this.radioSize = Math.round(this.fontSize);
+            const defSize = this.createDefinition(0, 0, this.areaRect.width, 0, false, this.fontSize, json.definition);
+
+            this.nextTop = this.createAnswer(
+                0, defSize[1] + this.padding, this.areaRect.width, false, this.fontSize, disabled) + this.padding;
+
+            // Adjust strip dimensions
+            this.stripLeft = this.iconSize + this.padding;
             this.stripWidth = 2 * this.iconSize;
             this.stripHeight = this.iconSize;
         }

@@ -599,11 +599,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * Creates the main game area.
          */
 
-        createArea(top) {
+        createArea(top, bottomSpace) {
             if (this.area !== undefined) {
                 this.body.removeChild(this.area);
             }
-
             this.area = this.createDOMElement('div', {
                 parent: this.body,
                 classnames: 'mmogame-area',
@@ -612,7 +611,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     left: `${this.padding}px`,
                     top: `${top}px`,
                     right: `${this.padding}px`,
-                    bottom: `${this.padding}px`,
+                    bottom: `${this.padding + bottomSpace}px`,
                     overflow: 'hidden',
                 }
             });
