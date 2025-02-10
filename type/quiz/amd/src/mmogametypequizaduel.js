@@ -63,7 +63,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         this.player1 = this.createDivScorePercent(fragment, 'mmogame-quiz-aduel-player1',
             this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight,
-            this.getContrastingColor(this.color), true);
+            true, this.colorScore);
         this.player1.avatarElement = avatar;
         this.player1.nicknameElement = nickname;
         this.player1.cacheAvatar = '';
@@ -81,7 +81,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         this.player2 = this.createDivScorePercent(fragment, 'mmogame-quiz-aduel-player2',
             this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight,
-            this.getContrastingColor(this.color), false);
+            false, this.colorScore2);
         this.player2.avatarElement = avatar;
         this.player2.nicknameElement = nickname;
         this.player2.cacheAvatar = '';

@@ -47,8 +47,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 'mmogame-quiz-alone',
                 this.padding + (i++) * step,
                 this.padding + nicknameHeight,
-                this.getContrastingColor(this.color),
-                true);
+                true,
+                this.colorScore);
             this.player.avatarElement = avatar;
             this.player.nicknameElement = nickname;
             this.player.cacheAvatar = '';
