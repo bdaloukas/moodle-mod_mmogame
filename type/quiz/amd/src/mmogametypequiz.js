@@ -21,6 +21,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         pin;
         labelTimer;
         timeForSendAnswer;
+        timefastjson;
 
         // Colors.
         colorScore;
@@ -129,16 +130,21 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 // Event listeners for interactions
                 item.addEventListener('click', () => {
                     if (!item.classList.contains("disabled")) {
-                        this.onClickRadio(i, this.colorBackground2, this.colorScore, true);
+                        this.onClickRadio(i, this.colorBackground2, this.colorScore);
                     }
                 });
 
                 label.addEventListener('click', () => {
-                    this.onClickRadio(i, this.colorBackground2, this.colorScore, true);
+                    this.onClickRadio(i, this.colorBackground2, this.colorScore);
                 });
 
                 fragment.appendChild(item);
-                fragment.appendChild(label);
+                this.area.appendChild(label);
+
+                const heightLabel = label.scrollHeight;
+                if (heightLabel > fontSize) {
+                    item.style.top = Math.round(top + (heightLabel - fontSize) / 2) + "px";
+                }
 
                 this.aItemAnswer[i] = item;
                 this.aItemCorrectX[i] = left + fontSize + this.padding;
@@ -159,9 +165,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @param {number} index - The index of the clicked radio button.
          * @param {string} colorBack - The background color for the radio button.
          * @param {string} color - The color for the radio button when selected.
-         * @param {boolean} callSendAnswer - Whether to send the answer immediately.
          */
-        onClickRadio(index, colorBack, color, callSendAnswer) {
+        onClickRadio(index, colorBack, color) {
             if (this.aItemAnswer[index].classList.contains("disabled")) {
                 return;
             }
@@ -179,10 +184,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.drawRadio(item, isDisabled ? colorBack : 0xFFFFFF, color);
             });
 
-            // Send the answer if autosave is enabled
-            if (this.autosave && callSendAnswer) {
-                this.callSetAnswer();
-            }
+            // Send the answer
+            this.callSetAnswer();
         }
 
         /**
@@ -205,39 +208,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     "\" class=\"bi bi-x-lg\" viewBox=\"0 0 18 18\"> <path fill=\"" + c +
                     `" d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 
                 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/></svg>`;
-            }
-        }
-
-
-        /**
-         * Updates the screen to show the correctness of the user's answers.
-         */
-        updateScreenAfterAnswerMultichoice() {
-            const correctAnswers = this.correct.split(","); // Split correct answer IDs into an array
-
-            for (let i = 0; i < this.answersID.length; i++) {
-                const label = this.aItemLabel[i];
-                const isChecked = this.aItemAnswer[i].classList.contains("checked");
-                const isCorrect = correctAnswers.includes(this.answersID[i]);
-
-                // Skip answers that are neither checked nor correct
-                if (!isCorrect && !isChecked) {
-                    continue;
-                }
-
-                // Adjust label styling and add correct/incorrect icon
-                const labelWidth = label.scrollWidth - this.radioSize;
-                label.style.left = `${parseInt(label.style.left) + this.radioSize}px`;
-                label.style.width = `${labelWidth}px`;
-
-                if (isCorrect) {
-                    label.innerHTML = `<b>${label.innerHTML}</b>`;
-                }
-
-                const top = parseInt(this.aItemAnswer[i].style.top);
-                const feedbackDiv = this.createDiv(this.area, 'mmogame-quiz-correct',
-                    this.aItemCorrectX[i], top, this.radioSize, this.radioSize);
-                feedbackDiv.innerHTML = this.getSVGcorrect(this.radioSize, isCorrect, this.colorScore, this.colorScore);
             }
         }
 
@@ -641,6 +611,28 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.callGetAttempt();
                 this.area.removeChild(btn);
             });
+        }
+
+        onServerFastJson(response) {
+            if (response === '') {
+                this.sendFastJSON();
+                return;
+            }
+
+            let a = response.split('-'); // Are state,timefastjson.
+            let newstate = a.length > 0 ? parseInt(a[0]) : 0;
+            let newTimeFastJSON = a.length > 1 ? a[1] : 0;
+
+            if (this.timefastjson === null) {
+                this.timefastjson = 0;
+            }
+
+            if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
+                this.callGetAttempt();
+                return;
+            }
+
+            this.sendFastJSON();
         }
 
     };

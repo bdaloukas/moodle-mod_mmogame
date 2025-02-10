@@ -352,7 +352,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @return bool (true or false)
      */
     public function iswizard(int $attemptid): bool {
-        error_log("iswizard($attemptid) ret=".($attemptid % (2 * $this->numquestions) == 0 ? 'true': ''));
         return $attemptid % (2 * $this->numquestions) == 0;
     }
 

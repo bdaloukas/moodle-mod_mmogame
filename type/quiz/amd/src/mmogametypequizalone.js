@@ -62,7 +62,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 const button = this.createButtonHelp(fragment, this.padding + (i++) * step, this.padding);
                 button.addEventListener("click", () => this.onClickHelp());
             }
-            this.createArea(2 * this.padding + this.iconSize + nicknameHeight);
+            this.createArea(2 * this.padding + this.iconSize + nicknameHeight, 0);
 
             this.body.appendChild(fragment); // Batch insert into DOM
         }
@@ -70,39 +70,23 @@ define(['mmogametype_quiz/mmogametypequiz'],
         processSetAnswer(json) {
             this.correct = json.correct;
 
-            this.playAudio(json.iscorrect !== 0 ? this.audioYes : this.audioNo);
-
-            if (json.correct !== undefined && this.qtype === "multichoice") {
-                this.updateScreenAfterAnswerMultichoice();
+            if (json.correct !== undefined) {
+                if (this.qtype === "multichoice") {
+                    this.onServerAnswerMultichoice(json);
+                }
             }
 
             this.disableInput();
 
-            const btn = super.createImageButton(
-                this.area,
-                'mmogame-quiz-next',
-                this.nextLeft,
-                this.nextTop,
-                0,
-                this.iconSize,
-                'assets/next.svg'
-            );
-            btn.addEventListener("click", () => {
-                this.callGetAttempt();
-                this.area.removeChild(btn);
-            });
-
-            this.showScore(json);
-        }
-
-        onServerFastJson(response) {
-            const [state, timefastjson] = response.split("-").map(Number);
-            if (timefastjson !== this.timefastjson || state !== this.state) {
-                this.callGetAttempt();
-                return;
+            if (this.aItemAnswer !== undefined && json.correct !== undefined) {
+                for (let i = 0; i < this.aItemAnswer.length; i++) {
+                    this.aItemAnswer[i].classList.add("disabled");
+                }
             }
 
-            this.sendFastJSON();
+            this.createNextButton(this.areaRect.width - this.iconSize - this.padding, this.stripTop);
+
+            this.showScore(json);
         }
 
         /**
@@ -114,9 +98,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
         createScreen(json, disabled) {
             if (this.endofgame) {
                 // Display end-of-game message and final score
-                this.createDivMessage('mmogame-endofgame', this.getStringM('js_game_over'));
+                this.createDivMessage('mmogame-quiz-alone-endofgame', this.getStringM('js_game_over'));
                 this.showScore(json);
                 return;
+            }
+
+            let child;
+            while ((child = this.area.firstChild)) {
+                this.area.removeChild(child);
             }
 
             // Render the screen layout based on orientation (vertical or horizontal)
@@ -137,77 +126,28 @@ define(['mmogametype_quiz/mmogametypequiz'],
          * @param {boolean} disabled - Whether user input should be disabled.
          */
         createScreenHorizontal(json, disabled) {
-            // Reserve space for next button
-            let maxHeight = this.areaRect.height - 2 * this.padding - this.iconSize;
-
-            const width = Math.round((this.areaRect.width - this.padding) / 2 - this.padding);
-            for (let step = 1; step <= 2; step++) {
-                let defSize;
-                this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
-                    (fontSize) => {
-                        defSize = this.createDefinition(0, 0, width - this.padding, 0, true, fontSize,
-                            json.definition);
-
-                        if (defSize[0] >= width) {
-                            return 1;
-                        }
-                        let ansSize = this.createAnswer(0, 0, width - this.padding, true, fontSize, disabled);
-                        if (ansSize[0] >= width) {
-                            return 1;
-                        }
-                        return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
-                    }
-                );
-                if (defSize[0] <= width && defSize[1] <= maxHeight) {
-                    break;
-                }
-            }
+            const [width] = this.computeBestFontSize(json);
 
             this.radioSize = Math.round(this.fontSize);
-            const heightAnswer = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
+            this.stripTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
 
-            this.createDefinition(0, 0, width - this.padding, heightAnswer, false, this.fontSize, json.definition);
-
-            this.nextTop = heightAnswer + this.padding;
+            this.createDefinition(0, 0, width - this.padding, this.stripTop - this.padding,
+                false, this.fontSize, json.definition);
 
             // Adjust strip dimensions
             this.stripLeft = width + this.padding;
-            this.stripWidth = 2 * this.iconSize;
-            this.stripHeight = this.iconSize;
         }
 
         createScreenVertical(json, disabled) {
-            let maxHeight = this.areaRect.height - 2 * this.padding - this.iconSize;
-
-            for (let step = 1; step <= 2; step++) {
-                let defSize, ansSize;
-                this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
-                    (fontSize) => {
-                        defSize = this.createDefinition(0, 0, this.areaRect.width, 0, true, fontSize,
-                            json.definition);
-                        ansSize = this.createAnswer(0, 0, this.areaRect.width, true, fontSize, disabled);
-
-                        if (defSize[0] >= this.areaRect.width || ansSize[0] >= this.areaRect.width) {
-                            return 1;
-                        }
-                        return defSize[1] + ansSize[1] < maxHeight ? -1 : 1;
-                    }
-                );
-                if (defSize[0] <= this.areaRect.width && defSize[1] + ansSize[1] <= maxHeight) {
-                    break;
-                }
-            }
+            this.computeBestFontSize(json);
 
             this.radioSize = Math.round(this.fontSize);
+
             const defSize = this.createDefinition(0, 0, this.areaRect.width, 0, false, this.fontSize, json.definition);
+            this.stripTop = this.createAnswer(0, defSize[1] + this.padding, this.areaRect.width, false, this.fontSize, disabled);
 
-            this.nextTop = this.createAnswer(
-                0, defSize[1] + this.padding, this.areaRect.width, false, this.fontSize, disabled) + this.padding;
-
-            // Adjust strip dimensions
-            this.stripLeft = this.iconSize + this.padding;
-            this.stripWidth = 2 * this.iconSize;
-            this.stripHeight = this.iconSize;
+            // Adjust strip position
+            this.stripLeft = 0;
         }
 
         processGetAttempt(json) {
@@ -275,8 +215,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.sendFastJSON(); // Send fast JSON updates
         }
 
-        showScore({sumscore, rank, percent, percentrank}) {
-            super.showScore(this.player, sumscore, rank, percent, percentrank, true);
+        showScore(json) {
+            super.showScore(this.player, json.sumscore, json.rank, json.percent, json.percentRank, true);
+            this.player.lblAddScore.innerHTML = json.addscore === undefined ? '' : json.addscore;
+            this.autoResizeText(this.player.lblAddScore, this.iconSize, this.player.heightLine3, true, 0, 0, 1);
         }
 
         showHelpScreen(div) {
@@ -292,5 +234,63 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 </table>
             `;
         }
+
+        onServerAnswerMultichoice(json) {
+            let foundCorrect = false;
+
+            let aCorrect = json.correct.split(",");
+            for (let i = 0; i < this.answersID.length; i++) {
+                if (this.answersID[i] === '') {
+                    continue;
+                }
+
+                const label = this.aItemLabel[i];
+
+                let iscorrect1;
+
+                const iscorrect = aCorrect.includes(this.answersID[i]);
+
+                if (this.aItemAnswer[i].classList.contains("checked")) {
+                    iscorrect1 = aCorrect.includes(this.answersID[i]);
+                }
+                if (iscorrect1) {
+                    foundCorrect = true;
+                }
+
+                if (iscorrect === false && iscorrect1 === undefined) {
+                    continue;
+                }
+
+                const height = this.aItemLabel[i].scrollHeight;
+
+                const move = iscorrect1 !== undefined ? this.radioSize : 0;
+                const width = this.labelWidth - move;
+
+                if (move !== 0) {
+                    label.style.left = (parseInt(label.style.left) + move) + "px";
+                }
+                this.aItemLabel[i].style.width = width + "px";
+                this.autoResizeText(this.aItemLabel[i], width, height, true, this.minFontSize, this.maxFontSize, 0.5);
+
+                this.onServerAnswerMultichoiceShowCorrect(i, iscorrect1);
+            }
+
+            this.playAudio(foundCorrect ? this.audioYes : this.audioNo);
+        }
+
+        onServerAnswerMultichoiceShowCorrect(i, iscorrect1, iscorrect) {
+            if (iscorrect) {
+                this.aItemLabel[i].innerHTML = '<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>';
+            }
+
+            if (iscorrect1 !== undefined) {
+                let t = parseInt(this.aItemAnswer[i].style.top);
+                let div = this.createDiv(this.area, 'mmogame-quiz-aduel-correct-answer',
+                    this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
+                div.title = iscorrect1 ? this.getStringT('js_correct_answer') : this.getStringT('js_wrong_answer');
+                div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorScore, this.colorScore);
+            }
+        }
+
     };
 });

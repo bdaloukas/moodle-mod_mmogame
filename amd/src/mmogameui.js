@@ -135,11 +135,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             if (kinduser === 'moodle' && isReady) {
                 await this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
             } else if (this.kinduser === 'guid') {
-                if (options.userGUID === undefined) {
-                    options.userGUID = '';
+                // Create a GUID if it needed.
+                if (options.userGUID === undefined || options.userGUID === '') {
+                    this.userGUID = crypto.randomUUID();
+                    this.setOptions({userGUID: this.userGUID});
                 }
-                if (options.userGUID.length >= 10 && isReady) {
-                    this.user = options.userGUID;
+                this.user = options.userGUID;
+                if (isReady) {
                     this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
                 } else {
                     this.gateCreateScreen();
@@ -150,23 +152,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gatePlayGame(save, nickname, paletteid, avatarid) {
-            let saveGuid = false;
-            if (this.kinduser === 'guid' && this.user === '') {
-                this.user = crypto.randomUUID();
-                saveGuid = true;
-            }
-
-            if (save || saveGuid) {
-                let data;
-                if (save) {
-                    data = {user: this.user, nickname, avatarid, paletteid};
-                    if (saveGuid) {
-                        data.userGUID = this.user;
-                    }
-                } else {
-                    data = {userGUID: this.user};
-                }
-                this.setOptions(data);
+            if (save) {
+                this.setOptions({user: this.user, nickname, avatarid, paletteid});
             }
             this.nickname = nickname;
             this.paletteid = paletteid;
@@ -184,7 +171,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             let maxHeight = this.areaRect.height - 5 * this.padding - this.iconSize;
             let maxWidth = this.areaRect.width;
             let size;
-
             const labels = [
                 `${this.getStringM('js_name')}: `,
                 this.getStringM('js_code'),
@@ -213,46 +199,44 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateCreateScreenDo(maxWidth, maxHeight) {
-            const instance = this;
-
-            let top = this.gateCreateNickName(0, maxWidth) + this.padding;
-            this.edtNickname.focus();
             // Creates the "nickname" field.
+            let top = this.gateCreateNickname(0, maxWidth) + this.padding;
+            this.edtNickname.focus();
 
             // Palette
-            const [lblPalette, btnPalette] = instance.gateCreateLabelRefresh(top, instance.getStringM('js_palette'),
+            const [lblPalette, btnPalette] = this.gateCreateLabelRefresh(top, this.getStringM('js_palette'),
                 'mmogame-gate-palette-label', 'mmogame-gate-palette-refresh', 'assets/refresh.svg');
-            top += lblPalette.scrollHeight + instance.padding;
+            top += lblPalette.scrollHeight + this.padding;
             const topGridPalette = top;
             let gridHeightPalette = (maxHeight - topGridPalette - lblPalette.scrollHeight) * 2 / 5;
             const countX = Math.floor((maxWidth - this.padding) / this.iconSize);
             const countYpalette = Math.floor(gridHeightPalette / this.iconSize);
-            gridHeightPalette = countYpalette * instance.iconSize;
+            gridHeightPalette = countYpalette * this.iconSize;
             top += gridHeightPalette + this.padding;
             // Label Avatars
-            const [lblAvatars, btnAvatars] = instance.gateCreateLabelRefresh(top, instance.getStringM('js_avatars'),
+            const [lblAvatars, btnAvatars] = this.gateCreateLabelRefresh(top, this.getStringM('js_avatars'),
                 'mmogame-gate-avatars-label', 'mmogame-gate-avatars-refresh', 'assets/refresh.svg');
 
-            top += lblAvatars.scrollHeight + instance.padding;
+            top += lblAvatars.scrollHeight + this.padding;
 
             const countYavatars = Math.floor(Math.floor(maxHeight - top - this.padding) / this.iconSize);
             const gridHeightAvatars = countYavatars * this.iconSize;
 
-            instance.addEventListenerRefresh(btnPalette, topGridPalette, countX, countYpalette,
+            this.addEventListenerRefresh(btnPalette, topGridPalette, countX, countYpalette,
                 top, countX, countYavatars, true, false);
 
-            instance.addEventListenerRefresh(btnAvatars, topGridPalette, countX, countYpalette,
+            this.addEventListenerRefresh(btnAvatars, topGridPalette, countX, countYpalette,
                 top, countX, countYavatars, false, true);
 
             // Horizontal
-            instance.gateSendGetColorsAvatars(0, topGridPalette, countX, countYpalette,
+            this.gateSendGetColorsAvatars(0, topGridPalette, countX, countYpalette,
                 0, top, countX, countYavatars, true, true);
 
             this.gateCreateSubmit(top + gridHeightAvatars + 2 * this.padding, maxWidth);
         }
 
-        gateCreateNickName(top, maxWidth) {
-            const lblNickName = this.createDOMElement('label', {
+        gateCreateNickname(top, maxWidth) {
+            const lblNickname = this.createDOMElement('label', {
                 parent: this.area,
                 classnames: 'mmogame-gate-name-label',
                 styles: {
@@ -264,13 +248,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     color: this.getContrastingColor(this.colorBackground),
                 },
             });
-            lblNickName.innerHTML = this.getStringM('js_name') + ": ";
+            lblNickname.innerHTML = this.getStringM('js_name') + ": ";
 
             if (this.isVertical) {
-                top += lblNickName.scrollHeight + this.padding;
+                top += lblNickname.scrollHeight + this.padding;
             }
 
-            const leftEdit = this.isVertical ? 0 : lblNickName.scrollWidth + this.padding;
+            const leftEdit = this.isVertical ? 0 : lblNickname.scrollWidth + this.padding;
             const width = this.isVertical ? maxWidth : maxWidth - 2 * this.padding;
             this.edtNickname = this.createDOMElement('input', {
                 parent: this.area,
@@ -284,7 +268,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 },
             });
             this.edtNickname.addEventListener("keyup", this.debounce(() => this.gateUpdateSubmit(), 300));
-            top += this.padding + (this.isVertical ? this.fontSize : Math.max(lblNickName.scrollHeight, this.fontSize));
+            top += this.padding + (this.isVertical ? this.fontSize : Math.max(lblNickname.scrollHeight, this.fontSize));
 
             return top;
         }
@@ -825,7 +809,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             // Compute sizes and layout
             this.gateComputeSizes();
-            this.createArea(this.padding);
+            this.createArea(this.padding, 0);
         }
     };
 });

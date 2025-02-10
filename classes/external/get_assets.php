@@ -44,7 +44,7 @@ class get_assets extends external_api {
         return new external_function_parameters([
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_ALPHANUM, 'The user data'),
+            'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
             'avatars' => new external_value(PARAM_INT, 'The count of avatars to return'),
             'colorpalettes' => new external_value(PARAM_INT, 'The count of colorpalettes to return'),
         ]);

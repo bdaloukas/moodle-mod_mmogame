@@ -96,7 +96,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      */
     public function set_answer(stdClass $attempt, stdClass $query, ?string $useranswer, ?int $useranswerid,
                                bool $autograde, array &$ret): bool {
-
+error_log( "alone.set_answer");
         // If auto-grading is enabled, check if the answer is correct and set iscorrect.
         if ($autograde) {
             $fraction = 0.0;

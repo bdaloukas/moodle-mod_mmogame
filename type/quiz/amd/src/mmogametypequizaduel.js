@@ -272,7 +272,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.definition = json.aduelAttempt + ". " + this.definition;
         }
         this.single = json.single;
-        this.autosave = json.autosave !== 0;
         this.errorcode = json.errorcode;
 
         // A this.readJsonFiles(json);
@@ -329,11 +328,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.buttonHighScore.style.visibility = 'visible';
 
         this.isWaitOpponent = false;
-        if (this.aItemAnswer !== undefined && json.correct !== undefined) {
-            for (let i = 0; i < this.aItemAnswer.length; i++) {
-                this.aItemAnswer[i].classList.add("disabled");
-            }
-        }
 
         this.showCorrectAnswer(json);
         this.createNextButton(this.areaRect.width - this.iconSize - this.padding, this.stripTop);
@@ -347,19 +341,11 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.timeclose = 0;
                 this.waitOpponent();
             }
-
-            this.showScore(json);
         }
 
         if (this.button5050 !== undefined) {
             this.button5050.style.visibility = 'hidden';
             this.buttonSkip.style.visibility = 'hidden';
-        }
-    }
-
-   callSetAnswer() {
-        if (this.correct === undefined) {
-            super.callSetAnswer();
         }
     }
 
@@ -483,28 +469,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.player2.divMain.style.visibility = 'hidden';
             super.showScore(this.player2, '', '', '', '', false);
         }
-    }
-
-    onServerFastJson(response) {
-        if (response === '') {
-            this.sendFastJSON();
-            return;
-        }
-
-        let a = response.split('-'); // Are state,timefastjson.
-        let newstate = a.length > 0 ? parseInt(a[0]) : 0;
-        let newTimeFastJSON = a.length > 1 ? a[1] : 0;
-
-        if (this.timefastjson === null) {
-            this.timefastjson = 0;
-        }
-
-        if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
-            this.callGetAttempt();
-            return;
-        }
-
-        this.sendFastJSON();
     }
 
     sendGetHighScore() {
