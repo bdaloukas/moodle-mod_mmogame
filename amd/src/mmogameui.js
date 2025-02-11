@@ -301,7 +301,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateComputeLabelSize(fontSize, aLabel) {
-            const instance = this;
             let maxWidth = 0;
             let maxHeight = 0;
 
@@ -314,7 +313,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 label.style.fontSize = fontSize + "px";
                 label.style.width = "0px";
                 label.style.height = "0px";
-                instance.area.appendChild(label);
+                this.area.appendChild(label);
 
                 if (label.scrollWidth > maxWidth) {
                     maxWidth = label.scrollWidth;
@@ -323,14 +322,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 if (label.scrollHeight > maxHeight) {
                     maxHeight = label.scrollHeight;
                 }
-                instance.area.removeChild(label);
+                this.area.removeChild(label);
             }
 
             return [maxWidth, maxHeight];
         }
 
         gateShowAvatars(left, top, countX, countY, avatarids, avatars) {
-            const instance = this;
             if (!avatars || avatars.length === 0) {
                 return; // Exit early if no avatars exist
             }
@@ -341,48 +339,46 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             const fragment = document.createDocumentFragment();
 
-            instance.avatar = undefined;
+            this.avatar = undefined;
             const count = avatars.length;
             let leftOriginal = left;
             let w = Math.round(this.padding / 2) + "px";
             for (let i = 0; i < count; i++) {
                 let avatarImagePath = 'assets/avatars/' + avatars[i];
-                let btn = instance.createCenterImageButton(
+                let btn = this.createCenterImageButton(
                     fragment,
                     left, top,
-                    instance.iconSize - instance.padding, instance.iconSize - instance.padding,
+                    this.iconSize - this.padding, this.iconSize - this.padding,
                     'mmogame-avatar',
                     avatarImagePath
                 );
                 btn.classList.add("mmogame-avatar");
                 let id = avatarids[i];
                 btn.addEventListener("click", () => {
-                    instance.gateUpdateAvatar(btn, id, w);
+                    this.gateUpdateAvatar(btn, id, w);
                 });
 
                 // Move left position after placing the button
-                left += instance.iconSize;
+                left += this.iconSize;
 
                 // Reset left and move to the next row after filling countX buttons
                 if ((i + 1) % countX === 0) {
-                    top += instance.iconSize;
+                    top += this.iconSize;
                     left = leftOriginal;
                 }
             }
-            instance.area.appendChild(fragment);
+            this.area.appendChild(fragment);
         }
 
         gateSendGetColorsAvatars(leftPalette, topPalette, countXpalette, countYpalette,
                                  leftAvatars, topAvatars, countXavatars, countYavatars,
                                  updatePalette = true, updateAvatars = true) {
-            const instance = this;
-
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
-                    mmogameid: instance.mmogameid,
-                    kinduser: instance.kinduser,
-                    user: instance.user,
+                    mmogameid: this.mmogameid,
+                    kinduser: this.kinduser,
+                    user: this.user,
                     avatars: updateAvatars ? countXavatars * countYavatars : 0,
                     colorpalettes: updatePalette ? countXpalette * countYpalette : 0,
                 };
@@ -395,11 +391,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 // Handling the response
                 getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes}) => {
                     if (updatePalette) {
-                        instance.gateShowColorPalettes(leftPalette, topPalette, countXpalette, countYpalette,
+                        this.gateShowColorPalettes(leftPalette, topPalette, countXpalette, countYpalette,
                             colorpaletteids, colorpalettes);
                     }
                     if (updateAvatars) {
-                        instance.gateShowAvatars(leftAvatars, topAvatars, countXavatars, countYavatars,
+                        this.gateShowAvatars(leftAvatars, topAvatars, countXavatars, countYavatars,
                             avatarids, avatars);
                     }
                 }).fail((error) => {
@@ -409,11 +405,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateShowColorPalettes(left, top, countX, countY, colorpaletteids, colorpalettes) {
-            const instance = this;
             let i = 0; // Counter for color palettes
             const count = colorpalettes.length;
             this.canvasColor = undefined;
-            const canvasSize = instance.iconSize - instance.padding * 3 / 2;
+            const canvasSize = this.iconSize - this.padding * 3 / 2;
             const parsedPalettes = colorpalettes.map(palette =>
                 palette.split(",").map(value => parseInt(value, 10) || 0)
             );
@@ -429,8 +424,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     // Create a new canvas element
                     let canvas = document.createElement('canvas');
                     canvas.style.position = "absolute";
-                    canvas.style.left = `${left + ix * instance.iconSize}px`;
-                    canvas.style.top = `${top + iy * instance.iconSize}px`;
+                    canvas.style.left = `${left + ix * this.iconSize}px`;
+                    canvas.style.top = `${top + iy * this.iconSize}px`;
                     canvas.width = canvasSize;
                     canvas.height = canvasSize;
                     canvas.style.cursor = 'pointer';
@@ -440,18 +435,18 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     fragment.appendChild(canvas);
 
                     // Render the color palette on the canvas
-                    instance.showColorPalette(canvas, parsedPalettes[i]);
+                    this.showColorPalette(canvas, parsedPalettes[i]);
 
                     // Get the palette ID and attach a click event listener
                     let id = colorpaletteids[i];
                     canvas.addEventListener("click", () => {
-                        instance.gateUpdateColorPalette(canvas, id);
+                        this.gateUpdateColorPalette(canvas, id);
                     });
 
                     i++;
                 }
             }
-            instance.area.appendChild(fragment);
+            this.area.appendChild(fragment);
         }
 
         gateUpdateColorPalette(canvas, id) {
@@ -474,12 +469,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateUpdateAvatar(avatar, id, w) {
-            const instance = this;
-
-            if (instance.avatar !== undefined) {
-                instance.avatar.style.borderStyle = "none";
+            if (this.avatar !== undefined) {
+                this.avatar.style.borderStyle = "none";
             }
-            instance.avatar = avatar;
+            this.avatar = avatar;
             avatar.style.borderStyle = "outset";
 
             avatar.style.borderLeftWidth = w;
@@ -487,9 +480,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             avatar.style.borderRightWidth = w;
             avatar.style.borderBottomWidth = w;
 
-            instance.avatarid = id;
+            this.avatarid = id;
 
-            instance.gateUpdateSubmit();
+            this.gateUpdateSubmit();
         }
 
         /**
@@ -504,11 +497,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateComputeSizes() {
-            const instance = this;
-
-            instance.computeSizes();
-            instance.iconSize = Math.round(0.8 * instance.iconSize);
-            instance.padding = Math.round(0.8 * instance.padding);
+            this.computeSizes();
+            this.iconSize = Math.round(0.8 * this.iconSize);
+            this.padding = Math.round(0.8 * this.padding);
         }
 
         /**
@@ -613,26 +604,24 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         createDivMessage(classnames, message) {
-            const instance = this;
-
-            if (instance.area !== undefined) {
-                instance.body.removeChild(instance.area);
-                instance.area = undefined;
+            if (this.area !== undefined) {
+                this.body.removeChild(this.area);
+                this.area = undefined;
             }
 
-            if (instance.divMessageHelp !== undefined) {
-                instance.body.removeChild(instance.divMessageHelp);
-                instance.divMessageHelp = undefined;
+            if (this.divMessageHelp !== undefined) {
+                this.body.removeChild(this.divMessageHelp);
+                this.divMessageHelp = undefined;
             }
 
-            let left = instance.padding;
-            let top = instance.areaRect !== undefined ? instance.areaRect.top : 0;
-            let width = window.innerWidth - 2 * instance.padding;
-            let height = window.innerHeight - instance.padding - top;
+            let left = this.padding;
+            let top = this.areaRect !== undefined ? this.areaRect.top : 0;
+            let width = window.innerWidth - 2 * this.padding;
+            let height = window.innerHeight - this.padding - top;
 
-            instance.createDivMessageDo(classnames, left, top, width, height, message, height);
+            this.createDivMessageDo(classnames, left, top, width, height, message, height);
 
-            instance.divMessage.style.top = (height - instance.divMessage.scrollHeight) / 2 + "px";
+            this.divMessage.style.top = (height - this.divMessage.scrollHeight) / 2 + "px";
         }
 
         createNicknameAvatar(parent, prefixclassname, left, topNickname, widthNickname, heightNickname, topAvatar, widthAvatar) {
@@ -666,26 +655,24 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
 
         createDivMessageStart(message) {
-            const instance = this;
-
-            if (instance.area !== undefined) {
-                instance.body.removeChild(instance.area);
-                instance.area = undefined;
+            if (this.area !== undefined) {
+                this.body.removeChild(this.area);
+                this.area = undefined;
             }
 
-            let left = instance.padding;
-            let top = instance.areaRect.top;
-            let width = window.innerWidth - 2 * instance.padding;
-            let height = window.innerHeight - instance.padding - top;
+            let left = this.padding;
+            let top = this.areaRect.top;
+            let width = window.innerWidth - 2 * this.padding;
+            let height = window.innerHeight - this.padding - top;
 
             let height1 = height / 8;
 
-            instance.createDivMessageDo('mmogame-message-start', left, top, width, height, message, height1);
+            this.createDivMessageDo('mmogame-message-start', left, top, width, height, message, height1);
 
-            top += (height1 - instance.divMessage.scrollHeight) / 2;
-            instance.divMessage.style.top = top + "px";
+            top += (height1 - this.divMessage.scrollHeight) / 2;
+            this.divMessage.style.top = top + "px";
 
-            if (instance.divMessageHelp === undefined) {
+            if (this.divMessageHelp === undefined) {
                 let div = document.createElement("div");
                 div.style.position = "absolute";
                 div.style.left = left + "px";
@@ -694,14 +681,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 div.style.paddingLeft = this.padding + "px";
                 div.style.paddingRight = this.padding + "px";
 
-                div.style.color = instance.getContrastingColor(this.colorBackground2);
-                let top = instance.iconSize + 3 * instance.padding + height1;
-                div.style.top = (top + instance.padding) + "px";
+                div.style.color = this.getContrastingColor(this.colorBackground2);
+                let top = this.iconSize + 3 * this.padding + height1;
+                div.style.top = (top + this.padding) + "px";
                 div.style.height = (height - height1) + "px";
-                instance.divMessageHelp = div;
-                instance.body.appendChild(instance.divMessageHelp);
+                this.divMessageHelp = div;
+                this.body.appendChild(this.divMessageHelp);
 
-                instance.showHelpScreen(div, (width - 2 * instance.padding), (height - height1));
+                this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));
             }
         }
 
