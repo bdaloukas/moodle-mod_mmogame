@@ -127,22 +127,19 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.kinduser = kinduser;
             this.user = user;
 
-            const options = await this.getOptions();
-            this.kindSound = [1, 2].includes(options.kindSound) ? options.kindSound : 0;
+            const option = await this.getOption('gate' + mmogameid);
 
-            const isReady = options.nickname && options.avatarid && options.paletteid;
+            const isReady = option !== null && option.nickname && option.avatarid && option.paletteid;
 
             if (kinduser === 'moodle' && isReady) {
-                await this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
+                await this.gatePlayGame(false, option.nickname, option.paletteid, option.avatarid);
             } else if (this.kinduser === 'guid') {
                 // Create a GUID if it needed.
-                if (options.userGUID === undefined || options.userGUID === '') {
-                    this.userGUID = crypto.randomUUID();
-                    this.setOptions({userGUID: this.userGUID});
+                if (!isReady) {
+                    this.user = crypto.randomUUID();
                 }
-                this.user = options.userGUID;
                 if (isReady) {
-                    this.gatePlayGame(false, options.nickname, options.paletteid, options.avatarid);
+                    await this.gatePlayGame(false, option.nickname, option.paletteid, option.avatarid);
                 } else {
                     this.gateCreateScreen();
                 }
@@ -151,9 +148,16 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             }
         }
 
-        gatePlayGame(save, nickname, paletteid, avatarid) {
+        async gatePlayGame(save, nickname, paletteid, avatarid) {
+            const option = await this.getOption('kindsound');
+            this.kindSound = option !== null && [1, 2].includes(option.kindSound) ? option.kindSound : 0;
+
             if (save) {
-                this.setOptions({user: this.user, nickname, avatarid, paletteid});
+                let data = {nickname, avatarid, paletteid};
+                if (this.kinduser === 'GUID') {
+                    data.user = this.user;
+                }
+                this.setOption('gate' + this.mmogameid, data);
             }
             this.nickname = nickname;
             this.paletteid = paletteid;

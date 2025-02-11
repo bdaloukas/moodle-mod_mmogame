@@ -46,8 +46,6 @@ define([''], function() {
         timestart = 0;
         timeclose = 0;
 
-        keyOptions = 'user';
-
         /**
          * Initialize game properties and compute initial sizes.
          *
@@ -557,39 +555,40 @@ define([''], function() {
 
         /**
          * Retrieves user options from IndexedDB.
+         * @param {string}name
          * @returns {Promise<Object>} A promise that resolves with the options.
          */
-        getOptions() {
+        async getOption(name) {
+            if (typeof name !== "string" || !name.trim()) {
+                throw new Error("name must be a non-empty string");
+            }
+
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('mmoGameDB', 1);
 
-                request.onupgradeneeded = function(event) {
+                request.onupgradeneeded = function (event) {
                     const db = event.target.result;
+                    // Create the "options" object store if it doesn't exist
                     if (!db.objectStoreNames.contains('options')) {
-                        db.createObjectStore('options', {keyPath: 'name'});
+                        db.createObjectStore('options', { keyPath: 'name' });
                     }
                 };
 
-                request.onsuccess = function(event) {
+                request.onsuccess = function (event) {
                     const db = event.target.result;
                     const transaction = db.transaction(['options'], 'readonly');
                     const store = transaction.objectStore('options');
 
-                    const getAllRequest = store.getAll();
-
-                    getAllRequest.onsuccess = function(event) {
-                        resolve(event.target.result.reduce((acc, item) => {
-                            acc[item.name] = item.value;
-                            return acc;
-                        }, {}));
+                    const getRequest = store.get(name);
+                    getRequest.onsuccess = function (event) {
+                        resolve(event.target.result || null); // Return the full object or null if not found
                     };
-
-                    getAllRequest.onerror = function() {
-                        reject(new Error('Failed to retrieve options'));
+                    getRequest.onerror = function () {
+                        reject(new Error(`Failed to retrieve option: ${name}`));
                     };
                 };
 
-                request.onerror = function() {
+                request.onerror = function () {
                     reject(new Error('Failed to open database'));
                 };
             });
@@ -597,47 +596,50 @@ define([''], function() {
 
         /**
          * Saves user options to IndexedDB.
-         * @param {object} options - The options to save.
+         * @param {string}name
+         * @param {object}data
          * @returns {Promise<void>} A promise that resolves when the save is complete.
          */
-        async setOptions(options) {
-            try {
-                const db = await this.openDatabase();
-                const transaction = db.transaction('options', 'readwrite');
-                const store = transaction.objectStore('options');
-                Object.entries(options).forEach(([key, value]) => store.put({name: key, value}));
-                await transaction.complete;
-            } catch (error) {
-                this.showError('setOption.Failed to save options:', error);
+        async setOption(name, data) {
+            if (typeof name !== "string" || !name.trim()) {
+                throw new Error("name must be a non-empty string");
             }
-        }
+            if (typeof data !== "object" || data === null) {
+                throw new Error("data must be a non-null object");
+            }
 
-        // Open IndexedDB connection
-        openDatabase() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('mmoGameDB', 1);
 
-                request.onupgradeneeded = (event) => {
+                request.onupgradeneeded = function(event) {
                     const db = event.target.result;
+                    // Create the "options" object store if it doesn't exist
                     if (!db.objectStoreNames.contains('options')) {
-                        db.createObjectStore('options', {keyPath: 'key'});
+                        db.createObjectStore('options', {keyPath: 'name'});
                     }
                 };
 
-                request.onsuccess = (event) => resolve(event.target.result);
-                request.onerror = (event) => reject(event.target.error);
+                request.onsuccess = function(event) {
+                    const db = event.target.result;
+                    const transaction = db.transaction(['options'], 'readwrite');
+                    const store = transaction.objectStore('options');
+
+                    // Ensure the object contains the correct key
+                    const record = {name, ...data};
+
+                    const putRequest = store.put(record);
+                    putRequest.onsuccess = function() {
+                        resolve(true);
+                    };
+                    putRequest.onerror = function() {
+                        reject(new Error(`Failed to save option: ${name}`));
+                    };
+                };
+
+                request.onerror = function() {
+                    reject(new Error('Failed to open database'));
+                };
             });
-        }
-        clearDB(url) {
-            let options = {nickname: ''};
-            this.setOptions(options)
-                .then(function() {
-                    window.location.href = url;
-                    return true;
-                })
-                .catch(() => {
-                    return false;
-                });
         }
 
         debounce(func, delay) {
