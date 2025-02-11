@@ -589,7 +589,7 @@ define([''], function() {
                 };
 
                 request.onerror = function() {
-                    reject(new Error('Failed to open database '));
+                    reject(new Error('Failed to open database'));
                 };
             });
         }
