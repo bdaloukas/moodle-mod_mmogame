@@ -240,7 +240,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * Check if $useranswer is the correct answer (internal function for multichoice answers with one correct answer)
      *
      * @param stdClass $query
-     * @param int $useranswerid
+     * @param ?int $useranswerid
      * @param float $fraction
      *
      * @return true or false

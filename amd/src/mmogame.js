@@ -566,29 +566,29 @@ define([''], function() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('mmoGameDB', 1);
 
-                request.onupgradeneeded = function (event) {
+                request.onupgradeneeded = function(event) {
                     const db = event.target.result;
                     // Create the "options" object store if it doesn't exist
                     if (!db.objectStoreNames.contains('options')) {
-                        db.createObjectStore('options', { keyPath: 'name' });
+                        db.createObjectStore('options', {keyPath: 'name'});
                     }
                 };
 
-                request.onsuccess = function (event) {
+                request.onsuccess = function(event) {
                     const db = event.target.result;
                     const transaction = db.transaction(['options'], 'readonly');
                     const store = transaction.objectStore('options');
 
                     const getRequest = store.get(name);
-                    getRequest.onsuccess = function (event) {
+                    getRequest.onsuccess = function(event) {
                         resolve(event.target.result || null); // Return the full object or null if not found
                     };
-                    getRequest.onerror = function () {
+                    getRequest.onerror = function() {
                         reject(new Error(`Failed to retrieve option: ${name}`));
                     };
                 };
 
-                request.onerror = function () {
+                request.onerror = function() {
                     reject(new Error('Failed to open database'));
                 };
             });

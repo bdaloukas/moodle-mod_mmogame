@@ -2,7 +2,6 @@
     position: absolute;
     padding: 0;
     border-radius: 0;
-    text-shadow: 1px 1px var(--c-sh-txt, rgba(0, 0, 0, 0.5));
     filter: none;
     cursor: pointer;
 }
@@ -28,7 +27,6 @@
     padding: 0;
     border-radius: 1em;
     color: #fff;
-    text-shadow: 1px 1px var(--c-sh-txt, rgba(0, 0, 0, 0.5));
     filter: none;
     cursor: pointer;
 }
@@ -49,7 +47,8 @@
     width: 100%;
 }
 
-.mmogame-table-help, .mmogame-table-help td {
+.mmogame-table-help,
+.mmogame-table-help td {
     border: 1px solid black;
 }
 
@@ -58,5 +57,5 @@
 }
 
 .mmogame-td-help-image {
-    text-align: center
+    text-align: center;
 }
