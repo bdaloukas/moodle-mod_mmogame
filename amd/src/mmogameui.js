@@ -31,7 +31,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
     return class MmoGameUI extends MmoGame {
 
         isVertical;
-        kindSound; // Type: Number (0 = on, 1 = off, 2 = speak)
+        kindSound; // Type: Number (0 = on, 1 = off, 2 = speak).
         buttonSound;
         colorBackground2;
 
