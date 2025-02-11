@@ -619,12 +619,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
     <tr>
         <td class="mmogame-td-help-image">
-            <img height="90" src="../../assets/aduel/example1.png" alt="" />
+            <img height="90" src="type/quiz/assets/aduel/example1.png" alt="" />
         </td>
 
         <td>` + this.getStringT('js_aduel_example1') + `</td>
         <td class="mmogame-td-help-image">
-            <img height="83" src="../../assets/aduel/example2.png" alt="" />
+            <img height="83" src="type/quiz/assets/aduel/example2.png" alt="" />
         </td>
 
         <td>\` + this.getStringT( 'js_aduel_example2') + \`</td>

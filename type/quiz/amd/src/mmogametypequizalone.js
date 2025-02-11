@@ -228,8 +228,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
                 <table class="mmogame-table-help">
                     <tr>
-                        <td><img height="83" src="assets/aduel/example2.png" alt="" /></td>
-                        <td>${this.getStringT('js_aduel_example2')}</td>
+                        <td><img height="83" src="type/quiz/assets/alone/example2.png" alt="" /></td>
+                        <td>${this.getStringT('js_alone_example2')}</td>
                     </tr>
                 </table>
             `;
