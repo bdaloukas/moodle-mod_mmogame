@@ -36,6 +36,7 @@ $fastjson = filter_input(INPUT_POST, 'fastjson', FILTER_SANITIZE_NUMBER_INT);
 $ret = '';
 $subdir = $fastjson % 100;
 $filemain = $CFG->dataroot. '/local/mmogame/states/'.$subdir."/$fastjson";
+
 if (!file_exists( $filemain.'.txt')) {
     return;
 }

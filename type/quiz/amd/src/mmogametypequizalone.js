@@ -21,9 +21,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
         player;
 
         constructor() {
-            super();
+            super('alone');
             this.cIcons = this.hasHelp() ? 5 : 4;
-            this.type = 'alone';
         }
 
         createIconBar() {
@@ -62,7 +61,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 const button = this.createButtonHelp(fragment, this.padding + (i++) * step, this.padding);
                 button.addEventListener("click", () => this.onClickHelp());
             }
-            this.createArea(2 * this.padding + this.iconSize + nicknameHeight, 0);
+
+            this.areaRect = {top: 2 * this.padding + this.iconSize + nicknameHeight};
 
             this.body.appendChild(fragment); // Batch insert into DOM
         }
@@ -103,10 +103,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 return;
             }
 
-            let child;
-            while ((child = this.area.firstChild)) {
-                this.area.removeChild(child);
-            }
+            this.removeAreaChildren();
 
             // Render the screen layout based on orientation (vertical or horizontal)
             if (this.isVertical) {
@@ -151,8 +148,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         processGetAttempt(json) {
-            // Calculate time difference and set up the clock
-            this.computeDifClock(json.time, json.timestart, json.timeclose);
+            super.processGetAttempt(json);
 
             if (parseInt(json.state) === 0) {
                 json.qtype = '';
@@ -162,12 +158,17 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 }
                 this.showScore(json);
                 this.createDivMessageStart(this.getStringM('js_wait_to_start'));
+                this.sendFastJSON(); // Send fast JSON updates
                 return;
             }
 
             if (this.player === undefined) {
                 this.setColorsString(json.colors);
                 this.createIconBar();
+            }
+
+            if (this.area === undefined) {
+                this.createArea(this.areaRect.top, 0);
             }
 
             // Update the window title if a name is provided
@@ -211,7 +212,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.createScreen(json, false);
             }
 
-            // A this.updateLabelTimer(); // Start or update the timer
             this.sendFastJSON(); // Send fast JSON updates
         }
 
@@ -228,8 +228,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
                 <table class="mmogame-table-help">
                     <tr>
-                        <td><img height="83" src="type/quiz/assets/alone/example2.png" alt="" /></td>
-                        <td>${this.getStringT('js_alone_example2')}</td>
+                        <td><img height="83" src="type/quiz/assets/aduel/example2.png" alt="" /></td>
+                        <td>${this.getStringT('js_aduel_example2')}</td>
                     </tr>
                 </table>
             `;

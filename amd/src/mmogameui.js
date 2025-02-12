@@ -603,6 +603,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             };
         }
 
+        removeAreaChildren() {
+            while (this.area.firstChild) {
+                this.area.removeChild(this.area.firstChild);
+            }
+        }
+
         createDivMessage(classnames, message) {
             if (this.area !== undefined) {
                 this.body.removeChild(this.area);

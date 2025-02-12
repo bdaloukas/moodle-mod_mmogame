@@ -476,12 +476,10 @@ define([''], function() {
             return colors.sort((a, b) => this.getContrast(a) - this.getContrast(b));
         }
 
-        computeDifClock(time, timeStart, timeClose) {
+        computeDifClock(time) {
             if (time !== undefined) {
                 this.difClock = ((new Date()).getTime() - time) / 1000;
             }
-
-            this.computeTimeStartClose(timeStart, timeClose);
         }
 
         computeTimeStartClose(timeStart, timeClose) {

@@ -37,7 +37,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     buttonWizard;
 
     constructor() {
-        super();
+        super('aduel');
 
         // Initialize core properties
         this.cIcons = this.isVertical ? 5 : 8;
@@ -185,6 +185,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     processGetAttempt(json) {
+        this.computeTimeStartClose(json.timestart, json.timeclose);
+
         if (this.buttonHighScore !== undefined) {
             this.buttonHighScore.style.visibility = 'hidden';
         }

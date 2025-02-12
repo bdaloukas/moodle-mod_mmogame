@@ -22,6 +22,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         labelTimer;
         timeForSendAnswer;
         timefastjson;
+        type;
 
         // Colors.
         colorScore;
@@ -35,8 +36,9 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
          */
 
-        constructor() {
+        constructor(type) {
             super();
+            this.type = type;
             this.timeForSendAnswer = 10000;
         }
 
@@ -232,29 +234,39 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * Improved AJAX request using Fetch API instead of XMLHttpRequest
          */
         async sendFastJSON() {
-            if (this.timeoutFastJSON) {
+            // Clear any existing timeout before setting a new one
+            if (this.timeoutFastJSON !== undefined) {
                 clearTimeout(this.timeoutFastJSON);
             }
 
             this.timeoutFastJSON = setTimeout(async() => {
                 try {
+                    // Create URL-encoded form data
+                    const formData = new URLSearchParams();
+                    formData.append("fastjson", this.fastjson);
+                    formData.append("type", this.type);
+
+                    // Send POST request with application/x-www-form-urlencoded format
                     const response = await fetch(`${this.url}/state.php`, {
                         method: 'POST',
-                        body: JSON.stringify({
-                            fastjson: this.fastjson,
-                            type: this.type
-                        }),
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: formData.toString(),
                     });
 
-                    if (response.ok) {
-                        const data = await response.text();
-                        this.onServerFastJson(data);
+                    // Check if the response is successful
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status ${response.status}`);
                     }
+
+                    // Read server response
+                    const data = await response.text();
+                    this.onServerFastJson(data);
                 } catch (error) {
                     this.showError('Error sending Fast JSON:', error);
                 }
             }, this.timeForSendAnswer);
         }
+
 
         getStringT(name) {
             return M.util.get_string(name, 'mmogametype_quiz');
@@ -635,5 +647,11 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.sendFastJSON();
         }
 
+        processGetAttempt(json) {
+            this.fastjson = json.fastjson;
+
+            // Calculate time difference and set up the clock
+            this.computeDifClock(json.time, json.timestart, json.timeclose);
+        }
     };
     });
