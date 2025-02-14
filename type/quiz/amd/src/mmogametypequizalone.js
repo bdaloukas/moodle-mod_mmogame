@@ -148,6 +148,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         processGetAttempt(json) {
+console.log(json);
             super.processGetAttempt(json);
 
             if (parseInt(json.state) === 0) {
@@ -182,10 +183,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 return;
             }
 
-            // Update game state and user-related data
+            // Update game state
             this.state = parseInt(json.state, 10);
-            this.fastjson = json.fastjson;
-            this.timefastjson = parseInt(json.timefastjson, 10);
 
             const nicknameWidth = 2 * this.iconSize + this.padding;
             const nicknameHeight = this.iconSize / 3;

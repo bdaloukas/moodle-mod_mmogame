@@ -185,45 +185,44 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     processGetAttempt(json) {
-        this.computeTimeStartClose(json.timestart, json.timeclose);
-
+        super.processGetAttempt(json);
         if (this.buttonHighScore !== undefined) {
             this.buttonHighScore.style.visibility = 'hidden';
         }
-        this.computeDifClock(json.time, json.timestart, json.timeclose);
-        this.timefastjson = json.timefastjson;
-        this.fastjson = json.fastjson;
 
         if (json.name !== undefined) {
             window.document.title = json.name;
         }
-
         this.correct = undefined;
-        if (json.state === 0) {
+        if (parseInt(json.state) === 0) {
             json.qtype = '';
-            super.processGetAttempt(json);
+            if (json.colors) {
+                this.setColorsString(json.colors);
+                this.createIconBar();
+            }
             this.showScore(json);
-            this.onServerGetAttemptHideButtons();
             this.createDivMessageStart(this.getStringM('js_wait_to_start'));
+            this.sendFastJSON(); // Send fast JSON updates
             return;
         }
-
+        // Update game state
         this.state = parseInt(json.state);
-
         // Need for a change on colors.
         if (this.savedColors === undefined || this.savedColors !== json.colors) {
             this.savedColors = json.colors;
             this.colors = undefined;
         }
-
         // Update the window title if a name is provided
         if (json.name) {
             document.title = json.name;
         }
-
         if (this.player1 === undefined) {
             this.setColorsString(json.colors);
             this.createIconBar();
+        }
+
+        if (this.area === undefined) {
+            this.createArea(this.areaRect.top, 0);
         }
 
         const nicknameWidth = 2 * this.iconSize + this.padding;
@@ -276,7 +275,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.single = json.single;
         this.errorcode = json.errorcode;
 
-        // A this.readJsonFiles(json);
         this.createScreen(json, false);
         this.updateDivTimer();
         this.sendFastJSON();
@@ -699,10 +697,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             return;
         }
 
-        let child;
-        while ((child = this.area.firstChild)) {
-            this.area.removeChild(child);
-        }
+        this.removeAreaChildren();
 
         // Render the screen layout based on orientation (vertical or horizontal)
         if (this.isVertical) {

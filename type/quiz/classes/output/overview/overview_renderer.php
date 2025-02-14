@@ -127,8 +127,8 @@ class overview_renderer extends plugin_renderer_base {
                     array_key_exists( $record->queryid, $queryoptions) ? $queryoptions[$record->queryid] : '',
                     $report->get_answer( $record, $answers),
                     $iscorrect,
-                    $record->timeanswer != 0 ? userdate($record->timeanswer, $strftimedaydate) : '',
                     $record->score,
+                    $record->timeanswer != 0 ? userdate($record->timeanswer, $strftimedaydate) : '',
                 ];
             }
             if ($report->export == 'cvs') {

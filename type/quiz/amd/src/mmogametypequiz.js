@@ -260,7 +260,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
                     // Read server response
                     const data = await response.text();
-                    this.onServerFastJson(data);
+                    this.processFastJson(data);
                 } catch (error) {
                     this.showError('Error sending Fast JSON:', error);
                 }
@@ -625,7 +625,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             });
         }
 
-        onServerFastJson(response) {
+        processFastJson(response) {
             if (response === '') {
                 this.sendFastJSON();
                 return;
@@ -633,13 +633,14 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             let a = response.split('-'); // Are state,timefastjson.
             let newstate = a.length > 0 ? parseInt(a[0]) : 0;
-            let newTimeFastJSON = a.length > 1 ? a[1] : 0;
+            let newTimeFastJSON = a.length > 1 ? parseInt(a[1]) : 0;
 
             if (this.timefastjson === null) {
                 this.timefastjson = 0;
             }
 
             if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
+                console.log("Change State from",this.state,"to",newstate);
                 this.callGetAttempt();
                 return;
             }

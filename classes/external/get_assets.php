@@ -76,7 +76,7 @@ class get_assets extends external_api {
         $result = [];
 
         $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid( $mmogame->get_db(), $kinduser, $user);
+        $auserid = mmogame::get_asuerid( $mmogame->get_db(), $kinduser, $user, true);
 
         // Generate avatars array if avatars > 0.
         if ($avatars > 0) {

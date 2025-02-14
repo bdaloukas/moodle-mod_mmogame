@@ -83,6 +83,16 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
             }
             $data->qbankparams = $new;
         }
+				
+		for (;;) {
+			if( $DB->count_records_select( 'mmogame', 'fastjson=?', [$data->fastjson]) === 0) {
+				return;
+			}
+
+			// Generate a random number with 10 digits.
+			// Check if the number already exists in the database.
+			$data->fastjson = random_int(1000000000, 9999999999); // Generates a 10-digit number.
+		}
 
         // Insert the mmogame record.
         $newitemid = $DB->insert_record('mmogame', $data);

@@ -49,7 +49,7 @@ class mmogame_model_aduel {
             $game->update_state( $game->get_rstate()->state);
             $game->set_state( $game->get_rstate()->state);
         } else if (isset( $data->state)) {
-            if ($data->state >= 0 && $data->state <= STATE_LAST) {
+            if ($data->state >= 0 && $data->state <= 1) {
                 $game->update_state( $data->state);
                 $game->set_state( $data->state);
             }

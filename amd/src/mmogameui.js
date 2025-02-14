@@ -109,7 +109,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         onClickSound(button) {
             this.kindSound = (this.kindSound + 1) % 2;
             button.src = this.getMuteFile();
-            this.setOptions({kindSound: this.kindSound});
+            this.setOption('kindSound', {value: this.kindSound});
         }
 
         /**
@@ -127,46 +127,16 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.kinduser = kinduser;
             this.user = user;
 
-            const option = await this.getOption('gate' + mmogameid);
-
-            const isReady = option !== null && option.nickname && option.avatarid && option.paletteid;
-
-            if (kinduser === 'moodle' && isReady) {
-                await this.gatePlayGame(false, option.nickname, option.paletteid, option.avatarid);
-            } else if (this.kinduser === 'guid') {
-                // Create a GUID if it needed.
-                if (!isReady) {
+            if (this.kinduser === 'guid') {
+                const option = await this.getOption('guid' + mmogameid);
+                if (option === null) {
                     this.user = crypto.randomUUID();
-                }
-                if (isReady) {
-                    await this.gatePlayGame(false, option.nickname, option.paletteid, option.avatarid);
+                    this.setOption('guid' + mmogameid, {value: this.user});
                 } else {
-                    this.gateCreateScreen();
+                    this.user = option.value;
                 }
-            } else {
-                this.gateCreateScreen();
             }
-        }
-
-        async gatePlayGame(save, nickname, paletteid, avatarid) {
-            const option = await this.getOption('kindsound');
-            this.kindSound = option !== null && [1, 2].includes(option.kindSound) ? option.kindSound : 0;
-
-            if (save) {
-                let data = {nickname, avatarid, paletteid};
-                if (this.kinduser === 'GUID') {
-                    data.user = this.user;
-                }
-                this.setOption('gate' + this.mmogameid, data);
-            }
-            this.nickname = nickname;
-            this.paletteid = paletteid;
-            this.avatarid = avatarid;
-            if (save) {
-                this.callGetAttempt({nickname, colorpaletteid: paletteid, avatarid});
-            } else {
-                this.callGetAttempt();
-            }
+            await this.callGetAttempt();
         }
 
         gateCreateScreen() {
@@ -180,7 +150,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.getStringM('js_code'),
                 this.getStringM('js_palette')
             ];
-
             this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, (fontSize) => {
                 size = this.gateComputeLabelSize(fontSize, labels);
 
@@ -296,7 +265,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }
             });
             this.btnSubmit.addEventListener("click", () => {
-                this.gatePlayGame(true, this.edtNickname.value, this.paletteid, this.avatarid);
+                // This.gatePlayGame(true, this.edtNickname.value, this.paletteid, this.avatarid);
+                this.callGetAttempt(
+                    {nickname: this.edtNickname.value, colorpaletteid: this.paletteid, avatarid: this.avatarid},
+                );
             });
         }
 
@@ -604,6 +576,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         removeAreaChildren() {
+            if (this.area === undefined) {
+                return;
+            }
             while (this.area.firstChild) {
                 this.area.removeChild(this.area.firstChild);
             }
@@ -703,7 +678,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          *
          * @param {Object} extraparams - Additional parameters to override default ones.
          */
-        callGetAttempt(extraparams = undefined) {
+        async callGetAttempt(extraparams = undefined) {
+            const option = await this.getOption("kindSound");
+            this.kindSound = option !== null ? option.value : 1;
+
             require(['core/ajax'], (Ajax) => {
                 let params = {
                     mmogameid: this.mmogameid,
@@ -724,10 +702,20 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 // Handling the response
                 getAttempt[0].done((response) => {
+                    const json = JSON.parse(response);
+                    if (json.errorcode === 'no_user') {
+                        this.gateCreateScreen();
+                        return;
+                    }
+                    if (this.area !== undefined) {
+                        this.body.removeChild(this.area);
+                        this.area = undefined;
+                    }
                     if (this.iconSize === undefined) {
                         this.openGame();
                     }
-                    this.processGetAttempt(JSON.parse(response));
+
+                    this.processGetAttempt(json);
                 }).fail((error) => {
                     this.createDivMessage('mmogame-error', error.message);
                     return error;

@@ -101,7 +101,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                 }
                 continue;
             }
-
             if ($newplayer1) {
                 return $this->get_attempt_new1();
             } else {
@@ -238,7 +237,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         } else if ($this->aduel->tool3numattempt2 == $attempt->numattempt) {
             // The wizard tool.
             $attempt->score -= 1;
-            $ret['addscore'] = $attempt->score >= 0 ? '+'.$attempt->score : $attempt->score;
+            $ret['addscore'] = '+'.$attempt->score;
             $this->db->update_record( 'mmogame_quiz_attempts',
                 ['id' => $attempt->id, 'score' => $attempt->score]);
             $this->qbank->update_grades( $attempt->auserid, -1, 0, 0);
@@ -268,7 +267,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
 
         $auserid = $this->get_auserid();
 
-        if ($this->aduel === false || $query === false) {
+        if ($this->aduel === null || $query === null) {
             return null;
         }
 
@@ -307,15 +306,18 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $ret['timeclose'] = $attempt != null ? $attempt->timeclose : 0;
         $ret['aduelAttempt'] = $attempt != null ? $attempt->numattempt : 0;
 
-        $player = ( $this->aduel->auserid1 == $auserid ? 1 : 2);
+        $player = ( $this->aduel === null || intval($this->aduel->auserid1) === $auserid ? 1 : 2);
         $ret['aduelPlayer'] = $player;
 
+            if ($this->aduel == null) {
+            return null;
+        }
         if ($player == 2) {
-            $info = $this->get_avatar_info( $this->aduel->auserid1);
+            $info = $this->get_avatar_info( $auserid);
             $ret['aduelScore'] = $info->sumscore;
             $ret['aduelAvatar'] = $info->avatar;
             $ret['aduelNickname'] = $info->nickname;
-            $ret['aduelRank'] = $this->get_rank( $this->aduel->auserid1, 'sumscore');
+            $ret['aduelRank'] = $this->get_rank( $auserid, 'sumscore');
             $ret['aduelPercent'] = $info->percentcompleted;
             $ret['aduelPercentRank'] = $this->get_rank($info->percentcompleted, 'percentcompleted');
             $ret['colors'] = implode( ',', $info->colors);     // Get the colors of opossite.

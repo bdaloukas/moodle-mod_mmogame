@@ -272,13 +272,14 @@ abstract class mmogame {
      * @param mmogame_database $db
      * @param string $kinduser
      * @param string $user
+     * @param bool $create
      * @return ?int (the id of table mmogame_aa_users)
      */
-    public static function get_asuerid(mmogame_database $db, string $kinduser, string $user): ?int {
+    public static function get_asuerid(mmogame_database $db, string $kinduser, string $user, $create): ?int {
         if ($kinduser == 'usercode') {
             return self::get_auserid_from_usercode($db, $user);
         } else if ($kinduser == 'guid') {
-            return self::get_auserid_from_guid( $db, $user);
+            return self::get_auserid_from_guid( $db, $user, $create);
         } else {
             return self::get_auserid_from_db( $db, $kinduser, $user, true);
         }

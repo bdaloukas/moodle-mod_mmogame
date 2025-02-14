@@ -42,7 +42,7 @@ class get_attempt extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
-            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user'),
+            'nickname' => new external_value(PARAM_RAW, 'The nickname of the user'),
             'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar'),
             'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette'),
         ]);
@@ -76,8 +76,11 @@ class get_attempt extends external_api {
         $ret = [];
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user);
-
+        $create = $nickname != null && $avatarid != null && $colorpaletteid != null;
+        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create);
+        if ($auserid == null) {
+            return json_encode( ['errorcode' => 'no_user']);
+        }
         $mmogame->login_user($auserid);
 
         if ($nickname !== null && $avatarid !== null && $colorpaletteid != null) {
@@ -85,7 +88,6 @@ class get_attempt extends external_api {
             $mmogame->get_db()->update_record('mmogame_aa_grades',
                 ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid,  'colorpaletteid' => $colorpaletteid]);
         }
-
         if ($mmogame->get_state() != 0) {
             $attempt = $mmogame->get_attempt();
         } else {
