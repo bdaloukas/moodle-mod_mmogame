@@ -83,7 +83,7 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
             }
             $data->qbankparams = $new;
         }
-				
+
 		for (;;) {
 			if( $DB->count_records_select( 'mmogame', 'fastjson=?', [$data->fastjson]) === 0) {
 				return;
@@ -126,7 +126,7 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $oldid = $data->id;
 
         if ($data->kind == 'guid') {
-            $data->instanceid = get_mapping( 'mmogame_uguid', $data->instanceid, $data->instanceid);
+            $data->instanceid = $this->get_mapping( 'mmogame_uguid', $data->instanceid, $data->instanceid);
         } else if ($data->kind == 'moodle') {
             $data->instanceid = $this->get_mappingid('user', $data->instanceid);
         }
@@ -289,6 +289,7 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data = (object)$data;
 
         $data->mmogameid = $this->get_new_parentid('mmogame');
+        $data->state = 0;       // Set state to wait.
 
         $newitemid = $DB->insert_record('mmogame_aa_states', $data);
     }

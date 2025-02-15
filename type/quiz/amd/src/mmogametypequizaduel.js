@@ -28,7 +28,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     stripLeft; // Left position of next button.
     stripTop; // Top position of next button.
 
-    timeoutWaitOpponent = 2000;
+    timeoutWaitOpponent = 5000;
 
     // Tools button
     buttonHighScore;
@@ -194,7 +194,11 @@ define(['mmogametype_quiz/mmogametypequiz'],
             window.document.title = json.name;
         }
         this.correct = undefined;
-        if (parseInt(json.state) === 0) {
+
+        // Update game state
+        this.state = parseInt(json.state);
+
+        if (this.state === 0) {
             json.qtype = '';
             if (json.colors) {
                 this.setColorsString(json.colors);
@@ -205,8 +209,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.sendFastJSON(); // Send fast JSON updates
             return;
         }
-        // Update game state
-        this.state = parseInt(json.state);
+
+        this.computeTimeStartClose(json.timestart, json.timeclose);
+
         // Need for a change on colors.
         if (this.savedColors === undefined || this.savedColors !== json.colors) {
             this.savedColors = json.colors;
@@ -278,12 +283,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.createScreen(json, false);
         this.updateDivTimer();
         this.sendFastJSON();
-    }
-
-    onServerGetAttemptHideButtons() {
-        this.button5050.style.visibility = 'hidden';
-        this.buttonSkip.style.visibility = 'hidden';
-        this.player2.avatarElement.style.visibility = 'hidden';
     }
 
     onTimeout() {
@@ -598,23 +597,21 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     showHelpScreen(div) {
-        div.innerHTML = `
-<div>` + this.getStringT('js_aduel_help') + `</div>
-
+        div.innerHTML = `<div> ${this.getStringT('js_aduel_help')} </div>
 <table class="mmogame-table-help">
     <tr>
         <td class="mmogame-td-help-image">
-            <img height="90" src="../../../../assets/cutred.svg" alt="" />
+            <img height="90" src="assets/cutred.svg" alt="" />
         </td>
-        <td>\` + this.getStringT('js_aduel_cut') + \`</td>
+        <td> ${this.getStringT('js_aduel_cut')} </td>
         <td class="mmogame-td-help-image">
-            <img height="90" src="../../../../assets/skip.svg" alt="" />
+            <img height="90" src="assets/skip.svg" alt="" />
         </td>
-        <td>\` + this.getStringT('js_aduel_skip') + \`</td>
+        <td> ${this.getStringT('js_aduel_skip')} </td>
         <td class="mmogame-td-help-image">
-            <img height="90" src="../../../../assets/wizard.svg" alt="" />
+            <img height="90" src="assets/wizard.svg" alt="" />
         </td>
-        <td>\` + this.getStringT('js_aduel_wizard') + \`</td>
+        <td> ${this.getStringT('js_aduel_wizard')} </td>
     </tr>
 
     <tr>
@@ -622,14 +619,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
             <img height="90" src="type/quiz/assets/aduel/example1.png" alt="" />
         </td>
 
-        <td>` + this.getStringT('js_aduel_example1') + `</td>
+        <td> ${this.getStringT('js_aduel_example1')} </td>
+
         <td class="mmogame-td-help-image">
             <img height="83" src="type/quiz/assets/aduel/example2.png" alt="" />
         </td>
-
-        <td>\` + this.getStringT( 'js_aduel_example2') + \`</td>
+        <td> ${this.getStringT('js_aduel_example2')} </td>
     </tr>
-</table>        
+</table>
         `;
     }
 

@@ -148,10 +148,15 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         processGetAttempt(json) {
-console.log(json);
             super.processGetAttempt(json);
 
-            if (parseInt(json.state) === 0) {
+            if (json.name !== undefined) {
+                window.document.title = json.name;
+            }
+
+            // Update game state
+            this.state = parseInt(json.state, 10);
+            if (this.state === 0) {
                 json.qtype = '';
                 if (json.colors) {
                     this.setColorsString(json.colors);
@@ -182,9 +187,6 @@ console.log(json);
                 this.createDivMessage('mmogame-error', json.errorcode);
                 return;
             }
-
-            // Update game state
-            this.state = parseInt(json.state, 10);
 
             const nicknameWidth = 2 * this.iconSize + this.padding;
             const nicknameHeight = this.iconSize / 3;

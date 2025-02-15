@@ -20,7 +20,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         url;
         pin;
         labelTimer;
-        timeForSendAnswer;
+        timeForSendFastJson = 3000;
         timefastjson;
         type;
 
@@ -39,7 +39,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         constructor(type) {
             super();
             this.type = type;
-            this.timeForSendAnswer = 10000;
         }
 
         /**
@@ -243,7 +242,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 try {
                     // Create URL-encoded form data
                     const formData = new URLSearchParams();
-                    formData.append("fastjson", this.fastjson);
+                    formData.append("fastjson", this.fastjson.toString());
                     formData.append("type", this.type);
 
                     // Send POST request with application/x-www-form-urlencoded format
@@ -264,7 +263,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 } catch (error) {
                     this.showError('Error sending Fast JSON:', error);
                 }
-            }, this.timeForSendAnswer);
+            }, this.timeForSendFastJson);
         }
 
 
@@ -630,7 +629,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.sendFastJSON();
                 return;
             }
-
             let a = response.split('-'); // Are state,timefastjson.
             let newstate = a.length > 0 ? parseInt(a[0]) : 0;
             let newTimeFastJSON = a.length > 1 ? parseInt(a[1]) : 0;
@@ -640,7 +638,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }
 
             if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
-                console.log("Change State from",this.state,"to",newstate);
+                this.removeMessageDivs();
                 this.callGetAttempt();
                 return;
             }
@@ -649,10 +647,11 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         }
 
         processGetAttempt(json) {
-            this.fastjson = json.fastjson;
+            this.fastjson = parseInt(json.fastjson);
+            this.timefastjson = parseInt(json.timefastjson);
 
             // Calculate time difference and set up the clock
-            this.computeDifClock(json.time, json.timestart, json.timeclose);
+            this.computeDifClock(json.time);
         }
     };
     });

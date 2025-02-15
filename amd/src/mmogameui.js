@@ -53,6 +53,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         // Gate variables
         mmogameid;
 
+        // Messages
+        divMessage;
+        divMessageHelp;
+        divMessageBackground;
+
         constructor() {
             super();
             this.isVertical = window.innerWidth < window.innerHeight;
@@ -636,6 +641,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
 
         createDivMessageStart(message) {
+            console.log("createDivMessageStart check=", this.divMessageHelp !== undefined);
+            if (this.divMessageHelp !== undefined) {
+                return;
+            }
             if (this.area !== undefined) {
                 this.body.removeChild(this.area);
                 this.area = undefined;
@@ -653,24 +662,24 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             top += (height1 - this.divMessage.scrollHeight) / 2;
             this.divMessage.style.top = top + "px";
 
-            if (this.divMessageHelp === undefined) {
-                let div = document.createElement("div");
-                div.style.position = "absolute";
-                div.style.left = left + "px";
-                div.style.textAlign = "left";
-                div.style.width = (width - 2 * this.padding) + "px";
-                div.style.paddingLeft = this.padding + "px";
-                div.style.paddingRight = this.padding + "px";
+            let div = document.createElement("div");
+            div.style.position = "absolute";
+            div.style.left = left + "px";
+            div.style.textAlign = "left";
+            div.style.width = (width - 2 * this.padding) + "px";
+            div.style.paddingLeft = this.padding + "px";
+            div.style.paddingRight = this.padding + "px";
 
-                div.style.color = this.getContrastingColor(this.colorBackground2);
-                let top = this.iconSize + 3 * this.padding + height1;
-                div.style.top = (top + this.padding) + "px";
-                div.style.height = (height - height1) + "px";
-                this.divMessageHelp = div;
-                this.body.appendChild(this.divMessageHelp);
+            div.style.color = this.getContrastingColor(this.colorBackground2);
+            top = this.iconSize + 3 * this.padding + height1;
+            div.style.top = (top + this.padding) + "px";
+            div.style.height = (height - height1) + "px";
+            this.divMessageHelp = div;
+            this.body.appendChild(this.divMessageHelp);
 
-                this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));
-            }
+            this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));
+
+            console.log("createDivMessageStart check2=", this.divMessageHelp !== undefined);
         }
 
         /**
@@ -748,6 +757,22 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
         }
 
+        removeMessageDivs() {
+            console.log("removeMessageDivs");
+            if (this.divMessage !== undefined) {
+                this.body.removeChild(this.divMessage);
+                this.divMessage = undefined;
+            }
+            if (this.divMessageHelp !== undefined) {
+                this.body.removeChild(this.divMessageHelp);
+                this.divMessageHelp = undefined;
+            }
+            if (this.divMessageBackground !== undefined) {
+                this.body.removeChild(this.divMessageBackground);
+                this.divMessageBackground = undefined;
+            }
+        }
+
         setColors(colors) {
             super.setColors(colors);
 
@@ -795,6 +820,21 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             // Compute sizes and layout
             this.gateComputeSizes();
             this.createArea(this.padding, 0);
+        }
+
+        removeDivMessage() {
+            if (this.divMessage !== undefined) {
+                this.body.removeChild(this.divMessage);
+                this.divMessage = undefined;
+            }
+            if (this.divMessageHelp !== undefined) {
+                this.body.removeChild(this.divMessageHelp);
+                this.divMessageHelp = undefined;
+            }
+            if (this.divMessageBackground !== undefined) {
+                this.divMessageBackground.remove();
+                this.divMessageBackground = undefined;
+            }
         }
     };
 });

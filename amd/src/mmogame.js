@@ -55,7 +55,6 @@ define([''], function() {
          */
         constructor() {
             // Initialize default properties.
-            this.kindSound = 0;
             this.state = 0;
             this.minFontSize = 0;
             this.maxFontSize = 0;
@@ -393,21 +392,6 @@ define([''], function() {
             }
 
             return low;
-        }
-
-        removeDivMessage() {
-            if (this.divMessage !== undefined) {
-                this.body.removeChild(this.divMessage);
-                this.divMessage = undefined;
-            }
-            if (this.divMessageHelp !== undefined) {
-                this.body.removeChild(this.divMessageHelp);
-                this.divMessageHelp = undefined;
-            }
-            if (this.divMessageBackground !== undefined) {
-                this.divMessageBackground.remove();
-                this.divMessageBackground = undefined;
-            }
         }
 
         disableButtons(buttons, disabled) {
