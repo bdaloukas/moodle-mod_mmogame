@@ -42,8 +42,11 @@ $PAGE->set_url('/mod/mmogame/view.php', ['id' => $cm->id]);
 
 $url = $CFG->wwwroot.'/mod/mmogame/gate.php?id='.$id.'&pin='.$mmogame->get_rgame()->pin;
 
+$context = context_module::instance( $cm->id);
+require_capability('mod/mmogame:view', $context);
+
 if (has_capability('mod/mmogame:manage', $context)) {
-    course_module_viewed::viewed($mmogame->get_rgame(), context_module::instance( $cm->id))->trigger();
+    course_module_viewed::viewed($mmogame->get_rgame(), $context)->trigger();
     mmogame_quiz_manage( $id, $mmogame, $url);
 } else {
     redirect( $url);

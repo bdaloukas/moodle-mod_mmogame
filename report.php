@@ -33,8 +33,18 @@ require_login();
 $id = optional_param('id', 0, PARAM_INT);
 $mode = required_param('mode', PARAM_ALPHANUM);
 
-$cm = $DB->get_record('course_modules', ['id' => $id], '*', MUST_EXIST);
+global $DB;
+
+if (! $cm = get_coursemodule_from_id('mmogame', $id)) {
+    throw new moodle_exception('invalidcoursemoduleid', 'error', '', null, $id);
+}
+
 $rgame = $DB->get_record('mmogame', ['id' => $cm->instance], '*', MUST_EXIST);
+
+global $USER;
+$usercontext = context_user::instance($USER->id);
+
+require_capability('mod/mmogame:viewreports', $usercontext);
 
 $controller = new overview_controller();
 $controller->display();

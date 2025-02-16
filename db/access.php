@@ -52,6 +52,18 @@ $capabilities = [
         ],
     ],
 
+    // Play the game.
+    'mod/mmogame:play' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'guest' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
 
     // Ability to add a new mmogame to the course.
     'mod/mmogame:addinstance' => [

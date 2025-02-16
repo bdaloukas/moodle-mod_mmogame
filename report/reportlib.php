@@ -34,38 +34,8 @@ require_once($CFG->dirroot . '/mod/mmogame/lib.php');
  * @throws dml_exception
  */
 function mmogame_report_list(stdClass $context): array {
+
+    require_capability('mod/mmogame:viewreports', $context);
+
     return ['overview'];
-    global $DB;
-    static $reportlist = null;
-    if (!is_null($reportlist)) {
-        return $reportlist;
-    }
-
-    $reports = $DB->get_records('mmogame_aa_reports', null, 'displayorder DESC', 'name, capability');
-    $reportdirs = core_component::get_plugin_list('mmogame');
-
-    // Order the reports tab in descending order of displayorder.
-    $reportcaps = [];
-    foreach ($reports as $key => $report) {
-        if (array_key_exists($report->name, $reportdirs)) {
-            $reportcaps[$report->name] = $report->capability;
-        }
-    }
-
-    // Add any other reports, which are on disc but not in the DB, on the end.
-    foreach ($reportdirs as $reportname => $notused) {
-        if (!isset($reportcaps[$reportname])) {
-            $reportcaps[$reportname] = null;
-        }
-    }
-    $reportlist = [];
-    foreach ($reportcaps as $name => $capability) {
-        if (empty($capability)) {
-            $capability = 'mod/mmogame:viewreports';
-        }
-        if (has_capability($capability, $context)) {
-            $reportlist[] = $name;
-        }
-    }
-    return $reportlist;
 }

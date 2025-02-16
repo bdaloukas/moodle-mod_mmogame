@@ -53,7 +53,11 @@ if (! $rgame = $DB->get_record('mmogame', ['id' => $cm->instance, 'pin' => $pin]
     throw new moodle_exception('ivalid_mmogame_or_pin', 'error', '', $cm->instance);
 }
 
-course_module_played::played($rgame, context_module::instance( $cm->id))->trigger();
+$context = context_module::instance( $cm->id);
+
+require_capability('mod/mmogame:play', $context);
+
+course_module_played::played($rgame, $context)->trigger();
 
 if ($rgame->kinduser == 'moodle' ) {
     require_login();
