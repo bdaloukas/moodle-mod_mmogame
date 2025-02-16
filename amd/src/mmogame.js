@@ -56,7 +56,7 @@ define([''], function() {
         constructor() {
             // Initialize default properties.
             this.state = 0;
-            this.minFontSize = 0;
+            this.minFontSize = 1;
             this.maxFontSize = 0;
             this.fontSize = 0;
             this.iconSize = 0;
