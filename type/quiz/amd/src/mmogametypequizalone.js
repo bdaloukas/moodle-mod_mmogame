@@ -58,7 +58,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.createButtonSound(fragment, this.padding + (i++) * step,
                 this.padding + nicknameHeight, this.iconSize);
             if (this.hasHelp()) {
-                const button = this.createButtonHelp(fragment, this.padding + (i++) * step, this.padding);
+                const button = this.createButtonHelp(fragment, this.padding + (i++) * step, this.padding + nicknameHeight);
                 button.addEventListener("click", () => this.onClickHelp());
             }
 
@@ -292,5 +292,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
         }
 
+        hasHelp() {
+            return true;
+        }
     };
 });

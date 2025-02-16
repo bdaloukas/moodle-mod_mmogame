@@ -40,7 +40,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         super('aduel');
 
         // Initialize core properties
-        this.cIcons = this.isVertical ? 5 : 8;
+        this.cIcons = (this.isVertical ? 5 : 8) + (this.hasHelp() ? 1 : 0);
 
         this.isWaitOpponent = false;
     }
@@ -165,13 +165,15 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.buttonWizard.title = this.getStringT('js_wizard');
 
         if (this.hasHelp()) {
-            if (!this.isVertical) {
-                this.createButtonHelp(fragment,
-                    leftButton + this.padding + (i++) * (this.iconSize + this.padding), this.padding + nicknameHeight);
+            let button;
+            if (this.isVertical) {
+                button = this.createButtonHelp(fragment,
+                    leftButton + this.iconSize + this.padding, this.areaRect.top + this.areaRect.height);
             } else {
-                this.createButtonHelp(fragment,
-                    this.padding + 3 * (this.iconSize + this.padding), this.areaRect.top + this.areaRect.height);
+                button = this.createButtonHelp(fragment,
+                    leftButton + this.iconSize + this.padding, this.padding + nicknameHeight);
             }
+            button.addEventListener("click", () => this.onClickHelp());
         }
 
         this.body.appendChild(fragment); // Batch insert into DOM
@@ -738,6 +740,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
         if (this.divTimer !== undefined) {
             this.divTimer.innerHTML = "";
         }
+    }
+
+    hasHelp() {
+        return true;
     }
 
     };

@@ -120,7 +120,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 label.style.color = this.getContrastingColor(this.colorBackground);
 
                 // Create the checkbox
-                const checked = aChecked !== undefined && aChecked.includes(this.answersID[i]);
+                const checked = aChecked !== undefined && aChecked !== null && aChecked.includes(this.answersID[i]);
                 const item = this.createRadiobox(this.body, checkboxSize, this.colorBackground2, this.colorScore,
                     checked, disabled);
                 item.style.position = "absolute";
@@ -422,12 +422,12 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }
 
             if (showPercent) {
-                s = percent === '' ? '' : (boldPercent ? `<b>${percent} </b>` : percent) + '%';
+                s = percent === '' ? '' : (boldPercent ? `<b>${Math.round(100 * percent)} </b>` : Math.round(100 * percent)) + '%';
                 if (player.lblPercent !== undefined) {
                     if (player.cachePercent !== s) {
                         player.cachePercent = s;
                         player.lblPercent.innerHTML = s;
-                        this.autoResizeText(player.lblPercent, player.cellSize, player.cellSize, false, 0, 0);
+                        this.autoResizeText(player.lblPercent, player.cellSize - this.padding, player.cellSize, false, 0, 0);
                     }
                 }
             }

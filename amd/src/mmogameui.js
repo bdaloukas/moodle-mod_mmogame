@@ -806,7 +806,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         onClickHelp() {
-            this.createDivMessageStart('test');
+            if (this.divMessageHelp === undefined) {
+                this.createDivMessageStart('Help');
+            } else {
+                this.removeMessageDivs();
+                this.callGetAttempt();
+            }
         }
 
         gateCompute() {
