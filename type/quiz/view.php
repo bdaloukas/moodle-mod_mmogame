@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_mmogame\event\course_module_viewed;
 use mod_mmogame\local\mmogame;
 
 defined('MOODLE_INTERNAL') || die();
@@ -39,9 +40,10 @@ require_capability('mod/mmogame:view', $context);
 // Initialize $PAGE, compute blocks.
 $PAGE->set_url('/mod/mmogame/view.php', ['id' => $cm->id]);
 
-$url = $CFG->wwwroot.'/mod/mmogame/gate.php?id='.$mmogame->get_id().'&pin='.$mmogame->get_rgame()->pin;
+$url = $CFG->wwwroot.'/mod/mmogame/gate.php?id='.$id.'&pin='.$mmogame->get_rgame()->pin;
 
 if (has_capability('mod/mmogame:manage', $context)) {
+    course_module_viewed::viewed($mmogame->get_rgame(), context_module::instance( $cm->id))->trigger();
     mmogame_quiz_manage( $id, $mmogame, $url);
 } else {
     redirect( $url);

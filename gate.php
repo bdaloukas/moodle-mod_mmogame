@@ -26,6 +26,8 @@
 // If are normal users include later require_login.
 // @codingStandardsIgnoreLine
 
+use mod_mmogame\event\course_module_played;
+
 define('NO_MOODLE_COOKIES', true);
 
 require( "../../config.php");
@@ -37,20 +39,21 @@ $PAGE->set_pagelayout('embedded'); // Layout χωρίς header και footer.
 $PAGE->set_context(context_system::instance());
 
 // Load the JavaScript module.
-$mmogameid = required_param('id', PARAM_INT);
+$id = required_param('id', PARAM_INT);
 $pin = required_param('pin', PARAM_INT);
+
+if (! $cm = get_coursemodule_from_id('mmogame', $id)) {
+    throw new moodle_exception('invalidcoursemoduleid', 'error', '', null, $id);
+}
 
 $color = $DB->get_record_select( 'mmogame_aa_colorpalettes', 'id=?', [2]);
 $colors = '['.$color->color1.', '.$color->color2.', '.$color->color3.', '.$color->color4.', '.$color->color5.']';
 
-$rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid, $pin]);
-if ($rgame === false) {
-    $data = new stdClass();
-    $data->mmogameid = $mmogameid;
-    $data->pin = $pin;
-    echo get_string( 'ivalid_mmogame_or_pin', 'mmogame', $data);
-    die;
+if (! $rgame = $DB->get_record('mmogame', ['id' => $cm->instance, 'pin' => $pin])) {
+    throw new moodle_exception('ivalid_mmogame_or_pin', 'error', '', $cm->instance);
 }
+
+course_module_played::played($rgame, context_module::instance( $cm->id))->trigger();
 
 if ($rgame->kinduser == 'moodle' ) {
     require_login();

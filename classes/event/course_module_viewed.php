@@ -39,7 +39,7 @@ class course_module_viewed extends \core\event\course_module_viewed {
      *
      * @param stdClass $mmogame
      * @param context_module $context
-     * @return course_module_viewed
+     * @return course_module_event
      * @throws coding_exception
      * @since Moodle 2.7
      *
@@ -53,20 +53,12 @@ class course_module_viewed extends \core\event\course_module_viewed {
     }
 
     /**
-     * Create instance of event.
+     * Return localised event name.
      *
-     * @param stdClass $mmogame
-     * @param context_module $context
-     *
-     * @return \core\event\base
-     * @throws coding_exception
+     * @return string
      */
-    public static function played(stdClass $mmogame, context_module $context): \core\event\base {
-        $data = ['context' => $context, 'objectid' => $mmogame->id];
-        $event = self::create($data);
-        $event->add_record_snapshot('mmogame', $mmogame);
-
-        return $event;
+    public static function get_name(): string {
+        return get_string('eventcoursemoduleviewed', 'mod_mmogame');
     }
 
     /**
