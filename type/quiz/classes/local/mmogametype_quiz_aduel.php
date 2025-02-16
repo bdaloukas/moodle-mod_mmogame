@@ -287,7 +287,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                         ['id' => $this->aduel->id, 'tool1numattempt2' => $attempt->numattempt]);
                 }
             }
-        } else if ($subcommand == 'tool3' && $this->iswizard( $attempt->id)) {
+        } else if ($subcommand == 'tool3') {
             if ($this->auserid == $this->aduel->auserid1) {
                 if ($this->aduel->tool3numattempt1 == 0 || $this->aduel->tool3numattempt1 == $attempt->numattempt) {
                     $this->aduel->tool3numattempt1 = $attempt->numattempt;
@@ -322,15 +322,12 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $ret['aduelRank'] = $this->get_rank( $info->sumscore, 'sumscore');
             $ret['aduelPercent'] = $info->percent;
             $ret['aduelPercentRank'] = $this->get_rank($info->percent, 'percent');
-            $ret['colors'] = implode( ',', $info->colors);     // Get the colors of opossite.
-            $ret['tool1numattempt'] = $this->aduel->tool1numattempt2;
-            $ret['tool2numattempt'] = $this->aduel->tool2numattempt2;
-            $ret['tool3numattempt'] = $this->aduel->tool3numattempt2;
-        } else {
-            $ret['tool1numattempt'] = $this->aduel->tool1numattempt1;
-            $ret['tool2numattempt'] = $this->aduel->tool2numattempt1;
-            $ret['tool3numattempt'] = $this->aduel->tool3numattempt1;
+            $ret['colors'] = implode( ',', $info->colors);     // Get the colors of opposite.
         }
+
+        $ret['tool1'] = $this->isvisibletool( 1, $attempt) ? 1 : 0;
+        $ret['tool2'] = $this->isvisibletool( 2, $attempt) ? 1 : 0;
+        $ret['tool3'] = $this->isvisibletool( 3, $attempt) ? 1 : 0;
 
         $numattempt = $attempt !== false ? $attempt->numattempt : 0;
         $attemptid = $attempt !== false ? $attempt->id : 0;
@@ -342,21 +339,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $this->append_json_wizard( $ret, $query);
         }
 
-        if ($this->iswizard( $attempt->id)) {
-            $ret['tool3'] = 1;
-        }
-
         return null;
-    }
-
-    /**
-     * Return true if this attempt will have the wizard tool.
-     *
-     * @param int $attemptid
-     * @return bool (true or false)
-     */
-    public function iswizard(int $attemptid): bool {
-        return $attemptid % (2 * $this->numquestions) == 0;
     }
 
     /**
@@ -381,17 +364,15 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $answers = $answerids = [];
         $count = count( $ret['answers']);
         for ($i = 0; $i < $count; $i++) {
-            $id = $ret[ 'answerids'][ $i];
-            if ($id== $correctid || $id == $answerid2) {
+            $id = $ret['answerids'][$i];
+            if ($id == $correctid || $id == $answerid2) {
                 $answers[] = $ret['answers'][$i];
-                //$answer[] = $ret['answer'][$i];
                 $answerids[] = $ret['answerids'][$i];
             }
         }
 
-        $ret[ 'answers' ] = $answers;
-        //$ret[ 'answer' ] = $answer;
-        $ret[ 'answerids' ] = $answerids;
+        $ret['answers'] = $answers;
+        $ret['answerids'] = $answerids;
     }
 
     /**
@@ -403,12 +384,13 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     protected function append_json_wizard(array &$ret, object $query): void {
         $correctid = $query->correctid;
 
-        $count = $ret['answers'];
-        for ($i = 1; $i <= $count; $i++) {
-            $id = intval( $ret['answerid_'.$i]);
-            if ($id != $correctid) {
-                $ret['answerid_'.$i] = '';
-                $ret['answer_'.$i] = '';
+        $count = count( $ret['answers']);
+        for ($i = 0; $i < $count; $i++) {
+            $id = $ret['answerids'][$i];
+            if ($id == $correctid) {
+                $ret['answers'] = [$ret['answers'][$i]];
+                $ret['answerids'] = [$ret['answerids'][$i]];
+                return;
             }
         }
     }
@@ -587,5 +569,27 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $ret['aduelPercentRank'] = $this->get_rank($info->percent, 'percent');
 
         return $attempt;
+    }
+
+    /**
+     *  Check if a tool have to be visible or not
+     * @param int $tool
+     * @param stdClass $attempt
+     * @return bool
+     */
+    private function isvisibletool(int $tool, stdClass $attempt): bool {
+        if ($tool === 1) {
+            return $attempt->id % 8 == 0;
+        }
+
+        if ($tool === 2) {
+            return $attempt->id % 8 == 4;
+        }
+
+        if ($tool === 3) {
+            return $attempt->id % 8 == 6;
+        }
+
+        return false;
     }
 }

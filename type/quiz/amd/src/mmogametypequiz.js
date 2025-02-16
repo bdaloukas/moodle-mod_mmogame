@@ -120,7 +120,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 label.style.color = this.getContrastingColor(this.colorBackground);
 
                 // Create the checkbox
-                const checked = aChecked !== null && aChecked.includes(this.answersID[i]);
+                const checked = aChecked !== undefined && aChecked.includes(this.answersID[i]);
                 const item = this.createRadiobox(this.body, checkboxSize, this.colorBackground2, this.colorScore,
                     checked, disabled);
                 item.style.position = "absolute";

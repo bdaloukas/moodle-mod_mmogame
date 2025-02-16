@@ -149,7 +149,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         processGetAttempt(json) {
             super.processGetAttempt(json);
-
             if (json.name !== undefined) {
                 window.document.title = json.name;
             }
@@ -219,7 +218,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         showScore(json) {
             super.showScore(this.player, json.sumscore, json.rank, json.percent, json.percentRank, true);
             this.player.lblAddScore.innerHTML = json.addscore === undefined ? '' : json.addscore;
-            this.autoResizeText(this.player.lblAddScore, this.iconSize, this.player.heightLine3, true, 0, 0, 1);
+            this.autoResizeText(this.player.lblAddScore, this.player.cellSize, this.player.cellSize, true, 0, 0, 1);
         }
 
         showHelpScreen(div) {

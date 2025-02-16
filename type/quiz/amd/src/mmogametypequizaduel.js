@@ -178,7 +178,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     updateButtonTool(btn, tool) {
-        btn.style.visibility = tool !== undefined && parseInt(tool) !== 0 ? "hidden" : "visible";
+        btn.style.visibility = tool !== undefined && parseInt(tool) !== 0 ? "visible" : "hidden";
     }
 
     processGetAttempt(json) {
@@ -232,14 +232,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.updateNicknameAvatar(this.player1, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
         this.updateNicknameAvatar(this.player2, json.aduelAvatar, json.aduelNickname, nicknameWidth, nicknameHeight);
 
-        this.updateButtonTool(this.button5050, json.tool1numattempt);
+        this.updateButtonTool(this.button5050, json.tool1);
         if (json.tool3 !== undefined) {
             json.tool2numattempt = -1;
         } else {
             json.tool3numattempt = -1;
         }
-        this.updateButtonTool(this.buttonSkip, json.tool2numattempt);
-        this.updateButtonTool(this.buttonWizard, json.tool3numattempt);
+        this.updateButtonTool(this.buttonSkip, json.tool2);
+        this.updateButtonTool(this.buttonWizard, json.tool3);
 
         this.attempt = json.attempt;
         this.aduelPlayer = json.aduelPlayer;
@@ -306,9 +306,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     hideTools() {
-        this.updateButtonTool(this.button5050, -1);
-        this.updateButtonTool(this.buttonSkip, -1);
-        this.updateButtonTool(this.buttonWizard, -1);
+        this.updateButtonTool(this.button5050, 0);
+        this.updateButtonTool(this.buttonSkip, 0);
+        this.updateButtonTool(this.buttonWizard, 0);
     }
 
     processSetAnswer(json) {
@@ -456,7 +456,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     showScore(json) {
         super.showScore(this.player1, json.sumscore, json.rank, json.percent, json.percentRank, true);
         this.player1.lblAddScore.innerHTML = json.addscore === undefined ? '' : json.addscore;
-        this.autoResizeText(this.player1.lblAddScore, this.iconSize, this.player1.cellSize, true, 0, 0, 1);
+        this.autoResizeText(this.player1.lblAddScore, this.player1.cellSize, this.player1.cellSize, true, 0, 0, 1);
 
         if (json.aduelPlayer === 2) {
             this.player2.divMain.style.visibility = 'visible';

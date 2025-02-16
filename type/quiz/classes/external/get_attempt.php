@@ -64,7 +64,8 @@ class get_attempt extends external_api {
      * @throws invalid_parameter_exception
      */
     public static function execute(int $mmogameid, string $kinduser, string $user,
-                                   ?string $nickname = null, ?int $avatarid = null, ?int $colorpaletteid = null, string $subcommand = ''): string {
+                                   ?string $nickname = null, ?int $avatarid = null, ?int $colorpaletteid = null,
+                                   string $subcommand = ''): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
