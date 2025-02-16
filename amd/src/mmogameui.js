@@ -641,7 +641,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
 
         createDivMessageStart(message) {
-            console.log("createDivMessageStart check=", this.divMessageHelp !== undefined);
             if (this.divMessageHelp !== undefined) {
                 return;
             }
@@ -678,8 +677,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.body.appendChild(this.divMessageHelp);
 
             this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));
-
-            console.log("createDivMessageStart check2=", this.divMessageHelp !== undefined);
         }
 
         /**
@@ -758,7 +755,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         removeMessageDivs() {
-            console.log("removeMessageDivs");
             if (this.divMessage !== undefined) {
                 this.body.removeChild(this.divMessage);
                 this.divMessage = undefined;

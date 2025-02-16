@@ -145,9 +145,9 @@ abstract class mmogame_qbank {
 
         foreach ($ret as $q) {
             if ($numteam != null && $numteam != 0) {
-                $this->update_stats( 0, $numteam, $q->id, true, false, false);
+                $this->update_stats( null, $numteam, $q->id, true, false, false);
             } else {
-                $this->update_stats( $auserid, 0, $q->id, true, false, false);
+                $this->update_stats( $auserid, null, $q->id, true, false, false);
             }
         }
 
@@ -169,12 +169,12 @@ abstract class mmogame_qbank {
         $rgame = $this->mmogame->get_rgame();
         $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
                 [$rgame->id, $rgame->numgame, $auserid]);
-        if ($rec === false) {
+        if ($rec === null) {
             $this->mmogame->get_grade( $auserid);
             $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
                 [$rgame->id, $rgame->numgame, $auserid]);
         }
-        if ($rec !== false) {
+        if ($rec !== null) {
             $a = ['id' => $rec->id];
             if ($countscore > 0) {
                 $a['countscore'] = $rec->countscore + $countscore;
@@ -218,59 +218,48 @@ abstract class mmogame_qbank {
 
         $select = 'mmogameid=? AND numgame=? ';
         $a = [$rgame->id, $rgame->numgame];
-        if ($auserid != 0) {
+        if ($auserid !== null) {
             $select .= ' AND auserid=?';
             $a[] = $auserid;
         } else {
             $select .= ' AND auserid IS NULL';
-            $auserid = null;
         }
-        if ($numteam != 0) {
+        if ($numteam !== null) {
             $select .= ' AND numteam=?';
             $a[] = $numteam;
         } else {
             $select .= ' AND numteam IS NULL';
-            $numteam = null;
         }
-        if ($queryid != 0) {
+        if ($queryid !== null) {
             $select .= ' AND queryid=?';
             $a[] = $queryid;
         } else {
             $select .= ' AND queryid IS NULL';
-            $queryid = 0;
         }
 
         $rec = $db->get_record_select( 'mmogame_aa_stats', $select, $a);
         if ($rec !== null) {
             $a = ['id' => $rec->id];
-            if ($isused > 0) {
+            if ($isused) {
                 $a['countused'] = $rec->countused + $isused;
             }
-            if ($iscorrect > 0) {
+            if ($iscorrect) {
                 $rec->countcorrect += $iscorrect;
                 $a['countcorrect'] = $rec->countcorrect;
+                $a['islastcorrect'] = 1;
             }
-            if ($iserror > 0) {
+            if ($iserror) {
                 $rec->counterror += $iserror;
                 $a['counterror'] = $rec->counterror;
                 $a['timeerror'] = time();
+                $a['islastcorrect'] = 0;
             }
 
             $count = $rec->countcorrect + $rec->counterror;
             $a['percent'] = $count == 0 ? null : $rec->countcorrect / $count;
             if ($values !== null) {
                 foreach ($values as $key => $value) {
-                    if ($value == 'percent2') {
-                        $value /= $rec->countanswers;
-                    }
                     $a[$key] = $value;
-                }
-                if ($queryid == null && array_key_exists( 'countcompleted', $values)) {
-                    $n = $rec->countanswers;
-                    $percentcompleted = $n != 0 ? $values['countcompleted'] / $n : 0;
-                    $sql = "UPDATE {mmogame_aa_grades} ".
-                        "SET percentcompleted=? WHERE mmogameid=? AND numgame=? AND auserid=?";
-                    $db->execute( $sql, [$percentcompleted, $rgame->id, $rgame->numgame, $auserid]);
                 }
             }
             $db->update_record( 'mmogame_aa_stats', $a);
@@ -280,12 +269,13 @@ abstract class mmogame_qbank {
             $a = ['mmogameid' => $rgame->id,
                 'numgame' => $rgame->numgame, 'queryid' => $queryid != 0 ? $queryid : null, 'auserid' => $auserid,
                 'numteam' => $numteam != 0 ? $numteam : null, 'percent' => $percent, 'countused' => $isused,
-                'countcorrect' => $iscorrect, 'counterror' => $iserror, ];
+                'countcorrect' => $iscorrect, 'counterror' => $iserror, 'islastcorrect' => $iscorrect, ];
             if ($values !== null) {
                 foreach ($values as $key => $value) {
                     $a[$key] = $value;
                 }
             }
+
             $db->insert_record( 'mmogame_aa_stats', $a);
         }
     }

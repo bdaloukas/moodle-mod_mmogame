@@ -298,7 +298,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     boxShadow: "inset 0 0 0.125em rgba(255, 255, 255, 0.75)",
                     background: this.getColorHex(colorBackground),
                     color: colorText,
-                    borderRadius: createAddScore ? 0 : `${this.iconSize}px`,
+                    borderRadius: createAddScore ? `${this.iconSize / 10}px` : `${this.iconSize}px`,
                 },
                 attributes: {
                     disabled: true,
@@ -306,48 +306,59 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 },
             });
 
-            let heightLine1, heightLine2, heightLine3;
+            const cellSize = Math.round(this.iconSize / 2);
+
+            let lblAddScore;
             if (createAddScore) {
-                const maxHeight = this.iconSize;
-                heightLine1 = Math.round(maxHeight / 2);
-                heightLine2 = heightLine3 = Math.round((maxHeight - heightLine1) / 2);
-            } else {
-                const maxHeight = this.iconSize;
-                heightLine1 = heightLine2 = Math.round(maxHeight / 2);
-                heightLine3 = maxHeight - heightLine1 - heightLine2;
+                // Create the additional score label (line3)
+                lblAddScore = this.createDOMElement('div', {
+                    parent: parent,
+                    classnames: `${prefixclassname}-addscore`,
+                    styles: {
+                        position: 'absolute',
+                        left: `${left}px`,
+                        width: `${cellSize}px`,
+                        top: `${top}px`,
+                        height: `${cellSize}px`,
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        color: colorText,
+                    },
+                    attributes: {
+                        title: this.getStringM('js_add_score'),
+                    },
+                });
             }
-            const topLine2 = top + heightLine1;
-            const topLine3 = topLine2 + heightLine2;
 
             // Create the ranking grade label (line1)
-            const rankLabel = this.createDOMElement('div', {
+            const lblRank = this.createDOMElement('div', {
                 parent: parent,
                 classnames: `${prefixclassname}-rank`,
                 styles: {
                     position: 'absolute',
-                    left: `${left}px`,
-                    width: `${this.iconSize}px`,
+                    left: `${createAddScore ? left + cellSize : left}px`,
+                    width: `${createAddScore ? cellSize : 2 * cellSize}px`,
                     top: `${top}px`,
-                    height: `${heightLine1}px`,
+                    height: `${cellSize}px`,
                     textAlign: 'center',
                     color: colorText,
                 },
                 attributes: {
-                    title: this.getStringM('js_ranking_grade'),
+                    title: this.getStringM('js_ranking'),
                 },
             });
 
             // Create the main score label (line2)
-            const scoreLabel = this.createDOMElement('div', {
+            const lblScore = this.createDOMElement('div', {
                 parent: parent,
                 classnames: `${prefixclassname}-score`,
                 styles: {
                     position: 'absolute',
                     left: `${left}px`,
-                    width: `${createAddScore ? this.iconSize / 2 : this.iconSize}px`,
-                    top: `${topLine2}px`,
-                    height: `${heightLine2}px`,
-                    lineHeight: `${this.iconSize / 2}px`,
+                    width: `${createAddScore ? cellSize : 2 * cellSize}px`,
+                    top: `${top + cellSize}px`,
+                    height: `${cellSize}px`,
+                    lineHeight: `${cellSize}px`,
                     textAlign: 'center',
                     color: colorText,
                 },
@@ -357,20 +368,19 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             });
 
             // Create the percentage label (line2)
-            let percentLabel;
+            let lblPercent;
             if (createAddScore) {
-                percentLabel = this.createDOMElement('div', {
+                lblPercent = this.createDOMElement('div', {
                     parent: parent,
                     classnames: `${prefixclassname}-percent`,
                     styles: {
                         position: 'absolute',
-                        left: `${left + this.iconSize / 2}px`,
-                        width: `${this.iconSize / 2}px`,
-                        top: `${topLine2}px`,
-                        height: `${heightLine2}px`,
+                        left: `${left + cellSize}px`,
+                        width: `${cellSize}px`,
+                        top: `${top + cellSize}px`,
+                        height: `${cellSize}px`,
                         textAlign: 'center',
-                        fontSize: `${this.iconSize / 3}px`,
-                        lineHeight: `${this.iconSize / 3}px`,
+                        lineHeight: `${cellSize}px`,
                         color: colorText,
                     },
                     attributes: {
@@ -379,64 +389,46 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 });
             }
 
-            // Create the additional score label (line3)
-            let addScoreLabel;
-            if (createAddScore) {
-                addScoreLabel = this.createDOMElement('div', {
-                    parent: parent,
-                    classnames: `${prefixclassname}-addscore`,
-                    styles: {
-                        position: 'absolute',
-                        left: `${left + this.iconSize / 2}px`,
-                        width: `${this.iconSize / 2}px`,
-                        top: `${topLine3}px`,
-                        height: `${heightLine3}px`,
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                        color: colorText,
-                    },
-                    attributes: {
-                        title: this.getStringM('js_percent'),
-                    },
-                });
-            }
-
-            return {divMain: divMain, lblRank: rankLabel, lblScore: scoreLabel, lblPercent: percentLabel,
-                lblAddScore: addScoreLabel, heightLine1: heightLine1, heightLine2: heightLine2, heightLine3: heightLine3};
+            return {divMain: divMain, lblRank: lblRank, lblScore: lblScore, lblPercent: lblPercent,
+                lblAddScore: lblAddScore, cellSize: cellSize};
         }
 
-
         showScore(player, score, rank, percent, rankpercent, showPercent) {
-            let showScore = true;
+            let boldScore = false;
+            let boldPercent = false;
             if (rank !== undefined && rankpercent !== undefined) {
                 if (parseInt(rankpercent) < parseInt(rank)) {
-                    showScore = false;
+                    boldScore = true;
+                    rank = rankpercent;
+                } else if (parseInt(rankpercent) === parseInt(rank)) {
+                    boldScore = true;
+                    boldPercent = true;
                 }
             }
 
             if (rank !== '') {
                 player.lblRank.innerHTML = `# ${rank}`;
-                this.autoResizeText(player.lblRank, 0.8 * this.iconSize, player.heightLine1, false, 0, 0);
+                this.autoResizeText(player.lblRank, player.cellSize, player.cellSize, false, 0, 0);
             } else {
                 player.lblRank.innerHTML = '';
             }
 
-            let s = showScore ? `<b>${score}</b>` : '';
-            if (player.lblPercent === undefined && parseInt(percent) !== 0 && showPercent) {
-                s = `<b>${percent} %</b>`;
-            }
+            let s = boldScore ? `<b>${score}</b>` : score;
             if (player.cacheScore !== s) {
                 player.cacheScore = s;
                 player.lblScore.innerHTML = s;
-                this.autoResizeText(player.lblScore, 0.9 * this.iconSize / 2, player.heightLine2, false, 0, 0);
+                const width = showPercent ? player.cellSize : 2 * player.cellSize;
+                this.autoResizeText(player.lblScore, width, player.cellSize, false, 0, 0);
             }
 
-            if (player.lblPercent !== undefined) {
-                s = !showScore || (showPercent && parseInt(percent) !== 0) ? `<b>${percent} %</b>` : '';
-                if (player.cachePercent !== s) {
-                    player.cachePercent = s;
-                    player.lblPercent.innerHTML = s;
-                    this.autoResizeText(player.lblPercent, 0.9 * this.iconSize / 2, player.heightLine2, false, 0, 0);
+            if (showPercent) {
+                s = percent === '' ? '' : (boldPercent ? `<b>${percent} </b>` : percent) + '%';
+                if (player.lblPercent !== undefined) {
+                    if (player.cachePercent !== s) {
+                        player.cachePercent = s;
+                        player.lblPercent.innerHTML = s;
+                        this.autoResizeText(player.lblPercent, player.cellSize, player.cellSize, false, 0, 0);
+                    }
                 }
             }
         }
@@ -522,6 +514,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 }])[0].done((response) => {
                     this.processSetAnswer(JSON.parse(response)); // Process the server's response
                 }).fail((error) => {
+                    console.log( error);
                     this.showError(error); // Handle errors
                 });
             });

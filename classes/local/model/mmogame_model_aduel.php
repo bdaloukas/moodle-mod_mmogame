@@ -70,102 +70,65 @@ class mmogame_model_aduel {
         $auserid = $mmogame->get_auserid();
         $db = $mmogame->get_db();
 
-        $stat = $db->get_record_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=? AND queryid IS NULL',
-            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
-        if ($stat === null) {
-            $stat = new stdClass();
-            $stat->percent = $stat->id = $stat->count1 = $stat->count2 = 0;
-        }
-
         // Returns one that is started and not finished.
         $recs = $db->get_records_select( 'mmogame_am_aduel_pairs',
             'mmogameid=? AND numgame=? AND '.
             '(auserid1=? AND timestart1 <> 0 AND isclosed1 = 0 OR auserid2=? AND timestart2 <> 0 AND isclosed2 = 0)',
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid, $auserid], 'id', '*', 0, 1);
-        $rec = false;
-        foreach ($recs as $rec) {
-            return $rec;
-        }
-        // Count1=count alone, Count2=count with an opposite.
-        if ($stat->count1 <= $stat->count2) {
-            return self::get_aduel_new( $mmogame, $newplayer1, $stat);
+        if (count( $recs ) > 0) {
+            return reset( $recs );
         }
 
-        // Count1 is bigger than count2.
+        $grade = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
+            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
+        $percent = $grade != null ? $grade->percent : 0;
 
-        // Selects one of the games without opponent.
-        $sql = "SELECT a.*, s.percent".
-            " FROM {mmogame_am_aduel_pairs} a ".
-            " LEFT JOIN {mmogame_aa_stats} s ON ".
-            "a.mmogameid=s.mmogameid AND a.numgame=s.numgame AND a.auserid1=s.auserid AND s.queryid IS NULL AND numteam IS NULL".
-            " WHERE a.auserid2 IS NULL AND a.mmogameid=? AND a.numgame=? AND a.auserid1<>? AND a.isclosed1 = 1";
-        $recs = $db->get_records_sql( $sql, [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
-
-        if ($stat->count1 - $stat->count2 == 1) {
-            if (count( $recs) < 3) {
-                return self::get_aduel_new( $mmogame, $newplayer1, $stat);
-            }
-        }
-
-        if (count( $recs) == 0) {
+        $pairs = $db->get_records_select( 'mmogame_am_aduel_pairs',
+            'mmogameid=? AND numgame=? AND auserid1 <> ? AND isclosed1 = 0 AND isclosed2 = 0',
+            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid], 'id', '*', 0, 5);
+        if (count( $pairs ) == 0) {
+            // There are no open aduel. Create a new one.
             $count = $db->count_records_select( 'mmogame_am_aduel_pairs',
                 'mmogameid=? AND numgame=? AND auserid1 = ? AND auserid2 IS NULL',
                 [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
             if ($count > $maxalone) {
                 return null;   // Wait an opponent.
             }
-            return self::get_aduel_new( $mmogame, $newplayer1, $stat);
+            $newplayer1 = true;
+            return self::get_aduel_new( $mmogame);
         }
 
-        // There are many "alone" games.
-        // Find a game with percent near my percent.
-        $map = [];    // The map1 contains games with lower grade and map2 with upper grade.
-        foreach ($recs as $rec) {
-            $step = $rec->percent <= $stat->percent ? 1 : 2; // 1 mean lower than my percent.
-            // Try to find the bigger of smaller or small of bigger percent.
-            $key = $step.sprintf( '%10.6f %10d', abs( $rec->percent - $stat->percent), $rec->id);
-            $map[$key] = $rec;
+        $map = [];
+        foreach ($pairs as $pair) {
+            $key = abs($pair->percent - $percent);
+            $map[$key] = $pair;
         }
         ksort( $map);
 
-        foreach ($map as $rec) {
-            break;
-        }
+        $pair = reset( $map);
 
         // Check if it has a game without opponent.
-        $rec->auserid2 = $auserid;
-        $rec->timestart2 = time();
-        $db->update_record( 'mmogame_am_aduel_pairs', ['id' => $rec->id, 'auserid2' => $auserid, 'timestart2' => time()]);
+        $pair->auserid2 = $auserid;
+        $pair->timestart2 = time();
+        $db->update_record( 'mmogame_am_aduel_pairs', ['id' => $pair->id, 'auserid2' => $auserid, 'timestart2' => time()]);
+
         $newplayer2 = true;
-        if ($stat->id == 0) {
-            $mmogame->get_qbank()->update_stats( $mmogame->get_auserid(), null, null, 0, 0, 0, ['count2' => 1]);
-        } else {
-            $db->update_record( 'mmogame_aa_stats', ['id' => $stat->id, 'count2' => $stat->count2 + 1]);
-        }
-        return $rec;
+
+        return $pair;
     }
 
     /**
      * Return the new aduel record for current $mmogame
      *
      * @param mmogame $mmogame
-     * @param bool $newplayer1
-     * @param stdClass $stat (the record of table mmogame_aa_stats)
      * @return ?stdClass
      */
-    public static function get_aduel_new(mmogame $mmogame, bool &$newplayer1, stdClass $stat): ?stdClass {
+    public static function get_aduel_new(mmogame $mmogame): ?stdClass {
         $db = $mmogame->get_db();
 
         $a = ['mmogameid' => $mmogame->get_id(), 'numgame' => $mmogame->get_numgame(), 'auserid1' => $mmogame->get_auserid(),
             'timestart1' => time(), 'timelimit' => $mmogame->get_timelimit(), 'isclosed1' => 0, 'isclosed2' => 0, ];
         $id = $db->insert_record( 'mmogame_am_aduel_pairs', $a);
-
-        $newplayer1 = true;
-        if ($stat->id == 0) {
-            $mmogame->get_qbank()->update_stats( $mmogame->get_auserid(), 0, 0, 0, 0, 0, ['count1' => 1]);
-        } else {
-            $db->update_record( 'mmogame_aa_stats', ['id' => $stat->id, 'count1' => $stat->count1 + 1]);
-        }
 
         return $db->get_record_select( 'mmogame_am_aduel_pairs', 'id=?', [$id]);
     }

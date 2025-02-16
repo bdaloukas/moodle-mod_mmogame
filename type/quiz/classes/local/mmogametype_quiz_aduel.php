@@ -184,11 +184,10 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param ?int $useranswerid Optional user answer ID.
      * @param bool $autograde Whether autograding is enabled.
      * @param array $ret Output array for additional information.
-     * @return bool True if the answer was set successfully, false otherwise.
      */
     public function set_answer(stdClass $attempt, stdClass $query, ?string $useranswer, ?int $useranswerid,
-                               bool $autograde, array &$ret): bool {
-        $retvalue = parent::set_answer( $attempt, $query, $useranswer, $useranswerid, $autograde, $ret);
+                               bool $autograde, array &$ret): void {
+        parent::set_answer( $attempt, $query, $useranswer, $useranswerid, $autograde, $ret);
 
         $ret['iscorrect'] = $attempt->iscorrect;
         if ($this->auserid == $this->aduel->auserid1) {
@@ -198,10 +197,15 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $rec = reset($recs);
             if ($rec === false) {
                 // We finished.
-                $this->db->update_record( 'mmogame_am_aduel_pairs', ['id' => $this->aduel->id, 'isclosed1' => 1]);
+                $grade = $this->db->get_record_select('mmogame_aa_grades',
+                    'mmogameid=? AND numgame=? AND auserid=?',
+                    [$attempt->mmogameid, $attempt->numgame, $this->auserid]);
+                $percent = $grade !== null ? $grade->percent : 0;
+                $this->db->update_record( 'mmogame_am_aduel_pairs',
+                    ['id' => $this->aduel->id, 'isclosed1' => 1, 'percent' => $percent]);
             }
 
-            return $retvalue;
+            return;
         }
 
         // Adjust the attempt score if negative.
@@ -250,8 +254,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             // We finished.
             $this->db->update_record( 'mmogame_am_aduel_pairs', ['id' => $this->aduel->id, 'isclosed2' => 1]);
         }
-
-        return $retvalue;
     }
 
     /**
@@ -309,17 +311,17 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $player = ( $this->aduel === null || intval($this->aduel->auserid1) === $auserid ? 1 : 2);
         $ret['aduelPlayer'] = $player;
 
-            if ($this->aduel == null) {
+        if ($this->aduel == null) {
             return null;
         }
         if ($player == 2) {
-            $info = $this->get_avatar_info( $auserid);
+            $info = $this->get_avatar_info( $this->aduel->auserid1);
             $ret['aduelScore'] = $info->sumscore;
             $ret['aduelAvatar'] = $info->avatar;
             $ret['aduelNickname'] = $info->nickname;
-            $ret['aduelRank'] = $this->get_rank( $auserid, 'sumscore');
-            $ret['aduelPercent'] = $info->percentcompleted;
-            $ret['aduelPercentRank'] = $this->get_rank($info->percentcompleted, 'percentcompleted');
+            $ret['aduelRank'] = $this->get_rank( $auserid, $info->sumscore, 'sumscore');
+            $ret['aduelPercent'] = $info->percent;
+            $ret['aduelPercentRank'] = $this->get_rank($info->percent, $info->percent, 'percent');
             $ret['colors'] = implode( ',', $info->colors);     // Get the colors of opossite.
             $ret['tool1numattempt'] = $this->aduel->tool1numattempt2;
             $ret['tool2numattempt'] = $this->aduel->tool2numattempt2;
@@ -414,7 +416,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     public function get_queries_aduel(int $count): ?array {
         // Get the ids of all the queries.
         $ids = $this->qbank->get_queries_ids();
-
         if ($ids === null || count( $ids) == 0) {
             return null;
         }
@@ -429,9 +430,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $qs[$id] = $q;
         }
 
-        $stat = $this->db->get_record_select( 'mmogame_aa_stats',
-            'mmogameid=? AND numgame=? AND auserid = ? AND queryid IS NULL',
-            [$this->rgame->id, $this->rgame->numgame, $this->auserid]);
+        $grade = $this->get_grade( $this->auserid);
 
         // Computes statistics per question.
         [$insql, $inparams] = $this->db->get_in_or_equal( $ids);
@@ -446,11 +445,13 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $qs[$rec->queryid] = $q;
         }
 
-        // Computes statistics per user.
+        // Computes statistics per question and user.
         $recs = $this->db->get_records_select( 'mmogame_aa_stats',
             "mmogameid=? AND numgame=? AND auserid = ? AND queryid $insql",
             array_merge([$this->rgame->id, $this->rgame->numgame, $this->auserid], $inparams),
-            '', 'queryid,countused,countcorrect,counterror,timeerror,percent');
+            '', 'queryid,countused,countcorrect,counterror,timeerror,percent,islastcorrect');
+
+        $corrects = 0;
         foreach ($recs as $rec) {
             $q = $qs[$rec->queryid];
             $q->utimeerror = $rec->timeerror;
@@ -458,6 +459,10 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $q->upercent = $rec->percent;
             $q->uscore = $rec->countcorrect - 2 * $rec->counterror;
             $qs[$rec->queryid] = $q;
+
+            if ($rec->islastcorrect) {
+                $corrects++;
+            }
         }
         $map = [];
         $min = 0;
@@ -467,18 +472,17 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             }
         }
 
+        $percent = $grade !== null ? $grade->percent : 0;
         foreach ($qs as $q) {
-            $key = sprintf( "%10d %10d %10d %5d %5d %10d %5d %10d",
+            $key = sprintf( "%10d %10d %10d %5d %10d %5d %10d",
                 // If it has big negative score give priority to them.
                 $q->uscore < 0 ? -$min + $q->uscore : 999999999,
                 // If it has negative score more priority has the older question.
                 $q->uscore < 0 ? $q->utimeerror : 0,
                 // Fewer times used by user higher priority has.
                 $q->ucountused,
-                // If question is easier than user sorts by distance.
-                $q->qpercent < $stat->percent ? round( 100 * $stat->percent - 100 * $q->qpercent) : 0,
-                // If question is more difficult than user sorts by distance.
-                $q->qpercent > $stat->percent ? round( -100 * $stat->percent + 100 * $q->qpercent) : 0,
+                // Sorts by distance.
+                $q->qpercent < $percent ? abs( round( 100 * $percent - 100 * $q->qpercent)) : 0,
                 // Prioritizes question that fewer times by everyone.
                 round( 100 * $q->qcountused),
                 rand(1, 9999),
@@ -514,8 +518,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $this->qbank->update_stats( $this->auserid, null, $q->id, 1, 0, 0);
             $this->qbank->update_stats( null, null, $q->id, 1, 0, 0);
         }
-        $this->qbank->update_stats( $this->auserid, null, null, count( $ret), 0, 0,
-            ['countanswers' => count( $ids)]);
+        $this->db->update_record( 'mmogame_aa_grades',
+            ['id' => $grade->id, 'countquestions' => count( $ids), 'percent' => $corrects / count($ids)]);
+
         return count( $ret) ? $ret : null;
     }
 
@@ -550,7 +555,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             }
         }
 
-        if ($aduel->auserid1 == $this->auserid) {
+        if ($aduel->auserid1 === $this->auserid) {
             return null;
         }
 
@@ -571,9 +576,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         }
         $info = $this->get_avatar_info( $aduel->auserid1);
         $ret['aduelScore'] = $info->sumscore;
-        $ret['aduelRank'] = $this->get_rank( $aduel->auserid1, 'sumscore');
-        $ret['aduelPercent'] = $info->percentcompleted;
-        $ret['aduelPercentRank'] = $this->get_rank($info->percentcompleted, 'percentcompleted');
+        $ret['aduelRank'] = $this->get_rank( $aduel->auserid1, $info->sumscore, 'sumscore');
+        $ret['aduelPercent'] = $info->percent;
+        $ret['aduelPercentRank'] = $this->get_rank($aduel->auserid1, $info->percent, 'percent');
 
         return $attempt;
     }

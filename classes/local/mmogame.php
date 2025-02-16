@@ -364,7 +364,6 @@ abstract class mmogame {
      * @return ?stdClass
      */
     public function get_grade(int $auserid): ?stdClass {
-
         $db = $this->db;
 
         $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
@@ -390,7 +389,7 @@ abstract class mmogame {
             $a['colorpaletteid'] = reset( $recs)->id;
 
             $user = $db->get_record_select( 'mmogame_aa_users', 'id=?', [$auserid]);
-            if ($user !== false) {
+            if ($user !== null) {
                 if ($user->kind == 'usercode') {
                     $rec = $db->get_record_select( 'mmogame_aa_users_code', 'id=?', [$user->instanceid]);
                     if ($rec !== false && $rec->code != 0) {
@@ -439,17 +438,11 @@ abstract class mmogame {
      * Returns the rank for user $auserid based on $field
      *
      * @param int $auserid
+     * @param $value
      * @param string $field
      * @return int
      */
-    public function get_rank(int $auserid, string $field): int {
-        $grade = $this->get_grade( $auserid);
-
-        $value = $grade->$field;
-        if ($value == null) {
-            $value = 0;
-        }
-
+    public function get_rank(int $auserid, $value, string $field): int {
         return $this->db->count_records_select( 'mmogame_aa_grades',
                 "mmogameid=? AND numgame=? AND $field > ?",
                 [$this->rgame->id, $this->rgame->numgame, $value]) + 1;

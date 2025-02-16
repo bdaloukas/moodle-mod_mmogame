@@ -459,7 +459,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     showScore(json) {
         super.showScore(this.player1, json.sumscore, json.rank, json.percent, json.percentRank, true);
         this.player1.lblAddScore.innerHTML = json.addscore === undefined ? '' : json.addscore;
-        this.autoResizeText(this.player1.lblAddScore, this.iconSize, this.player1.heightLine3, true, 0, 0, 1);
+        this.autoResizeText(this.player1.lblAddScore, this.iconSize, this.player1.cellSize, true, 0, 0, 1);
 
         if (json.aduelPlayer === 2) {
             this.player2.divMain.style.visibility = 'visible';
