@@ -319,9 +319,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $ret['aduelScore'] = $info->sumscore;
             $ret['aduelAvatar'] = $info->avatar;
             $ret['aduelNickname'] = $info->nickname;
-            $ret['aduelRank'] = $this->get_rank( $auserid, $info->sumscore, 'sumscore');
+            $ret['aduelRank'] = $this->get_rank( $info->sumscore, 'sumscore');
             $ret['aduelPercent'] = $info->percent;
-            $ret['aduelPercentRank'] = $this->get_rank($info->percent, $info->percent, 'percent');
+            $ret['aduelPercentRank'] = $this->get_rank($info->percent, 'percent');
             $ret['colors'] = implode( ',', $info->colors);     // Get the colors of opossite.
             $ret['tool1numattempt'] = $this->aduel->tool1numattempt2;
             $ret['tool2numattempt'] = $this->aduel->tool2numattempt2;
@@ -576,9 +576,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         }
         $info = $this->get_avatar_info( $aduel->auserid1);
         $ret['aduelScore'] = $info->sumscore;
-        $ret['aduelRank'] = $this->get_rank( $aduel->auserid1, $info->sumscore, 'sumscore');
+        $ret['aduelRank'] = $this->get_rank( $info->sumscore, 'sumscore');
         $ret['aduelPercent'] = $info->percent;
-        $ret['aduelPercentRank'] = $this->get_rank($aduel->auserid1, $info->percent, 'percent');
+        $ret['aduelPercentRank'] = $this->get_rank($info->percent, 'percent');
 
         return $attempt;
     }

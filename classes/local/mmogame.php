@@ -272,10 +272,10 @@ abstract class mmogame {
      * @param mmogame_database $db
      * @param string $kinduser
      * @param string $user
-     * @param bool $create
+     * @param boolean $create
      * @return ?int (the id of table mmogame_aa_users)
      */
-    public static function get_asuerid(mmogame_database $db, string $kinduser, string $user, $create): ?int {
+    public static function get_asuerid(mmogame_database $db, string $kinduser, string $user, bool $create): ?int {
         if ($kinduser == 'usercode') {
             return self::get_auserid_from_usercode($db, $user);
         } else if ($kinduser == 'guid') {
@@ -437,12 +437,11 @@ abstract class mmogame {
     /**
      * Returns the rank for user $auserid based on $field
      *
-     * @param int $auserid
      * @param $value
      * @param string $field
      * @return int
      */
-    public function get_rank(int $auserid, $value, string $field): int {
+    public function get_rank($value, string $field): int {
         return $this->db->count_records_select( 'mmogame_aa_grades',
                 "mmogameid=? AND numgame=? AND $field > ?",
                 [$this->rgame->id, $this->rgame->numgame, $value]) + 1;

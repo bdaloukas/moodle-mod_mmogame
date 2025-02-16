@@ -344,10 +344,10 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
 
         $info = $this->get_avatar_info( $this->auserid);
         $ret['sumscore'] = $info->sumscore;
-        $ret['rank'] = $this->get_rank( $this->auserid, $info->sumscore, 'sumscore');
+        $ret['rank'] = $this->get_rank( $info->sumscore, 'sumscore');
 
         $ret['percent'] = $info->percent;
-        $ret['percentrank'] = $this->get_rank( $this->auserid, $info->percent, 'percent');
+        $ret['percentrank'] = $this->get_rank( $info->percent, 'percent');
 
         return $attempt;
     }

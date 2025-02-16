@@ -106,11 +106,11 @@ abstract class mmogametype_quiz extends mmogame {
         $ret['fastjson'] = $this->rgame->fastjson;
         $ret['name'] = $this->rgame->name;
         $ret['state'] = $this->rstate->state;
-        $ret['rank'] = $this->get_rank( $auserid, $info->sumscore, 'sumscore');
+        $ret['rank'] = $this->get_rank( $info->sumscore, 'sumscore');
         $ret['sumscore'] = $info->sumscore;
         $ret['timefastjson'] = $this->rgame->timefastjson;
         $ret['percent'] = $info->percent;
-        $ret['percentrank'] = $this->get_rank( $auserid, $info->percent, 'percent');
+        $ret['percentrank'] = $this->get_rank( $info->percent, 'percent');
 
         if ($attempt === null) {
             $attempt = new stdClass();
