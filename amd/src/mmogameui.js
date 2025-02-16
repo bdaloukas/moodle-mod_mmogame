@@ -696,6 +696,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     nickname: null,
                     colorpaletteid: null,
                     avatarid: null,
+                    subcommand: '',
                 };
                 if (extraparams !== undefined) {
                     params = {...params, ...extraparams};

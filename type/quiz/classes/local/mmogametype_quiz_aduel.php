@@ -336,10 +336,10 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $attemptid = $attempt !== false ? $attempt->id : 0;
         if ($player == 1 && $this->aduel->tool1numattempt1 == $numattempt
         || $player == 2 && $this->aduel->tool1numattempt2 == $numattempt) {
-            $this->append_json_only2( $ret, $query, $attemptid);
+            $this->append_json_5050( $ret, $query, $attemptid);
         } else if ($player == 1 && $this->aduel->tool3numattempt1 == $numattempt
         || $player == 2 && $this->aduel->tool3numattempt2 == $numattempt) {
-            $this->append_json_only1( $ret, $query);
+            $this->append_json_wizard( $ret, $query);
         }
 
         if ($this->iswizard( $attempt->id)) {
@@ -360,13 +360,13 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     }
 
     /**
-     * Saves to array $ret informations about the $attempt (only for the second player).
+     * Saves to array $ret information about the $attempt (only when using tool1=50x50).
      *
      * @param array $ret (returns info about the current attempt)
      * @param stdClass $query
      * @param int $attemptid
      */
-    protected function append_json_only2(array &$ret, stdClass $query, int $attemptid): void {
+    protected function append_json_5050(array &$ret, stdClass $query, int $attemptid): void {
         $correctid = $query->correctid;
         $ids = [];
         foreach ($query->answers as $answer) {
@@ -378,23 +378,29 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $pos = $attemptid % count( $ids);
         $answerid2 = $ids[$pos];
 
-        $count = $ret['answers'];
-        for ($i = 1; $i <= $count; $i++) {
-            $id = intval( $ret['answerid_'.$i]);
-            if ($id != $correctid && $id != $answerid2) {
-                $ret['answerid_'.$i] = '';
-                $ret['answer_'.$i] = '';
+        $answers = $answerids = [];
+        $count = count( $ret['answers']);
+        for ($i = 0; $i < $count; $i++) {
+            $id = $ret[ 'answerids'][ $i];
+            if ($id== $correctid || $id == $answerid2) {
+                $answers[] = $ret['answers'][$i];
+                //$answer[] = $ret['answer'][$i];
+                $answerids[] = $ret['answerids'][$i];
             }
         }
+
+        $ret[ 'answers' ] = $answers;
+        //$ret[ 'answer' ] = $answer;
+        $ret[ 'answerids' ] = $answerids;
     }
 
     /**
-     * Saves to array $ret informations about the $attempt (only for the first player).
+     * Saves to array $ret informations about the $attempt (only for wizard tool).
      *
      * @param array $ret (returns info about the current attempt)
      * @param object $query
      */
-    protected function append_json_only1(array &$ret, object $query): void {
+    protected function append_json_wizard(array &$ret, object $query): void {
         $correctid = $query->correctid;
 
         $count = $ret['answers'];

@@ -159,6 +159,10 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
             $result->attempt, $answertexts[0], $answerids[1], ''));
         $this->assertTrue( $result->iscorrect == 0);
 
+        // Use tool1 (50x50).
+        $result = json_decode( $classgetattempt->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1, 'tool1'));
+        $this->assertTrue( $result->attempt != 0);
+
         $classgethighscore = new mmogametype_quiz\external\get_highscore();
         $result = json_decode( $classgethighscore->execute( $rgame->id, 'moodle', $USER->id, 3));
         $this->assertTrue( $result->count == 1);

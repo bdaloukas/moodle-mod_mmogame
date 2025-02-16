@@ -81,7 +81,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          */
         createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled) {
             const n = this.answers ? this.answers.length : 0;
-            const aChecked = this.answer?.split(",").filter(Boolean) || [];
+            const aChecked = this.answer;
             const fragment = document.createDocumentFragment(); // ✅ Batch DOM updates
 
             const retSize = [0, 0];
@@ -120,7 +120,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 label.style.color = this.getContrastingColor(this.colorBackground);
 
                 // Create the checkbox
-                const checked = aChecked.includes(this.answersID[i]);
+                const checked = aChecked !== null && aChecked.includes(this.answersID[i]);
                 const item = this.createRadiobox(this.body, checkboxSize, this.colorBackground2, this.colorScore,
                     checked, disabled);
                 item.style.position = "absolute";
@@ -484,7 +484,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             return [definitionDiv.scrollWidth, definitionDiv.scrollHeight];
         }
 
-
         /**
          * Sends the selected answer to the server using Moodle's AJAX API.
          * @param {string} subcommand
@@ -514,7 +513,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 }])[0].done((response) => {
                     this.processSetAnswer(JSON.parse(response)); // Process the server's response
                 }).fail((error) => {
-                    console.log( error);
                     this.showError(error); // Handle errors
                 });
             });

@@ -128,7 +128,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.sendGetHighScore();
         });
         this.button5050.addEventListener("click", () => {
-            this.callGetAttempt({tool1: 1});
+            this.callGetAttempt({subcommand: 'tool1'});
         });
         this.button5050.title = this.getStringT('js_help_5050');
 
@@ -159,13 +159,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.iconSize, 'assets/wizard.svg');
         }
         this.buttonWizard.addEventListener("click", () => {
-            this.callGetAttempt({tool3: 1});
+            this.callGetAttempt({'subcommand': 'tool3'});
         });
         this.buttonWizard.style.visibility = 'hidden';
         this.buttonWizard.title = this.getStringT('js_wizard');
-        this.buttonWizard.addEventListener("click", () => {
-            this.callGetAttempt({tool3: 1});
-        });
 
         if (this.hasHelp()) {
             if (!this.isVertical) {

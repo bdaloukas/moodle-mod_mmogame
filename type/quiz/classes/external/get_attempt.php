@@ -45,6 +45,7 @@ class get_attempt extends external_api {
             'nickname' => new external_value(PARAM_RAW, 'The nickname of the user'),
             'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar'),
             'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette'),
+            'subcommand' => new external_value(PARAM_ALPHANUMEXT, 'Subcommands like tool1, tool2, tool3'),
         ]);
     }
 
@@ -57,12 +58,13 @@ class get_attempt extends external_api {
      * @param string|null $nickname
      * @param int|null $avatarid
      * @param int|null $colorpaletteid
+     * @param string $subcommand
      * @return string
      * @throws coding_exception
      * @throws invalid_parameter_exception
      */
     public static function execute(int $mmogameid, string $kinduser, string $user,
-                                   ?string $nickname = null, ?int $avatarid = null, ?int $colorpaletteid = null): string {
+                                   ?string $nickname = null, ?int $avatarid = null, ?int $colorpaletteid = null, string $subcommand = ''): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
@@ -71,6 +73,7 @@ class get_attempt extends external_api {
             'nickname' => $nickname,
             'avatarid' => $avatarid,
             'colorpaletteid' => $colorpaletteid,
+            'subcommand' => $subcommand,
         ]);
 
         $ret = [];
@@ -94,7 +97,7 @@ class get_attempt extends external_api {
             $attempt = false;
         }
 
-        $mmogame->append_json($ret, $attempt !== false ? $attempt : null);
+        $mmogame->append_json($ret, $attempt !== false ? $attempt : null, $subcommand);
 
         return json_encode( $ret);
     }
