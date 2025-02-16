@@ -272,7 +272,7 @@ abstract class mmogame {
      * @param mmogame_database $db
      * @param string $kinduser
      * @param string $user
-     * @param boolean $create
+     * @param bool $create
      * @return ?int (the id of table mmogame_aa_users)
      */
     public static function get_asuerid(mmogame_database $db, string $kinduser, string $user, bool $create): ?int {
@@ -435,9 +435,9 @@ abstract class mmogame {
     }
 
     /**
-     * Returns the rank for user $auserid based on $field
+     * Returns the rank for the current user based on $field
      *
-     * @param $value
+     * @param int|float $value
      * @param string $field
      * @return int
      */
