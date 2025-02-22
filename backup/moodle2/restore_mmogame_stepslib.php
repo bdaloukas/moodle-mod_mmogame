@@ -275,7 +275,7 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data->auserid1 = $this->get_mappingid('mmogame_auser', $data->auserid1);
         $data->auserid2 = $this->get_mappingid('mmogame_auser', $data->auserid2);
 
-        $newitemid = $DB->insert_record('mmogame_aa_aduel_pairs', $data);
+        $newitemid = $DB->insert_record('mmogame_am_aduel_pairs', $data);
     }
 
     /**
