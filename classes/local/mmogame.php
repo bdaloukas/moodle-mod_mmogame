@@ -503,7 +503,8 @@ abstract class mmogame {
     public function save_state_file(int $state, string $filecontents): string {
         global $CFG;
 
-        // Creates an upload directory in temp.
+        // Creates an upload directory in dataroot.
+        // This directory is used for checking of state without opening database.
         $file = $this->rgame->fastjson === null ? '00' : $this->rgame->fastjson;
         $newdir = $CFG->dataroot.'/local/mmogame/states/'.substr( $file, -2);
         if (!is_dir( $newdir)) {
