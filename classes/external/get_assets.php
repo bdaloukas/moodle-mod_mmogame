@@ -17,6 +17,7 @@
 namespace mod_mmogame\external;
 
 use coding_exception;
+use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
@@ -72,6 +73,12 @@ class get_assets extends external_api {
             'avatars' => $avatars ?? 0,
             'colorpalettes' => $colorpalettes ?? 0,
         ]);
+
+        // Perform security checks.
+        $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
+        $context = module::instance($cm->id);
+        self::validate_context($context);
+        require_capability('mod/mmogame:play', $context);
 
         $result = [];
 

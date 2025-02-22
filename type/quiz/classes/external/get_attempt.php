@@ -17,6 +17,7 @@
 namespace mmogametype_quiz\external;
 
 use coding_exception;
+use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -76,6 +77,12 @@ class get_attempt extends external_api {
             'colorpaletteid' => $colorpaletteid,
             'subcommand' => $subcommand,
         ]);
+
+        // Perform security checks.
+        $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
+        $context = module::instance($cm->id);
+        self::validate_context($context);
+        require_capability('mod/mmogame:play', $context);
 
         $ret = [];
 
