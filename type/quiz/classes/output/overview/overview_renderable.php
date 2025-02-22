@@ -87,7 +87,8 @@ class overview_renderable implements renderable {
     public function get_data(): array {
         global $DB;
 
-        return $DB->get_records_sql("SELECT * FROM {mmogame_quiz_attempts} mqa WHERE $this->where ORDER BY id", $this->params);
+        return $DB->get_records_sql(
+            "SELECT * FROM {mmogame_quiz_attempts} mqa WHERE $this->where ORDER BY id", $this->params);
     }
 
     /**
@@ -107,9 +108,8 @@ class overview_renderable implements renderable {
             $where .= ' AND mqa.numgame=?';
             $params[] = $numgame;
         }
-
         if ($auserid !== null && $auserid != 0) {
-            $where .= ' AND mqa.auserid=?';
+            $where .= ' AND auserid=?';
             $params[] = $auserid;
         }
 
@@ -133,17 +133,15 @@ class overview_renderable implements renderable {
         $ret = [ null => ''];
 
         if ($this->rgame->kinduser == 'moodle') {
-            $sql = "SELECT DISTINCT u.id as userid, u.lastname, u.firstname
+            $sql = "SELECT DISTINCT au.id as auserid, u.lastname, u.firstname
                 FROM {mmogame_quiz_attempts} mqa, {mmogame_aa_users} au, {user} u
-                WHERE $this->where
+                WHERE $this->where0
                 AND mqa.auserid = au.id AND au.instanceid = u.id
                 ORDER BY u.lastname, u.firstname, mqa.auserid";
             $recs = $DB->get_records_sql( $sql, $this->params0);
             foreach ($recs as $rec) {
-                $ret[$rec->userid] = $rec->lastname.' '.$rec->firstname;
+                $ret[$rec->auserid] = $rec->lastname.' '.$rec->firstname;
             }
-            print_r( $recs);
-            echo $sql;print_r( $this->params0);
         } else if ($this->rgame->kinduser == 'guid') {
             $sql = "SELECT DISTINCT auserid
                 FROM {mmogame_quiz_attempts} mqa
