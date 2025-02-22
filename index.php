@@ -42,6 +42,9 @@ $PAGE->set_url('/mod/mmogame/index.php', ['id' => $id]);
 $PAGE->set_title(get_string('modulenameplural', 'mod_mmogame'));
 $PAGE->set_heading($course->fullname);
 
+$params = ['context' => context_course::instance($id)];
+\mod_mmogame\event\course_module_instance_list_viewed::create($params)->trigger();
+
 // Get all instances of the module in the course.
 $instances = get_all_instances_in_course('mmogame', $course);
 

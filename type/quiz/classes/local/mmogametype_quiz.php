@@ -155,7 +155,7 @@ abstract class mmogametype_quiz extends mmogame {
      * @param stdClass $rgame
      * @param int $auserid
      */
-    public static function delete_auser(mmogame_database $db, stdClass $rgame, int $auserid): void {
+    public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void {
         $db->delete_records_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
     }
 }
