@@ -104,7 +104,7 @@ class provider implements
         $recs = $DB->get_records_select( 'mmogame_quiz_attempts',
             'mmogameid=? AND auserid=? AND numgame=?', [$mmogameid, $auserid, $numgame], 'id',
             'id,numattempt,queryid,useranswerid,useranswer,iscorrect,layout,timestart,timeclose,timeanswer,'.
-            'fraction,score, score2,iscorrect2');
+            'fraction, score, score2, iscorrect2');
         $i = 0;
         foreach ($recs as $rec) {
             $newpath = array_merge( $path,

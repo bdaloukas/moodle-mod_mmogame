@@ -24,19 +24,20 @@
 
 namespace mod_mmogame\privacy;
 
+use context;
+use core\context\module;
+use core_privacy\local\request\core_userlist_provider;
+use core_privacy\local\request\helper;
 use core_privacy\local\request\writer;
-use core_privacy\local\request\transform;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\approved_contextlist;
-use core_privacy\local\request\deletion_criteria;
 use core_privacy\local\metadata\collection;
 use core_privacy\manager;
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
 
@@ -50,7 +51,7 @@ use mod_mmogame\local\mmogame;
 class provider implements
     // This plugin has data.
     \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\core_userlist_provider,
+    core_userlist_provider,
 
     // This plugin currently implements the original plugin_provider interface.
     \core_privacy\local\request\plugin\provider {
@@ -61,20 +62,20 @@ class provider implements
     /**
      * Get the list of contexts that contain user information for the specified user.
      *
-     * @param   collection  $items  The collection to add metadata to.
+     * @param   collection  $collection  The collection to add metadata to.
      * @return  collection  The array of metadata
      */
-    public static function get_metadata(collection $items): collection {
+    public static function get_metadata(collection $collection): collection {
         // The table 'mmogame' stores a record for each mmogame.
         // It does not contain user personal data, but data is returned from it for contextual requirements.
 
-        $items->add_database_table('mmogame', [
+        $collection->add_database_table('mmogame', [
                 'type' => 'privacy:metadata:mmogame:type',
                 'model' => 'privacy:metadata:mmogame:model',
             ], 'privacy:metadata:mmogame');
 
         // The table 'mmogame_aa_grades' contains the current grade for each game/user combination.
-        $items->add_database_table('mmogame_aa_grades', [
+        $collection->add_database_table('mmogame_aa_grades', [
                 'numgame' => 'privacy:metadata:mmogame_grades:numgame',
                 'avatar' => 'privacy:metadata:mmogame_grades:avatar',
                 'nickname' => 'privacy:metadata:mmogame_grades:nickname',
@@ -91,7 +92,7 @@ class provider implements
                 'timemodified' => 'privacy:metadata:mmogame_grades:timemodified',
             ], 'privacy:metadata:mmogame_aa_grades');
 
-        return $items;
+        return $collection;
     }
 
     /**
@@ -129,8 +130,8 @@ class provider implements
      *
      * @param   approved_contextlist    $contextlist    The approved contexts to export information for.
      */
-    public static function export_user_data(approved_contextlist $contextlist) {
-        global $CFG, $DB;
+    public static function export_user_data(approved_contextlist $contextlist): void {
+        global $DB;
 
         if (!count($contextlist)) {
             return;
@@ -151,7 +152,7 @@ class provider implements
             INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
             INNER JOIN {mmogame_aa_grades} gg ON gg.mmogameid = cm.instance AND gg.auserid = :auserid
             INNER JOIN {mmogame} g ON gg.mmogameid=g.id
-            WHERE c.id {$contextsql}";
+            WHERE c.id $contextsql";
 
         $params = [
             'contextlevel' => CONTEXT_MODULE,
@@ -164,11 +165,11 @@ class provider implements
         // Fetch the individual games.
         $cms = $DB->get_recordset_sql($sql, $params);
         foreach ($cms as $cm) {
-            $context = context_module::instance( $cm->id);
+            $context = module::instance($cm->id);
 
-            $data = \core_privacy\local\request\helper::get_context_data($context, $contextlist->get_user());
+            $data = helper::get_context_data($context, $contextlist->get_user());
 
-            \core_privacy\local\request\helper::export_context_files($context, $contextlist->get_user());
+            helper::export_context_files($context, $contextlist->get_user());
 
             unset($data->accessdata);
             $data->type = $cm->type;
@@ -183,18 +184,18 @@ class provider implements
     /**
      * Export each numgame.
      *
-     * @param approved_contextlist $context    The approved contexts to export information for.
+     * @param module|false $context    The approved contexts to export information for.
      * @param int $mmogameid
      * @param int $auserid
      * @param string $type
      * @param string $model
      * @param array $path
      */
-    protected static function export_numgames($context, $mmogameid, $auserid, $type, $model, $path) {
+    protected static function export_numgames($context, int $mmogameid, int $auserid, string $type, string $model, array $path): void {
         global $DB;
 
-        $sql = "SELECT gg.id, gg.numgame, gg.nickname, gg.usercode, gg.sumscore, gg.score,
-            gg.sumscore2, gg.numteam, gg.timemodified, CONCAT( a.directory, '/', a.filename) as avatar,
+        $sql = "SELECT gg.id, gg.numgame, gg.nickname, gg.usercode, gg.sumscore,
+            gg.numteam, gg.timemodified, CONCAT( a.directory, '/', a.filename) as avatar,
             mc.color1, mc.color2, mc.color3, mc.color4, mc.color5
             FROM {mmogame_aa_grades} gg
             LEFT JOIN {mmogame_aa_avatars} a ON gg.avatarid = a.id
@@ -208,16 +209,16 @@ class provider implements
 
             manager::component_class_callback('mmogametype_'.$type, self::MMOGAMETYPE_INTERFACE,
                 'export_type_user_data',
-                [$context, $mmogameid, $model, $auserid, $rec->numgame, $newpath], $newpath);
+                [$context, $mmogameid, $model, $auserid, $rec->numgame, $newpath]);
         }
     }
 
     /**
      * Delete all data for all users in the specified context.
      *
-     * @param   context                 $context   The specific context to delete data for.
+     * @param context $context   The specific context to delete data for.
      */
-    public static function delete_data_for_all_users_in_context(\context $context) {
+    public static function delete_data_for_all_users_in_context(context $context) {
 
         if ($context->contextlevel != CONTEXT_MODULE) {
             // Only mmogame module will be handled.
@@ -240,7 +241,7 @@ class provider implements
      * @param   approved_contextlist    $contextlist    The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        $db = new \mmogame_database_moodle();
+        $db = new mmogame_database_moodle();
 
         foreach ($contextlist as $context) {
             if ($context->contextlevel != CONTEXT_MODULE) {
@@ -256,11 +257,11 @@ class provider implements
 
             // Fetch the details of the data to be removed.
             $user = $contextlist->get_user();
-            $auserid = \mmogame::get_auserid_from_db( $db, 'moodle', $user->id, false);
+            $auserid = mmogame::get_auserid_from_db( $db, 'moodle', $user->id, false);
             if ($auserid != 0) {
                 $rgame = $db->get_record_select( 'mmogame', 'id=?', [$cm->instance]);
                 // This will delete all attempts and mmogame grades for this mmogame.
-                \mmogame::delete_auser( $db, $rgame, $auserid);
+                mmogame::delete_auser( $db, $rgame, $auserid);
             }
         }
     }
@@ -273,7 +274,7 @@ class provider implements
     public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
 
-        if (!$context instanceof \context_module) {
+        if (!$context instanceof module) {
             return;
         }
 
@@ -303,7 +304,7 @@ class provider implements
      * @param   approved_userlist    $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        $db = new \mmogame_database_moodle();
+        $db = new mmogame_database_moodle();
 
         $context = $userlist->get_context();
         if ($context->contextlevel != CONTEXT_MODULE) {
