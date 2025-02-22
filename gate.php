@@ -46,7 +46,7 @@ $color = $DB->get_record_select( 'mmogame_aa_colorpalettes', 'id=?', [2]);
 $colors = '['.$color->color1.', '.$color->color2.', '.$color->color3.', '.$color->color4.', '.$color->color5.']';
 
 if (! $rgame = $DB->get_record('mmogame', ['id' => $cm->instance, 'pin' => $pin])) {
-    throw new moodle_exception('ivalid_mmogame_or_pin', 'error', '', $cm->instance);
+    throw new moodle_exception('invalid_mmogame_or_pin', 'error', '', $cm->instance);
 }
 $context = context_module::instance( $cm->id);
 if ($rgame->kinduser == 'moodle' ) {

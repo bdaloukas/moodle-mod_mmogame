@@ -49,7 +49,7 @@ echo $OUTPUT->header();
 
 // Display the module list.
 if (!$instances) {
-    echo $OUTPUT->notification(get_string('noinstances', 'mod_mmogame'));
+    echo $OUTPUT->notification(get_string('index_error_noinstances', 'mod_mmogame'));
 } else {
     $table = new html_table();
     $table->head = [
