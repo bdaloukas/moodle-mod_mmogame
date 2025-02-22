@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_mmogame\event\course_module_instance_list_viewed;
+
 require_once(__DIR__ . '/../../config.php');
 
 $id = required_param('id', PARAM_INT); // Course ID.
@@ -32,18 +34,17 @@ if (!$course = $DB->get_record('course', ['id' => $id])) {
 }
 
 // Require login to the course.
-require_login($course);
-
-$context = context_course::instance($course->id);
-require_capability('mod/mmogame:view', $context);
+require_course_login($course, true);
 
 // Set up the page.
 $PAGE->set_url('/mod/mmogame/index.php', ['id' => $id]);
 $PAGE->set_title(get_string('modulenameplural', 'mod_mmogame'));
 $PAGE->set_heading($course->fullname);
 
-$params = ['context' => context_course::instance($id)];
-\mod_mmogame\event\course_module_instance_list_viewed::create($params)->trigger();
+// Trigger instances list viewed event.
+$event = \mod_page\event\course_module_instance_list_viewed::create(array('context' => context_course::instance($course->id)));
+$event->add_record_snapshot('course', $course);
+$event->trigger();
 
 // Get all instances of the module in the course.
 $instances = get_all_instances_in_course('mmogame', $course);
