@@ -226,7 +226,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         if (this.area === undefined) {
-            this.createArea(this.areaRect.top, 0);
+            this.createArea(this.areaRect.top, this.areaRect.bottom);
         }
 
         const nicknameWidth = 2 * this.iconSize + this.padding;

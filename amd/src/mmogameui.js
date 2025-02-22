@@ -577,6 +577,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 top: top,
                 width: this.area.offsetWidth,
                 height: this.area.offsetHeight,
+                bottom: bottomSpace,
             };
         }
 

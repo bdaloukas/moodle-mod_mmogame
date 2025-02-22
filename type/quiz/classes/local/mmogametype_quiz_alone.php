@@ -84,6 +84,13 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     }
 
     /**
+     * Creates the files of state.
+     */
+    public function refresh_state(): void {
+        $this->set_state($this->get_state());
+    }
+
+    /**
      * Processes the user's answer for a quiz question, with optional auto-grading and statistics updates.
      *
      * @param stdClass $attempt
