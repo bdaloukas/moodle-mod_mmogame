@@ -139,11 +139,6 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @param stdClass $defaultvalues
      */
     public function data_preprocessing(&$defaultvalues): void {
-        if (isset($toform['grade'])) {
-            // Convert to a real number, so we don't get 0.0000.
-            $defaultvalues['grade'] = $toform['grade'] + 0;
-        }
-
         // Completion settings check.
         if (empty($defaultvalues['completionusegrade'])) {
             $defaultvalues['completionpass'] = 0; // Forced unchecked.
@@ -208,14 +203,6 @@ class mod_mmogame_mod_form extends moodleform_mod {
 
         $courseid = $COURSE->id;
         $context = context_course::instance( $courseid);
-
-        $qtypes = '';
-        $qtypes .= ($qtypes != '' ? ' OR ' : '').'qtype = "shortanswer"';
-        $qtypes .= ($qtypes != '' ? ' OR ' : '').'qtype = "multichoice"';
-
-        if ($qtypes == '') {
-            return null;
-        }
 
         $a = [];
         $table = "{question} q, {qtype_multichoice_options} qmo";
