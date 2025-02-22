@@ -55,7 +55,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @throws coding_exception
      * @throws dml_exception
      */
-    protected function definition() {
+    protected function definition(): void {
         global $CFG;
         $mform = $this->_form;
 
@@ -104,7 +104,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @param object $mform
      * @throws coding_exception
      */
-    protected function definition_models(object $mform) {
+    protected function definition_models(object $mform): void {
         $types = mmogame_get_types();
         $dir = __DIR__.'/type';
         $models = [];
@@ -115,11 +115,6 @@ class mod_mmogame_mod_form extends moodleform_mod {
             foreach ($map as $model => $value) {
                 $models[$type.'-'.$model] = $value;
             }
-        }
-
-        $options = [];
-        foreach ($models as $model => $title) {
-            $options[$model] = $title;
         }
 
         $mform->addElement('select', 'typemodel', get_string('type', 'mmogame'), $models);
@@ -143,7 +138,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      *
      * @param stdClass $defaultvalues
      */
-    public function data_preprocessing(&$defaultvalues) {
+    public function data_preprocessing(&$defaultvalues): void {
         if (isset($toform['grade'])) {
             // Convert to a real number, so we don't get 0.0000.
             $defaultvalues['grade'] = $toform['grade'] + 0;
@@ -208,7 +203,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @return bool|array of question categories
      * @throws dml_exception
      */
-    public function get_array_question_categories() {
+    public function get_array_question_categories(): ?array {
         global $DB, $COURSE;
 
         $courseid = $COURSE->id;
@@ -219,7 +214,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $qtypes .= ($qtypes != '' ? ' OR ' : '').'qtype = "multichoice"';
 
         if ($qtypes == '') {
-            return false;
+            return null;
         }
 
         $a = [];
@@ -243,7 +238,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      *
      * @param object $defaultvalues
      */
-    public function set_data($defaultvalues) {
+    public function set_data($defaultvalues): void {
         $mmogameid = isset( $defaultvalues->id) ? intval($defaultvalues->id) : 0;
 
         if (isset( $defaultvalues->type) && isset( $defaultvalues->model)) {
@@ -268,7 +263,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
      *
      * @param object $defaultvalues
      */
-    public function set_data_categories(object $defaultvalues) {
+    public function set_data_categories(object $defaultvalues): void {
         if (!isset( $defaultvalues->instance)) {
             $defaultvalues->instance = 0;
         }
