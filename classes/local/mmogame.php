@@ -596,11 +596,25 @@ abstract class mmogame {
      * @param stdClass $rgame
      * @param int $auserid
      */
-    public static function delete_auser(mmogame_database $db, stdClass $rgame, int $auserid): void {
-        $db->delete_records_select( 'mmogame_aa_grades', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
-        $db->delete_records_select( 'mmogame_aa_stats', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
-        $db->delete_records_select( 'mmogame_am_aduel_pairs',
-            'mmogameid = ? AND (auserid1=? OR auserid2=?)', [$rgame->id, $auserid, $auserid]);
+    public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void {
+        $select = 'mmogameid=?';
+        $params = [$rgame->id];
+
+        if ($auserid !== null) {
+            $select .= ' AND mmogameid=? AND auserid=?';
+            $params[] = $auserid;
+        }
+
+        $db->delete_records_select( 'mmogame_aa_grades', $select, $params);
+        $db->delete_records_select( 'mmogame_aa_stats', $select, $params);
+
+        $select = 'mmogameid=?'.( $auserid !== null ? ' AND (auserid1=? OR auserid2=?)' : '');
+        $params[] = $rgame->id;
+        if ($auserid !== null) {
+            $params[] = $auserid;
+            $params[] = $auserid;
+        }
+        $db->delete_records_select( 'mmogame_am_aduel_pairs', $select, $params);
 
         require_once( 'type/'.$rgame->type.'/'.$rgame->type.'.php');
         $class = 'mmogame_'.$rgame->type;

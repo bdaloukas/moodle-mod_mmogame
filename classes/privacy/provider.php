@@ -36,8 +36,9 @@ use core_privacy\manager;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/mmogame/database/moodle.php');
-require_once($CFG->dirroot . '/mod/mmogame/mmogame.php');
+use mod_mmogame\local\database\mmogame_database;
+use mod_mmogame\local\database\mmogame_database_moodle;
+use mod_mmogame\local\mmogame;
 
 /**
  * Privacy Subsystem implementation for mod_mmogame.
@@ -230,7 +231,7 @@ class provider implements
         }
 
         // This will delete all attempts and mmogame grades for this game.
-        mmogame::delete_auser( new \mmogame_database_moodle(), $cm->instance, $auserid);
+        mmogame::delete_auser( new mmogame_database_moodle(), $cm->instance, null);
     }
 
     /**
@@ -310,7 +311,7 @@ class provider implements
         }
         $cm = get_coursemodule_from_id('mmogame', $context->instanceid);
 
-        $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$cm->instance]);
+        $rgame = $db->get_record_select( 'mmogame', 'id=?', [$cm->instance]);
 
         $userids = $userlist->get_userids();
         foreach ($userids as $userid) {
