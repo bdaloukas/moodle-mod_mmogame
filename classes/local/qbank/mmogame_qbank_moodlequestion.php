@@ -123,11 +123,11 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @param array $ret
      * @param string $num
      * @param int $id
-     * @param string $layout
+     * @param ?string $layout
      * @param bool $fillconcept
      * @return stdClass
      */
-    public function load_json(mmogame $mmogame, array &$ret, string $num, int $id, string $layout, bool $fillconcept): stdClass {
+    public function load_json(mmogame $mmogame, array &$ret, string $num, int $id, ?string $layout, bool $fillconcept): stdClass {
         $rec = $this->load( $id);
 
         $ret['qtype'.$num] = $rec->qtype;
