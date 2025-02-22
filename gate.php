@@ -28,8 +28,6 @@
 
 use mod_mmogame\event\course_module_played;
 
-define('NO_MOODLE_COOKIES', true);
-
 require( "../../config.php");
 
 global $CFG, $DB, $USER, $OUTPUT, $PAGE;
@@ -42,9 +40,7 @@ $PAGE->set_context(context_system::instance());
 $id = required_param('id', PARAM_INT);
 $pin = required_param('pin', PARAM_INT);
 
-if (! $cm = get_coursemodule_from_id('mmogame', $id)) {
-    throw new moodle_exception('invalidcoursemoduleid', 'error', '', null, $id);
-}
+list ($course, $cm) = get_course_and_cm_from_cmid($id, 'mmogame');
 
 $color = $DB->get_record_select( 'mmogame_aa_colorpalettes', 'id=?', [2]);
 $colors = '['.$color->color1.', '.$color->color2.', '.$color->color3.', '.$color->color4.', '.$color->color5.']';
@@ -52,16 +48,15 @@ $colors = '['.$color->color1.', '.$color->color2.', '.$color->color3.', '.$color
 if (! $rgame = $DB->get_record('mmogame', ['id' => $cm->instance, 'pin' => $pin])) {
     throw new moodle_exception('ivalid_mmogame_or_pin', 'error', '', $cm->instance);
 }
-
 $context = context_module::instance( $cm->id);
+if ($rgame->kinduser == 'moodle' ) {
+    require_login($course, true, $cm);
+}
 
 require_capability('mod/mmogame:play', $context);
 
 course_module_played::played($rgame, $context)->trigger();
 
-if ($rgame->kinduser == 'moodle' ) {
-    require_login();
-}
 $user = $rgame->kinduser == 'moodle' ? $USER->id : '';
 
 $PAGE->requires->strings_for_js(

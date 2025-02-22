@@ -133,15 +133,17 @@ class overview_renderable implements renderable {
         $ret = [ null => ''];
 
         if ($this->rgame->kinduser == 'moodle') {
-            $sql = "SELECT DISTINCT a.auserid, u.lastname, u.firstname
-                FROM {mmogame_quiz_attempts} mqa, {mmomgame_aa_users} u
-                WHERE $this->where0
-                AND mqa.userid = u.instanceid
+            $sql = "SELECT DISTINCT u.id as userid, u.lastname, u.firstname
+                FROM {mmogame_quiz_attempts} mqa, {mmogame_aa_users} au, {user} u
+                WHERE $this->where
+                AND mqa.auserid = au.id AND au.instanceid = u.id
                 ORDER BY u.lastname, u.firstname, mqa.auserid";
             $recs = $DB->get_records_sql( $sql, $this->params0);
             foreach ($recs as $rec) {
                 $ret[$rec->userid] = $rec->lastname.' '.$rec->firstname;
             }
+            print_r( $recs);
+            echo $sql;print_r( $this->params0);
         } else if ($this->rgame->kinduser == 'guid') {
             $sql = "SELECT DISTINCT auserid
                 FROM {mmogame_quiz_attempts} mqa
