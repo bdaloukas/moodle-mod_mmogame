@@ -407,7 +407,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }
 
             if (rank !== '') {
-                player.lblRank.innerHTML = `# ${rank}`;
+                player.lblRank.innerHTML = `#${rank}`;
                 this.autoResizeText(player.lblRank, player.cellSize, player.cellSize, false, 0, 0);
             } else {
                 player.lblRank.innerHTML = '';
@@ -554,7 +554,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     // Remove extension, fallback if no extension
                     s = filenameWithExt.split('.').slice(0, -1).join('.') || filenameWithExt;
                 }
-
                 s = this.repairNickname(s);
                 player.nicknameElement.innerHTML = s;
                 player.nicknameElement.style.textAlign = "center";

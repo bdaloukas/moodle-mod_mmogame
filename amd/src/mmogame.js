@@ -250,10 +250,6 @@ define([''], function() {
             return button;
         }
 
-        hasHelp() {
-            return false;
-        }
-
         /**
          * Clear all children of the <body> element.
          */

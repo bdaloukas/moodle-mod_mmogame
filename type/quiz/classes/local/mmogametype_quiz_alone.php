@@ -66,7 +66,28 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             return $attempt;
         }
 
-        return $this->get_attempt_new_internal(0, 0, 0, 0);
+        $countquestions = 0;
+        $a = $this->qbank->get_attempt_new( 1, true, $countquestions);
+        if ($a === null) {
+            $this->set_errorcode( ERRORCODE_NO_QUERIES);
+            return null;
+        }
+
+        // Update field countquestions in table mmogame_aa_grades.
+        $grade = $this->db->get_record_select( 'mmogame_aa_grades',
+            'mmogameid=? AND numgame=? AND auserid=?',
+            [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
+        if ($grade !== null) {
+            $this->db->update_record( 'mmogame_aa_grades',
+                ['id' => $grade->id, 'countquestions' => $countquestions]);
+        }
+
+        $a['numattempt'] = $this->compute_next_numattempt();
+        $a['timestart'] = time();
+
+        // Insert data to mmogame_quiz_attempts table.
+        $id = $this->db->insert_record( 'mmogame_quiz_attempts', $a);
+        return $this->db->get_record_select( 'mmogame_quiz_attempts', 'id=?', [$id]);
     }
 
     /**
@@ -81,13 +102,6 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         $filecontents = '';
 
         $this->save_state($state, $statecontents, $filecontents, $timefastjson);
-    }
-
-    /**
-     * Creates the files of state.
-     */
-    public function refresh_state(): void {
-        $this->set_state($this->get_state());
     }
 
     /**
@@ -148,7 +162,6 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                     } else if ($attempt->iscorrect == 0 && $stat->islastcorrect) {
                         $mul = -1;
                     }
-
                     if ($mul !== 0) {
                         $this->db->update_record( 'mmogame_aa_grades',
                             ['id' => $stat->gradeid, 'percent' => $stat->percent + $mul / $stat->countquestions]);

@@ -22,9 +22,11 @@ use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
 
+use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use required_capability_exception;
 
 /**
  * External function for starting a new attempt or continuing the last attempt.
@@ -55,6 +57,8 @@ class get_highscore extends external_api {
      * @param string $user
      * @param int $count
      * @return string
+     * @throws restricted_context_exception
+     * @throws required_capability_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
      */

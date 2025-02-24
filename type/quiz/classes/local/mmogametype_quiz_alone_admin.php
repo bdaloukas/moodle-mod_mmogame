@@ -26,6 +26,8 @@
 
 namespace mmogametype_quiz\local;
 
+use moodleform;
+
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
@@ -39,7 +41,7 @@ require_once($CFG->libdir.'/formslib.php');
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mmogametype_quiz_alone_admin extends \moodleform {
+class mmogametype_quiz_alone_admin extends moodleform {
     /** @var int $_id: the course_module id. */
     protected int $_id;
 

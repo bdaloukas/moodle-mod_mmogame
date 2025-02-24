@@ -839,5 +839,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.divMessageBackground = undefined;
             }
         }
+
+        hasHelp() {
+            return false;
+        }
     };
 });

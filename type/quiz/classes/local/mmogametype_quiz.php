@@ -54,41 +54,6 @@ abstract class mmogametype_quiz extends mmogame {
     }
 
     /**
-     * Creates a new attempt
-     *
-     * @param ?int $queryid
-     * @param int $timelimit
-     * @param int $numattempt
-     * @param int $timeclose
-     * @return ?stdClass (the new attempt or false if no attempt)
-     */
-    protected function get_attempt_new_internal(?int $queryid, int $timelimit, int $numattempt, int $timeclose): ?stdClass {
-        $table = 'mmogame_quiz_attempts';
-        if ($queryid === 0) {
-            $query = null;
-        } else {
-            $query = $this->qbank->load( $queryid);
-        }
-
-        $a = $this->qbank->get_attempt_new( 1, true, $query);
-        if ($a === null) {
-            $this->set_errorcode( ERRORCODE_NO_QUERIES);
-            return null;
-        }
-        $a['numattempt'] = $numattempt == 0 ? $this->compute_next_numattempt() : $numattempt;
-        $a['timestart'] = time();
-        if ($timeclose != 0) {
-            $a['timeclose'] = $timeclose;
-        } else if ($timelimit != 0) {
-            $a['timelimit'] = $timelimit;
-            $a['timestart'] = $a['timestart'] + $timelimit;
-        }
-        $id = $this->db->insert_record( $table, $a);
-
-        return $this->db->get_record_select( $table, 'id=?', [$id]);
-    }
-
-    /**
      * Saves to array $ret information about the $attempt.
      *
      * @param array $ret (returns info about the current attempt)
@@ -153,7 +118,7 @@ abstract class mmogametype_quiz extends mmogame {
      *
      * @param mmogame_database $db
      * @param stdClass $rgame
-     * @param int $auserid
+     * @param ?int $auserid
      */
     public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void {
         $db->delete_records_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);

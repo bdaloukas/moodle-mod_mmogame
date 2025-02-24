@@ -34,7 +34,7 @@ if (!$course = $DB->get_record('course', ['id' => $id])) {
 }
 
 // Require login to the course.
-require_course_login($course, true);
+require_course_login($course);
 
 // Set up the page.
 $PAGE->set_url('/mod/mmogame/index.php', ['id' => $id]);
@@ -42,7 +42,7 @@ $PAGE->set_title(get_string('modulenameplural', 'mod_mmogame'));
 $PAGE->set_heading($course->fullname);
 
 // Trigger instances list viewed event.
-$event = \mod_page\event\course_module_instance_list_viewed::create(array('context' => context_course::instance($course->id)));
+$event = course_module_instance_list_viewed::create(['context' => context_course::instance($course->id)]);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 

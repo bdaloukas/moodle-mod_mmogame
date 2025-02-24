@@ -51,19 +51,17 @@ abstract class mmogame_qbank {
      *
      * @param int $count
      * @param bool $usenumattempt
-     * @param ?array $queries
+     * @param int $countquestions
      * @return ?array
      */
-    public function get_attempt_new(int $count, bool $usenumattempt, ?array $queries): ?array {
+    public function get_attempt_new(int $count, bool $usenumattempt, int &$countquestions): ?array {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
         $auserid = $this->mmogame->get_auserid();
 
+        $queries = $this->get_queries( $auserid, null, $count, $countquestions);
         if ($queries === null) {
-            $queries = $this->get_queries( $auserid, 0, $count);
-            if ($queries === null) {
-                return null;
-            }
+            return null;
         }
 
         if ($usenumattempt) {
@@ -98,13 +96,14 @@ abstract class mmogame_qbank {
      * Returns the id of selected queries.
      *
      * @param int $auserid
-     * @param int $numteam
+     * @param ?int $numteam
      * @param int $count (how many queries they want)
-     *
+     * @param int $countquestions return the count of questions
      * @return ?array of int or false if no queries found.
      */
-    protected function get_queries(int $auserid, int $numteam, int $count): ?array {
+    protected function get_queries(int $auserid, ?int $numteam, int $count, int &$countquestions): ?array {
         $ids = $this->get_queries_ids();
+        $countquestions = count( $ids );
         if ($ids === false) {
             return null;
         }
@@ -112,7 +111,7 @@ abstract class mmogame_qbank {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
 
-        if ($numteam == 0) {
+        if ($numteam === null) {
             $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=?',
                 [$rgame->id, $rgame->numgame, $auserid], '', 'queryid,countused,countcorrect,counterror');
         } else {
@@ -241,16 +240,14 @@ abstract class mmogame_qbank {
         if ($rec !== null) {
             $a = ['id' => $rec->id];
             if ($isused) {
-                $a['countused'] = $rec->countused + $isused;
+                $a['countused'] = $rec->countused + 1;
             }
             if ($iscorrect) {
-                $rec->countcorrect += $iscorrect;
-                $a['countcorrect'] = $rec->countcorrect;
+                $a['countcorrect'] = ++$rec->countcorrect;
                 $a['islastcorrect'] = 1;
             }
             if ($iserror) {
-                $rec->counterror += $iserror;
-                $a['counterror'] = $rec->counterror;
+                $a['counterror'] = ++$rec->counterror;
                 $a['timeerror'] = time();
                 $a['islastcorrect'] = 0;
             }
@@ -264,12 +261,12 @@ abstract class mmogame_qbank {
             }
             $db->update_record( 'mmogame_aa_stats', $a);
         } else {
-            $count = $iscorrect + $iserror;
-            $percent = $count == 0 ? null : $iscorrect / $count;
+            $count = $iscorrect + ($iserror ? 1 : 0);
+            $percent = $count == 0 ? null : ($iscorrect ? 1 : 0) / $count;
             $a = ['mmogameid' => $rgame->id,
                 'numgame' => $rgame->numgame, 'queryid' => $queryid != 0 ? $queryid : null, 'auserid' => $auserid,
-                'numteam' => $numteam != 0 ? $numteam : null, 'percent' => $percent, 'countused' => $isused,
-                'countcorrect' => $iscorrect, 'counterror' => $iserror, 'islastcorrect' => $iscorrect, ];
+                'numteam' => $numteam != 0 ? $numteam : null, 'percent' => $percent, 'countused' => $isused ? 1 : 0,
+                'countcorrect' => $iscorrect ? 1 : 0, 'counterror' => $iserror ? 1 : 0, 'islastcorrect' => $iscorrect ? 1 : 0, ];
             if ($values !== null) {
                 foreach ($values as $key => $value) {
                     $a[$key] = $value;

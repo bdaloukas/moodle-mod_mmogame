@@ -22,9 +22,11 @@ use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
 
+use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use required_capability_exception;
 
 /**
  * External function for saving the answer of each question.
@@ -62,6 +64,8 @@ class set_answer extends external_api {
      * @param int|null $answerid
      * @param string $subcommand
      * @return string
+     * @throws restricted_context_exception
+     * @throws required_capability_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
      */

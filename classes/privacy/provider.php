@@ -24,6 +24,7 @@
 
 namespace mod_mmogame\privacy;
 
+use coding_exception;
 use context;
 use core\context\module;
 use core_privacy\local\request\core_userlist_provider;
@@ -38,6 +39,7 @@ use core_privacy\manager;
 
 defined('MOODLE_INTERNAL') || die();
 
+use dml_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
 
@@ -128,7 +130,9 @@ class provider implements
     /**
      * Write out the user data filtered by contexts.
      *
-     * @param   approved_contextlist    $contextlist    The approved contexts to export information for.
+     * @param approved_contextlist $contextlist The approved contexts to export information for.
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public static function export_user_data(approved_contextlist $contextlist): void {
         global $DB;
@@ -184,14 +188,16 @@ class provider implements
     /**
      * Export each numgame.
      *
-     * @param module|false $context    The approved contexts to export information for.
+     * @param module|false $context The approved contexts to export information for.
      * @param int $mmogameid
      * @param int $auserid
      * @param string $type
      * @param string $model
      * @param array $path
+     * @throws dml_exception
      */
-    protected static function export_numgames($context, int $mmogameid, int $auserid, string $type, string $model, array $path): void {
+    protected static function export_numgames($context, int $mmogameid, int $auserid,
+                                              string $type, string $model, array $path): void {
         global $DB;
 
         $sql = "SELECT gg.id, gg.numgame, gg.nickname, gg.usercode, gg.sumscore,
@@ -216,7 +222,8 @@ class provider implements
     /**
      * Delete all data for all users in the specified context.
      *
-     * @param context $context   The specific context to delete data for.
+     * @param context $context The specific context to delete data for.
+     * @throws coding_exception
      */
     public static function delete_data_for_all_users_in_context(context $context) {
 
@@ -238,7 +245,9 @@ class provider implements
     /**
      * Delete all user data for the specified user, in the specified contexts.
      *
-     * @param   approved_contextlist    $contextlist    The approved contexts and user information to delete information for.
+     * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         $db = new mmogame_database_moodle();
@@ -301,7 +310,9 @@ class provider implements
     /**
      * Delete multiple users within a single context.
      *
-     * @param   approved_userlist    $userlist The approved context and user information to delete information for.
+     * @param approved_userlist $userlist The approved context and user information to delete information for.
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
         $db = new mmogame_database_moodle();
