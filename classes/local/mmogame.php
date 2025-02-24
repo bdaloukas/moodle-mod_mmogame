@@ -595,7 +595,7 @@ abstract class mmogame {
      *
      * @param mmogame_database $db
      * @param stdClass $rgame
-     * @param int $auserid
+     * @param ?int $auserid
      */
     public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void {
         $select = 'mmogameid=?';

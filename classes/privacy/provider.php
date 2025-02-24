@@ -37,8 +37,6 @@ use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\metadata\collection;
 use core_privacy\manager;
 
-defined('MOODLE_INTERNAL') || die();
-
 use dml_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
