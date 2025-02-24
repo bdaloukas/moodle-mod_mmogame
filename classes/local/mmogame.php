@@ -465,9 +465,8 @@ abstract class mmogame {
     public function get_avatars(int $auserid): array {
         $info = $this->get_avatar_info( $auserid);
 
-        $where = 'ishidden = 0 AND '.
-            "id NOT IN (SELECT avatarid ".
-            "FROM {mmogame_aa_grades} WHERE mmogameid=? AND numgame=? AND auserid<>?)";
+        $where = "id NOT IN (SELECT avatarid
+            FROM {mmogame_aa_grades} WHERE mmogameid=? AND numgame=? AND auserid<>?)";
         $grades = $this->db->get_records_select( 'mmogame_aa_avatars', $where,
             [$this->rgame->id, $info->numgame, $info->auserid]);
         $ret = [];

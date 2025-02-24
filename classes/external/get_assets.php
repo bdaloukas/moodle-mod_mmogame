@@ -24,9 +24,11 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 
-use invalid_parameter_exception;
+use core_external\restricted_context_exception;
+use invalid_parameter_exception as invalid_parameter_exceptionAlias;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use required_capability_exception;
 
 /**
  * External function to get the list of avatars and color palettes.
@@ -60,8 +62,11 @@ class get_assets extends external_api {
      * @param int $avatars
      * @param int $colorpalettes
      * @return array
+     * @throws restricted_context_exception
+     * @throws required_capability_exception
      * @throws coding_exception
-     * @throws invalid_parameter_exception
+     * @throws invalid_parameter_exceptionAlias
+     * @throws coding_exception
      */
     public static function execute(int $mmogameid, string $kinduser, string $user, int $avatars = 0,
                                    int $colorpalettes = 0): array {
@@ -73,7 +78,6 @@ class get_assets extends external_api {
             'avatars' => $avatars ?? 0,
             'colorpalettes' => $colorpalettes ?? 0,
         ]);
-
         // Perform security checks.
         $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
         $context = module::instance($cm->id);
@@ -84,17 +88,14 @@ class get_assets extends external_api {
 
         $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
         $auserid = mmogame::get_asuerid( $mmogame->get_db(), $kinduser, $user, true);
-
         // Generate avatars array if avatars > 0.
         if ($avatars > 0) {
             self::compute_avatars($mmogame, $auserid, $avatars, $result);
         }
-
         // Generate colorpalettes array if colorpalettes > 0.
         if ($colorpalettes > 0) {
             self::compute_colorpalettes($mmogame, $colorpalettes, $result);
         }
-
         return $result;
     }
 
@@ -139,9 +140,7 @@ class get_assets extends external_api {
      */
     private static function compute_avatars(mmogame $mmogame, int $auserid, int $count, array &$result): void {
         $info = $mmogame->get_avatar_info( $auserid);
-
         $a = $mmogame->get_avatars( $auserid);
-
         $avatars = $ids = [];
 
         if ($info->avatarid != 0 && array_key_exists( $info->avatarid, $avatars)) {

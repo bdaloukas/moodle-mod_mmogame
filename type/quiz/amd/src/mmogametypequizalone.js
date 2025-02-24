@@ -153,6 +153,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 window.document.title = json.name;
             }
 
+            const nicknameWidth = 2 * this.iconSize + this.padding;
+            const nicknameHeight = this.iconSize / 3;
+
             // Update game state
             this.state = parseInt(json.state, 10);
             if (this.state === 0) {
@@ -161,6 +164,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                     this.setColorsString(json.colors);
                     this.createIconBar();
                 }
+                this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
                 this.showScore(json);
                 this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                 this.sendFastJSON(); // Send fast JSON updates
@@ -187,8 +191,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 return;
             }
 
-            const nicknameWidth = 2 * this.iconSize + this.padding;
-            const nicknameHeight = this.iconSize / 3;
             this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
             this.attempt = json.attempt;
 
