@@ -105,7 +105,6 @@ function xmldb_mmogame_install_avatars() {
     $dir = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'avatars';
     $d = dir( $dir);
 
-    $map = [];
     while (false !== ($entry = $d->read())) {
         if (substr( $entry, 0, 1) != '.') {
             $d2 = dir( $dir.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$entry);
@@ -116,7 +115,6 @@ function xmldb_mmogame_install_avatars() {
                 $rec = $DB->get_record_select( 'mmogame_aa_avatars', 'directory=? AND filename=?',
                     [$entry, $entry2]);
                 if ($rec != false) {
-                    $map[$rec->id] = $rec->id;
                     continue;
                 }
                 $rec = new stdClass();
@@ -124,21 +122,10 @@ function xmldb_mmogame_install_avatars() {
                 $rec->filename = $entry2;
                 $rec->numused = 0;
                 $rec->randomkey = mt_rand();
-                $id = $DB->insert_record( 'mmogame_aa_avatars', $rec);
-                $map[$id] = $id;
+                $DB->insert_record( 'mmogame_aa_avatars', $rec);
             }
             $d2->close();
         }
     }
     $d->close();
-
-    $recs = $DB->get_records_select( 'mmogame_aa_avatars', '');
-    foreach ($recs as $rec) {
-        if (!array_key_exists( $rec->id, $map)) {
-            $updrec = new stdClass();
-            $updrec->id = $rec->id;
-            $updrec->ishidden = 1;
-            $DB->update_record( 'mmogame_aa_avatars', $updrec);
-        }
-    }
 }

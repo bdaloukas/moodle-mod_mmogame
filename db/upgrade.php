@@ -661,5 +661,16 @@ function xmldb_mmogame_upgrade( $oldversion) {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
+    if ($oldversion < ($ver = 2025022400)) {
+        $table = new xmldb_table('mmogame_aa_avatars');
+        $field = new xmldb_field('ishidden');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }

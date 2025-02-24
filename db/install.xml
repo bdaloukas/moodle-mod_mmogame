@@ -51,7 +51,6 @@
         <FIELD NAME="filename" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numused" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="randomkey" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-		<FIELD NAME="ishidden" TYPE="int" LENGTH="1" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -169,8 +168,6 @@
         <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="state" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="param1" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="remark" TYPE="TEXT" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param2" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

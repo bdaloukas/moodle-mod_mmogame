@@ -51,7 +51,7 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
 
         $states = new backup_nested_element('states');
         $state = new backup_nested_element('state', ['id'],
-            ['numgame', 'state', 'param1', 'remark', 'param2']);
+            ['numgame', 'state', 'param1']);
 
         $pairs = new backup_nested_element('aduel_pairs');
         $pair = new backup_nested_element('aduel_pair', ['id'],
