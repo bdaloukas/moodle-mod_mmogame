@@ -459,16 +459,18 @@ abstract class mmogame {
     /**
      * Returns the available avatars for user auserid.
      *
-     * @param int $auserid
+     * @param ?int $auserid
      * @return array
      */
-    public function get_avatars(int $auserid): array {
-        $info = $this->get_avatar_info( $auserid);
-
-        $where = "id NOT IN (SELECT avatarid
-            FROM {mmogame_aa_grades} WHERE mmogameid=? AND numgame=? AND auserid<>?)";
-        $grades = $this->db->get_records_select( 'mmogame_aa_avatars', $where,
-            [$this->rgame->id, $info->numgame, $info->auserid]);
+    public function get_avatars(?int $auserid): array {
+        $where = '';
+        $params = [$this->rgame->id, $this->rgame->numgame];
+        if ($auserid !== null ) {
+            $where = "id NOT IN (SELECT avatarid
+                FROM {mmogame_aa_grades} WHERE mmogameid=? AND numgame=? AND auserid<>?)";
+            $params[] = $auserid;
+        }
+        $grades = $this->db->get_records_select( 'mmogame_aa_avatars', $where, $params);
         $ret = [];
         foreach ($grades as $grade) {
             $ret[$grade->id] = $grade->directory.'/'.$grade->filename;

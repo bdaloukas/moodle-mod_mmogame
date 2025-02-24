@@ -87,7 +87,7 @@ class get_assets extends external_api {
         $result = [];
 
         $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid( $mmogame->get_db(), $kinduser, $user, true);
+        $auserid = mmogame::get_asuerid( $mmogame->get_db(), $kinduser, $user, false);
         // Generate avatars array if avatars > 0.
         if ($avatars > 0) {
             self::compute_avatars($mmogame, $auserid, $avatars, $result);
@@ -133,17 +133,17 @@ class get_assets extends external_api {
      * Returns a list of avatars and corresponding id
      *
      * @param mmogame $mmogame
-     * @param int $auserid
+     * @param ?int $auserid
      * @param int $count
      * @param array $result
      * @return void
      */
-    private static function compute_avatars(mmogame $mmogame, int $auserid, int $count, array &$result): void {
-        $info = $mmogame->get_avatar_info( $auserid);
+    private static function compute_avatars(mmogame $mmogame, ?int $auserid, int $count, array &$result): void {
+        $info = $auserid !== null ? $mmogame->get_avatar_info( $auserid) : null;
         $a = $mmogame->get_avatars( $auserid);
         $avatars = $ids = [];
 
-        if ($info->avatarid != 0 && array_key_exists( $info->avatarid, $avatars)) {
+        if ($info !== null && $info->avatarid != 0 && array_key_exists( $info->avatarid, $avatars)) {
             $avatars[] = $avatars[$info->avatarid];
             $ids[] = $info->avatarid;
             unset( $avatars[$info->avatarid]);
