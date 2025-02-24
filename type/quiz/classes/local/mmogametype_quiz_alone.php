@@ -66,8 +66,8 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             return $attempt;
         }
 
-        $countquestions = 0;
-        $a = $this->qbank->get_attempt_new( 1, true, $countquestions);
+        $countquestions = $corrects = 0;
+        $a = $this->qbank->get_attempt_new( 1, true, $countquestions, $corrects);
         if ($a === null) {
             $this->set_errorcode( ERRORCODE_NO_QUERIES);
             return null;
@@ -79,7 +79,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
         if ($grade !== null) {
             $this->db->update_record( 'mmogame_aa_grades',
-                ['id' => $grade->id, 'countquestions' => $countquestions]);
+                ['id' => $grade->id, 'countquestions' => $countquestions, 'percent' => $corrects / $countquestions]);
         }
 
         $a['numattempt'] = $this->compute_next_numattempt();

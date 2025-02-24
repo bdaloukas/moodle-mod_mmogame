@@ -52,14 +52,15 @@ abstract class mmogame_qbank {
      * @param int $count
      * @param bool $usenumattempt
      * @param int $countquestions
+     * @param int $corrects
      * @return ?array
      */
-    public function get_attempt_new(int $count, bool $usenumattempt, int &$countquestions): ?array {
+    public function get_attempt_new(int $count, bool $usenumattempt, int &$countquestions, int &$corrects): ?array {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
         $auserid = $this->mmogame->get_auserid();
 
-        $queries = $this->get_queries( $auserid, null, $count, $countquestions);
+        $queries = $this->get_queries( $auserid, null, $count, $countquestions, $corrects);
         if ($queries === null) {
             return null;
         }
@@ -99,9 +100,10 @@ abstract class mmogame_qbank {
      * @param ?int $numteam
      * @param int $count (how many queries they want)
      * @param int $countquestions return the count of questions
+     * @param int $corrects returns the correct questions
      * @return ?array of int or false if no queries found.
      */
-    protected function get_queries(int $auserid, ?int $numteam, int $count, int &$countquestions): ?array {
+    protected function get_queries(int $auserid, ?int $numteam, int $count, int &$countquestions, int &$corrects): ?array {
         $ids = $this->get_queries_ids();
         $countquestions = count( $ids );
         if ($ids === false) {
@@ -111,15 +113,17 @@ abstract class mmogame_qbank {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
 
+        $fields = 'queryid,countused,countcorrect,counterror,islastcorrect';
         if ($numteam === null) {
             $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=?',
-                [$rgame->id, $rgame->numgame, $auserid], '', 'queryid,countused,countcorrect,counterror');
+                [$rgame->id, $rgame->numgame, $auserid], '', $fields);
         } else {
             $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND numteam=?',
-                [$rgame->id, $rgame->numgame, $numteam], '', 'queryid,countused,countcorrect,counterror');
+                [$rgame->id, $rgame->numgame, $numteam], '', $fields);
         }
 
         $map = [];
+        $corrects = 0;
         foreach ($ids as $id => $qtype) {
             $r = mt_rand( 0, 1000 * 1000 - 1);
             $stat = array_key_exists( $id, $stats) ? $stats[$id] : false;
@@ -129,6 +133,10 @@ abstract class mmogame_qbank {
             $countcorrect = $stat !== false ? $stat->countcorrect : 0;
             $key = sprintf( "%10d-%10d-%10d-%10d-%10d", $countcorrect, $countused, $group, $r, $id);
             $map[$key] = $id;
+
+            if ($stat !== false && $stat->islastcorrect) {
+                $corrects++;
+            }
         }
         ksort( $map);
 
