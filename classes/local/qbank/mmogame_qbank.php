@@ -151,11 +151,8 @@ abstract class mmogame_qbank {
         shuffle( $ret);
 
         foreach ($ret as $q) {
-            if ($numteam != null && $numteam != 0) {
-                $this->update_stats( null, $numteam, $q->id, true, false, false);
-            } else {
-                $this->update_stats( $auserid, null, $q->id, true, false, false);
-            }
+            $this->update_stats( $auserid, null, $q->id, true, false, false);
+            $this->update_stats( null, null, $q->id, true, false, false);
         }
 
         return count( $ret) ? $ret : null;
@@ -219,7 +216,6 @@ abstract class mmogame_qbank {
      */
     public function update_stats(?int $auserid, ?int $numteam, ?int $queryid, bool $isused, bool $iscorrect, bool $iserror,
         ?array $values = null): void {
-
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
 

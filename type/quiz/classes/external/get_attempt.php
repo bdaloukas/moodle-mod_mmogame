@@ -96,6 +96,14 @@ class get_attempt extends external_api {
         if ($auserid === null) {
             return json_encode( ['errorcode' => 'no_user']);
         }
+
+        // No selection of avatar and colorpalettes yet.
+        $grade = $mmogame->get_db()->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
+            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
+        if ($grade === null) {
+            return json_encode( ['errorcode' => 'no_user']);
+        }
+
         $mmogame->login_user($auserid);
 
         if ($nickname !== null && $avatarid !== null && $colorpaletteid != null) {

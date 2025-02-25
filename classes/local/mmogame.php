@@ -281,7 +281,7 @@ abstract class mmogame {
         } else if ($kinduser == 'guid') {
             return self::get_auserid_from_guid( $db, $user, $create);
         } else {
-            return self::get_auserid_from_db( $db, $kinduser, $user, true);
+            return self::get_auserid_from_db( $db, $kinduser, $user, $create);
         }
     }
 

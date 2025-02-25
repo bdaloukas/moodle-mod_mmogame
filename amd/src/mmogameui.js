@@ -145,6 +145,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateCreateScreen() {
+            while (this.body.firstChild) {
+                this.body.removeChild(this.body.firstChild);
+            }
+            this.area = undefined;
+
             this.gateCompute();
 
             let maxHeight = this.areaRect.height - 5 * this.padding - this.iconSize;
