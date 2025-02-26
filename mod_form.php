@@ -160,7 +160,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
 
         if ($data['qbank'] == 'question') {
             if (!array_key_exists( 'questioncategoryid', $data) || $data['questioncategoryid'] == 0) {
-                $errors['questioncategoryid'] = get_string( 'sourcemodule_questioncategory', 'game');
+                $errors['questioncategoryid'] = get_string( 'sourcemodule_questioncategory', 'mmogame');
             }
         }
 
