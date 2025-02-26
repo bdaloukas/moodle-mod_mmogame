@@ -50,4 +50,11 @@ $functions = [
         'ajax'          => true,
         'loginrequired' => false,
     ],
+    'mod_mmogame_get_state' => [
+        'classname'     => 'mod_mmogame\external\get_state',
+        'description'   => 'Gets the current state of game.',
+        'type'          => 'read',
+        'ajax'          => true,
+        'loginrequired' => false,
+    ],
 ];

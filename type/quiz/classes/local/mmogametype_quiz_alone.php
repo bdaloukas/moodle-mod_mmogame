@@ -91,20 +91,6 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     }
 
     /**
-     * Set the state of the current game.
-     *
-     * @param int $state
-     */
-    public function set_state(int $state): void {
-        $timefastjson = round( 10 * microtime( true));
-
-        $statecontents = $state . "-" . $timefastjson;
-        $filecontents = '';
-
-        $this->save_state($state, $statecontents, $filecontents, $timefastjson);
-    }
-
-    /**
      * Processes the user's answer for a quiz question, with optional auto-grading and statistics updates.
      *
      * @param stdClass $attempt

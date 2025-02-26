@@ -254,7 +254,6 @@ abstract class mmogame {
      */
     public static function get_auserid_from_db(mmogame_database $db, string $kind, int $userid, bool $create): ?int {
         $rec = $db->get_record_select( 'mmogame_aa_users', 'kind = ? AND instanceid=?', [$kind, $userid]);
-
         if ($rec !== null) {
             return $rec->id;
         }
@@ -262,7 +261,6 @@ abstract class mmogame {
         if (!$create) {
             return null;
         }
-
         return $db->insert_record( 'mmogame_aa_users',
             ['kind' => $kind, 'instanceid' => $userid, 'lastlogin' => time(), 'lastip' => self::get_ip()]);
     }
@@ -504,13 +502,11 @@ abstract class mmogame {
     public function save_state_file(int $state, string $filecontents): string {
         global $CFG;
 
-        // Creates an upload directory in dataroot.
+        // Creates an upload directory in temp directory.
         // This directory is used for checking of state without opening database.
         $file = $this->rgame->fastjson === null ? '00' : $this->rgame->fastjson;
-        $newdir = $CFG->dataroot.'/local/mmogame/states/'.substr( $file, -2);
-        if (!is_dir( $newdir)) {
-            mkdir( $newdir, 0777, true);
-        }
+        $newdir = 'mmogame/states/'.substr( $file, -2);
+        $newdir = make_temp_directory( $newdir);
 
         if ($filecontents != '') {
             $file = "$newdir/$file-$state.txt";
@@ -638,6 +634,7 @@ abstract class mmogame {
      * Set the state of the current game.
      *
      * @param int $state
+     * @return string
      */
-    abstract public function set_state(int $state): void;
+    abstract public function set_state(int $state): string;
 }

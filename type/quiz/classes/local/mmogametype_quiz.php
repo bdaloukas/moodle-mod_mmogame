@@ -123,4 +123,21 @@ abstract class mmogametype_quiz extends mmogame {
     public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void {
         $db->delete_records_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
     }
+
+    /**
+     * Set the state of the current game.
+     *
+     * @param int $state
+     * @return string
+     */
+    public function set_state(int $state): string {
+        $timefastjson = round( 10 * microtime( true));
+
+        $statecontents = $state . "-" . $timefastjson;
+        $filecontents = '';
+
+        $this->save_state($state, $statecontents, $filecontents, $timefastjson);
+
+        return $statecontents;
+    }
 }

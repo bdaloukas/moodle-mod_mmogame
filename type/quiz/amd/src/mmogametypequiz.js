@@ -259,7 +259,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
                     // Read server response
                     const data = await response.text();
-                    this.processFastJson(data);
+                    await this.processFastJson(data);
                 } catch (error) {
                     this.showError('Error sending Fast JSON:', error);
                 }
@@ -614,10 +614,9 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             });
         }
 
-        processFastJson(response) {
+        async processFastJson(response) {
             if (response === '') {
-                this.sendFastJSON();
-                return;
+                response = await this.callGetState();
             }
             let a = response.split('-'); // Are state,timefastjson.
             let newstate = a.length > 0 ? parseInt(a[0]) : 0;
@@ -629,11 +628,11 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
                 this.removeMessageDivs();
-                this.callGetAttempt();
+                await this.callGetAttempt();
                 return;
             }
 
-            this.sendFastJSON();
+            await this.sendFastJSON();
         }
 
         processGetAttempt(json) {

@@ -91,7 +91,7 @@ class get_attempt extends external_api {
         $ret = [];
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $create = $nickname != null && $avatarid != null && $colorpaletteid != null;
+        $create = $nickname !== null && $avatarid !== null && $colorpaletteid !== null;
         $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create);
         if ($auserid === null) {
             return json_encode( ['errorcode' => 'no_user']);
@@ -100,7 +100,7 @@ class get_attempt extends external_api {
         // No selection of avatar and colorpalettes yet.
         $grade = $mmogame->get_db()->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
-        if ($grade === null) {
+        if (!$create && $grade === null) {
             return json_encode( ['errorcode' => 'no_user']);
         }
 

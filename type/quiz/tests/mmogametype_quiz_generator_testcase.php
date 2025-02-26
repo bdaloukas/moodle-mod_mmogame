@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_mmogame\external\get_state;
 use mod_mmogame\local\database\mmogame_database_moodle;
 
 defined('MOODLE_INTERNAL') || die();
@@ -96,6 +97,10 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $result = json_decode( $classsetanswer->execute( $rgame->id, 'moodle', $USER->id,
             $result->attempt, $answertexts[1], $answerids[1], ''));
         $this->assertTrue($result->iscorrect == 0);
+
+        $classgetstate = new get_state();
+        $result = $classgetstate->execute( $rgame->id);
+        $this->assertTrue($result != '' && strpos($result, '-') !== false);
     }
 
     /**
@@ -167,9 +172,15 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $result = json_decode( $classgethighscore->execute( $rgame->id, 'moodle', $USER->id, 3));
         $this->assertTrue( $result->count == 1);
 
+        // Reset data.
         $data = new stdClass();
         $data->reset_mmogame_all = 1;
         $data->reset_mmogame_deleted_course = 1;
         mmogametype_quiz_reset_userdata( $data, $mmogame->get_id());
+
+        // Recreate state files.
+        $classgetstate = new get_state();
+        $result = $classgetstate->execute( $rgame->id);
+        $this->assertTrue($result != '' && strpos($result, '-') !== false);
     }
 }
