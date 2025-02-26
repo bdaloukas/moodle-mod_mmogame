@@ -68,7 +68,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * Returns the appropriate file for mute/unmute.
          * @returns {string} The file path.
          */
-        getMuteFile() {
+        getSoundFile() {
             return this.kindSound === 0 ? 'assets/sound-on-flat.png' : 'assets/sound-off-flat.png';
         }
 
@@ -77,7 +77,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          *
          * @param {HTMLAudioElement} audioElement - The audio element to play.
          */
-        async playAudio(audioElement) {
+        async playSound(audioElement) {
             if (this.kindSound !== 0 && audioElement) {
                 try {
                     await audioElement.play();
@@ -99,7 +99,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     height: `${this.iconSize}px`,
                 },
                 attributes: {
-                    src: this.getMuteFile(),
+                    src: this.getSoundFile(),
                     alt: this.getStringM('js_sound'),
                     role: 'button',
                 },
@@ -113,7 +113,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          */
         onClickSound(button) {
             this.kindSound = (this.kindSound + 1) % 2;
-            button.src = this.getMuteFile();
+            button.src = this.getSoundFile();
             this.setOption('kindSound', {value: this.kindSound});
         }
 
@@ -691,8 +691,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {Object} extraparams - Additional parameters to override default ones.
          */
         async callGetAttempt(extraparams = undefined) {
-            const option = await this.getOption("kindSound");
-            this.kindSound = option !== null ? option.value : 1;
+
+            if (this.kindSound === undefined) {
+                const option = await this.getOption("kindSound");
+                this.kindSound = option !== null ? option.value : 1;
+            }
 
             require(['core/ajax'], (Ajax) => {
                 let params = {

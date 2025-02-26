@@ -57,6 +57,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             this.createButtonSound(fragment, this.padding + (i++) * step,
                 this.padding + nicknameHeight, this.iconSize);
+
             if (this.hasHelp()) {
                 const button = this.createButtonHelp(fragment, this.padding + (i++) * step, this.padding + nicknameHeight);
                 button.addEventListener("click", () => this.onClickHelp());
@@ -277,7 +278,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.onServerAnswerMultichoiceShowCorrect(i, iscorrect1);
             }
 
-            this.playAudio(foundCorrect ? this.audioYes : this.audioNo);
+            this.playSound(foundCorrect ? this.audioYes : this.audioNo);
         }
 
         onServerAnswerMultichoiceShowCorrect(i, iscorrect1, iscorrect) {

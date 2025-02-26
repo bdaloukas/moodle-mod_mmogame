@@ -406,7 +406,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.onServerAnswerMultichoiceShowCorrect(i, iscorrect1, iscorrect2);
         }
 
-        this.playAudio(foundCorrect ? this.audioYes : this.audioNo);
+        this.playSound(foundCorrect ? this.audioYes : this.audioNo);
     }
 
     onServerAnswerMultichoiceShowCorrect(i, iscorrect1, iscorrect2, iscorrect) {

@@ -141,15 +141,15 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
         } else if ($this->is_multichoice( $rec)) {
             $ret['single'] = $rec->multichoice->single;
             $l = $layout == '' ? [] : explode( ',', $layout);
-
             for ($i = 1; $i <= count( $rec->answers); $i++) {
                 if (!in_array($i, $l)) {
                     $l[] = $i;
                 }
             }
-
             $answers = $answerids = [];
-            foreach ($rec->answers as $info) {
+            foreach ($l as $pos) {
+                $info = $rec->answers[$pos - 1];
+
                 $answers[] = $info->answer;
                 $answerids[] = $info->id;
             }
