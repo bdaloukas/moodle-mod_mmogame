@@ -137,7 +137,7 @@ class overview_renderable implements renderable {
                 FROM {mmogame_quiz_attempts} mqa, {mmogame_aa_users} au, {user} u
                 WHERE $this->where0
                 AND mqa.auserid = au.id AND au.instanceid = u.id
-                ORDER BY u.lastname, u.firstname, mqa.auserid";
+                ORDER BY u.lastname, u.firstname, au.id";
             $recs = $DB->get_records_sql( $sql, $this->params0);
             foreach ($recs as $rec) {
                 $ret[$rec->auserid] = $rec->lastname.' '.$rec->firstname;

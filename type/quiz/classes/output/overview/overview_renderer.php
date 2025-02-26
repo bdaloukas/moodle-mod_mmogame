@@ -172,7 +172,8 @@ class overview_renderer extends plugin_renderer_base {
         foreach ($table->data as $row) {
             // Convert each row to plain text (remove HTML).
             $plainrow = array_map(function ($cell) {
-                return strip_tags(is_object($cell) ? $cell->text : $cell);
+                $s = is_object($cell) ? $cell->text : $cell;
+                return $s !== null ? strip_tags($s) : null;
             }, $row);
 
             fputcsv($output, $plainrow);
