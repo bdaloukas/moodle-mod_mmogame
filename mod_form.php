@@ -202,7 +202,24 @@ class mod_mmogame_mod_form extends moodleform_mod {
         global $DB, $COURSE;
 
         $courseid = $COURSE->id;
-        $context = context_course::instance( $courseid);
+
+        if ($DB->get_manager()->table_exists('qbank')) {
+            $sql = "SELECT ctx.id AS contextid
+                FROM {context} ctx
+                JOIN {course_modules} cm ON cm.id = ctx.instanceid
+                JOIN {modules} m ON m.id = cm.module
+                WHERE ctx.contextlevel = 70 AND cm.course = ? AND m.name = ?";
+            $recs = $DB->get_records_sql( $sql, [$courseid, 'qbank']);
+            $contextids = [];
+            foreach ($recs as $rec) {
+                $contextids[] = $rec->contextid;
+            }
+        } else {
+            $contextids = [game_get_context_course_instance( $courseid)->id];
+        }
+        if (count( $contextids) == 0) {
+            return [];
+        }
 
         $a = [];
         $table = "{question} q, {qtype_multichoice_options} qmo";
@@ -210,8 +227,9 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $sql2 = "SELECT COUNT(DISTINCT questionbankentryid) FROM $table,{question_bank_entries} qbe,".
             " {question_versions} qv ".
             " WHERE qbe.questioncategoryid = qc.id AND qbe.id=qv.questionbankentryid AND q.id=qv.questionid $select";
-        $sql = "SELECT id,name,($sql2) as c FROM {question_categories} qc WHERE contextid = $context->id";
-        if ($recs = $DB->get_records_sql( $sql)) {
+        [$insql, $params] = $DB->get_in_or_equal($contextids);
+        $sql = "SELECT id,name,($sql2) as c FROM {question_categories} qc WHERE contextid ".$insql;
+        if ($recs = $DB->get_records_sql( $sql, $params)) {
             foreach ($recs as $rec) {
                 $a[$rec->id] = $rec->name.' ('.$rec->c.')';
             }
