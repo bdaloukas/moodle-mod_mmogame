@@ -223,10 +223,10 @@ class mmogame_model_aduel {
      * Closes the pair.
      *
      * @param mmogame $mmogame
-     * @param $aduelid
-     * @param $score
+     * @param int $aduelid
+     * @param float $score
      */
-    public static function close_user1(mmogame $mmogame, $aduelid, $score) {
+    public static function close_user1(mmogame $mmogame, int $aduelid, float $score) {
         $params = ['id' => $aduelid, 'isclosed1' => 1, 'score' => $score];
 
         $mmogame->get_db()->update_record( 'mmogame_am_aduel_pairs', $params);

@@ -181,9 +181,14 @@ class mmogametype_quiz_split extends mmogame {
         $sql = "SELECT * FROM {mmogame_quiz_attempts} WHERE id $insql ORDER BY id";
         return $this->db->get_records_sql($sql, $inparams);
     }
+
     /**
      * Creates a new attempt for the first player. Also select which question will be contained in the attempt.
      *
+     * @param array $ids
+     * @param array $qs
+     * @param stdClass $aduel
+     * @param array $ignore
      * @return ?array (a new attempt of false if no attempt)
      */
     protected function get_attempts_new1(array $ids, array $qs, stdClass $aduel, array &$ignore): ?array {
@@ -493,6 +498,8 @@ class mmogametype_quiz_split extends mmogame {
      * @param stdClass $attempt The quiz attempt object.
      * @param stdClass $query The query object related to the quiz.
      * @param ?string $useranswer The user's answer as a string.
+     * @param int $timestart
+     * @param int $timeanswer
      * @param ?int $useranswerid Optional user answer ID.
      * @param bool $autograde Whether autograding is enabled.
      * @param array $ret Output array for additional information.

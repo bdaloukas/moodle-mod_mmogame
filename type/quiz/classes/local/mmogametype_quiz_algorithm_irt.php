@@ -47,13 +47,13 @@ class mmogametype_quiz_algorithm_irt {
     /**
      * Repairs stats.
      *
-     * @param $db
+     * @param mmogame_database $db
      * @param int $mmogameid
      * @param int $numgame
      * @param array $questions
      * @param array $ids
      */
-    protected static function repair_stats($db, int $mmogameid, int $numgame, array &$questions, array $ids) {
+    protected static function repair_stats(mmogame_database $db, int $mmogameid, int $numgame, array &$questions, array $ids) {
         $mapd = $mapq = [];
         foreach ($questions as $id => $question) {
             if (!in_array($question->queryid, $ids)) {
@@ -86,7 +86,7 @@ class mmogametype_quiz_algorithm_irt {
     /**
      * * Get queries.
      *
-     * @param $db
+     * @param mmogame_database $db
      * @param int $mmogameid
      * @param int $numgame
      * @param int $auserid
@@ -96,7 +96,7 @@ class mmogametype_quiz_algorithm_irt {
      * @param array $ignore
      * @return array
      */
-    public static function get_queries($db, int $mmogameid, int $numgame, int $auserid, array $ids,
+    public static function get_queries(mmogame_database $db, int $mmogameid, int $numgame, int $auserid, array $ids,
                                        $count, $numquery, array $ignore): array {
 
         $start = microtime(true);
@@ -211,7 +211,7 @@ class mmogametype_quiz_algorithm_irt {
     /**
      * Updates tables mmogame_aa_grades and mmogame_aa_irt.
      *
-     * @param $db
+     * @param mmogame_database $db
      * @param int $mmogameid
      * @param int $numgame
      * @param int $auserid
@@ -219,7 +219,7 @@ class mmogametype_quiz_algorithm_irt {
      * @param bool $iscorrect
      * @return void
      */
-    public static function update($db, int $mmogameid, int $numgame, int $auserid, int $queryid, bool $iscorrect) {
+    public static function update(mmogame_database $db, int $mmogameid, int $numgame, int $auserid, int $queryid, bool $iscorrect) {
         // Read parameters from database.
         $recg = $db->get_record_select( 'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
@@ -247,7 +247,7 @@ class mmogametype_quiz_algorithm_irt {
     /**
      * Saves logs to table mmogame_aa_irt_log
      *
-     * @param $db
+     * @param mmogame_database $db
      * @param $mmogameid
      * @param $numgame
      * @param $auserid
@@ -262,7 +262,7 @@ class mmogametype_quiz_algorithm_irt {
      * @param string $info
      * @return void
      */
-    private static function log($db, $mmogameid, $numgame, $auserid, mixed $theta, $queryid,
+    private static function log(mmogame_database $db, $mmogameid, $numgame, $auserid, mixed $theta, $queryid,
             $difficulty, $serialcorrects, $nextquery, int $step, int $numquery, $bestscore, string $info) {
         $db->insert_record( 'mmogame_aa_irt_log',
             ['mmogameid' => $mmogameid,
