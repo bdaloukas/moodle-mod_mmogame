@@ -647,7 +647,6 @@ define([''], function() {
          * @param {Error} [error] - The error object to display.
          */
         showError(name, error) {
-            console.log("showError", name, error);
             return name + error;
         }
 

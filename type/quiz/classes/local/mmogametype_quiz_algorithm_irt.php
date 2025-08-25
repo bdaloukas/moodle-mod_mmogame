@@ -48,12 +48,12 @@ class mmogametype_quiz_algorithm_irt {
      * Repairs stats.
      *
      * @param $db
-     * @param $mmogameid
-     * @param $numgame
-     * @param $questions
-     * @param $ids
+     * @param int $mmogameid
+     * @param int $numgame
+     * @param array $questions
+     * @param array $ids
      */
-    private static function repair_stats($db, $mmogameid, $numgame, &$questions, $ids) {
+    protected static function repair_stats($db, int $mmogameid, int $numgame, array &$questions, array $ids) {
         $mapd = $mapq = [];
         foreach ($questions as $id => $question) {
             if (!in_array($question->queryid, $ids)) {
@@ -87,16 +87,16 @@ class mmogametype_quiz_algorithm_irt {
      * * Get queries.
      *
      * @param $db
-     * @param $mmogameid
-     * @param $numgame
-     * @param $auserid
-     * @param $ids
+     * @param int $mmogameid
+     * @param int $numgame
+     * @param int $auserid
+     * @param array $ids
      * @param $count
      * @param $numquery
-     * @param $ignore
+     * @param array $ignore
      * @return array
      */
-    public static function get_queries($db, $mmogameid, $numgame, $auserid, $ids, $count, $numquery, $ignore): array {
+    public static function get_queries($db, int $mmogameid, int $numgame, int $auserid, array $ids, $count, $numquery, array $ignore): array {
 
         $start = microtime(true);
 
@@ -181,23 +181,23 @@ class mmogametype_quiz_algorithm_irt {
     /**
      * Computes raschProbability.
      *
-     * @param $theta
-     * @param $difficulty
+     * @param float $theta
+     * @param float $difficulty
      * @return float|int
      */
-    protected static function rasch_probability($theta, $difficulty) {
+    protected static function rasch_probability(float $theta, float $difficulty) {
         return 1 / (1 + exp(-($theta - $difficulty)));
     }
 
     /**
      * Updates probability and error.
-     * @param $theta
-     * @param $difficulty
-     * @param $response
+     * @param float $theta
+     * @param float $difficulty
+     * @param float $response
      * @param float $learningrate
      * @return void
      */
-    protected static function update_parameters(&$theta, &$difficulty, $response, float $learningrate = 0.05) {
+    protected static function update_parameters(float &$theta, float &$difficulty, float $response, float $learningrate = 0.05) {
         // Computes probability.
         $prob = self::rasch_probability($theta, $difficulty);
         $error = $response - $prob;
@@ -211,14 +211,14 @@ class mmogametype_quiz_algorithm_irt {
      * Updates tables mmogame_aa_grades and mmogame_aa_irt.
      *
      * @param $db
-     * @param $mmogameid
-     * @param $numgame
-     * @param $auserid
-     * @param $queryid
-     * @param $iscorrect
+     * @param int $mmogameid
+     * @param int $numgame
+     * @param int $auserid
+     * @param int $queryid
+     * @param boolean $iscorrect
      * @return void
      */
-    public static function update($db, $mmogameid, $numgame, $auserid, $queryid, $iscorrect) {
+    public static function update($db, int $mmogameid, int $numgame, int $auserid, int $queryid, boolean $iscorrect) {
         // Read parameters from database.
         $recg = $db->get_record_select( 'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',

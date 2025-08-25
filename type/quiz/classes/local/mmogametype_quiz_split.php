@@ -19,7 +19,7 @@
 /**
  * mmogametype_quiz_aduelsplit class
  *
- * @package    mmogametype_quiz_aduelsplit
+ * @package    mmogametype_quiz_split
  * @copyright  2025 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -40,7 +40,7 @@ define( 'ERRORCODE_NO_QUERIES', 'no_questions');
 define( 'ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');
 
 /**
- * mmogametype_quiz_aduelsplit is responsible for managing and facilitating quiz gameplay
+ * mmogametype_quiz_split is responsible for managing and facilitating quiz gameplay
  * within the mmogame system, including handling attempts, scoring,
  * and maintaining related user data.
  */
@@ -81,12 +81,12 @@ class mmogametype_quiz_split extends mmogame {
     /**
      * Returns the attempts.
      *
-     * @param $auserids
-     * @param $isaduel
-     * @param $adueluserids
+     * @param array $auserids
+     * @param bool $isaduel
+     * @param array $adueluserids
      * @return array|null
      */
-    public function get_attempts($auserids, $isaduel, $adueluserids): ?array {
+    public function get_attempts(array $auserids, bool $isaduel, array $adueluserids): ?array {
         $ids = $qs0 = null;
 
         $ret = $ignore = [];
@@ -236,10 +236,12 @@ class mmogametype_quiz_split extends mmogame {
     /**
      * Return the queries for ADuel.
      *
+     * @param array $ids
+     * @param array $qs
      * @param int $count (how many)
      * @return ?array or false
      */
-    public function get_queries_aduel(array $ids, $qs, int $count): ?array {
+    public function get_queries_aduel(array $ids, array $qs, int $count): ?array {
 
         $grade = $this->get_grade( $this->auserid);
 

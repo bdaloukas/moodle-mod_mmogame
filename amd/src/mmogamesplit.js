@@ -583,7 +583,6 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             } else {
                 this.kinduser = user;
             }
-            console.log("this.gateSendGetAssets");
             this.gateSendGetAssets();
         }
 

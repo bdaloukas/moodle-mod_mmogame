@@ -64,7 +64,7 @@ class mmogame_model_aduel {
      * @param int $maxalone
      * @param bool $newplayer1
      * @param bool $newplayer2
-     * @param array $auserids
+     * @param array|null $auserids
      * @param bool $isaduel
      * @return ?stdClass
      */

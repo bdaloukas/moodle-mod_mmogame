@@ -691,14 +691,14 @@ abstract class mmogame {
      * @param int $countsplit
      * @param int $countpalettes
      * @param int $countavatars
-     * @param $retpalettes
-     * @param $retavatars
-     * @param $maxavatars
+     * @param array $retpalettes
+     * @param array $retavatars
+     * @param array $maxavatars
      * @param string $kinduser
      * @param string $user
      */
     public function get_assets_split(int $countsplit, int $countpalettes, int $countavatars,
-                &$retpalettes, &$retavatars, &$maxavatars, string $kinduser, string $user): void {
+                array &$retpalettes, array &$retavatars, array &$maxavatars, string $kinduser, string $user): void {
         $db = $this->db;
 
         // Reads info from database.

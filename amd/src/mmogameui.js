@@ -123,13 +123,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {string} pin - The game PIN.
          * @param {string} kinduser - The type of user (e.g., "moodle" or "guid").
          * @param {string} user - The user identifier.
+         * @param {string} modelparams - Parameters of model.
          * @param {string} url - The game URL.
          */
-        /*async gateOpen(mmogameid, pin, kinduser, user, url) {
-            super.gateOpen(mmogameid, pin, kinduser, user, url);
-
-            await this.callGetAttempt();
-        }*/
         async gateOpen(mmogameid, pin, kinduser, user, modelparams, url) {
             this.mmogameid = mmogameid;
             this.pin = pin;
@@ -149,12 +145,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 this.kinduser = user;
             }
             this.gateCreateScreen();
-            //console.log("this.gateSendGetAssets");
-            //this.gateSendGetAssets();
         }
 
         gateSendGetAssets() {
-            console.log("gateSendGetAssets");
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -165,13 +158,11 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     countpalettes: this.countPalettes,
                     countavatars: this.countXavatars * this.countYavatars,
                 };
-                console.log("params=",params);
                 // Calling the service through the Moodle AJAX API
                 let getAssets = Ajax.call([{
                     methodname: 'mod_mmogame_get_assets_split',
                     args: params
                 }]);
-                console.log("before done");
                 // Handling the response
                 getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars}) => {
                     this.info = {
@@ -181,10 +172,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                         colorpalettes: colorpalettes,
                         numavatars: numavatars,
                     };
-                    console.log(this.info);
                     this.gateCreateScreen();
                 }).fail((error) => {
-                    console.log("fail ", error);
                     return error;
                 });
             });
@@ -229,7 +218,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateCreateScreenDo(maxWidth, maxHeight) {
-            console.log("gateCreateScreenDo");
             // Creates the "nickname" field.
             let top = this.gateCreateNickname(0, maxWidth) + this.padding;
             this.edtNickname.focus();
@@ -429,7 +417,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                             avatarids, avatars);
                     }
                 }).fail((error) => {
-                    console.log("fail", error);
                     return error;
                 });
             });
@@ -814,7 +801,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {Error} [error] - The error object to display.
          */
         showError(name, error) {
-            console.log(name, error);
             const message = error?.message || 'An unknown error occurred.';
             this.createDivMessage('mmogame-error', message);
         }

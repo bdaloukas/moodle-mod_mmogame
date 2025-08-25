@@ -111,11 +111,11 @@ function mmogame_quiz_manage_irt(mmogame $mmogame, string $kind): void {
 /**
  * Prints data.
  *
- * @param $mapqueries
+ * @param array $mapqueries
  * @param array $data
  * @return void
  */
-function mmogame_quiz_manage_irt_print_b($mapqueries, array $data): void {
+function mmogame_quiz_manage_irt_print_b(array $mapqueries, array $data): void {
     $b = $data['b'];
     $seb = $data['se_b'];
     $infit = $data['infit'];
@@ -175,11 +175,11 @@ function mmogame_quiz_manage_irt_print_b($mapqueries, array $data): void {
 /**
  * Prints theta.
  *
- * @param $mapusers
+ * @param array $mapusers
  * @param array $data
  * @return void
  */
-function mmogame_quiz_manage_irt_print_theta($mapusers, array $data): void {
+function mmogame_quiz_manage_irt_print_theta(array $mapusers, array $data): void {
     $theta = $data['theta'];
 
     echo '<table border="1" cellspacing="0" cellpadding="4">';
