@@ -53,7 +53,7 @@ class mmogametype_quiz_algorithm_irt {
      * @param array $questions
      * @param array $ids
      */
-    protected static function repair_stats(mmogame_database $db, int $mmogameid, int $numgame, array &$questions, array $ids) {
+    protected static function repair_stats(mmogame_database $db, int $mmogameid, int $numgame, array &$questions, array $ids): void {
         $mapd = $mapq = [];
         foreach ($questions as $id => $question) {
             if (!in_array($question->queryid, $ids)) {
@@ -98,8 +98,6 @@ class mmogametype_quiz_algorithm_irt {
      */
     public static function get_queries(mmogame_database $db, int $mmogameid, int $numgame, int $auserid, array $ids,
                                        int $count, int $numquery, array $ignore): array {
-
-        $start = microtime(true);
 
         // Get player's skill rating (theta).
         $rec = $db->get_record_select('mmogame_aa_grades',
@@ -184,9 +182,9 @@ class mmogametype_quiz_algorithm_irt {
      *
      * @param float $theta
      * @param float $difficulty
-     * @return float|int
+     * @return float
      */
-    protected static function rasch_probability(float $theta, float $difficulty) {
+    protected static function rasch_probability(float $theta, float $difficulty): float {
         return 1 / (1 + exp(-($theta - $difficulty)));
     }
 
@@ -198,7 +196,7 @@ class mmogametype_quiz_algorithm_irt {
      * @param float $learningrate
      * @return void
      */
-    protected static function update_parameters(float &$theta, float &$difficulty, float $response, float $learningrate = 0.05) {
+    protected static function update_parameters(float &$theta, float &$difficulty, float $response, float $learningrate = 0.05): void {
         // Computes probability.
         $prob = self::rasch_probability($theta, $difficulty);
         $error = $response - $prob;
@@ -219,7 +217,7 @@ class mmogametype_quiz_algorithm_irt {
      * @param bool $iscorrect
      * @return void
      */
-    public static function update(mmogame_database $db, int $mmogameid, int $numgame, int $auserid, int $queryid, bool $iscorrect) {
+    public static function update(mmogame_database $db, int $mmogameid, int $numgame, int $auserid, int $queryid, bool $iscorrect): void {
         // Read parameters from database.
         $recg = $db->get_record_select( 'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
@@ -253,17 +251,17 @@ class mmogametype_quiz_algorithm_irt {
      * @param $auserid
      * @param mixed $theta
      * @param $queryid
-     * @param $difficulty
-     * @param $serialcorrects
-     * @param $nextquery
+     * @param float $difficulty
+     * @param int $serialcorrects
+     * @param int $nextquery
      * @param int $step
      * @param int $numquery
-     * @param $bestscore
+     * @param float $bestscore
      * @param string $info
      * @return void
      */
     private static function log(mmogame_database $db, $mmogameid, $numgame, $auserid, mixed $theta, $queryid,
-            $difficulty, $serialcorrects, $nextquery, int $step, int $numquery, $bestscore, string $info) {
+            float $difficulty, int $serialcorrects, int $nextquery, int $step, int $numquery, float $bestscore, string $info): void {
         $db->insert_record( 'mmogame_aa_irt_log',
             ['mmogameid' => $mmogameid,
                 'numgame' => $numgame,
