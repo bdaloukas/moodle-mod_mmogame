@@ -33,7 +33,7 @@ use required_capability_exception;
 /**
  * External function to get the list of avatars and color palettes.
  *
- * @package    mmogametype_quizsplit
+ * @package    mmogametype_quiz
  * @copyright 2025 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -90,6 +90,7 @@ class get_assets_split extends external_api {
 
         $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
         $retpalettes = $retavatars = [];
+        $maxavatars = 0;
         $mmogame->get_assets_split($countsplit, $countpalettes, $countavatars, $retpalettes,
             $retavatars, $maxavatars, $kinduser, $user);
         $avatarids = $avatars = $paletteids = $palettes = [];
