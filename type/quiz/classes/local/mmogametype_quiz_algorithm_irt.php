@@ -27,7 +27,6 @@
 namespace mmogametype_quiz\local;
 
 use mod_mmogame\local\database\mmogame_database;
-use mod_mmogame\local\mmogame;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -53,7 +52,8 @@ class mmogametype_quiz_algorithm_irt {
      * @param array $questions
      * @param array $ids
      */
-    protected static function repair_stats(mmogame_database $db, int $mmogameid, int $numgame, array &$questions, array $ids): void {
+    protected static function repair_stats(mmogame_database $db, int $mmogameid, int $numgame,
+                                           array &$questions, array $ids): void {
         $mapd = $mapq = [];
         foreach ($questions as $id => $question) {
             if (!in_array($question->queryid, $ids)) {
@@ -196,7 +196,8 @@ class mmogametype_quiz_algorithm_irt {
      * @param float $learningrate
      * @return void
      */
-    protected static function update_parameters(float &$theta, float &$difficulty, float $response, float $learningrate = 0.05): void {
+    protected static function update_parameters(float &$theta, float &$difficulty, float $response,
+                                                float $learningrate = 0.05): void {
         // Computes probability.
         $prob = self::rasch_probability($theta, $difficulty);
         $error = $response - $prob;
@@ -217,7 +218,8 @@ class mmogametype_quiz_algorithm_irt {
      * @param bool $iscorrect
      * @return void
      */
-    public static function update(mmogame_database $db, int $mmogameid, int $numgame, int $auserid, int $queryid, bool $iscorrect): void {
+    public static function update(mmogame_database $db, int $mmogameid, int $numgame, int $auserid,
+                                  int $queryid, bool $iscorrect): void {
         // Read parameters from database.
         $recg = $db->get_record_select( 'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
@@ -246,11 +248,11 @@ class mmogametype_quiz_algorithm_irt {
      * Saves logs to table mmogame_aa_irt_log
      *
      * @param mmogame_database $db
-     * @param $mmogameid
-     * @param $numgame
-     * @param $auserid
+     * @param int $mmogameid
+     * @param int $numgame
+     * @param int $auserid
      * @param mixed $theta
-     * @param $queryid
+     * @param int $queryid
      * @param float $difficulty
      * @param int $serialcorrects
      * @param int $nextquery
@@ -260,8 +262,9 @@ class mmogametype_quiz_algorithm_irt {
      * @param string $info
      * @return void
      */
-    private static function log(mmogame_database $db, $mmogameid, $numgame, $auserid, mixed $theta, $queryid,
-            float $difficulty, int $serialcorrects, int $nextquery, int $step, int $numquery, float $bestscore, string $info): void {
+    private static function log(mmogame_database $db, int $mmogameid, int $numgame, int $auserid,
+                                mixed $theta, int $queryid, float $difficulty, int $serialcorrects,
+                                int $nextquery, int $step, int $numquery, float $bestscore, string $info): void {
         $db->insert_record( 'mmogame_aa_irt_log',
             ['mmogameid' => $mmogameid,
                 'numgame' => $numgame,
