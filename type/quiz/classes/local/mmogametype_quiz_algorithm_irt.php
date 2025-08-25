@@ -96,7 +96,8 @@ class mmogametype_quiz_algorithm_irt {
      * @param array $ignore
      * @return array
      */
-    public static function get_queries($db, int $mmogameid, int $numgame, int $auserid, array $ids, $count, $numquery, array $ignore): array {
+    public static function get_queries($db, int $mmogameid, int $numgame, int $auserid, array $ids,
+                                       $count, $numquery, array $ignore): array {
 
         $start = microtime(true);
 
@@ -215,10 +216,10 @@ class mmogametype_quiz_algorithm_irt {
      * @param int $numgame
      * @param int $auserid
      * @param int $queryid
-     * @param boolean $iscorrect
+     * @param bool $iscorrect
      * @return void
      */
-    public static function update($db, int $mmogameid, int $numgame, int $auserid, int $queryid, boolean $iscorrect) {
+    public static function update($db, int $mmogameid, int $numgame, int $auserid, int $queryid, bool $iscorrect) {
         // Read parameters from database.
         $recg = $db->get_record_select( 'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
