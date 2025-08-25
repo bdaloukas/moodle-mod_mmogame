@@ -91,13 +91,13 @@ class mmogametype_quiz_algorithm_irt {
      * @param int $numgame
      * @param int $auserid
      * @param array $ids
-     * @param $count
-     * @param $numquery
+     * @param int $count
+     * @param int $numquery
      * @param array $ignore
      * @return array
      */
     public static function get_queries(mmogame_database $db, int $mmogameid, int $numgame, int $auserid, array $ids,
-                                       $count, $numquery, array $ignore): array {
+                                       int $count, int $numquery, array $ignore): array {
 
         $start = microtime(true);
 
