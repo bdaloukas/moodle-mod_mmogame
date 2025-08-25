@@ -21,7 +21,7 @@
  *
  * @package    mmogametype_quiz
  * @copyright  2025 Vasilis Daloukas
- * @license    http://www.gnu.onpx browserslist@latest --update-dbrg/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mmogametype_quiz\local;
