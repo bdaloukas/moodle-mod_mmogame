@@ -76,7 +76,7 @@ abstract class mmogame {
         if ($this->rstate === null) {
             $id = $this->db->insert_record( 'mmogame_aa_states',
                 ['mmogameid' => $this->rgame->id,
-                'numgame' => $this->rgame->numgame, 'state' => 0,
+                    'numgame' => $this->rgame->numgame, 'state' => 0,
                 ]);
             $this->rstate = $this->db->get_record_select( 'mmogame_aa_states', 'id=?', [$id]);
         }
@@ -89,7 +89,7 @@ abstract class mmogame {
 
     /**
      * Sets the variable code.
-     @param string $code
+    @param string $code
      */
     public function set_errorcode($code): void {
         $this->error = $code;
@@ -213,9 +213,10 @@ abstract class mmogame {
      * @param mmogame_database $db
      * @param string $guid
      * @param bool $create
+     * @param int $split
      * @return ?int
      */
-    public static function get_auserid_from_guid(mmogame_database $db, string $guid, bool $create = true): ?int {
+    public static function get_auserid_from_guid(mmogame_database $db, string $guid, bool $create, int $split): ?int {
         $rec = $db->get_record_select( 'mmogame_aa_users_guid', 'guid=?', [$guid]);
         if ($rec === null) {
             if (!$create) {
@@ -225,23 +226,23 @@ abstract class mmogame {
         } else {
             $userid = $rec->id;
         }
-
-        return self::get_auserid_from_db($db, 'guid', $userid, $create);
+        return self::get_auserid_from_db($db, 'guid', $userid, $create, $split);
     }
 
     /**
      * Return coresponding auserid from a users in the table mmogame_aa_users_code.
      * @param mmogame_database $db
      * @param string $code
+     * @param int $split
      * @return ?int
      */
-    public static function get_auserid_from_usercode(mmogame_database $db, string $code): ?int {
+    public static function get_auserid_from_usercode(mmogame_database $db, string $code, int $split): ?int {
         $rec = $db->get_record_select( 'mmogame_aa_users_code', 'code=?', [$code]);
         if ($rec === false) {
             return false;
         }
 
-        return self::get_auserid_from_db($db, 'usercode', $rec->id, true);
+        return self::get_auserid_from_db($db, 'usercode', $rec->id, true, $split);
     }
 
     /**
@@ -250,19 +251,19 @@ abstract class mmogame {
      * @param string $kind (the kind of user e.g., Moodle, GUID)
      * @param int $userid
      * @param bool $create
+     * @param int $split
      * @return ?int
      */
-    public static function get_auserid_from_db(mmogame_database $db, string $kind, int $userid, bool $create): ?int {
-        $rec = $db->get_record_select( 'mmogame_aa_users', 'kind = ? AND instanceid=?', [$kind, $userid]);
+    public static function get_auserid_from_db(mmogame_database $db, string $kind, int $userid, bool $create, int $split): ?int {
+        $rec = $db->get_record_select( 'mmogame_aa_users', 'kind = ? AND instanceid=? AND splitnum=?', [$kind, $userid, $split]);
         if ($rec !== null) {
             return $rec->id;
         }
-
         if (!$create) {
             return null;
         }
         return $db->insert_record( 'mmogame_aa_users',
-            ['kind' => $kind, 'instanceid' => $userid, 'lastlogin' => time(), 'lastip' => self::get_ip()]);
+            ['kind' => $kind, 'instanceid' => $userid, 'splitnum' => $split, 'lastlogin' => time(), 'lastip' => self::get_ip()]);
     }
 
     /**
@@ -271,16 +272,49 @@ abstract class mmogame {
      * @param string $kinduser
      * @param string $user
      * @param bool $create
+     * @param int $split
      * @return ?int (the id of table mmogame_aa_users)
      */
-    public static function get_asuerid(mmogame_database $db, string $kinduser, string $user, bool $create): ?int {
+    public static function get_asuerid(mmogame_database $db, string $kinduser, string $user, bool $create, int $split): ?int {
         if ($kinduser == 'usercode') {
-            return self::get_auserid_from_usercode($db, $user);
+            return self::get_auserid_from_usercode($db, $user, $split);
         } else if ($kinduser == 'guid') {
-            return self::get_auserid_from_guid( $db, $user, $create);
+            return self::get_auserid_from_guid( $db, $user, $create, $split);
         } else {
-            return self::get_auserid_from_db( $db, $kinduser, $user, $create);
+            return self::get_auserid_from_db( $db, $kinduser, $user, $create, $split);
         }
+    }
+
+    /**
+     * Returns an array for auserids.
+     * @param string $kinduser
+     * @param string $user
+     * @return array|null
+     */
+    public function get_auserids_split(string $kinduser, string $user): ?array {
+        if ($kinduser == 'usercode') {
+            die("Problem");
+        } else if ($kinduser == 'guid') {
+            $rec = $this->db->get_record_select( 'mmogame_aa_users_guid', 'guid=?', [$user]);
+            if ($rec === null) {
+                return null;
+            }
+            $instanceid = $rec->id;
+        } else {
+            $instanceid = intval( $user);
+        }
+
+        if ($instanceid == 0) {
+            return null;
+        }
+
+        $recs = $this->db->get_records_select( 'mmogame_aa_users', 'kind=? AND instanceid=?', [$kinduser, $instanceid]);
+        $ret = [];
+        foreach ($recs as $rec) {
+            $ret[] = $rec->id;
+        }
+
+        return $ret;
     }
 
     /**
@@ -291,6 +325,27 @@ abstract class mmogame {
         $this->db->update_record( 'mmogame_aa_users',
             ['id' => $auserid, 'lastlogin' => time(), 'lastip' => self::get_ip()]);
 
+        $this->auserid = $auserid;
+    }
+
+    /**
+     * Marks user as loged in.
+     * @param array $ids
+     */
+    public function login_user_log(array $ids): void {
+        if (count($ids) == 0) {
+            return;
+        }
+        [$insql, $inparams] = $this->db->get_in_or_equal($ids);
+        $sql = "UPDATE {mmogame_aa_users} SET lastlogin=?, lastip=? WHERE id $insql";
+        $this->db->execute($sql, array_merge([time(), self::get_ip()], $inparams));
+    }
+
+    /**
+     * Marks user as loged in.
+     * @param int $auserid
+     */
+    public function login_user_nolog(int $auserid): void {
         $this->auserid = $auserid;
     }
 
@@ -309,6 +364,7 @@ abstract class mmogame {
         }
 
         $classname = 'mmogametype_' . $rgame->type.'\local\mmogametype_' . $rgame->type.'_'.$rgame->model;
+
         if (!class_exists($classname)) {
             throw new coding_exception("Class $classname does not exist for type: $rgame->type");
         }
@@ -336,10 +392,11 @@ abstract class mmogame {
         $db = $this->db;
 
         // Ones that are not used in this numgame.
-        $sql = "SELECT a.id, numused FROM {mmogame_aa_avatars} a ".
-            " LEFT JOIN {mmogame_aa_grades} g ON g.avatarid=a.id AND g.mmogameid=? AND g.numgame=?".
-            " WHERE g.id IS NULL ".
-            " ORDER BY a.numused,a.randomkey";
+        $sql = "SELECT a.id, a.numused
+            FROM {mmogame_aa_avatars} a
+            LEFT JOIN {mmogame_aa_grades} g ON g.avatarid=a.id AND g.mmogameid=? AND g.numgame=?
+            WHERE g.id IS NULL
+            ORDER BY a.numused,a.randomkey";
         $recs = $db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame], 0, 1);
         if (count($recs) === 0) {
             // All avatars are used in this numgame (players > avatars).
@@ -373,7 +430,7 @@ abstract class mmogame {
         $grades = $db->get_records_select( 'mmogame_aa_grades', 'mmogameid=? AND auserid=? AND numgame < ?',
             [$this->rgame->id, $auserid, $this->rgame->numgame], 'numgame DESC', '*', 1);
         $a = ['mmogameid' => $this->rgame->id, 'numgame' => $this->rgame->numgame, 'auserid' => $auserid,
-             'timemodified' => time(), 'sumscore' => 0,
+            'timemodified' => time(), 'sumscore' => 0,
         ];
         if (count( $grades) > 0) {
             $grade = reset( $grades);
@@ -405,13 +462,20 @@ abstract class mmogame {
      * Returns info about avatar for the user auserid.
      *
      * @param int $auserid
+     * @param bool $computepalette
      * @return ?stdClass
      */
-    public function get_avatar_info(int $auserid): ?stdClass {
-        $sql = "SELECT g.*, a.directory, a.filename, a.id as aid, c.color1, c.color2, c.color3, c.color4, c.color5".
-            " FROM {mmogame_aa_grades} g LEFT JOIN {mmogame_aa_avatars} a ON g.avatarid=a.id".
-            " LEFT JOIN {mmogame_aa_colorpalettes} c ON c.id=g.colorpaletteid ".
-            " WHERE g.mmogameid=? AND g.numgame=? AND g.auserid=?";
+    public function get_avatar_info(int $auserid, bool $computepalette = true): ?stdClass {
+        $sql = "SELECT g.*, a.directory, a.filename, a.id as aid";
+        if ($computepalette) {
+            $sql .= ", c.color1, c.color2, c.color3, c.color4, c.color5";
+        }
+        $sql .= " FROM {mmogame_aa_grades} g
+                LEFT JOIN {mmogame_aa_avatars} a ON g.avatarid=a.id";
+        if ($computepalette) {
+            $sql .= " LEFT JOIN {mmogame_aa_colorpalettes} c ON c.id=g.colorpaletteid ";
+        }
+        $sql .= " WHERE g.mmogameid=? AND g.numgame=? AND g.auserid=?";
         $grades = $this->db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
         if (count($grades) == 0) {
             $grade = $this->get_grade( $auserid);
@@ -427,7 +491,9 @@ abstract class mmogame {
             $grade = $this->db->get_record_sql( $sql, [$this->rgame->id, $this->rgame->numgame, $auserid]);
         }
         $grade->avatar = $grade->directory.'/'.$grade->filename;
-        $grade->colors = [$grade->color1, $grade->color2, $grade->color3, $grade->color4, $grade->color5];
+        if ($computepalette) {
+            $grade->colors = [$grade->color1, $grade->color2, $grade->color3, $grade->color4, $grade->color5];
+        }
 
         return $grade;
     }
@@ -435,7 +501,7 @@ abstract class mmogame {
     /**
      * Returns the rank for the current user based on $field
      *
-     * @param int|float $value
+     * @param float|int $value
      * @param string $field
      * @return int
      */
@@ -500,8 +566,6 @@ abstract class mmogame {
      * @return string (the directory where the data is saved)
      */
     public function save_state_file(int $state, string $filecontents): string {
-        global $CFG;
-
         // Creates an upload directory in temp directory.
         // This directory is used for checking of state without opening database.
         $file = $this->rgame->fastjson === null ? '00' : $this->rgame->fastjson;
@@ -622,6 +686,92 @@ abstract class mmogame {
     }
 
     /**
+     * Returns info abouts avatars and palettes.
+     *
+     * @param int $countsplit
+     * @param int $countpalettes
+     * @param int $countavatars
+     * @param $retpalettes
+     * @param $retavatars
+     * @param $maxavatars
+     * @param string $kinduser
+     * @param string $user
+     */
+    public function get_assets_split(int $countsplit, int $countpalettes, int $countavatars,
+                &$retpalettes, &$retavatars, &$maxavatars, string $kinduser, string $user): void {
+        $db = $this->db;
+
+        // Reads info from database.
+        $recs = $db->get_records_select('mmogame_aa_colorpalettes', '');
+        $palettes = [];
+        foreach ($recs as $rec) {
+            $palettes[$rec->id] = [$rec->colorsort1, $rec->colorsort2, $rec->colorsort3, $rec->colorsort4, $rec->colorsort5];
+        }
+
+        $retpalettes = [];
+        $random = array_rand( $palettes, min( $countpalettes, count( $palettes)));
+        foreach ($random as $r) {
+            $retpalettes[$r] = $palettes[$r];
+        }
+
+        $avatars = [];
+        $recs = $db->get_records_select('mmogame_aa_avatars', '');
+        foreach ($recs as $rec) {
+            $avatars[$rec->id] = $rec->directory.'/'.$rec->filename;
+        }
+
+        $currentids = $currentfiles = [];
+        for ($i = 0; $i < $countsplit; ++$i) {
+            $auserid = self::get_asuerid($this->db, $kinduser, $user, false, $i);
+            if ($auserid !== null) {
+                $info = $this->get_avatar_info( $auserid, false);
+                $avatarid = $info->avatarid;
+                if (array_key_exists( $avatarid, $avatars) ) {
+                    $currentids[$i] = $avatarid;
+                    $currentfiles[$i] = $avatars[$avatarid];
+                    unset($avatars[$avatarid]);
+                }
+            }
+        }
+        $maxavatars = count( $avatars);
+        $retavatars = $avatars2 = [];
+        for ($i = 0; $i < $countsplit; ++$i) {
+            if (array_key_exists( $i, $currentids)) {
+                $set = [$currentids[$i] => $currentfiles[$i]];
+            } else {
+                $set = [];
+            }
+
+            $maxcount = min( $maxavatars, $countavatars);
+            while (count( $set) < $maxcount ) {
+                $n = min( $maxcount - count( $set), count( $avatars));
+                $keys = array_rand($avatars, $n);
+                if ($n == 1) {
+                    $keys = [$keys];
+                }
+                shuffle( $keys);
+
+                $temp = [];
+                foreach ($keys as $key) {
+                    $temp[] = $key;
+                    $value = $avatars[$key];
+                    $avatars2[$key] = $avatars[$key];
+                    $set[$key] = $value;
+                }
+                foreach ($temp as $key) {
+                    unset( $avatars[$key]);
+                }
+
+                if (count( $avatars) == 0) {
+                    $avatars = $avatars2;
+                    $avatars2 = [];
+                }
+            }
+            $retavatars[] = $set;
+        }
+    }
+
+    /**
      * Saves to array $ret information about the $attempt.
      *
      * @param array $ret (returns info about the current attempt)
@@ -630,11 +780,4 @@ abstract class mmogame {
      * @return ?stdClass
      */
     abstract public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass;
-    /**
-     * Set the state of the current game.
-     *
-     * @param int $state
-     * @return string
-     */
-    abstract public function set_state(int $state): string;
 }

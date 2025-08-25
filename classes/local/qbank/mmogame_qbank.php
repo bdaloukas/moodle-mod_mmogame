@@ -151,8 +151,8 @@ abstract class mmogame_qbank {
         shuffle( $ret);
 
         foreach ($ret as $q) {
-            $this->update_stats( $auserid, null, $q->id, true, false, false);
-            $this->update_stats( null, null, $q->id, true, false, false);
+            $this->update_stats( $auserid, null, $q->id, true, false, false, 0, null);
+            $this->update_stats(null, null, $q->id, true, false, false, 0, null);
         }
 
         return count( $ret) ? $ret : null;
@@ -172,7 +172,7 @@ abstract class mmogame_qbank {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
         $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
-                [$rgame->id, $rgame->numgame, $auserid]);
+            [$rgame->id, $rgame->numgame, $auserid]);
         if ($rec === null) {
             $this->mmogame->get_grade( $auserid);
             $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
@@ -196,8 +196,8 @@ abstract class mmogame_qbank {
         } else {
             $db->insert_record( 'mmogame_aa_grades',
                 ['mmogameid' => $rgame->id, 'numgame' => $rgame->numgame, 'auserid' => $auserid, 'sumscore' => max( 0, $score),
-                'countscore' => $countscore,
-                'score' => max( 0, $score), 'sumscore2' => max( 0, $score2), 'timemodified' => time(), ]);
+                    'countscore' => $countscore,
+                    'score' => max( 0, $score), 'sumscore2' => max( 0, $score2), 'timemodified' => time(), ]);
         }
     }
 
@@ -212,13 +212,14 @@ abstract class mmogame_qbank {
      * @param bool $isused
      * @param bool $iscorrect
      * @param bool $iserror
+     * @param int $nextquery
      * @param ?array $values
      */
     public function update_stats(?int $auserid, ?int $numteam, ?int $queryid, bool $isused, bool $iscorrect, bool $iserror,
-        ?array $values = null): void {
+                                      int $nextquery, ?array $values): void {
+
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
-
         $select = 'mmogameid=? AND numgame=? ';
         $a = [$rgame->id, $rgame->numgame];
         if ($auserid !== null) {
@@ -243,17 +244,22 @@ abstract class mmogame_qbank {
         $rec = $db->get_record_select( 'mmogame_aa_stats', $select, $a);
         if ($rec !== null) {
             $a = ['id' => $rec->id];
+            if ($nextquery > 0) {
+                $a['nextquery'] = $nextquery;
+            }
             if ($isused) {
                 $a['countused'] = $rec->countused + 1;
             }
             if ($iscorrect) {
                 $a['countcorrect'] = ++$rec->countcorrect;
                 $a['islastcorrect'] = 1;
+                $a['serialcorrects'] = $rec->serialcorrects + 1;
             }
             if ($iserror) {
                 $a['counterror'] = ++$rec->counterror;
                 $a['timeerror'] = time();
                 $a['islastcorrect'] = 0;
+                $a['serialcorrects'] = 0;
             }
 
             $count = $rec->countcorrect + $rec->counterror;
@@ -263,6 +269,7 @@ abstract class mmogame_qbank {
                     $a[$key] = $value;
                 }
             }
+
             $db->update_record( 'mmogame_aa_stats', $a);
         } else {
             $count = $iscorrect + ($iserror ? 1 : 0);
@@ -270,7 +277,15 @@ abstract class mmogame_qbank {
             $a = ['mmogameid' => $rgame->id,
                 'numgame' => $rgame->numgame, 'queryid' => $queryid != 0 ? $queryid : null, 'auserid' => $auserid,
                 'numteam' => $numteam != 0 ? $numteam : null, 'percent' => $percent, 'countused' => $isused ? 1 : 0,
-                'countcorrect' => $iscorrect ? 1 : 0, 'counterror' => $iserror ? 1 : 0, 'islastcorrect' => $iscorrect ? 1 : 0, ];
+                'countcorrect' => $iscorrect ? 1 : 0, 'counterror' => $iserror ? 1 : 0 ,
+                'islastcorrect' => $iscorrect ? 1 : 0,
+                'serialcorrects' => ($iscorrect ? 1 : 0),
+                'nextquery' => $nextquery,
+                ];
+            if ($iserror) {
+                $a['timeerror'] = time();
+            }
+
             if ($values !== null) {
                 foreach ($values as $key => $value) {
                     $a[$key] = $value;

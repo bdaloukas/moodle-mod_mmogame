@@ -45,8 +45,15 @@ defined('MOODLE_INTERNAL') || die();
 $functions = [
     'mod_mmogame_get_assets' => [
         'classname'     => 'mod_mmogame\external\get_assets',
-        'description'   => 'Gets the list of avatars.',
-        'type'          => 'write',
+        'description'   => 'Gets the list of avatars and color palettes.',
+        'type'          => 'read',
+        'ajax'          => true,
+        'loginrequired' => false,
+    ],
+    'mod_mmogame_get_assets_split' => [
+        'classname'     => 'mod_mmogame\external\get_assets_split',
+        'description'   => 'Gets the list of avatars and colorpalettes.',
+        'type'          => 'read',
         'ajax'          => true,
         'loginrequired' => false,
     ],

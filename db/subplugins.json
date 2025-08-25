@@ -1,5 +1,8 @@
 {
+    "subplugintypes": {
+        "mmogametype": "type"
+    },
     "plugintypes": {
         "mmogametype": "mod\/mmogame\/type"
-    }   
+    }
 }

@@ -78,5 +78,6 @@ function mmogametype_quiz_get_models(): array {
     return [
         'alone' => get_string( 'model_alone', 'mmogametype_quiz'),
         'aduel' => get_string( 'model_aduel', 'mmogametype_quiz'),
+        'split' => get_string( 'model_split', 'mmogametype_quiz'),
     ];
 }

@@ -33,11 +33,11 @@ use required_capability_exception;
 /**
  * External function to get the list of avatars and color palettes.
  *
- * @package    mod_mmogame
- * @copyright 2024 Vasilis Daloukas
+ * @package    mmogametype_quizsplit
+ * @copyright 2025 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_assets extends external_api {
+class get_assets_split extends external_api {
 
     /**
      * Returns description of method parameters
@@ -48,8 +48,9 @@ class get_assets extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
-            'avatars' => new external_value(PARAM_INT, 'The count of avatars to return'),
-            'colorpalettes' => new external_value(PARAM_INT, 'The count of colorpalettes to return'),
+            'countsplit' => new external_value(PARAM_INT, 'The number of splits'),
+            'countpalettes' => new external_value(PARAM_INT, 'The count of colorpalettes to return'),
+            'countavatars' => new external_value(PARAM_INT, 'The count of avatars to return'),
         ]);
     }
 
@@ -59,44 +60,52 @@ class get_assets extends external_api {
      * @param int $mmogameid
      * @param string $kinduser
      * @param string $user
-     * @param int $avatars
-     * @param int $colorpalettes
+     * @param int $countsplit
+     * @param int $countpalettes
+     * @param int $countavatars
      * @return array
-     * @throws restricted_context_exception
-     * @throws required_capability_exception
      * @throws coding_exception
      * @throws invalid_parameter_exceptionAlias
-     * @throws coding_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user, int $avatars = 0,
-                                   int $colorpalettes = 0): array {
+    public static function execute(int $mmogameid, string $kinduser, string $user, int $countsplit,
+                                   int $countpalettes = 0, int $countavatars = 0): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
             'kinduser' => $kinduser,
             'user' => $user,
-            'avatars' => $avatars ?? 0,
-            'colorpalettes' => $colorpalettes ?? 0,
+            'countsplit' => $countsplit,
+            'countpalettes' => $colorpalettes ?? 0,
+            'countavatars' => $numavatars ?? 0,
         ]);
         // Perform security checks.
         $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
-        $context = module::instance($cm->id);
-        self::validate_context($context);
-        require_capability('mod/mmogame:play', $context);
-
-        $result = [];
+        if ($kinduser == 'moodle') {
+            $context = module::instance($cm->id);
+            self::validate_context($context);
+            require_capability('mod/mmogame:play', $context);
+        }
 
         $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid( $mmogame->get_db(), $kinduser, $user, false, 0);
-        // Generate avatars array if avatars > 0.
-        if ($avatars > 0) {
-            self::compute_avatars($mmogame, $auserid, $avatars, $result);
+        $retpalettes = $retavatars = [];
+        $mmogame->get_assets_split($countsplit, $countpalettes, $countavatars, $retpalettes,
+            $retavatars, $maxavatars, $kinduser, $user);
+        $avatarids = $avatars = $paletteids = $palettes = [];
+        foreach ($retpalettes as $key => $value) {
+            $paletteids[] = $key;
+            $palettes[] = implode( ',', $value);
         }
-        // Generate colorpalettes array if colorpalettes > 0.
-        if ($colorpalettes > 0) {
-            self::compute_colorpalettes($mmogame, $colorpalettes, $result);
+        foreach ($retavatars as $map) {
+            foreach ($map as $key => $value) {
+                $avatarids[] = $key;
+                $avatars[] = $value;
+            }
         }
-        return $result;
+        return ['avatars' => $avatars, 'avatarids' => $avatarids,
+            'colorpalettes' => $palettes, 'colorpaletteids' => $paletteids,
+            'numavatars' => min( $maxavatars, $countavatars)];
     }
 
     /**
@@ -126,67 +135,7 @@ class get_assets extends external_api {
                 'The list of color palette IDs',
                 VALUE_OPTIONAL
             ),
+            'numavatars' => new external_value(PARAM_INT, 'The number of avatars'),
         ]);
-    }
-
-    /**
-     * Returns a list of avatars and corresponding id
-     *
-     * @param mmogame $mmogame
-     * @param ?int $auserid
-     * @param int $count
-     * @param array $result
-     * @return void
-     */
-    private static function compute_avatars(mmogame $mmogame, ?int $auserid, int $count, array &$result): void {
-        $info = $auserid !== null ? $mmogame->get_avatar_info( $auserid) : null;
-        $a = $mmogame->get_avatars( $auserid);
-        $avatars = $ids = [];
-
-        if ($info !== null && $info->avatarid != 0 && array_key_exists( $info->avatarid, $avatars)) {
-            $avatars[] = $avatars[$info->avatarid];
-            $ids[] = $info->avatarid;
-            unset( $avatars[$info->avatarid]);
-            $count--;
-        }
-        if ($count == 1) {
-            $ids[] = $id = array_rand( $a, min($count, count($a)));
-            $avatars[] = $a[$id];
-        } else if ($count > 1) {
-            $keys = array_rand( $a, min($count, count($a)));
-            shuffle( $keys);
-            foreach ($keys as $key) {
-                $ids[] = $key;
-                $avatars[] = $a[$key];
-            }
-        }
-
-        $result['avatars'] = $avatars;
-        $result['avatarids'] = $ids;
-    }
-
-    /**
-     * Returns a list of color palettes and corresponding id
-     *
-     * @param mmogame $mmogame
-     * @param int $count
-     * @param array $result
-     * @return void
-     */
-    private static function compute_colorpalettes(mmogame $mmogame, int $count, array &$result): void {
-        $pals = $mmogame->get_palettes();
-
-        while (count( $pals) > $count) {
-            $id = array_rand( $pals);
-            unset( $pals[$id]);
-        }
-
-        $colorpalettes = [];
-        foreach ($pals as $pal) {
-            $colorpalettes[] = implode( ',', $pal);
-        }
-
-        $result['colorpaletteids'] = array_keys( $pals);
-        $result['colorpalettes'] = $colorpalettes;
     }
 }

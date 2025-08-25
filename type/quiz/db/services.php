@@ -61,4 +61,18 @@ $functions = [
         'ajax'          => true,
         'loginrequired' => false,
     ],
+    'mmogametype_quiz_get_attempts_split' => [
+        'classname'     => 'mmogametype_quiz\external\get_attempts_split',
+        'description'   => 'Starts a new attempt or continues the last attempt.',
+        'type'          => 'write',
+        'ajax'          => true,
+        'loginrequired' => false,
+    ],
+    'mmogametype_quiz_send_answers_split' => [
+        'classname'     => 'mmogametype_quiz\external\send_answers_split',
+        'description'   => 'Send answers to server.',
+        'type'          => 'write',
+        'ajax'          => true,
+        'loginrequired' => false,
+    ],
 ];

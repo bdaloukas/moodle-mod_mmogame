@@ -50,6 +50,7 @@ $string['js_wizard'] = 'Revealing the correct answer will cost you 1 mark';
 $string['js_wrong_answer'] = 'Wrong answer';
 $string['model_aduel'] = 'Quiz - ADuel';
 $string['model_alone'] = 'Quiz - Alone';
+$string['model_split'] = 'Quiz - Split';
 $string['pluginname'] = 'MMOGame Quiz';
 $string['privacy:metadata:mmogame_quiz_attempt:fraction'] = 'fraction';
 $string['privacy:metadata:mmogame_quiz_attempt:iscorrect'] = 'iscorrect';

@@ -43,7 +43,7 @@ class mmogame_model_alone {
      * @param stdClass $data
      * @param mmogame $mmogame
      */
-    public static function json_setadmin(stdClass $data, mmogame $mmogame): void {
+    public static function setadmin(stdClass $data, mmogame $mmogame): void {
         $rgame = $mmogame->get_rgame();
 
         if (isset( $data->numgame) && $data->numgame > 0) {

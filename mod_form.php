@@ -115,6 +115,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
             foreach ($map as $model => $value) {
                 $models[$type.'-'.$model] = $value;
             }
+            echo $function;
         }
 
         $mform->addElement('select', 'typemodel', get_string('type', 'mmogame'), $models);

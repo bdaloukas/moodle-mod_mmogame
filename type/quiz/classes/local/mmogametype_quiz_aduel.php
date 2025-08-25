@@ -83,7 +83,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
 
         $newplayer1 = $newplayer2 = false;
         for ($step = 1; $step <= 2; $step++) {
-            $this->aduel = mmogame_model_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2);
+            $this->aduel = mmogame_model_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2, null, false);
             if ($this->aduel === null) {
                 $this->set_errorcode( ERRORCODE_ADUEL_NO_RIVALS);
                 return null;
@@ -130,7 +130,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $a['numgame'] = $this->rgame->numgame;
             $a['numteam'] = $this->aduel->id;
             $a['auserid'] = $this->auserid;
-            $a['numattempt'] = ++$num;
+            $a['numquery'] = $a['numattempt'] = ++$num;
             $a['queryid'] = $query->id;
             $a['timestart'] = $ret == 0 ? time() : 0;
             $a['timeanswer'] = 0;
@@ -167,9 +167,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                 $ret = $id;
             }
 
-            $this->qbank->update_stats( $this->aduel->auserid2, null, $rec->queryid, 1, 0, 0);
-            $this->qbank->update_stats( $this->aduel->auserid2, null, null, 1, 0, 0);
-            $this->qbank->update_stats( null, null,  $rec->queryid, 1, 0, 0);
+            $this->qbank->update_stats( $this->aduel->auserid2, null, $rec->queryid, 1, 0, 0, 0, null);
+            $this->qbank->update_stats( $this->aduel->auserid2, null, null, 1, 0, 0, 0, null);
+            $this->qbank->update_stats( null, null,  $rec->queryid, 1, 0, 0, 0, null);
         }
 
         return $this->db->get_record_select( $table, 'id=?', [$ret]);
@@ -503,8 +503,8 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
 
         // Update statistics.
         foreach ($ret as $q) {
-            $this->qbank->update_stats( $this->auserid, null, $q->id, 1, 0, 0);
-            $this->qbank->update_stats( null, null, $q->id, 1, 0, 0);
+            $this->qbank->update_stats( $this->auserid, null, $q->id, 1, 0, 0, 0, null);
+            $this->qbank->update_stats( null, null, $q->id, 1, 0, 0, 0, null);
         }
         $this->db->update_record( 'mmogame_aa_grades',
             ['id' => $grade->id, 'countquestions' => count( $ids), 'percent' => $corrects / count($ids)]);

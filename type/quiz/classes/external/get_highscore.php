@@ -80,7 +80,7 @@ class get_highscore extends external_api {
         $ret = [];
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false);
+        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
 
         $mmogame->login_user($auserid);
 

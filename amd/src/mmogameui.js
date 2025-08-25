@@ -125,12 +125,17 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {string} user - The user identifier.
          * @param {string} url - The game URL.
          */
-        async gateOpen(mmogameid, pin, kinduser, user, url) {
-            this.url = url;
+        /*async gateOpen(mmogameid, pin, kinduser, user, url) {
+            super.gateOpen(mmogameid, pin, kinduser, user, url);
+
+            await this.callGetAttempt();
+        }*/
+        async gateOpen(mmogameid, pin, kinduser, user, modelparams, url) {
             this.mmogameid = mmogameid;
             this.pin = pin;
             this.kinduser = kinduser;
-            this.user = user;
+            this.screen = 0;
+            this.url = url;
 
             if (this.kinduser === 'guid') {
                 const option = await this.getOption('guid' + mmogameid);
@@ -140,9 +145,51 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 } else {
                     this.user = option.value;
                 }
+            } else {
+                this.kinduser = user;
             }
-            await this.callGetAttempt();
+            this.gateCreateScreen();
+            //console.log("this.gateSendGetAssets");
+            //this.gateSendGetAssets();
         }
+
+        gateSendGetAssets() {
+            console.log("gateSendGetAssets");
+            require(['core/ajax'], (Ajax) => {
+                // Defining the parameters to be passed to the service
+                let params = {
+                    mmogameid: this.mmogameid,
+                    kinduser: this.kinduser,
+                    user: this.user,
+                    countsplit: 1,
+                    countpalettes: this.countPalettes,
+                    countavatars: this.countXavatars * this.countYavatars,
+                };
+                console.log("params=",params);
+                // Calling the service through the Moodle AJAX API
+                let getAssets = Ajax.call([{
+                    methodname: 'mod_mmogame_get_assets_split',
+                    args: params
+                }]);
+                console.log("before done");
+                // Handling the response
+                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars}) => {
+                    this.info = {
+                        avatarids: avatarids,
+                        avatars: avatars,
+                        colorpaletteids: colorpaletteids,
+                        colorpalettes: colorpalettes,
+                        numavatars: numavatars,
+                    };
+                    console.log(this.info);
+                    this.gateCreateScreen();
+                }).fail((error) => {
+                    console.log("fail ", error);
+                    return error;
+                });
+            });
+        }
+
 
         gateCreateScreen() {
             while (this.body.firstChild) {
@@ -182,6 +229,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateCreateScreenDo(maxWidth, maxHeight) {
+            console.log("gateCreateScreenDo");
             // Creates the "nickname" field.
             let top = this.gateCreateNickname(0, maxWidth) + this.padding;
             this.edtNickname.focus();
@@ -257,7 +305,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateCreateSubmit(top, maxWidth) {
-           this.btnSubmit = this.createDOMElement('img', {
+            this.btnSubmit = this.createDOMElement('img', {
                 parent: this.area,
                 classnames: 'mmogame-button-gate-submit',
                 styles: {
@@ -373,7 +421,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 // Handling the response
                 getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes}) => {
                     if (updatePalette) {
-                        this.gateShowColorPalettes(leftPalette, topPalette, countXpalette, countYpalette,
+                        this.gateShowColorPalettes(this.area, leftPalette, topPalette, countXpalette, countYpalette,
                             colorpaletteids, colorpalettes);
                     }
                     if (updateAvatars) {
@@ -381,12 +429,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                             avatarids, avatars);
                     }
                 }).fail((error) => {
+                    console.log("fail", error);
                     return error;
                 });
             });
         }
 
-        gateShowColorPalettes(left, top, countX, countY, colorpaletteids, colorpalettes) {
+        gateShowColorPalettes(parent, left, top, countX, countY, colorpaletteids, colorpalettes) {
             let i = 0; // Counter for color palettes
             const count = colorpalettes.length;
             this.canvasColor = undefined;
@@ -394,6 +443,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             const parsedPalettes = colorpalettes.map(palette =>
                 palette.split(",").map(value => parseInt(value, 10) || 0)
             );
+            let acanvas = [];
             const fragment = document.createDocumentFragment();
             for (let iy = 0; iy < countY; iy++) {
                 for (let ix = 0; ix < countX; ix++) {
@@ -413,6 +463,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     canvas.style.cursor = 'pointer';
                     canvas.classList.add("mmogame_color");
 
+                    acanvas.push(canvas);
+
                     // Append canvas to the area
                     fragment.appendChild(canvas);
 
@@ -428,7 +480,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     i++;
                 }
             }
-            this.area.appendChild(fragment);
+            parent.appendChild(fragment);
+
+            return acanvas;
         }
 
         gateUpdateColorPalette(canvas, id) {
@@ -554,36 +608,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     0, topAvatars, countXavatars, countYavatars,
                     updateColors, updateAvatars);
             });
-        }
-
-        /**
-         * Creates the main game area.
-         */
-
-        createArea(top, bottomSpace) {
-            if (this.area !== undefined) {
-                this.body.removeChild(this.area);
-            }
-            this.area = this.createDOMElement('div', {
-                parent: this.body,
-                classnames: 'mmogame-area',
-                styles: {
-                    position: 'absolute',
-                    left: `${this.padding}px`,
-                    top: `${top}px`,
-                    right: `${this.padding}px`,
-                    bottom: `${this.padding + bottomSpace}px`,
-                    overflow: 'hidden',
-                }
-            });
-
-            this.areaRect = {
-                left: this.padding,
-                top: top,
-                width: this.area.offsetWidth,
-                height: this.area.offsetHeight,
-                bottom: bottomSpace,
-            };
         }
 
         removeAreaChildren() {
@@ -781,7 +805,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
         setColors(colors) {
             super.setColors(colors);
-
             this.colorBackground2 = colors[1];
         }
 
@@ -791,6 +814,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {Error} [error] - The error object to display.
          */
         showError(name, error) {
+            console.log(name, error);
             const message = error?.message || 'An unknown error occurred.';
             this.createDivMessage('mmogame-error', message);
         }

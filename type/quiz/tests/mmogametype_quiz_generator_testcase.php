@@ -66,7 +66,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 'numgame' => 1, 'type' => 'quiz', 'model' => 'alone', 'typemodel' => 'quiz,alone',
                 'kinduser' => 'guid', 'enabled' => 1]);
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
-        $this->assertEquals(1, count($records));
+        $this->assertCount(1, $records);
         $this->assertArrayHasKey($rgame->id, $records);
         $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state( 1);
@@ -75,7 +75,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame->update_state( 1);
         $classgetattempt = new mmogametype_quiz\external\get_attempt();
         $result = json_decode( $classgetattempt->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
-        $this->assertTrue($result->attempt == 0);
+        $this->assertTrue($result->attempt === 0);
 
         // Command get_attempt with 1 question.
 

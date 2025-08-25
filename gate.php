@@ -53,7 +53,9 @@ if ($rgame->kinduser == 'moodle' ) {
     require_login($course, true, $cm);
 }
 
-require_capability('mod/mmogame:play', $context);
+if ($rgame->kinduser == 'moodle') {
+    require_capability('mod/mmogame:play', $context);
+}
 
 course_module_played::played($rgame, $context)->trigger();
 
@@ -74,11 +76,12 @@ $PAGE->requires->strings_for_js(
 $url = $CFG->wwwroot.'/mod/mmogame';
 $classname = "MmoGameType".ucfirst( $rgame->type).ucfirst( $rgame->model);
 $PAGE->requires->js_call_amd('mmogametype_'.$rgame->type.'/'.strtolower( $classname));
+$modelparams = $rgame->modelparams === null || $rgame->modelparams === [] ? 'null' : "'$rgame->modelparams'";
 $PAGE->requires->js_init_code("
     require(['mmogametype_" . $rgame->type."/" . strtolower( $classname)."'], function(".$classname.") {
         const obj = new ".$classname."();
         obj.setColors( obj.sortColors( $colors));
-        obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$user', '$url');
+        obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modelparams, '$url');
     });
 ");
 

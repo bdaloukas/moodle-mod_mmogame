@@ -89,7 +89,7 @@ abstract class mmogametype_quiz extends mmogame {
 
         $recquery = null;
         if ($attempt->queryid != 0) {
-            $recquery = $this->get_qbank()->load_json( $this, $ret, '', $attempt->queryid, $attempt->layout, false);
+            $recquery = $this->get_qbank()->load_json( $ret, '', $attempt->queryid, $attempt->layout, false);
         }
 
         $ret['timestart'] = $attempt->timestart;

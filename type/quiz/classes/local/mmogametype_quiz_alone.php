@@ -82,7 +82,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                 ['id' => $grade->id, 'countquestions' => $countquestions, 'percent' => $corrects / $countquestions]);
         }
 
-        $a['numattempt'] = $this->compute_next_numattempt();
+        $a['numquery'] = $a['numattempt'] = $this->compute_next_numattempt();
         $a['timestart'] = time();
 
         // Insert data to mmogame_quiz_attempts table.
@@ -159,10 +159,10 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                 $ret['addscore'] = $attempt->score >= 0 ? '+'.$attempt->score : $attempt->score;
 
                 $this->qbank->update_stats( $attempt->auserid, null, $attempt->queryid, 0,
-                    $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0);
+                    $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0, 0, null);
 
                 $this->qbank->update_stats( null, null, $attempt->queryid, 0,
-                    $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0);
+                    $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0, 0, null);
             }
         }
 
@@ -356,5 +356,13 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         $ret['percentrank'] = $this->get_rank( $info->percent, 'percent');
 
         return $attempt;
+    }
+
+    /**
+     * Returns question types that uses (multichoice).
+     * @return string[]
+     */
+    public function get_qtypes() {
+        return ['multichoice'];
     }
 }

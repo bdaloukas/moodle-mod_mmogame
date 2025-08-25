@@ -26,6 +26,7 @@ namespace mod_mmogame\local\database;
 
 use coding_exception;
 use dml_exception;
+use Exception;
 use stdClass;
 
 /**
@@ -108,11 +109,15 @@ class mmogame_database_moodle extends mmogame_database {
      * @throws dml_exception
      */
     public function get_record_select(string $table, string $select, ?array $params=null, string $fields='*'): ?stdClass {
+
         global $DB;
 
-        $rec = $DB->get_record_select( $table, $select, $params, $fields);
-
-        return $rec === false ? null : $rec;
+        try {
+            $rec = $DB->get_record_select($table, $select, $params ?? [], $fields);
+            return $rec !== false ? $rec : null;
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     /**

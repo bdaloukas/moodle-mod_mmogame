@@ -45,28 +45,80 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      */
     public function load(int $id, bool $loadextra = true, string $fields = ''): ?stdClass {
         if ($fields == '') {
-            $fields = 'qbe.id, q.id as questionid,q.qtype,q.name,q.questiontext as definition';
+            $fields = 'qbe.id, q.id as questionid, q.qtype,q.name,q.questiontext as definition';
         }
         $db = $this->mmogame->get_db();
-        $sql = "SELECT $fields ".
-            " FROM {question} q, {question_bank_entries} qbe,{question_versions} qv ".
-            " WHERE qbe.id=qv.questionbankentryid AND qv.questionid=q.id AND qbe.id=? ".
-            " ORDER BY qv.version DESC";
-        $recs = $db->get_records_sql( $sql, [$id], 0, 1);
-        if (count( $recs) == 0) {
+        $sql = "SELECT $fields
+            FROM {question_bank_entries} qbe, {question} q, {question_versions} qv
+            WHERE qbe.id=qv.questionbankentryid AND qv.questionid=q.id AND qbe.id=?
+            AND qv.version = (
+                SELECT MAX(subqv.version)
+                FROM {question_versions} subqv
+                WHERE subqv.questionbankentryid = qv.questionbankentryid
+            )";
+        $rec = $db->get_record_sql( $sql, [$id]);
+        if ($rec === null) {
             return null;
         }
-        $ret = reset( $recs);
 
         if ($this->mmogame->get_rgame()->striptags) {
-            $ret->definition = strip_tags( $ret->definition);
+            $rec->definition = strip_tags( $rec->definition);
         }
 
         if (!$loadextra) {
-            return $ret;
+            return $rec;
         }
 
-        return $this->load2( $ret);
+        return $this->load2( $rec);
+    }
+
+    /**
+     * Loads data for question id.
+     *
+     * @param array $ids
+     * @param bool $loadextra
+     * @param string $fields
+     * @return ?stdClass
+     */
+    public function load_many(array $ids, bool $loadextra = true, string $fields = ''): ?array {
+        if ($fields == '') {
+            $fields = 'qbe.id, q.id as questionid,q.qtype,q.name,q.questiontext as definition';
+        }
+        $db = $this->mmogame->get_db();
+        [$insql, $inparams] = $db->get_in_or_equal( $ids);
+        $sql = "SELECT $fields
+            FROM {question} q, {question_bank_entries} qbe,{question_versions} qv
+            WHERE qbe.id=qv.questionbankentryid AND qv.questionid=q.id AND qbe.id $insql
+            AND qv.version = (
+                SELECT MAX(subqv.version)
+                FROM {question_versions} subqv
+                WHERE subqv.questionbankentryid = qv.questionbankentryid
+            )";
+        $recs = $db->get_records_sql( $sql, $inparams);
+        if (count( $recs) == 0) {
+            return null;
+        }
+        $striptags = $this->mmogame->get_rgame()->striptags;
+        $map = [];
+        foreach ($recs as $rec) {
+            if ($striptags) {
+                $rec->definition = strip_tags( $rec->definition);
+            }
+            $info = new stdClass();
+            $info->id = $rec->id;
+            $info->definition = $rec->definition;
+            $info->qtype = $rec->qtype;
+            $info->questionid = $rec->questionid;
+            $map[$info->id] = $info;
+        }
+
+        if (!$loadextra) {
+            return $map;
+        }
+
+        $this->load2_many( $map);
+
+        return $map;
     }
 
     /**
@@ -117,9 +169,62 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     }
 
     /**
+     * Loads data from table question_answers.
+     *
+     * @param array $mapid
+     */
+    private function load2_many(array $mapid): void {
+        $questionids = $map = [];
+        foreach ($mapid as $info) {
+            $questionids[] = $info->questionid;
+            $map[$info->questionid] = $info;
+        }
+
+        [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal( $questionids);
+        $recs = $this->mmogame->get_db()->get_records_select( 'question_answers', "question $insql",
+            $inparams, 'fraction DESC,id', 'id,question,answer,fraction');
+        $ids = [];
+        $striptags = $this->mmogame->get_rgame()->striptags;
+
+        foreach ($recs as $rec) {
+            if ($striptags) {
+                $rec->answer = strip_tags($rec->answer);
+            }
+            $info = $map[$rec->question];
+
+            if (!isset($info->correctid)) {
+                // First occurrence so is the correct answer.
+                if ($info->qtype == 'shortanswer') {
+                    $info->concept = $rec->answer;
+                    continue;
+                }
+                if ($info->qtype == 'multichoice') {
+                    $ids[] = $rec->question;
+                }
+
+                $info->answerids = [$rec->id];
+                $info->answers = [$rec->answer];
+                $info->correctid = $rec->id;
+            } else {
+                $info->answerids[] = $rec->id;
+                $info->answers[] = $rec->answer;
+            }
+        }
+
+        if (count( $ids)) {
+            [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal( $ids);
+            $recs = $this->mmogame->get_db()->get_records_select( 'qtype_multichoice_options',
+                'questionid '.$insql, $inparams);
+            foreach ($recs as $rec) {
+                $info = $map[$rec->questionid];
+                $info->multichoice = $rec;
+            }
+        }
+    }
+
+    /**
      * Copy data from questions to $ret that is used to JSON call.
      *
-     * @param mmogame $mmogame
      * @param array $ret
      * @param string $num
      * @param int $id
@@ -127,7 +232,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @param bool $fillconcept
      * @return stdClass
      */
-    public function load_json(mmogame $mmogame, array &$ret, string $num, int $id, ?string $layout, bool $fillconcept): stdClass {
+    public function load_json(array &$ret, string $num, int $id, ?string $layout, bool $fillconcept): stdClass {
         $rec = $this->load( $id);
 
         $ret['qtype'.$num] = $rec->qtype;
@@ -332,31 +437,32 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      */
     public function get_queries_ids(): ?array {
         $rgame = $this->mmogame->get_rgame();
-        $qtypes = [];
-        $qtypes[] = 'shortanswer';
-        $qtypes[] = 'multichoice';
+        $qtypes = $this->mmogame->get_qtypes();
 
         if ( count($qtypes) === 0) {
             return null;
         }
         $db = $this->mmogame->get_db();
 
-        $categoryids = $rgame->qbankparams != '' ? $rgame->qbankparams : '0';
-        [$insql1, $inparams1] = $db->get_in_or_equal( $qtypes);
-        [$insql2, $inparams2] = $db->get_in_or_equal( explode( ',', $categoryids));
-        $sql = "SELECT q.id,qtype,qbe.id as qbeid
-            FROM {question} q,{question_bank_entries} qbe,{question_versions} qv
-            WHERE qtype $insql1 AND qbe.id=qv.questionbankentryid AND qv.questionid=q.id
-            AND qbe.questioncategoryid $insql2
-            ORDER BY qv.version DESC";
-        $recs = $db->get_records_sql( $sql, array_merge($inparams1, $inparams2));
+        $categoryids = !empty($rgame->qbankparams) ? explode(',', $rgame->qbankparams) : ['0'];
+        [$insql1, $inparams1] = $db->get_in_or_equal( $categoryids);
+        [$insql2, $inparams2] = $db->get_in_or_equal( $qtypes);
 
+        $sql = "SELECT qbe.id
+            FROM {question_bank_entries} qbe
+            JOIN {question_versions} qv ON qbe.id = qv.questionbankentryid
+            JOIN {question} q ON qv.questionid = q.id
+            WHERE qv.version = (
+                SELECT MAX(subqv.version)
+                FROM {question_versions} subqv
+                WHERE subqv.questionbankentryid = qv.questionbankentryid
+            )
+            AND qbe.questioncategoryid $insql1
+            AND q.qtype $insql2";
+        $recs = $db->get_records_sql( $sql, array_merge($inparams1, $inparams2));
         $map = [];
         foreach ($recs as $rec) {
-            if (array_key_exists( $rec->qbeid, $map)) {
-                continue;
-            }
-            $map[$rec->qbeid] = $rec->qbeid;
+            $map[$rec->id] = $rec->id;
         }
 
         return $map;

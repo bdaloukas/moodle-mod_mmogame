@@ -91,5 +91,16 @@ function xmldb_mmogametype_quiz_upgrade( string $oldversion): bool {
          upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 
+    if ($oldversion < ($ver = 2025081901)) {
+        // Define field numgame to be added to mmogame.
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('numquery', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'numattempt');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
     return true;
 }

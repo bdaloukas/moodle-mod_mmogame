@@ -92,7 +92,7 @@ class get_attempt extends external_api {
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
         $create = $nickname !== null && $avatarid !== null && $colorpaletteid !== null;
-        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create);
+        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create, 0);
         if ($auserid === null) {
             return json_encode( ['errorcode' => 'no_user']);
         }

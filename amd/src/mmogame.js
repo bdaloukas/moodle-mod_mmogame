@@ -271,7 +271,6 @@ define([''], function() {
 
         autoResizeText(item, width, height, wrap, minFontSize, maxFontSize) {
             const text = item.innerHTML.toString();
-
             if (text.length === 0) {
                 return;
             }
@@ -474,22 +473,34 @@ define([''], function() {
 
         drawRadio(canvas, color1, color2) {
             let ctx = canvas.getContext("2d");
-            let size = canvas.width;
-            ctx.clearRect(0, 0, size, canvas.height);
 
+            // Ensure the canvas dimensions match its displayed size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            let size = canvas.width;
+            let height = canvas.height;
+
+            // Clear previous drawing
+            ctx.clearRect(0, 0, size, height);
+
+            // Draw outer circle
             ctx.beginPath();
-            ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI, false);
+            ctx.arc(size / 2, height / 2, Math.min(size, height) / 2, 0, 2 * Math.PI, false);
+
             ctx.fillStyle = this.getColorHex(color1);
             ctx.fill();
 
+            // Draw inner circle if checked
             let checked = canvas.classList.contains("checked");
             if (checked) {
                 ctx.beginPath();
-                ctx.arc(size / 2, size / 2, size / 4, 0, 2 * Math.PI, false);
+                ctx.arc(size / 2, height / 2, Math.min(size, height) / 4, 0, 2 * Math.PI, false);
                 ctx.fillStyle = this.getColorHex(color2);
                 ctx.fill();
             }
         }
+
 
         createRadiobox(parent, size, color1, color2, checked, disabled) {
             let canvas = document.createElement('canvas');
@@ -504,7 +515,9 @@ define([''], function() {
                 canvas.classList.add("disabled");
             }
 
-            this.drawRadio(canvas, disabled ? color1 : 0xFFFFFF, color2);
+            if (size > 0) {
+                this.drawRadio(canvas, disabled ? color1 : 0xFFFFFF, color2);
+            }
 
             return canvas;
         }
@@ -634,12 +647,45 @@ define([''], function() {
          * @param {Error} [error] - The error object to display.
          */
         showError(name, error) {
+            console.log("showError", name, error);
             return name + error;
         }
 
         setColors(colors) {
             this.colorBackground = colors[0];
+            this.colorBackground2 = colors[1];
             this.body.style.backgroundColor = this.getColorHex(this.colorBackground);
         }
+
+        /**
+         * Creates the main game area.
+         */
+
+        createArea(top, bottomSpace) {
+            if (this.area !== undefined) {
+                this.body.removeChild(this.area);
+            }
+            this.area = this.createDOMElement('div', {
+                parent: this.body,
+                classnames: 'mmogame-area',
+                styles: {
+                    position: 'absolute',
+                    left: `${this.padding}px`,
+                    top: `${top}px`,
+                    right: `${this.padding}px`,
+                    bottom: `${this.padding + bottomSpace}px`,
+                    overflow: 'hidden',
+                }
+            });
+
+            this.areaRect = {
+                left: this.padding,
+                top: top,
+                width: this.area.offsetWidth,
+                height: this.area.offsetHeight,
+                bottom: bottomSpace,
+            };
+        }
+
     };
 });
