@@ -254,8 +254,8 @@ class mmogametype_quiz_algorithm_irt {
      * @param mixed $theta
      * @param int $queryid
      * @param float $difficulty
-     * @param int $serialcorrects
-     * @param int $nextquery
+     * @param ?int $serialcorrects
+     * @param ?int $nextquery
      * @param int $step
      * @param int $numquery
      * @param float $bestscore
@@ -263,8 +263,8 @@ class mmogametype_quiz_algorithm_irt {
      * @return void
      */
     private static function log(mmogame_database $db, int $mmogameid, int $numgame, int $auserid,
-                                mixed $theta, int $queryid, float $difficulty, int $serialcorrects,
-                                int $nextquery, int $step, int $numquery, float $bestscore, string $info): void {
+                                mixed $theta, int $queryid, float $difficulty, ?int $serialcorrects,
+                                ?int $nextquery, int $step, int $numquery, float $bestscore, string $info): void {
         $db->insert_record( 'mmogame_aa_irt_log',
             ['mmogameid' => $mmogameid,
                 'numgame' => $numgame,

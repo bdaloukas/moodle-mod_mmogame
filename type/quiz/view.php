@@ -148,23 +148,27 @@ function mmogame_quiz_manage_irt_print_b(array $mapqueries, array $data): void {
         echo '<tr>';
         echo '<td>'.($i + 1) . '</td>';
         echo '<td>'.$info->questiontext. '</td>';
-        echo '<td>'.round($b[$i], 2) . '</td>';
+        echo '<td>'.(array_key_exists( $i, $b) ? round($b[$i], 2) : ''). '</td>';
         echo '<td>'.round($info->difficulty, 2).'</td>';
-        echo '<td>'.($seb[$i] !== null ? round($seb[$i], 2) : '') . '</td>';
-        $b1 = $infit[$i] > 1.5 || $infit[$i] < 0.5 ? '<b>' : '';
-        $b2 = $infit[$i] > 1.5 || $infit[$i] < 0.5 ? '</b>' : '';
-        echo '<td>'.$b1.($infit[$i] !== null ? round($infit[$i], 2) : '').$b2.'</td>';
-        echo '<td>'.($stdinfit[$i] !== null ? round($stdinfit[$i], 2) : '').'</td>';
-        $b1 = $outfit[$i] > 1.5 || $outfit[$i] < 0.5 ? '<b>' : '';
-        $b2 = $outfit[$i] > 1.5 || $outfit[$i] < 0.5 ? '</b>' : '';
-        echo '<td>' . $b1.($outfit[$i] !== null ? round($outfit[$i], 2) : '').$b2.'</td>';
-        echo '<td>'.($stdoutfit[$i] !== null ? round($stdoutfit[$i], 2) : '').'</td>';
-        echo '<td>'.$freq[$i].'</td>';
-        echo '<td>'.($percent[$i] !== null ? round($percent[$i]) : '').'%</td>';
+        echo '<td>'.(array_key_exists( $i, $seb) && $seb[$i] !== null ? round($seb[$i], 2) : '') . '</td>';
+        $b1 = array_key_exists( $i, $infit) && ($infit[$i] > 1.5 || $infit[$i] < 0.5) ? '<b>' : '';
+        $b2 = array_key_exists( $i, $infit) && ($infit[$i] > 1.5 || $infit[$i] < 0.5) ? '</b>' : '';
+        echo '<td>'.$b1.(array_key_exists( $i, $infit) && $infit[$i] !== null ? round($infit[$i], 2) : '').$b2.'</td>';
+        echo '<td>'.(array_key_exists( $i, $stdinfit) && $stdinfit[$i] !== null ? round($stdinfit[$i], 2) : '').'</td>';
+        $b1 = array_key_exists( $i, $outfit) && ($outfit[$i] > 1.5 || $outfit[$i] < 0.5) ? '<b>' : '';
+        $b2 = array_key_exists($i, $outfit) && ($outfit[$i] > 1.5 || $outfit[$i] < 0.5) ? '</b>' : '';
+        echo '<td>' . $b1.(array_key_exists( $i, $outfit) && $outfit[$i] !== null ? round($outfit[$i], 2) : '').$b2.'</td>';
+        echo '<td>'.(array_key_exists( $i, $stdoutfit) && $stdoutfit[$i] !== null ? round($stdoutfit[$i], 2) : '').'</td>';
+        echo '<td>'.(array_key_exists( $i, $freq) ? $freq[$i] : '').'</td>';
+        echo '<td>'.(array_key_exists( $i, $percent) && $percent[$i] !== null ? round($percent[$i]) : '').'%</td>';
         echo '</tr>';
         $lines[] = ($i + 1).';"'.htmlspecialchars($info->questiontext).
-            '";'.$b[$i].';'.$seb[$i].';'.$infit[$i].';'.$stdinfit[$i].';'.
-            $outfit[$i].';'.$stdoutfit[$i];
+            '";'.(array_key_exists( $i, $b) ? $b[$i] : '').';'.
+            (array_key_exists( $i, $seb) ? $seb[$i] : '').';'.
+            (array_key_exists( $i, $infit) ? $infit[$i] : '').';'.
+            (array_key_exists( $i, $stdinfit) ? $stdinfit[$i] : '').';'.
+            (array_key_exists( $i, $outfit) ? $outfit[$i] : '').';'.
+            (array_key_exists( $i, $stdoutfit) ? $stdoutfit[$i] : '');
     }
     echo '</tbody>';
     echo '</table>';
