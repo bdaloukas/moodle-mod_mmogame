@@ -851,5 +851,64 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
+    if ($oldversion < ($ver = 2025082600)) {
+        $table = new xmldb_table('mmogame_aa_irt_key');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('mmogameid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('numgame', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('PRIMARY', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('index_unique', XMLDB_INDEX_UNIQUE, ['mmogameid', 'numgame', 'userid']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2025082606)) {
+        $table = new xmldb_table('mmogame_aa_irt_students');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('keyid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('keyrec', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('mmogameid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('numgame', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('auserid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('theta', XMLDB_TYPE_FLOAT);
+
+        $table->add_key('PRIMARY', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('keyid', XMLDB_INDEX_NOTUNIQUE, ['keyid']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2025082607)) {
+        $table = new xmldb_table('mmogame_aa_irt_questions');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('keyid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('keyrec', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('b', XMLDB_TYPE_FLOAT);
+        $table->add_field('se_b', XMLDB_TYPE_FLOAT);
+        $table->add_field('infit', XMLDB_TYPE_FLOAT);
+        $table->add_field('std_infit', XMLDB_TYPE_FLOAT);
+        $table->add_field('outfit', XMLDB_TYPE_FLOAT);
+        $table->add_field('std_outfit', XMLDB_TYPE_FLOAT);
+
+        $table->add_key('PRIMARY', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('keyid', XMLDB_INDEX_NOTUNIQUE, ['keyid']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }

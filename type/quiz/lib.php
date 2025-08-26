@@ -214,6 +214,8 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, int $numitems, ?array &$res
             $info->numgame = $rec->numgame;
             $info->auserid = $rec->auserid;
             $info->theta = $rec->theta;
+            $info->numgame = $rec->numgame;
+            $info->auserid = $rec->auserid;
             $info->corrects = $info->wrongs = $info->count = 0;
             $mapusers[$key] = $info;
             $info->first = [];

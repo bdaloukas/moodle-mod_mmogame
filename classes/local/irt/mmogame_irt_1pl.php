@@ -24,6 +24,9 @@
 
 namespace mod_mmogame\local\irt;
 
+use mod_mmogame\local\mmogame;
+use stdClass;
+
 /**
  * The class mmogame_irt_1pl has the code for IRT 1PL analysis
  *
@@ -198,7 +201,6 @@ class mmogame_irt_1pl {
             'theta' => $theta,
             'b' => $b,
             'se_b' => $seb,
-            'theta_mean' => array_sum($theta) / count($theta),
             'infit' => $infit,
             'outfit' => $outfit,
             'std_infit' => $stdinfit,
@@ -247,6 +249,80 @@ class mmogame_irt_1pl {
                 $stdinfit[$j] = null;
                 $stdoutfit[$j] = null;
             }
+        }
+    }
+
+    /**
+     * Saves computations on database.
+     *
+     * @param mmogame $mmogame
+     * @param array $data
+     * @param array $mapusers
+     * @return void
+     * @throws \dml_exception
+     */
+    public static function save(mmogame $mmogame, array $data, array $mapusers): void {
+        global $DB, $USER;
+
+        $rec = $DB->get_record_select( 'mmogame_aa_irt_key',
+            'mmogameid=? AND numgame=? AND userid=?',
+            [$mmogame->get_id(), $mmogame->get_numgame(), $USER->id]);
+        if (!$rec) {
+            $rec = new stdClass();
+            $rec->mmogameid = $mmogame->get_id();
+            $rec->numgame = $mmogame->get_numgame();
+            $rec->userid = $USER->id;
+            $rec->timecreated = time();
+            $keyid = $DB->insert_record( 'mmogame_aa_irt_key', $rec);
+        } else {
+            $keyid = $rec->id;
+            $rec = new stdClass();
+            $rec->id = $keyid;
+            $rec->timecreated = time();
+            $DB->update_record('mmogame_aa_irt_key', $rec);
+        }
+
+        $DB->delete_records_select('mmogame_aa_irt_questions', 'keyid=?', [$keyid]);
+        $DB->delete_records_select('mmogame_aa_irt_students', 'keyid=?', [$keyid]);
+
+        $b = $data['b'];
+        $seb = $data['se_b'];
+        $infit = $data['infit'];
+        $outfit = $data['outfit'];
+        $stdinfit = $data['std_infit'];
+        $stdoutfit = $data['std_outfit'];
+        $freq = $data['freq'];
+        $percent = $data['percent'];
+
+        foreach( $b as $key => $vb) {
+            $new = new stdClass();
+            $new->keyid = $keyid;
+            $new->keyrec = $key;
+            $new->b = $vb;
+            $new->se_b = $seb[$key];
+            $new->infit = $infit[$key];
+            $new->std_infit = $stdinfit[$key];
+            $new->outfit = $outfit[$key];
+            $new->std_outfit = $stdoutfit[$key];
+            $new->freq = $freq[$key];
+            $new->percent = $percent[$key];
+
+            $DB->insert_record('mmogame_aa_irt_questions', $new);
+        }
+
+        $keys = array_keys( $mapusers);
+        $theta = $data['theta'];
+        $pos = 0;
+        foreach( $theta as $key => $vtheta) {
+            $user = $mapusers[ $keys[$pos++]];
+            $new = new stdClass();
+            $new->keyid = $keyid;
+            $new->keyrec = $key;
+            $new->mmogameid = $user->mmogameid;
+            $new->numgame = $user->numgame;
+            $new->auserid = $user->auserid;
+            $new->theta = $vtheta;
+            $DB->insert_record('mmogame_aa_irt_students', $new);
         }
     }
 }

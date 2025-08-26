@@ -78,6 +78,7 @@ function mmogame_irt(mmogame $mmogame, stdClass $context, string $kind): void {
     }
 
     $ret = mmogame_irt_1pl::compute($responses, $numitems);
+    mmogame_irt_1pl::save($mmogame, $ret, $mapusers);
 
     $download = optional_param('download', null, PARAM_ALPHA);
 
