@@ -48,6 +48,7 @@ $string['js_percent_opponent'] = "Opponent's percentage of correct answers";
 $string['js_ranking_order'] = 'Ranking order';
 $string['js_wizard'] = 'Revealing the correct answer will cost you 1 mark';
 $string['js_wrong_answer'] = 'Wrong answer';
+$string['menulabel_irt'] = 'IRT';
 $string['model_aduel'] = 'Quiz - ADuel';
 $string['model_alone'] = 'Quiz - Alone';
 $string['model_split'] = 'Quiz - Split';

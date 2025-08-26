@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once(dirname(__FILE__) . '/../../config.php');
+
 use mod_mmogame\event\course_module_instance_list_viewed;
 
 require_once(__DIR__ . '/../../config.php');

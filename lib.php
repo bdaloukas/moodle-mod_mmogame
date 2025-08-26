@@ -324,9 +324,17 @@ function mmogame_extend_settings_navigation(settings_navigation $settings, navig
 
         foreach ($reportlist as $report) {
             $url = new moodle_url('/mod/mmogame/report.php', ['id' => $settings->get_page()->cm->id, 'mode' => $report]);
-            $reportnode->add_node(navigation_node::create(get_string('report_'.$report, 'mmogametype_'.$model), $url,
+            $reportnode->add_node(navigation_node::create(get_string('report_' . $report, 'mmogametype_' . $model), $url,
                 navigation_node::TYPE_SETTING,
                 null, 'mmogame_report_' . $report, new pix_icon('i/item', '')));
+        }
+    }
+
+    foreach (core_component::get_plugin_list('mmogametype') as $name => $dir) {
+        $component = 'mmogametype_' . $name;
+        if (component_callback_exists($component, 'extend_settings_navigation')) {
+            error_log("call extend_settings_navigation $name");
+            component_callback($component, 'extend_settings_navigation', [$settings, $mmogamenode]);
         }
     }
 }
