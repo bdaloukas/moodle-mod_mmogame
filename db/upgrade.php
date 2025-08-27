@@ -851,7 +851,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2025082600)) {
+    if ($oldversion < ($ver = 2025082705)) {
         $table = new xmldb_table('mmogame_aa_irt_key');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
@@ -859,6 +859,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         $table->add_field('numgame', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, '0');
+        $table->add_field("filter", XMLDB_TYPE_TEXT);
         $table->add_key('PRIMARY', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_index('index_unique', XMLDB_INDEX_UNIQUE, ['mmogameid', 'numgame', 'userid']);
 
@@ -868,16 +869,24 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2025082606)) {
-        $table = new xmldb_table('mmogame_aa_irt_students');
+    if ($oldversion < ($ver = 2025082708)) {
+        $table = new xmldb_table('mmogame_aa_irt_queries');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
         $table->add_field('keyid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
         $table->add_field('keyrec', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
-        $table->add_field('mmogameid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
-        $table->add_field('numgame', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
-        $table->add_field('auserid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
-        $table->add_field('theta', XMLDB_TYPE_FLOAT);
+        $table->add_field('name', XMLDB_TYPE_CHAR, 20);
+        $table->add_field('querytext', XMLDB_TYPE_TEXT);
+        $table->add_field('b', XMLDB_TYPE_FLOAT);
+        $table->add_field('se', XMLDB_TYPE_FLOAT);
+        $table->add_field('infit', XMLDB_TYPE_FLOAT);
+        $table->add_field('std_infit', XMLDB_TYPE_FLOAT);
+        $table->add_field('outfit', XMLDB_TYPE_FLOAT);
+        $table->add_field('std_outfit', XMLDB_TYPE_FLOAT);
+        $table->add_field('count_correct', XMLDB_TYPE_INTEGER, 10);
+        $table->add_field('count_wrong', XMLDB_TYPE_INTEGER, 10);
+        $table->add_field('count_null', XMLDB_TYPE_INTEGER, 10);
+        $table->add_field('count_percent', XMLDB_TYPE_FLOAT, 10);
 
         $table->add_key('PRIMARY', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_index('keyid', XMLDB_INDEX_NOTUNIQUE, ['keyid']);
@@ -888,18 +897,21 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2025082607)) {
-        $table = new xmldb_table('mmogame_aa_irt_questions');
+    if ($oldversion < ($ver = 2025082709)) {
+        $table = new xmldb_table('mmogame_aa_irt_ausers');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
         $table->add_field('keyid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
         $table->add_field('keyrec', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
-        $table->add_field('b', XMLDB_TYPE_FLOAT);
-        $table->add_field('se_b', XMLDB_TYPE_FLOAT);
-        $table->add_field('infit', XMLDB_TYPE_FLOAT);
-        $table->add_field('std_infit', XMLDB_TYPE_FLOAT);
-        $table->add_field('outfit', XMLDB_TYPE_FLOAT);
-        $table->add_field('std_outfit', XMLDB_TYPE_FLOAT);
+        $table->add_field('mmogameid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('numgame', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('auserid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $table->add_field('theta', XMLDB_TYPE_FLOAT);
+        $table->add_field('theta_rt', XMLDB_TYPE_FLOAT);
+        $table->add_field('count_queries', XMLDB_TYPE_INTEGER, 10);
+        $table->add_field('count_correct', XMLDB_TYPE_INTEGER, 10);
+        $table->add_field('count_error', XMLDB_TYPE_INTEGER, 10);
+        $table->add_field('percent', XMLDB_TYPE_FLOAT);
 
         $table->add_key('PRIMARY', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_index('keyid', XMLDB_INDEX_NOTUNIQUE, ['keyid']);

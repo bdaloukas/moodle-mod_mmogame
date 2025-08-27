@@ -24,6 +24,7 @@
 
 namespace mod_mmogame\local\irt;
 
+use dml_exception;
 use mod_mmogame\local\mmogame;
 use stdClass;
 
@@ -237,7 +238,6 @@ class mmogame_irt_1pl {
             }
 
             $df = $count;
-
             if ($df > 0) {
                 // Variance approximation for small sample size.
                 $varinfit = 2 / $df;
@@ -253,15 +253,13 @@ class mmogame_irt_1pl {
     }
 
     /**
-     * Saves computations on database.
+     * Compute id used for saving.
      *
      * @param mmogame $mmogame
-     * @param array $data
-     * @param array $mapusers
-     * @return void
-     * @throws \dml_exception
+     * @return int
+     * @throws dml_exception
      */
-    public static function save(mmogame $mmogame, array $data, array $mapusers): void {
+    public static function keyid(mmogame $mmogame): int {
         global $DB, $USER;
 
         $rec = $DB->get_record_select( 'mmogame_aa_irt_key',
@@ -273,17 +271,32 @@ class mmogame_irt_1pl {
             $rec->numgame = $mmogame->get_numgame();
             $rec->userid = $USER->id;
             $rec->timecreated = time();
-            $keyid = $DB->insert_record( 'mmogame_aa_irt_key', $rec);
-        } else {
-            $keyid = $rec->id;
-            $rec = new stdClass();
-            $rec->id = $keyid;
-            $rec->timecreated = time();
-            $DB->update_record('mmogame_aa_irt_key', $rec);
+            return $DB->insert_record( 'mmogame_aa_irt_key', $rec);
         }
 
-        $DB->delete_records_select('mmogame_aa_irt_questions', 'keyid=?', [$keyid]);
-        $DB->delete_records_select('mmogame_aa_irt_students', 'keyid=?', [$keyid]);
+        $upd = new stdClass();
+        $upd->id = $rec->id;
+        $upd->timecreated = time();
+        $DB->update_record('mmogame_aa_irt_key', $rec);
+
+        return $upd->id;
+    }
+
+    /**
+     * Saves computations on database.
+     *
+     * @param int $keyid
+     * @param array $data
+     * @param array $mapusers
+     * @param array $mapqueries
+     * @return void
+     * @throws dml_exception
+     */
+    public static function save(int $keyid, array $data, array $mapusers, array $mapqueries): void {
+        global $DB;
+
+        $DB->delete_records_select('mmogame_aa_irt_queries', 'keyid=?', [$keyid]);
+        $DB->delete_records_select('mmogame_aa_irt_ausers', 'keyid=?', [$keyid]);
 
         $b = $data['b'];
         $seb = $data['se_b'];
@@ -294,12 +307,17 @@ class mmogame_irt_1pl {
         $freq = $data['freq'];
         $percent = $data['percent'];
 
-        foreach( $b as $key => $vb) {
+        $keys = array_keys($mapqueries);
+        $pos = 0;
+        foreach ($b as $key => $vb) {
+            $query = $mapqueries[$keys[$pos++]];
             $new = new stdClass();
             $new->keyid = $keyid;
             $new->keyrec = $key;
+            $new->name = $query->name;
+            $new->querytext = $query->querytext;
             $new->b = $vb;
-            $new->se_b = $seb[$key];
+            $new->se = $seb[$key];
             $new->infit = $infit[$key];
             $new->std_infit = $stdinfit[$key];
             $new->outfit = $outfit[$key];
@@ -307,14 +325,14 @@ class mmogame_irt_1pl {
             $new->freq = $freq[$key];
             $new->percent = $percent[$key];
 
-            $DB->insert_record('mmogame_aa_irt_questions', $new);
+            $DB->insert_record('mmogame_aa_irt_queries', $new);
         }
 
         $keys = array_keys( $mapusers);
         $theta = $data['theta'];
         $pos = 0;
-        foreach( $theta as $key => $vtheta) {
-            $user = $mapusers[ $keys[$pos++]];
+        foreach ($theta as $key => $vtheta) {
+            $user = $mapusers[$keys[$pos++]];
             $new = new stdClass();
             $new->keyid = $keyid;
             $new->keyrec = $key;
@@ -322,7 +340,7 @@ class mmogame_irt_1pl {
             $new->numgame = $user->numgame;
             $new->auserid = $user->auserid;
             $new->theta = $vtheta;
-            $DB->insert_record('mmogame_aa_irt_students', $new);
+            $DB->insert_record('mmogame_aa_irt_ausers', $new);
         }
     }
 }

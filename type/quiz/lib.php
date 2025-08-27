@@ -87,26 +87,25 @@ function mmogametype_quiz_get_models(): array {
 /**
  * Add an "IRT" link to the Course navigation (left drawer) from the subplugin.
  *
- * @param navigation_node $parentnode  Root node for the current course navigation.
- * @param stdClass        $course      Course record.
- * @param context_course  $context     Course context.
+ * @param navigation_node $parentnode Root node for the current course navigation.
+ * @param stdClass $course Course record.
+ * @param context_course $context Course context.
+ * @throws \core\exception\moodle_exception
+ * @throws coding_exception
  */
-function mmogametype_quiz_extend_navigation_course(
-    navigation_node $parentnode,
-    stdClass $course,
-    context_course $context
-) {
-    // (1) Capability gate (προσαρμόσ’ το αν θέλεις να το βλέπουν και άλλοι ρόλοι)
-    //if (!has_capability('mmogametype_quiz:viewirt', $context)) {
- //       return;
-    //}
+function mmogametype_quiz_extend_navigation_course( navigation_node $parentnode,  stdClass $course,
+                                                    context_course $context): void {
+    /* (1) Capability gate (προσαρμόσ’ το αν θέλεις να το βλέπουν και άλλοι ρόλοι)
+    if (!has_capability('mmogametype_quiz:viewirt', $context)) {
+           return;
+    }*/
 
-    // (2) Προορισμός: σελίδα IRT του subplugin (course-level)
+    // Destination : page IRT of subplugin (course-level).
     $url   = new moodle_url('/mod/mmogame/type/quiz/irt/index.php', ['courseid' => $course->id]);
     $label = get_string('menulabel_irt', 'mmogametype_quiz');
     $icon  = new pix_icon('i/report', '');
 
-    // (3) Φτιάξε το node
+    // Make node.
     $node = navigation_node::create(
         $label,
         $url,
@@ -115,19 +114,9 @@ function mmogametype_quiz_extend_navigation_course(
         'mmogametype_quiz_irt',
         $icon
     );
-    // Helpful for some themes:
+    // Helpful for some themes.
     $node->showinflatnavigation = true;
-
-    // (4) Προσπάθησε να το τοποθετήσεις κάτω από "Reports" αν υπάρχει, αλλιώς στη ρίζα
-    //$reports = $parentnode->find('coursereports', navigation_node::TYPE_CONTAINER);
-    //if ($reports instanceof navigation_node) {
-    //    $reports->add_node($node);
-    //} else {
-        $parentnode->add_node($node);
-    //}
-
-    // (προαιρετικό debug)
-    error_log('[mmogametype_quiz] IRT node added to course nav for course '.$course->id);
+    $parentnode->add_node($node);
 }
 
 /**
@@ -153,16 +142,17 @@ function mmogametype_quiz_extend_settings_navigation(settings_navigation $settin
  * Reads data from Database.
  *
  * @param mmogame $mmogame
+ * @param context $context
  * @param int $numitems
  * @param ?array $responses
  * @param ?array $mapqueries
  * @param ?array $mapusers
- * @param string $kind
  * @return array
+ * @throws coding_exception
  * @throws dml_exception
  */
-function mmogametype_quiz_irt_read(mmogame $mmogame, int $numitems, ?array &$responses,
-                                   ?array &$mapqueries, ?array &$mapusers, string $kind): array {
+function mmogametype_quiz_irt_read(mmogame $mmogame, context $context,  int $numitems, ?array &$responses,
+                                   ?array &$mapqueries, ?array &$mapusers): array {
     global $DB;
 
     $responses = [];
@@ -199,7 +189,9 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, int $numitems, ?array &$res
 
             $infoq = new stdClass;
             $infoq->queryid = $rec->queryid;
-            $infoq->questiontext = $question->questiontext;
+            $infoq->name = $rec->name;
+            $infoq->querytext = format_text($rec->questiontext ?? '',
+                $rec->questionformat ?? FORMAT_HTML, ['context' => $context]);
             $infoq->questiontextformat = $question->questiontextformat;
             $infoq->difficulty = $rec->difficulty;
             $mapqueries[$rec->queryid] = $infoq;

@@ -333,7 +333,6 @@ function mmogame_extend_settings_navigation(settings_navigation $settings, navig
     foreach (core_component::get_plugin_list('mmogametype') as $name => $dir) {
         $component = 'mmogametype_' . $name;
         if (component_callback_exists($component, 'extend_settings_navigation')) {
-            error_log("call extend_settings_navigation $name");
             component_callback($component, 'extend_settings_navigation', [$settings, $mmogamenode]);
         }
     }

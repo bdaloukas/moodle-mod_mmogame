@@ -28,14 +28,24 @@
 // The commands in here will all be database-neutral,
 // using the methods of database_manager class.
 
+/**
+ * Capability definitions for the mmogametype_quiz module.
+ *
+ * @package    mmogametype_quiz
+ * @copyright  2024 Vasilis Daloukas
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 $capabilities = [
     'mmogametype_quiz:viewirt' => [
-        'captype'     => 'read',
-        'contextlevel'=> CONTEXT_COURSE, // ή CONTEXT_MODULE αν θες per-activity
-        'archetypes'  => [
-            'manager'        => CAP_ALLOW,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'teacher'        => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
         ],
     ],
 ];

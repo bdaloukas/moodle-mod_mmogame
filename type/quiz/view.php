@@ -22,13 +22,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->libdir.'/tablelib.php');
 
 use mod_mmogame\event\course_module_viewed;
 use mod_mmogame\local\mmogame;
-
-defined('MOODLE_INTERNAL') || die();
 
 global $course, $cm, $id, $mmogame, $CFG, $PAGE;
 
