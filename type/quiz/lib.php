@@ -143,23 +143,22 @@ function mmogametype_quiz_extend_settings_navigation(settings_navigation $settin
  *
  * @param mmogame $mmogame
  * @param context $context
- * @param string|null $select
  * @param ?array $responses
  * @param ?array $mapqueries
  * @param ?array $mapusers
- * @param array $positionsq
- * @param array|null $positionsu
+ * @param string $safewhere
+ * @param array $filterparams
  * @return array
  * @throws coding_exception
  * @throws dml_exception
  */
-function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?string $select, ?array &$responses,
-                                   ?array &$mapqueries, ?array &$mapusers, array &$positionsq, ?array &$positionsu): array {
+function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$responses,
+                                   ?array &$mapqueries, ?array &$mapusers,
+                                   string $safewhere = '', array $filterparams = []): array {
     global $DB;
 
     $responses = [];
-    $where = ' AND a.mmogameid=? AND a.numgame=?';
-    $params = [$mmogame->get_id(), $mmogame->get_numgame()];
+
     $sql = "SELECT a.id, a.mmogameid, a.numgame, a.auserid, a.queryid, a.numquery, qv.questionid,
         a.score, a.iscorrect, i.difficulty, g.theta
         FROM  {mmogame_quiz_attempts} a
@@ -173,8 +172,17 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?string $
                 SELECT MAX(subqv.version)
                 FROM {question_versions} subqv
                 WHERE subqv.questionbankentryid = qv.questionbankentryid
-            ) $where
-        ORDER BY a.auserid, a.queryid, a.timeanswer, a.id";
+            )";
+
+    if ($safewhere !== '') {
+        $sql .= " AND ( $safewhere )";
+        $params = $filterparams;
+    } else {
+        $sql .= ' AND a.mmogameid=? AND a.numgame=?';
+        $params = [$mmogame->get_id(), $mmogame->get_numgame()];
+    }
+
+    $sql .= " ORDER BY a.auserid, a.queryid, a.timeanswer, a.id";
     $recs = $DB->get_records_sql($sql, $params);
     $mapqueries = [];
     $mapusers = [];
@@ -211,7 +219,6 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?string $
             $infoq->querytext = format_text($rawtext, $rawfmt, ['context' => $context]);
 
             $mapqueries[$rec->queryid] = $infoq;
-            $positionsq[] = $rec->queryid;
         } else {
             $position = $mapqueries[$rec->queryid]->position;
         }
@@ -229,7 +236,6 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?string $
             $info->corrects = $info->wrongs = $info->count = 0;
             $info->first = [];
             $mapusers[$key] = $info;
-            $positionsu[] = $key;
         }
         if ($rec->iscorrect == 0) {
             $info->wrongs++;

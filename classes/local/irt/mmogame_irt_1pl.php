@@ -56,15 +56,15 @@ class mmogame_irt_1pl {
         $b = array_fill(0, $numitems, 0.0);
 
         // Early-stop parameters.
-        $tol      = 1e-4;   // max absolute change threshold
-        $patience = 3;      // require < tol for this many consecutive iters
+        $tol = 1e-4;   // Max absolute change threshold.
+        $patience = 3; // Require < tol for this many consecutive iterations.
         $stable   = 0;
 
         // JMLE estimation.
         for ($iter = 0; $iter < $maxiter; $iter++) {
             // Keep previous values for early-stop check.
-            $b_prev     = $b;
-            $theta_prev = $theta;
+            $bprev = $b;
+            $thetaprev = $theta;
 
             // Update item difficulties b_j.
             for ($j = 0; $j < $numitems; $j++) {
@@ -72,7 +72,7 @@ class mmogame_irt_1pl {
                 $den = 0.0;
                 for ($i = 0; $i < $numstudents; $i++) {
                     $x = $responses[$i][$j];
-                    // χ is 0/1/null.
+                    // The x is 0/1/null.
                     if ($x === null) {
                         continue;
                     }
@@ -121,21 +121,25 @@ class mmogame_irt_1pl {
                 }
             }
 
-            // --- Early stop: max parameter change across b and theta ---
-            $maxDelta = 0.0;
+            // Early stop: max parameter change across b and theta.
+            $maxdelta = 0.0;
             for ($j = 0; $j < $numitems; $j++) {
-                $d = abs($b[$j] - $b_prev[$j]);
-                if ($d > $maxDelta) { $maxDelta = $d;}
+                $d = abs($b[$j] - $bprev[$j]);
+                if ($d > $maxdelta) {
+                    $maxdelta = $d;
+                }
             }
             for ($i = 0; $i < $numstudents; $i++) {
-                $d = abs($theta[$i] - $theta_prev[$i]);
-                if ($d > $maxDelta) { $maxDelta = $d;}
+                $d = abs($theta[$i] - $thetaprev[$i]);
+                if ($d > $maxdelta) {
+                    $maxdelta = $d;
+                }
             }
 
-            if ($maxDelta < $tol) {
+            if ($maxdelta < $tol) {
                 $stable++;
                 if ($stable >= $patience) {
-                    break; // converged
+                    break; // Converged.
                 }
             } else {
                 $stable = 0;
@@ -180,7 +184,7 @@ class mmogame_irt_1pl {
             for ($i = 0; $i < $numstudents; $i++) {
                 $x = $responses[$i][$j];
 
-                // χ is 0/1/null.
+                // The x is 0/1/null.
                 if ($x === null) {
                     $countnullvalue++;
                     continue;
@@ -214,7 +218,7 @@ class mmogame_irt_1pl {
 
             for ($i = 0; $i < $numstudents; $i++) {
                 $x = $responses[$i][$j];
-                // χ is 0/1/null.
+                // The x is 0/1/null.
                 if ($x === null) {
                     continue;
                 }
@@ -238,7 +242,6 @@ class mmogame_irt_1pl {
         }
 
         self::compute_std_fit($numitems, $numstudents, $responses, $irtq);
-        unset( $thetaj);
         foreach ($theta as $position => $thetaj) {
             $info = new stdClass();
             $info->theta = $thetaj;
@@ -319,14 +322,15 @@ class mmogame_irt_1pl {
      * * @param array $irtq // indexed by item position (0..numitems-1)
      * * @param array $irtu // indexed by user position (0..numusers-1)
      * * @param array $mapqueries // map: queryKey => object { position, queryid, name, querytext, b_online|difficulty, ... }
-     * * @param array $mapusers // map: userKey  => object { position, mmogameid, numgame, auserid, theta_online, count, corrects, wrongs, ... }
-     * * @param array $positionsq // list of queryKeys in the same order as $irtq (matrix item order)
-     * * @param array $positionsu // list of userKeys  in the same order as $irtu (matrix row order)
+     * * @param array $mapusers // map: userKey  => object { position, mmogameid, numgame, auserid, theta_online, corrects, ... }
      * @return void
      * @throws dml_exception
      */
-    public static function save(int $keyid, array $irtq, array $irtu, array $mapqueries, array $mapusers, array $positionsq, array $positionsu): void {
+    public static function save(int $keyid, array $irtq, array $irtu, array $mapqueries, array $mapusers): void {
         global $DB;
+
+        $positionsq = array_keys($mapqueries);
+        $positionsu = array_keys($mapusers);
 
         // Start atomic transaction (ensures delete+bulk insert consistency).
         $tx = $DB->start_delegated_transaction();
@@ -337,8 +341,8 @@ class mmogame_irt_1pl {
 
         $pos = 0;
         foreach ($irtq as $irt) {
-            $queryid = $positionsq[ $pos++];
-            $query = $mapqueries[ $queryid];
+            $queryid = $positionsq[$pos++];
+            $query = $mapqueries[$queryid];
             $new = new stdClass();
             $new->keyid = $keyid;
             $new->position = $query->position;
@@ -362,7 +366,7 @@ class mmogame_irt_1pl {
 
         $pos = 0;
         foreach ($irtu as $irt) {
-            $key = $positionsu[ $pos++];
+            $key = $positionsu[$pos++];
             $user = $mapusers[$key];
             $new = new stdClass();
             $new->keyid = $keyid;
