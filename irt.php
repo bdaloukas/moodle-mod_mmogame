@@ -94,7 +94,7 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
             $irtq = $irtu = [];
             mmogame_irt_1pl::compute($responses, count($mapqueries), $irtq, $irtu);
             $keyid = mmogame_irt_1pl::keyid($mmogame);
-            mmogame_irt_1pl::save($keyid, $irtq, $irtu, $mapqueries, $mapusers);
+            mmogame_irt_1pl::save($keyid, $wheresnippet, $irtq, $irtu, $mapqueries, $mapusers);
 
             notification::success('recomputed');
         } catch (Exception $e) {
@@ -303,7 +303,7 @@ function mmogame_irt_print_theta_moodle(int $keyid, ?string $download): void {
             $rec->wrongs ?? '',
             $rec->nulls ?? '',
             $rec->queries ?? '',
-            $rec->percent ?? '',
+            round($rec->percent) ?? '',
         ]);
     }
 
@@ -340,22 +340,33 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
     $parts = [];
     $parens = 0;
 
+    // Added: IN and comma (,) as tokens
     $re = '/\G\s*(?:'
         .'(?<field>a\.(?:auserid|mmogameid|numgame))'
         .'|(?<op><=|>=|<>|!=|=|<|>)'
+        .'|(?<in>IN)'
         .'|(?<lp>\()'
         .'|(?<rp>\))'
+        .'|(?<comma>,)'
         .'|(?<logic>AND|OR)'
         .'|(?<num>-?\d+)'
         .')\s*/Ai';
 
-    // State machine variables: all lower-case, no underscores.
+    // State machine values
     $expectfieldorlp = 0;
     $expectop = 1;
     $expectnum = 2;
     $expectlogicorrp = 3;
 
+    // Extra states for IN(...)
+    $expectlpforin = 4;
+    $expectnumin = 5;
+    $expectcommanorclosein = 6;
+
     $state = $expectfieldorlp;
+
+    // Temporary buffer for '?' placeholders inside IN
+    $inqmarks = null; // null => not inside IN, array => collecting placeholders
 
     while ($i < $len) {
         if (!preg_match($re, $s, $m, 0, $i)) {
@@ -380,29 +391,74 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
             $parts[] = $op;
             $state = $expectnum;
 
-        } else if (!empty($m['num'])) {
-            if ($state !== $expectnum) {
+        } else if (!empty($m['in'])) {
+            if ($state !== $expectop) {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
             }
-            $parts[] = '?';
-            $outparams[] = (int)$m['num'];
-            $state = $expectlogicorrp;
+            // Enter IN(...) mode
+            $inqmarks = [];
+            $state = $expectlpforin;
+
+        } else if (!empty($m['num'])) {
+            if ($state === $expectnum) {
+                // Normal comparison with a single number
+                $parts[] = '?';
+                $outparams[] = (int)$m['num'];
+                $state = $expectlogicorrp;
+
+            } else if ($state === $expectnumin) {
+                // Number inside IN(...)
+                $outparams[] = (int)$m['num'];
+                $inqmarks[] = '?';
+                $state = $expectcommanorclosein;
+
+            } else {
+                throw new \moodle_exception('invalidfilter', 'mod_mmogame');
+            }
 
         } else if (!empty($m['lp'])) {
-            if ($state !== $expectfieldorlp) {
+            if ($state === $expectfieldorlp) {
+                // Outer grouping parenthesis
+                $parts[] = '(';
+                $parens++;
+                $state = $expectfieldorlp;
+
+            } else if ($state === $expectlpforin) {
+                // Opening parenthesis of IN(...)
+                // Does not affect $parens (only grouping parentheses count)
+                $state = $expectnumin;
+
+            } else {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
             }
-            $parts[] = '(';
-            $parens++;
-            $state = $expectfieldorlp;
+
+        } else if (!empty($m['comma'])) {
+            if ($state !== $expectcommanorclosein) {
+                throw new \moodle_exception('invalidfilter', 'mod_mmogame');
+            }
+            // Expect another number in IN(...)
+            $state = $expectnumin;
 
         } else if (!empty($m['rp'])) {
-            if ($state !== $expectlogicorrp || $parens === 0) {
+            if ($state === $expectlogicorrp && $parens > 0) {
+                // Closing outer grouping parenthesis
+                $parts[] = ')';
+                $parens--;
+                $state = $expectlogicorrp;
+
+            } else if ($state === $expectcommanorclosein && is_array($inqmarks)) {
+                // Closing IN(...) list
+                if (count($inqmarks) === 0) {
+                    // Disallow empty IN()
+                    throw new \moodle_exception('invalidfilter', 'mod_mmogame');
+                }
+                $parts[] = 'IN (' . implode(',', $inqmarks) . ')';
+                $inqmarks = null;
+                $state = $expectlogicorrp;
+
+            } else {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
             }
-            $parts[] = ')';
-            $parens--;
-            $state = $expectlogicorrp;
 
         } else if (!empty($m['logic'])) {
             if ($state !== $expectlogicorrp) {
@@ -415,7 +471,8 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
         $i += strlen($m[0]);
     }
 
-    if ($parens !== 0 || $state !== $expectlogicorrp) {
+    // Final checks
+    if ($parens !== 0 || $state !== $expectlogicorrp || $inqmarks !== null) {
         throw new \moodle_exception('invalidfilter', 'mod_mmogame');
     }
 

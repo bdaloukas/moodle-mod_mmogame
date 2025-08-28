@@ -25,6 +25,7 @@
 namespace mod_mmogame\local\irt;
 
 use dml_exception;
+use dml_transaction_exception;
 use mod_mmogame\local\mmogame;
 use stdClass;
 
@@ -298,35 +299,31 @@ class mmogame_irt_1pl {
         $rec = $DB->get_record_select( 'mmogame_aa_irt_key',
             'mmogameid=? AND numgame=? AND userid=?',
             [$mmogame->get_id(), $mmogame->get_numgame(), $USER->id]);
-        if (!$rec) {
-            $rec = new stdClass();
-            $rec->mmogameid = $mmogame->get_id();
-            $rec->numgame = $mmogame->get_numgame();
-            $rec->userid = $USER->id;
-            $rec->timecomputed = time();
-            return $DB->insert_record( 'mmogame_aa_irt_key', $rec);
+        if ($rec !== false) {
+            return $rec->id;
         }
 
-        $upd = new stdClass();
-        $upd->id = $rec->id;
-        $upd->timecomputed = time();
-        $DB->update_record('mmogame_aa_irt_key', $upd);
+        $rec = new stdClass();
+        $rec->mmogameid = $mmogame->get_id();
+        $rec->numgame = $mmogame->get_numgame();
+        $rec->userid = $USER->id;
 
-        return $upd->id;
+        return $DB->insert_record( 'mmogame_aa_irt_key', $rec);
     }
 
     /**
      * Saves computations on database.
      *
      * @param int $keyid
-     * * @param array $irtq // indexed by item position (0..numitems-1)
-     * * @param array $irtu // indexed by user position (0..numusers-1)
-     * * @param array $mapqueries // map: queryKey => object { position, queryid, name, querytext, b_online|difficulty, ... }
-     * * @param array $mapusers // map: userKey  => object { position, mmogameid, numgame, auserid, theta_online, corrects, ... }
-     * @return void
+     * @param string $wheresnippet
+     * @param array $irtq
+     * @param array $irtu
+     * @param array $mapqueries
+     * @param array $mapusers
      * @throws dml_exception
+     * @throws dml_transaction_exception
      */
-    public static function save(int $keyid, array $irtq, array $irtu, array $mapqueries, array $mapusers): void {
+    public static function save(int $keyid, string $wheresnippet, array $irtq, array $irtu, array $mapqueries, array $mapusers): void {
         global $DB;
 
         $positionsq = array_keys($mapqueries);
@@ -383,6 +380,12 @@ class mmogame_irt_1pl {
             $new->percent = ($user->count != 0 ? 100 * $user->corrects / $user->count : null);
             $DB->insert_record('mmogame_aa_irt_ausers', $new);
         }
+
+        $upd = new stdClass();
+        $upd->id = $keyid;
+        $upd->filter = $wheresnippet;
+        $upd->timecomputed = time();
+        $DB->update_record( 'mmogame_aa_irt_key', $upd);
 
         // Commit (will auto-rollback on exception).
         $tx->allow_commit();

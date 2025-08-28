@@ -237,16 +237,17 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
             $info->first = [];
             $mapusers[$key] = $info;
         }
-        if ($rec->iscorrect == 0) {
-            $info->wrongs++;
-            $info->count++;
-        } else if ($rec->iscorrect == 1) {
-            $info->count++;
-            $info->corrects++;
-        }
 
         if (!array_key_exists( $position, $info->first)) {
             $info->first[$position] = $rec->iscorrect;
+
+            if ($rec->iscorrect == 0) {
+                $info->wrongs++;
+                $info->count++;
+            } else if ($rec->iscorrect == 1) {
+                $info->count++;
+                $info->corrects++;
+            }
         }
     }
 

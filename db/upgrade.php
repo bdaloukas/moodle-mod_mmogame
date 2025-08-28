@@ -895,7 +895,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2025082811)) {
+    if ($oldversion < ($ver = 2025082816)) {
         $table = new xmldb_table('mmogame_aa_irt_queries');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);

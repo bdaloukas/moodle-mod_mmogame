@@ -102,5 +102,12 @@ function xmldb_mmogametype_quiz_upgrade( string $oldversion): bool {
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 
+    if ($oldversion < ($ver = 2025082817)) {
+        // Rename model value 'aduelsplit' -> 'split' safely using DML helper.
+        $DB->set_field('mmogame', 'model', 'split', ['type' => 'quiz', 'model' => 'aduelsplit']);
+
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
     return true;
 }
