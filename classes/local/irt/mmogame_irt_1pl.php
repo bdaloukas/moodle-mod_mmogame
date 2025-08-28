@@ -41,16 +41,20 @@ class mmogame_irt_1pl {
      *
      * @param array $responses
      * @param int $numitems
+     * @param array $irtq
+     * @param array $irtu
      * @param int $maxiter
-     * @return array
+     * @return void
      */
-    public static function compute(array $responses, int $numitems, int $maxiter = 150): array {
+    public static function compute(array $responses, int $numitems, array &$irtq, array &$irtu, int $maxiter = 150): void {
         $numstudents = count($responses);
+
+        $irtq = $irtu = [];
 
         // Initialize theta and b.
         $theta = array_fill(0, $numstudents, 0.0);
         $b = array_fill(0, $numitems, 0.0);
-
+error_log("numitems=$numitems numstudents=$numstudents");
         // JMLE estimation.
         for ($iter = 0; $iter < $maxiter; $iter++) {
             // Update item difficulties b_j.
@@ -138,15 +142,14 @@ class mmogame_irt_1pl {
         }
 
         // Computes SE for b.
-        $seb = $freq = $percent = [];
         for ($j = 0; $j < $numitems; $j++) {
             $suminfo = 0.0;
-            $count0 = $count1 = $countnull = 0;
+            $count0 = $count1 = $countnullvalue = 0;
             for ($i = 0; $i < $numstudents; $i++) {
                 $x = $responses[$i][$j];
 
                 if ($x === null) {
-                    $countnull++;
+                    $countnullvalue++;
                     continue;
                 }
 
@@ -158,15 +161,18 @@ class mmogame_irt_1pl {
                 $p = 1 / (1 + exp(-($theta[$i] - $b[$j])));
                 $suminfo += $p * (1 - $p);
             }
-            $seb[$j] = ($suminfo > 0) ? 1 / sqrt($suminfo) : null;
-            $freq[$j] = "$count1-$count0-$countnull";
-
-            $percent[$j] = $count0 + $count1 === 0 ? null : $count1 / ($count0 + $count1) * 100;
+            $info = new stdClass();
+            $info->b = $b[$j];
+            $info->seb = ($suminfo > 0) ? 1 / sqrt($suminfo) : null;
+            $info->corrects = $count1;
+            $info->wrongs = $count0;
+            $info->nulls = $countnullvalue;
+            $info->percent = $count0 + $count1 === 0 ? null : $count1 / ($count0 + $count1) * 100;
+            $irtq[] = $info;
+            unset( $info);
         }
 
         // Improved Infit and Outfit.
-        $infit = [];
-        $outfit = [];
         for ($j = 0; $j < $numitems; $j++) {
             $sumwz2 = 0.0;
             $sumw = 0.0;
@@ -191,24 +197,22 @@ class mmogame_irt_1pl {
                 $sumz2 += $z * $z;
                 $count++;
             }
-
-            $infit[$j] = ($sumw > 0) ? $sumwz2 / $sumw : null;
-            $outfit[$j] = ($count > 0) ? $sumz2 / $count : null;
+            $info = &$irtq[$j];
+            $info->infit = ($sumw > 0) ? $sumwz2 / $sumw : null;
+            $info->outfit = ($count > 0) ? $sumz2 / $count : null;
+            unset( $info);
         }
 
-        self::compute_std_fit($numitems, $numstudents, $responses, $infit, $outfit, $stdinfit, $stdoutfit);
+        self::compute_std_fit($numitems, $numstudents, $responses, $irtq);
+        unset( $thetaj);
+        foreach( $theta as $position => $thetaj) {
+            $info = new stdClass();
+            $info->theta = $thetaj;
+            $irtu[$position] = $info;
+        }
 
-        return [
-            'theta' => $theta,
-            'b' => $b,
-            'se_b' => $seb,
-            'infit' => $infit,
-            'outfit' => $outfit,
-            'std_infit' => $stdinfit,
-            'std_outfit' => $stdoutfit,
-            'freq' => $freq,
-            'percent' => $percent,
-        ];
+        error_log("after irtq=".json_encode($irtq, JSON_PRETTY_PRINT));
+        error_log("after irtu=".json_encode($irtu, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -217,18 +221,13 @@ class mmogame_irt_1pl {
      * @param int $numitems
      * @param int $numstudents
      * @param array $responses
-     * @param array $infit
-     * @param array $outfit
-     * @param ?array $stdinfit
-     * @param ?array $stdoutfit
+     * @param array $irtq
      * @return void
      */
-    protected static function compute_std_fit(int $numitems, int $numstudents, array $responses,
-                array $infit, array $outfit, ?array &$stdinfit, ?array &$stdoutfit): void {
-        $stdinfit = [];
-        $stdoutfit = [];
-
+    protected static function compute_std_fit(int $numitems, int $numstudents, array $responses, array &$irtq): void {
         for ($j = 0; $j < $numitems; $j++) {
+            $info = &$irtq[$j];
+
             $count = 0;
             for ($i = 0; $i < $numstudents; $i++) {
                 $x = $responses[$i][$j];
@@ -243,11 +242,11 @@ class mmogame_irt_1pl {
                 $varinfit = 2 / $df;
                 $varoutfit = 2 / $df;
 
-                $stdinfit[$j] = ($infit[$j] - 1) / sqrt($varinfit);
-                $stdoutfit[$j] = ($outfit[$j] - 1) / sqrt($varoutfit);
+                $info->stdinfit = ($info->infit - 1) / sqrt($varinfit);
+                $info->stdoutfit = ($info->outfit - 1) / sqrt($varoutfit);
             } else {
-                $stdinfit[$j] = null;
-                $stdoutfit[$j] = null;
+                $info->stdinfit = null;
+                $info->stdoutfit = null;
             }
         }
     }
@@ -286,60 +285,61 @@ class mmogame_irt_1pl {
      * Saves computations on database.
      *
      * @param int $keyid
-     * @param array $data
-     * @param array $mapusers
+     * @param array $irtq
+     * @param array $irtu
      * @param array $mapqueries
+     * @param array $mapusers
      * @return void
      * @throws dml_exception
      */
-    public static function save(int $keyid, array $data, array $mapusers, array $mapqueries): void {
+    public static function save(int $keyid, array $irtq, array $irtu, array $mapqueries, array $mapusers): void {
         global $DB;
-
+error_log("irtq=".json_encode($irtq,JSON_PRETTY_PRINT));
         $DB->delete_records_select('mmogame_aa_irt_queries', 'keyid=?', [$keyid]);
         $DB->delete_records_select('mmogame_aa_irt_ausers', 'keyid=?', [$keyid]);
 
-        $b = $data['b'];
-        $seb = $data['se_b'];
-        $infit = $data['infit'];
-        $outfit = $data['outfit'];
-        $stdinfit = $data['std_infit'];
-        $stdoutfit = $data['std_outfit'];
-        $freq = $data['freq'];
-        $percent = $data['percent'];
-
-        $keys = array_keys($mapqueries);
         $pos = 0;
-        foreach ($b as $key => $vb) {
+        $keys = array_keys( $mapqueries);
+        foreach ($irtq as $irt) {
             $query = $mapqueries[$keys[$pos++]];
             $new = new stdClass();
             $new->keyid = $keyid;
-            $new->keyrec = $key;
+            $new->position = $pos;
+            $new->queryid = $query->queryid;
             $new->name = $query->name;
             $new->querytext = $query->querytext;
-            $new->b = $vb;
-            $new->se = $seb[$key];
-            $new->infit = $infit[$key];
-            $new->std_infit = $stdinfit[$key];
-            $new->outfit = $outfit[$key];
-            $new->std_outfit = $stdoutfit[$key];
-            $new->freq = $freq[$key];
-            $new->percent = $percent[$key];
+            error_log("irt=".json_encode($irt,JSON_PRETTY_PRINT));
+            $new->b = $irt->b;
+            $new->b_online = $query->b_online;
+            $new->seb = $irt->seb;
+            $new->infit = $irt->infit;
+            $new->std_infit = $irt->stdinfit;
+            $new->outfit = $irt->outfit;
+            $new->std_outfit = $irt->stdoutfit;
+            $new->corrects = $irt->corrects;
+            $new->wrongs = $irt->wrongs;
+            $new->nulls = $irt->nulls;
+            $new->percent = $irt->percent;
 
             $DB->insert_record('mmogame_aa_irt_queries', $new);
         }
 
         $keys = array_keys( $mapusers);
-        $theta = $data['theta'];
         $pos = 0;
-        foreach ($theta as $key => $vtheta) {
+        foreach ($irtu as $irt) {
             $user = $mapusers[$keys[$pos++]];
             $new = new stdClass();
             $new->keyid = $keyid;
-            $new->keyrec = $key;
             $new->mmogameid = $user->mmogameid;
             $new->numgame = $user->numgame;
             $new->auserid = $user->auserid;
-            $new->theta = $vtheta;
+            $new->theta = $irt->theta;
+            $new->theta_online = $user->theta_online;
+            $new->queries = $user->count;
+            $new->corrects = $user->corrects;
+            $new->wrongs = $user->wrongs;
+            $new->nulls = count($mapqueries) - $user->count;
+            $new->percent = ($user->count != 0 ? 100 * $user->corrects / $user->count : null);
             $DB->insert_record('mmogame_aa_irt_ausers', $new);
         }
     }

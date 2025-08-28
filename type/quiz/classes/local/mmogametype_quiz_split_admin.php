@@ -178,10 +178,6 @@ class mmogametype_quiz_split_admin extends moodleform {
             $mform->addElement('html', '</tr>');
         }
 
-        $mform->addElement('html', '<tr><td>
-            <button name="irt">IRT</button>
-            </td></tr>');
-
         // End of the table.
         $mform->addElement('html', '</table>');
 

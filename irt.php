@@ -68,12 +68,10 @@ mmogame_irt( $mmogame, $context, 'first');
  * @throws dml_exception|coding_exception
  */
 function mmogame_irt(mmogame $mmogame, stdClass $context, string $kind): void {
-    $numitems = 36;
-
     $responses = $mapqueries = $mapusers = [];
     $function = 'mmogametype_'.$mmogame->get_type().'_irt_read';
     if (function_exists($function)) {
-        $function($mmogame, $context, $numitems, $responses, $mapqueries, $mapusers, $kind);
+        $function($mmogame, $context, $responses, $mapqueries, $mapusers, $kind);
     } else {
         die("function does not exist ".$function."()");
     }
@@ -82,8 +80,9 @@ function mmogame_irt(mmogame $mmogame, stdClass $context, string $kind): void {
 
     $keyid = mmogame_irt_1pl::keyid( $mmogame);
     if ($compute) {
-        $ret = mmogame_irt_1pl::compute($responses, $numitems);
-        mmogame_irt_1pl::save($keyid, $ret, $mapusers, $mapqueries);
+        $irtq = $irtu = [];
+        mmogame_irt_1pl::compute($responses, count($mapqueries), $irtq, $irtu);
+        mmogame_irt_1pl::save($keyid, $irtq, $irtu, $mapqueries, $mapusers);
     }
 
     $download = optional_param('download', null, PARAM_ALPHA);
@@ -141,13 +140,13 @@ function mmogame_irt_print_b_moodle(int $keyid, ?string $download): void {
     $table = new flexible_table('mmogame-b-table');
     $table->define_baseurl($PAGE->url);
 
-    $sort = optional_param('sort', 'name', PARAM_ALPHA);
+    $sort = optional_param('sort', 'id', PARAM_ALPHA);
 
     $recs = $DB->get_records_select( 'mmogame_aa_irt_queries', 'keyid=?', [$keyid], $sort);
-    $columns = ['num', 'name', 'questiontext', 'b', 'b_rt', 'se', 'wms', 'std_wms', 'ums',
-        'std_ums', 'freq', 'percent'];
-    $headers = ['#', 'Name', 'Question', 'b', 'Real time (b)', 'SE', 'WMS', 'Std.WMS', 'UMS',
-        'Std.UMS', 'Correct/Error/Null', '%'];
+    $columns = ['num', 'name', 'questiontext', 'b', 'b_rt', 'se', 'infit', 'std_infit', 'outfit',
+        'std_outfit', 'corrects', 'wrongs', 'queries', 'nulls', 'percent'];
+    $headers = ['#', 'Name', 'Question', 'b', 'Online (b)', 'SE', 'Infit MNSQ', 'Std.Infit', 'Outfit MNSQ',
+        'Std.Outfit', 'Corrects', 'Wrongs', 'Nulls', 'Queries', 'Percent %'];
 
     $table->define_columns($columns);
     $table->define_headers($headers);
@@ -167,12 +166,17 @@ function mmogame_irt_print_b_moodle(int $keyid, ?string $download): void {
             $rec->name,
             $rec->querytext,
             is_null($rec->b) ? '' : format_float($rec->b, 2),
-            isset($rec->difficulty) ? format_float($rec->difficulty, 2) : '',
-            is_null($rec->se) ? '' : format_float($rec->se, 2),
+            isset($rec->b_online) ? format_float($rec->b_online, 2) : '',
+            is_null($rec->seb) ? '' : format_float($rec->seb, 2),
             is_null($rec->infit) ? '' : format_float($rec->infit, 2),
             is_null($rec->std_infit) ? '' : format_float($rec->std_infit, 2),
             is_null($rec->outfit) ? '' : format_float($rec->outfit, 2),
             is_null($rec->std_outfit) ? '' : format_float($rec->std_outfit, 2),
+            $rec->corrects ?? '',
+            $rec->wrongs ?? '',
+            $rec->nulls ?? '',
+            ($rec->corrects + $rec->wrongs) ?? '',
+            $rec->percent ?? '',
         ]);
     }
 
@@ -186,6 +190,7 @@ function mmogame_irt_print_b_moodle(int $keyid, ?string $download): void {
  * @param int $keyid
  * @param string|null $download
  * @throws coding_exception
+ * @throws dml_exception
  */
 function mmogame_irt_print_theta_moodle(int $keyid, ?string $download): void {
     global $DB, $PAGE;
@@ -194,9 +199,9 @@ function mmogame_irt_print_theta_moodle(int $keyid, ?string $download): void {
     $table->define_baseurl($PAGE->url);
 
     $columns = ['s_num', 's_mmogameid', 's_numgame', 's_auserid', 's_theta', 's_theta_rt',
-        's_difcount', 's_questions', 's_corrects', 's_wrongs', 's_percent'];
-    $headers = ['#', 'mmogameid', 'numgame', 'auserid', 'θ', 'θ (real time)',
-        'Dif count', 'Questions', 'Corrects', 'Wrongs', '%'];
+        's_corrects', 's_wrongs', 's_nulls', 's_queries', 's_percent'];
+    $headers = ['#', 'mmogameid', 'numgame', 'auserid', 'theta', 'Online theta',
+        'Corrects', 'Wrongs', 'Nulls', 'Queries', 'Percent %'];
 
     $table->define_columns($columns);
     $table->define_headers($headers);
@@ -219,12 +224,12 @@ function mmogame_irt_print_theta_moodle(int $keyid, ?string $download): void {
             s($rec->numgame ?? ''),
             s($rec->auserid ?? ''),
             is_null($rec->theta) ? '' : format_float($rec->theta, 2),
-            is_null($rec->theta_rt) ? '' : format_float($rec->theta_rt,  2),
-            0,
-            $rec->count_queries ?? '',
-            $rec->count_correct ?? '',
-            $rec->count_wrong ?? '',
-            $rec->percent,
+            is_null($rec->theta_online) ? '' : format_float($rec->theta_online,  2),
+            $rec->corrects ?? '',
+            $rec->wrongs ?? '',
+            $rec->nulls ?? '',
+            $rec->queries ?? '',
+            $rec->percent ?? '',
         ]);
     }
 
