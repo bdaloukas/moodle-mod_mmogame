@@ -115,13 +115,11 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         queryanswerids0: queryanswerids0,
                         grades: grades,
                     };
-                    console.log("sendGetAttmptsSplit", this.info);
                     if (this.palette !== undefined) {
                         this.setColors(this.palette);
                     }
                     this.createScreen();
                 }).fail((error) => {
-                    console.log("fail", error);
                     return error;
                 });
             });
@@ -218,24 +216,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     role: 'button',
                 },
             });
-
-            // AUserid
-            let auserid = this.createDOMElement('div', {
-                parent: sp.parent,
-                classnames: 'mmogame-quiz-aduelsplit-auserid',
-                styles: {
-                    position: 'absolute',
-                    left: '0',
-                    top: `0`,
-                    width: `auto`,
-                    height: `auto`,
-                    overflow: 'hidden',
-                    align: 'left',
-                    color:  this.getContrastingColor(this.colorDefinition),
-                }
-            });
-            //auserid.innerHTML = sp.auserid;
-
 
             // Definition.
             sp.definitionWidth = ishorizontal ?

@@ -244,7 +244,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     const formData = new URLSearchParams();
                     formData.append("fastjson", this.fastjson.toString());
                     formData.append("type", this.type);
-console.log("this.url=", this.url, this);
+
                     // Send POST request with application/x-www-form-urlencoded format
                     const response = await fetch(`${this.url}/state.php`, {
                         method: 'POST',
