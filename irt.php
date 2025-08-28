@@ -68,10 +68,10 @@ mmogame_irt( $mmogame, $context, 'first');
  * @throws dml_exception|coding_exception
  */
 function mmogame_irt(mmogame $mmogame, stdClass $context, string $kind): void {
-    $responses = $mapqueries = $mapusers = [];
+    $responses = $mapqueries = $mapusers = $positionsq = $positionsu = [];
     $function = 'mmogametype_'.$mmogame->get_type().'_irt_read';
     if (function_exists($function)) {
-        $function($mmogame, $context, $responses, $mapqueries, $mapusers, $kind);
+        $function($mmogame, $context, null, $responses, $mapqueries, $mapusers, $positionsq, $positionsu);
     } else {
         die("function does not exist ".$function."()");
     }
@@ -82,7 +82,7 @@ function mmogame_irt(mmogame $mmogame, stdClass $context, string $kind): void {
     if ($compute) {
         $irtq = $irtu = [];
         mmogame_irt_1pl::compute($responses, count($mapqueries), $irtq, $irtu);
-        mmogame_irt_1pl::save($keyid, $irtq, $irtu, $mapqueries, $mapusers);
+        mmogame_irt_1pl::save($keyid, $irtq, $irtu, $mapqueries, $mapusers, $positionsq, $positionsu);
     }
 
     $download = optional_param('download', null, PARAM_ALPHA);

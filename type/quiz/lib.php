@@ -143,53 +143,75 @@ function mmogametype_quiz_extend_settings_navigation(settings_navigation $settin
  *
  * @param mmogame $mmogame
  * @param context $context
+ * @param string|null $select
  * @param ?array $responses
  * @param ?array $mapqueries
  * @param ?array $mapusers
+ * @param array $positionsq
+ * @param array|null $positionsu
  * @return array
  * @throws coding_exception
  * @throws dml_exception
  */
-function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$responses,
-                                   ?array &$mapqueries, ?array &$mapusers): array {
+function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?string $select, ?array &$responses,
+                                   ?array &$mapqueries, ?array &$mapusers, array &$positionsq, ?array &$positionsu): array {
     global $DB;
 
     $responses = [];
-    $where = [];
-    $where[] = " a.mmogameid=".$mmogame->get_id()." AND a.numgame=".$mmogame->get_numgame();
-    $where = count( $where) == 0 ? '' : " AND (".implode( " OR ", $where) . ")";
-    $sql = "SELECT a.id, a.mmogameid, a.numgame, a.auserid, a.queryid, a.numquery,
+    $where = ' AND a.mmogameid=? AND a.numgame=?';
+    $params = [$mmogame->get_id(), $mmogame->get_numgame()];
+    $sql = "SELECT a.id, a.mmogameid, a.numgame, a.auserid, a.queryid, a.numquery, qv.questionid,
         a.score, a.iscorrect, i.difficulty, g.theta
-        FROM {question_bank_entries} qbe, {question_versions} qv, {mmogame_quiz_attempts} a
-        LEFT JOIN {mmogame_am_aduel_pairs} AS ad ON a.numteam = ad.id
+        FROM  {mmogame_quiz_attempts} a
+        JOIN {question_bank_entries} qbe ON qbe.id = a.queryid
+        JOIN {question_versions} qv ON qbe.id=qv.questionbankentryid
         LEFT JOIN {mmogame_aa_irt} i ON i.mmogameid=a.mmogameid AND i.numgame=a.numgame AND i.queryid=a.queryid
         LEFT JOIN {mmogame_aa_grades} g ON g.mmogameid=a.mmogameid AND g.numgame=a.numgame AND g.auserid=a.auserid
-        LEFT JOIN {mmogame_aa_stats} s ON s.mmogameid=a.mmogameid AND s.numgame=a.numgame
-            AND s.queryid=a.queryid AND s.auserid=a.auserid
-        WHERE qbe.id=qv.questionbankentryid AND qbe.id= a.queryid
-        AND a.timeanswer > 0
+        WHERE
+        a.timeanswer > 0
         AND qv.version = (
                 SELECT MAX(subqv.version)
                 FROM {question_versions} subqv
                 WHERE subqv.questionbankentryid = qv.questionbankentryid
             ) $where
-        ORDER BY a.timeanswer, a.id";
-    $recs = $DB->get_records_sql($sql);
+        ORDER BY a.auserid, a.queryid, a.timeanswer, a.id";
+    $recs = $DB->get_records_sql($sql, $params);
     $mapqueries = [];
     $mapusers = [];
+
+    // Batch prefetch all needed questions (single query, avoids JOIN and N+1).
+    $questionids = [];
+    foreach ($recs as $rec) {
+        $questionids[$rec->questionid] = true;
+    }
+    $questions = empty($questionids)
+        ? []
+        : $DB->get_records_list(
+            'question',
+            'id',
+            array_keys($questionids),
+            '',
+            'id,name,questiontext,questiontextformat'
+        );
+
+    $aquery = [];
     foreach ($recs as $rec) {
         if (!array_key_exists( $rec->queryid, $mapqueries)) {
-            $question = $DB->get_record_select('question', 'id=?', [$rec->queryid]);
+            $q = $questions[$rec->questionid] ?? null;
 
             $infoq = new stdClass;
             $position = $infoq->position = count($mapqueries);
             $infoq->queryid = $rec->queryid;
-            $infoq->name = $question->name;
-            $infoq->querytext = format_text($question->questiontext ?? '',
-                $question->questiontextformat ?? FORMAT_HTML, ['context' => $context]);
-            $infoq->questiontextformat = $question->questiontextformat;
+            $infoq->name = $q->name;
             $infoq->b_online = $rec->difficulty;
+
+            // Safely format question text with context.
+            $rawtext = $q->questiontext ?? '';
+            $rawfmt  = $q->questiontextformat ?? FORMAT_HTML;
+            $infoq->querytext = format_text($rawtext, $rawfmt, ['context' => $context]);
+
             $mapqueries[$rec->queryid] = $infoq;
+            $positionsq[] = $rec->queryid;
         } else {
             $position = $mapqueries[$rec->queryid]->position;
         }
@@ -199,6 +221,7 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
             $info = $mapusers[$key];
         } else {
             $info = new stdClass();
+            $info->position = count($mapusers); // Assign stable 0-based position.
             $info->mmogameid = $rec->mmogameid;
             $info->numgame = $rec->numgame;
             $info->auserid = $rec->auserid;
@@ -206,6 +229,7 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
             $info->corrects = $info->wrongs = $info->count = 0;
             $info->first = [];
             $mapusers[$key] = $info;
+            $positionsu[] = $key;
         }
         if ($rec->iscorrect == 0) {
             $info->wrongs++;
@@ -222,7 +246,7 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
 
     $numitems = count( $mapqueries);
     $empty = [];
-    for ($i = 0 ; $i < $numitems; $i++) {
+    for ($i = 0; $i < $numitems; $i++) {
         $empty[] = null;
     }
     foreach ($mapusers as $info) {
@@ -233,11 +257,11 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
         $responses[] = $a;
     }
 
-    $lines = $header = [];
+    $header = [];
     for ($i = 1; $i <= $numitems; $i++) {
         $header[] = 'query'.$i;
     }
-    $lines[] = implode( ';', $header);
+    $lines = [implode( ';', $header)];
     foreach ($responses as $response) {
         $lines[] = implode( ';', $response);
     }

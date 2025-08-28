@@ -54,15 +54,25 @@ class mmogame_irt_1pl {
         // Initialize theta and b.
         $theta = array_fill(0, $numstudents, 0.0);
         $b = array_fill(0, $numitems, 0.0);
-error_log("numitems=$numitems numstudents=$numstudents");
+
+        // Early-stop parameters.
+        $tol      = 1e-4;   // max absolute change threshold
+        $patience = 3;      // require < tol for this many consecutive iters
+        $stable   = 0;
+
         // JMLE estimation.
         for ($iter = 0; $iter < $maxiter; $iter++) {
+            // Keep previous values for early-stop check.
+            $b_prev     = $b;
+            $theta_prev = $theta;
+
             // Update item difficulties b_j.
             for ($j = 0; $j < $numitems; $j++) {
                 $num = 0.0;
                 $den = 0.0;
                 for ($i = 0; $i < $numstudents; $i++) {
                     $x = $responses[$i][$j];
+                    // χ is 0/1/null.
                     if ($x === null) {
                         continue;
                     }
@@ -70,7 +80,7 @@ error_log("numitems=$numitems numstudents=$numstudents");
                     $num += $x - $p;
                     $den += $p * (1 - $p);
                 }
-                if ($den != 0) {
+                if ($den > 1e-8) {
                     $b[$j] -= $num / $den;
                 }
             }
@@ -95,10 +105,10 @@ error_log("numitems=$numitems numstudents=$numstudents");
                         continue;
                     }
                     $p = 1 / (1 + exp(-($theta[$i] - $b[$j])));
-                    $num += $x - $p;
+                    $num += (int )$x - $p;
                     $den += $p * (1 - $p);
                 }
-                if ($den != 0) {
+                if ($den > 1e-8) {
                     $theta[$i] += $num / $den;
                 }
             }
@@ -109,6 +119,26 @@ error_log("numitems=$numitems numstudents=$numstudents");
                 } else if ($thetaj < -6) {
                     $thetaj = -6;
                 }
+            }
+
+            // --- Early stop: max parameter change across b and theta ---
+            $maxDelta = 0.0;
+            for ($j = 0; $j < $numitems; $j++) {
+                $d = abs($b[$j] - $b_prev[$j]);
+                if ($d > $maxDelta) { $maxDelta = $d;}
+            }
+            for ($i = 0; $i < $numstudents; $i++) {
+                $d = abs($theta[$i] - $theta_prev[$i]);
+                if ($d > $maxDelta) { $maxDelta = $d;}
+            }
+
+            if ($maxDelta < $tol) {
+                $stable++;
+                if ($stable >= $patience) {
+                    break; // converged
+                }
+            } else {
+                $stable = 0;
             }
         }
 
@@ -135,11 +165,13 @@ error_log("numitems=$numitems numstudents=$numstudents");
         }
         unset($bj);
 
+        // Centering theta.
         foreach ($theta as &$thetaj) {
             if ($thetaj > -6 && $thetaj < 6) {
                 $thetaj -= $meanb;
             }
         }
+        unset( $thetaj);
 
         // Computes SE for b.
         for ($j = 0; $j < $numitems; $j++) {
@@ -148,6 +180,7 @@ error_log("numitems=$numitems numstudents=$numstudents");
             for ($i = 0; $i < $numstudents; $i++) {
                 $x = $responses[$i][$j];
 
+                // χ is 0/1/null.
                 if ($x === null) {
                     $countnullvalue++;
                     continue;
@@ -181,6 +214,7 @@ error_log("numitems=$numitems numstudents=$numstudents");
 
             for ($i = 0; $i < $numstudents; $i++) {
                 $x = $responses[$i][$j];
+                // χ is 0/1/null.
                 if ($x === null) {
                     continue;
                 }
@@ -205,14 +239,11 @@ error_log("numitems=$numitems numstudents=$numstudents");
 
         self::compute_std_fit($numitems, $numstudents, $responses, $irtq);
         unset( $thetaj);
-        foreach( $theta as $position => $thetaj) {
+        foreach ($theta as $position => $thetaj) {
             $info = new stdClass();
             $info->theta = $thetaj;
             $irtu[$position] = $info;
         }
-
-        error_log("after irtq=".json_encode($irtq, JSON_PRETTY_PRINT));
-        error_log("after irtu=".json_encode($irtu, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -230,13 +261,13 @@ error_log("numitems=$numitems numstudents=$numstudents");
 
             $count = 0;
             for ($i = 0; $i < $numstudents; $i++) {
-                $x = $responses[$i][$j];
+                $x = $responses[$i][$j] ?? null;
                 if ($x !== null) {
                     $count++;
                 }
             }
 
-            $df = $count;
+            $df = $count - 1;
             if ($df > 0) {
                 // Variance approximation for small sample size.
                 $varinfit = 2 / $df;
@@ -269,14 +300,14 @@ error_log("numitems=$numitems numstudents=$numstudents");
             $rec->mmogameid = $mmogame->get_id();
             $rec->numgame = $mmogame->get_numgame();
             $rec->userid = $USER->id;
-            $rec->timecreated = time();
+            $rec->timecomputed = time();
             return $DB->insert_record( 'mmogame_aa_irt_key', $rec);
         }
 
         $upd = new stdClass();
         $upd->id = $rec->id;
-        $upd->timecreated = time();
-        $DB->update_record('mmogame_aa_irt_key', $rec);
+        $upd->timecomputed = time();
+        $DB->update_record('mmogame_aa_irt_key', $upd);
 
         return $upd->id;
     }
@@ -285,30 +316,35 @@ error_log("numitems=$numitems numstudents=$numstudents");
      * Saves computations on database.
      *
      * @param int $keyid
-     * @param array $irtq
-     * @param array $irtu
-     * @param array $mapqueries
-     * @param array $mapusers
+     * * @param array $irtq // indexed by item position (0..numitems-1)
+     * * @param array $irtu // indexed by user position (0..numusers-1)
+     * * @param array $mapqueries // map: queryKey => object { position, queryid, name, querytext, b_online|difficulty, ... }
+     * * @param array $mapusers // map: userKey  => object { position, mmogameid, numgame, auserid, theta_online, count, corrects, wrongs, ... }
+     * * @param array $positionsq // list of queryKeys in the same order as $irtq (matrix item order)
+     * * @param array $positionsu // list of userKeys  in the same order as $irtu (matrix row order)
      * @return void
      * @throws dml_exception
      */
-    public static function save(int $keyid, array $irtq, array $irtu, array $mapqueries, array $mapusers): void {
+    public static function save(int $keyid, array $irtq, array $irtu, array $mapqueries, array $mapusers, array $positionsq, array $positionsu): void {
         global $DB;
-error_log("irtq=".json_encode($irtq,JSON_PRETTY_PRINT));
+
+        // Start atomic transaction (ensures delete+bulk insert consistency).
+        $tx = $DB->start_delegated_transaction();
+
+        // Clean previous rows for this key.
         $DB->delete_records_select('mmogame_aa_irt_queries', 'keyid=?', [$keyid]);
         $DB->delete_records_select('mmogame_aa_irt_ausers', 'keyid=?', [$keyid]);
 
         $pos = 0;
-        $keys = array_keys( $mapqueries);
         foreach ($irtq as $irt) {
-            $query = $mapqueries[$keys[$pos++]];
+            $queryid = $positionsq[ $pos++];
+            $query = $mapqueries[ $queryid];
             $new = new stdClass();
             $new->keyid = $keyid;
-            $new->position = $pos;
+            $new->position = $query->position;
             $new->queryid = $query->queryid;
             $new->name = $query->name;
             $new->querytext = $query->querytext;
-            error_log("irt=".json_encode($irt,JSON_PRETTY_PRINT));
             $new->b = $irt->b;
             $new->b_online = $query->b_online;
             $new->seb = $irt->seb;
@@ -324,12 +360,13 @@ error_log("irtq=".json_encode($irtq,JSON_PRETTY_PRINT));
             $DB->insert_record('mmogame_aa_irt_queries', $new);
         }
 
-        $keys = array_keys( $mapusers);
         $pos = 0;
         foreach ($irtu as $irt) {
-            $user = $mapusers[$keys[$pos++]];
+            $key = $positionsu[ $pos++];
+            $user = $mapusers[$key];
             $new = new stdClass();
             $new->keyid = $keyid;
+            $new->position = $user->position;
             $new->mmogameid = $user->mmogameid;
             $new->numgame = $user->numgame;
             $new->auserid = $user->auserid;
@@ -342,5 +379,8 @@ error_log("irtq=".json_encode($irtq,JSON_PRETTY_PRINT));
             $new->percent = ($user->count != 0 ? 100 * $user->corrects / $user->count : null);
             $DB->insert_record('mmogame_aa_irt_ausers', $new);
         }
+
+        // Commit (will auto-rollback on exception).
+        $tx->allow_commit();
     }
 }
