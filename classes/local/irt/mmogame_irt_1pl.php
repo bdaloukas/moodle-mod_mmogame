@@ -290,18 +290,22 @@ class mmogame_irt_1pl {
      * Compute id used for saving.
      *
      * @param mmogame $mmogame
+     * @param string &$filter
      * @return int
      * @throws dml_exception
      */
-    public static function keyid(mmogame $mmogame): int {
+    public static function keyid(mmogame $mmogame, string &$filter): int {
         global $DB, $USER;
 
         $rec = $DB->get_record_select( 'mmogame_aa_irt_key',
             'mmogameid=? AND numgame=? AND userid=?',
             [$mmogame->get_id(), $mmogame->get_numgame(), $USER->id]);
         if ($rec !== false) {
+            $filter = $rec->filter;
             return $rec->id;
         }
+
+        $select = '';
 
         $rec = new stdClass();
         $rec->mmogameid = $mmogame->get_id();

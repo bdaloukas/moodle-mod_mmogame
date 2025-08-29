@@ -74,7 +74,8 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
     $recompute = optional_param('recompute', 0, PARAM_INT);
     $wheresnippet = optional_param('wheresnippet', '', PARAM_RAW_TRIMMED);
 
-    $keyid = mmogame_irt_1pl::keyid( $mmogame);
+    $filter = '';
+    $keyid = mmogame_irt_1pl::keyid( $mmogame, $filter);
 
     if ($recompute) {
         require_sesskey();
@@ -83,7 +84,7 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
             $filterparams = [];
             $safewhere = mmogame_compile_where_snippet($wheresnippet, $filterparams);
 
-            $responses = $mapqueries = $mapusers = $positionsq = $positionsu = [];
+            $responses = $mapqueries = $mapusers = [];
             $function = 'mmogametype_'.$mmogame->get_type().'_irt_read';
             if (function_exists($function)) {
                 $function($mmogame, $context, $responses, $mapqueries, $mapusers, $safewhere, $filterparams);
@@ -93,7 +94,6 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
 
             $irtq = $irtu = [];
             mmogame_irt_1pl::compute($responses, count($mapqueries), $irtq, $irtu);
-            $keyid = mmogame_irt_1pl::keyid($mmogame);
             mmogame_irt_1pl::save($keyid, $wheresnippet, $irtq, $irtu, $mapqueries, $mapusers);
 
             notification::success('recomputed');
@@ -107,7 +107,7 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
     $download = optional_param('download', null, PARAM_ALPHA);
 
     if ($download === null) {
-        mmogame_irt_begin_page(get_string('pluginname', 'mod_mmogame') ?? 'IRT Dashboard', $mmogame, $context);
+        mmogame_irt_begin_page(get_string('pluginname', 'mod_mmogame') ?? 'IRT Dashboard', $mmogame, $context, $filter);
         echo html_writer::tag('h3', 'Items (b)');
     }
     mmogame_irt_print_b_moodle($keyid, $download);
@@ -126,11 +126,12 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
  * @param string $pagetitle
  * @param mmogame $mmogame
  * @param context $context
+ * @param string $filter
  * @return void
  * @throws \core\exception\coding_exception
  * @throws coding_exception
  */
-function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $context): void {
+function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $context, string $filter): void {
     global $PAGE, $OUTPUT;
     $PAGE->set_pagelayout('report');
     $PAGE->set_title($pagetitle);
@@ -155,7 +156,7 @@ function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $co
 
     echo html_writer::start_div('form-group mb-2');
     echo html_writer::tag('label', 'irt_wheresnippet', ['for' => 'id_wheresnippet']);
-    echo html_writer::tag('textarea', '',
+    echo html_writer::tag('textarea', $filter,
         ['id' => 'id_wheresnippet', 'name' => 'wheresnippet', 'rows' => 3, 'class' => 'form-control',
             'placeholder' => 'a.mmogameid = '.$mmogame->get_id().' AND a.numgame='.$mmogame->get_numgame()]);
     echo html_writer::tag('small', 'irt_wheresnippet_help', ['class' => 'form-text text-muted']);
@@ -172,9 +173,9 @@ function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $co
 ?>
 <script>
     (function() {
-        var toggleBtn = document.getElementById('toggle-recompute');
-        var panel     = document.getElementById('irt-recompute-form');
-        var cancelBtn = document.getElementById('cancel-recompute');
+        let toggleBtn = document.getElementById('toggle-recompute');
+        let panel     = document.getElementById('irt-recompute-form');
+        let cancelBtn = document.getElementById('cancel-recompute');
 
         if (!toggleBtn || !panel) return;
 
@@ -330,6 +331,9 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
         return '';
     }
 
+    $s = preg_replace('/[\x{00A0}\x{2007}\x{202F}]/u', ' ', $s); // NBSPs -> space.
+    $s = preg_replace('/\s+/u', ' ', $s); // Whitespace (incl. \n) -> one space.
+
     // Disallow quotes, semicolons and SQL comments.
     if (preg_match('/[;\'"]|--|\/\*/u', $s)) {
         throw new \moodle_exception('invalidfilter', 'mod_mmogame');
@@ -341,7 +345,7 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
     $parens = 0;
 
     // Added: IN and comma (,) as tokens.
-    $re = '/\G\s*(?:'
+    $re = '/(*UTF8)(*UCP)\G(?:\h|\v)*(?:'
         .'(?<field>a\.(?:auserid|mmogameid|numgame))'
         .'|(?<op><=|>=|<>|!=|=|<|>)'
         .'|(?<in>IN)'
@@ -350,15 +354,13 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
         .'|(?<comma>,)'
         .'|(?<logic>AND|OR)'
         .'|(?<num>-?\d+)'
-        .')\s*/Ai';
-
-    // State machine values.
+        .')(?:\h|\v)*/Ai';    // State machine values.
     $expectfieldorlp = 0;
     $expectop = 1;
     $expectnum = 2;
     $expectlogicorrp = 3;
 
-    // Extra states for IN(...).
+    // Extra states for IN (...).
     $expectlpforin = 4;
     $expectnumin = 5;
     $expectcommanorclosein = 6;
@@ -447,7 +449,7 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
                 $state = $expectlogicorrp;
 
             } else if ($state === $expectcommanorclosein && is_array($inqmarks)) {
-                // Closing IN(...) list.
+                // Closing IN list.
                 if (count($inqmarks) === 0) {
                     // Disallow empty IN().
                     throw new \moodle_exception('invalidfilter', 'mod_mmogame');

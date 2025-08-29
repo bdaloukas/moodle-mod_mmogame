@@ -182,8 +182,9 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
         $params = [$mmogame->get_id(), $mmogame->get_numgame()];
     }
 
-    $sql .= " ORDER BY a.auserid, a.queryid, a.timeanswer, a.id";
+    $sql .= " ORDER BY a.mmogameid, a.numgame, a.auserid, a.queryid, a.id";
     $recs = $DB->get_records_sql($sql, $params);
+
     $mapqueries = [];
     $mapusers = [];
 
@@ -202,7 +203,6 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
             'id,name,questiontext,questiontextformat'
         );
 
-    $aquery = [];
     foreach ($recs as $rec) {
         if (!array_key_exists( $rec->queryid, $mapqueries)) {
             $q = $questions[$rec->questionid] ?? null;
@@ -245,8 +245,8 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
                 $info->wrongs++;
                 $info->count++;
             } else if ($rec->iscorrect == 1) {
-                $info->count++;
                 $info->corrects++;
+                $info->count++;
             }
         }
     }

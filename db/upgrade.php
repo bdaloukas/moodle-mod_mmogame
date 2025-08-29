@@ -40,6 +40,59 @@
  */
 
 /**
+ * Removes table mmogame_aa_instances
+ *
+ * @param stdClass $dbman
+ * @return void
+ * @throws dml_exception
+ */
+function mmogame_remove_table_instances(stdClass $dbman): void {
+    global $DB;
+
+    $table = new xmldb_table('mmogame');
+    $field = new xmldb_field('old_ginstanceid', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+    }
+
+    $mmogames = $DB->get_records_select('mmogame', "(type IS NULL OR type='') AND (model IS NULL OR model='')");
+    foreach ($mmogames as $mmogame) {
+        $sql = "SELECT * FROM {mmogame_aa_instances} i
+            WHERE mmogameid = ? AND NOT EXISTS (SELECT * FROM {mmogame} m WHERE m.old_ginstanceid=i.id)";
+        $instances = $DB->get_records_sql( $sql, [$mmogame->id]);
+
+        foreach ($instances as $instance) {
+            $new = new stdClass();
+            $new->name = $instance->name;
+            $new->course = $mmogame->course;
+            $new->intro = $mmogame->intro;
+            $new->introformat = $mmogame->introformat;
+            $new->qbank = $mmogame->qbank;
+            $new->qbankparams = $mmogame->qbankparams;
+            $new->typeparams = $mmogame->typeparams;
+            $new->modelparams = $mmogame->modelparams;
+            $new->usemultichoice = $mmogame->usemultichoice;
+            $new->usershortanswer = $mmogame->useshortanswer;
+            $new->enablejson = 1;
+            $new->numgame = $mmogame->numgame;
+            $new->type = $instance->type;
+            $new->model = $instance->model;
+            $new->kinduser = $instance->kinduser;
+            $new->old_ginstanceid = $instance->id;
+            $new->id = $DB->insert_record('mmogame', $new);
+
+            $sql = "UPDATE {mmogame_aa_grades} SET mmogameid = ? WHERE mmogameid = ? AND ginstanceid=?";
+            $DB->execute($sql, [$new->id, $mmogame->id, $instance->id]);
+
+            die;
+        }
+        die;
+    }
+    die;
+}
+
+/**
  * Upgrades database
  *
  * @param int $oldversion
@@ -162,6 +215,11 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
             $dbman->drop_index($table, $index);
         }
 
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2024102901)) {
+        mmogame_remove_table_instances($dbman);
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
