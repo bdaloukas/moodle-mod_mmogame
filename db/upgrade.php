@@ -42,11 +42,13 @@
 /**
  * Removes table mmogame_aa_instances
  *
- * @param stdClass $dbman
+ * @param database_manager $dbman
  * @return void
+ * @throws ddl_exception
+ * @throws ddl_table_missing_exception
  * @throws dml_exception
  */
-function mmogame_remove_table_instances(stdClass $dbman): void {
+function mmogame_remove_table_instances(database_manager $dbman): void {
     global $DB;
 
     $table = new xmldb_table('mmogame');
@@ -78,18 +80,17 @@ function mmogame_remove_table_instances(stdClass $dbman): void {
             $new->numgame = $mmogame->numgame;
             $new->type = $instance->type;
             $new->model = $instance->model;
-            $new->kinduser = $instance->kinduser;
+            $new->kinduser = $instance->kinduser !== null ? $instance->kinduser : 'moodle1';
             $new->old_ginstanceid = $instance->id;
             $new->id = $DB->insert_record('mmogame', $new);
 
-            $sql = "UPDATE {mmogame_aa_grades} SET mmogameid = ? WHERE mmogameid = ? AND ginstanceid=?";
-            $DB->execute($sql, [$new->id, $mmogame->id, $instance->id]);
-
-            die;
+            $tables = ['mmogame_aa_grades', 'mmogame_aa_grades', 'mmogame_aa_states', 'mmogame_aa_stats', 'mmogame_am_aduel_pairs',
+                'mmogame_quiz_attempts', 'mmogame_quiz_log_attempts', 'mmogame_quiz_log_confirm'];
+            foreach ($tables as $table) {
+                $DB->set_field($table, 'mmogameid', $new->id, ['mmogameid' => $mmogame->id, 'ginstanceid' => $instance->id]);
+            }
         }
-        die;
     }
-    die;
 }
 
 /**
@@ -236,6 +237,13 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
     if ($oldversion < ($ver = 2024102903)) {
         $table = new xmldb_table('mmogame_aa_grades');
+        $index = new xmldb_index('ginstancenumgameavatarid', XMLDB_INDEX_NOTUNIQUE, ['ginstanceid', 'numgame', 'avatarid']);
+
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $table = new xmldb_table('mmogame_aa_grades');
         $field = new xmldb_field('ginstanceid');
 
         if ($dbman->field_exists($table, $field)) {
@@ -269,6 +277,12 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
     if ($oldversion < ($ver = 2024102906)) {
         $table = new xmldb_table('mmogame_aa_stats');
+        $index = new xmldb_index('mdl_mmogaastat_mmonumqueau_uix', XMLDB_INDEX_UNIQUE, ['ginstanceid', 'numgame']);
+
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
         $field = new xmldb_field('ginstanceid');
 
         if ($dbman->field_exists($table, $field)) {
@@ -279,6 +293,13 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2024102907)) {
+        $table = new xmldb_table('mmogame_aa_states');
+        $index = new xmldb_index('mdl_mmogamargu_ginnum_uix', XMLDB_INDEX_UNIQUE, ['ginstanceid', 'numgame']);
+
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
         $table = new xmldb_table('mmogame_aa_states');
         $field = new xmldb_field('ginstanceid');
 
@@ -403,10 +424,9 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
                     $updrec->id = $mmogame->id;
                     $updrec->type = $rec->type;
                     $updrec->model = $rec->model;
-                    $updrec->kinduser = $rec->kinduser;
+                    $updrec->kinduser = $rec->kinduser !== null ? $rec->kinduser : 'moodle';
                     $updrec->enabled = $rec->enabled;
                     $updrec->pin = $rec->pin;
-                    $updrec->numattempt = $rec->numattempt;
                     $updrec->striptags = $rec->striptags;
                     $DB->update_record( 'mmogame', $updrec);
                 }
@@ -590,6 +610,11 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
     if ($oldversion < ($ver = 2024111916)) {
         $table = new xmldb_table('mmogame_aa_stats');
+        $field = new xmldb_field( 'numteam', XMLDB_TYPE_INTEGER, 10, null, null, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
         $index = new xmldb_index('index_unique', XMLDB_INDEX_UNIQUE,
             ['mmogameid', 'numgame', 'queryid', 'auserid', 'numteam']);
 

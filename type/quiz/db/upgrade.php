@@ -39,6 +39,36 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+function mmogametype_quiz_repair_queries() {
+    global $DB;
+
+    // Start atomic transaction (ensures update consistency).
+    $tx = $DB->start_delegated_transaction();
+
+    $tables = ['mmogame_quiz_attempts', 'mmogame_aa_stats'];
+    foreach ($tables as $table) {
+        $sql = 'UPDATE {'.$table.'} AS a
+            SET queryid = (
+                SELECT v.questionbankentryid
+                FROM {question_versions} AS v
+                WHERE v.questionid = a.queryid
+            )
+            WHERE EXISTS (
+                SELECT 1
+                FROM {question_versions} AS v
+                WHERE v.questionid = a.queryid
+            )
+            AND queryid <> (
+                SELECT v.questionbankentryid
+                FROM {question_versions} AS v
+                WHERE v.questionid = a.queryid)';
+        $DB->execute($sql);
+    }
+    // Commit (will auto-rollback on exception).
+    $tx->allow_commit();
+}
+
+
 /**
  * Upgrades database
  *
@@ -58,7 +88,7 @@ function xmldb_mmogametype_quiz_upgrade( string $oldversion): bool {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < ($ver = 2024103001)) {
+    if ($oldversion < ($ver = 2024103002)) {
         $table = new xmldb_table('mmogame_quiz_attempts');
         $index = new xmldb_index('ginstanceidnumattempt', XMLDB_INDEX_NOTUNIQUE, ['ginstanceid', 'numattempt']);
 
@@ -66,11 +96,6 @@ function xmldb_mmogametype_quiz_upgrade( string $oldversion): bool {
             $dbman->drop_index($table, $index);
         }
 
-         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
-    }
-
-    if ($oldversion < ($ver = 2024103002)) {
-        $table = new xmldb_table('mmogame_quiz_attempts');
         $index = new xmldb_index('mmogameidnumattempt', XMLDB_INDEX_NOTUNIQUE, ['mmogameid', 'numattempt']);
 
         if (!$DB->get_manager()->index_exists($table, $index)) {
@@ -81,17 +106,24 @@ function xmldb_mmogametype_quiz_upgrade( string $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2024103003)) {
+        mmogametype_quiz_repair_queries();
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2025081901)) {
         $table = new xmldb_table('mmogame_quiz_attempts');
+        $index = new xmldb_index('mdl_mmogquizatte_ginnumtim_ix', XMLDB_INDEX_NOTUNIQUE, ['ginstanceid', 'numgame', 'timeanswer']);
+
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
         $field = new xmldb_field('ginstanceid');
 
         if ($dbman->field_exists($table, $field)) {
             $dbman->drop_field($table, $field);
         }
 
-         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
-    }
-
-    if ($oldversion < ($ver = 2025081901)) {
         // Define field numgame to be added to mmogame.
         $table = new xmldb_table('mmogame_quiz_attempts');
         $field = new xmldb_field('numquery', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'numattempt');

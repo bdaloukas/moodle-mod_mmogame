@@ -39,7 +39,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    'mmogametype_quiz:viewirt' => [
+    'mod/mmogametype_quiz:viewirt' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
