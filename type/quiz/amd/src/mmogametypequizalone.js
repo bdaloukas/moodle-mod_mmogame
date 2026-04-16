@@ -123,16 +123,19 @@ define(['mmogametype_quiz/mmogametypequiz'],
          * @param {boolean} disabled - Whether user input should be disabled.
          */
         createScreenHorizontal(json, disabled) {
-            const [width] = this.computeBestFontSize(json);
+            const maxHeight = this.areaRect.height - this.iconSize - 2 * this.padding;
+            const [width] = this.computeBestFontSize(json, maxHeight);
 
             this.radioSize = Math.round(this.fontSize);
-            this.stripTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
+            this.labelWidth = width - this.padding;
+            const topCreate = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
 
-            this.createDefinition(0, 0, width - this.padding, this.stripTop - this.padding,
+            this.createDefinition(0, 0, width - this.padding, topCreate - this.padding,
                 false, this.fontSize, json.definition);
 
             // Adjust strip dimensions
             this.stripLeft = width + this.padding;
+            this.stripTop = maxHeight + this.padding;
         }
 
         createScreenVertical(json, disabled) {
@@ -239,7 +242,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         onServerAnswerMultichoice(json) {
             let foundCorrect = false;
-
             let aCorrect = json.correct.split(",");
             for (let i = 0; i < this.answersID.length; i++) {
                 if (this.answersID[i] === '') {
@@ -266,15 +268,23 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 const height = this.aItemLabel[i].scrollHeight;
 
                 const move = iscorrect1 !== undefined ? this.radioSize : 0;
-                const width = this.labelWidth - move;
+                const width = this.aItemLabel[i].scrollWidth - move;
 
                 if (move !== 0) {
                     label.style.left = (parseInt(label.style.left) + move) + "px";
                 }
                 this.aItemLabel[i].style.width = width + "px";
-                this.autoResizeText(this.aItemLabel[i], width, height, true, this.minFontSize, this.maxFontSize, 0.5);
 
-                this.onServerAnswerMultichoiceShowCorrect(i, iscorrect1);
+                this.onServerAnswerMultichoiceShowCorrect(i, iscorrect1, iscorrect);
+                this.autoResizeText(
+                    this.aItemLabel[i],
+                    width - this.padding,
+                    height,
+                    true,
+                    this.minFontSize / 2,
+                    this.maxFontSize,
+                    0.5)
+                ;
             }
 
             this.playSound(foundCorrect ? this.audioYes : this.audioNo);

@@ -209,7 +209,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             sp.ring = this.createDifficultyRing(sp.parent, 2 * this.iconSize + 3 * this.padding, this.padding, this.iconSize);
             if (this.info.countquestion > 0) {
                 let percent = sp.attempts[0].queryrank / this.info.countquestion;
-                console.log("percent=", percent);
                 this.updateDifficultyRing(sp.ring, percent);
             }
             // Avatar.

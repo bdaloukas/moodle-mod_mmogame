@@ -168,6 +168,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @param {string} color - The color for the radio button when selected.
          */
         onClickRadio(index, colorBack, color) {
+console.log('onClickRadio');
             if (this.aItemAnswer[index].classList.contains("disabled")) {
                 return;
             }
@@ -184,7 +185,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
                 this.drawRadio(item, isDisabled ? colorBack : 0xFFFFFF, color);
             });
-
+console.log("callSetAnswer");
             // Send the answer
             this.callSetAnswer();
         }
@@ -576,14 +577,15 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             player.nicknameElement.style.visibility = 'visible';
         }
 
-        computeBestFontSize(json) {
-            let maxHeight, definitionWidth;
+        computeBestFontSize(json, maxHeight) {
+console.log("computeBestFontSize", "maxHeight=",maxHeight);
+            let definitionWidth;
 
-            maxHeight = this.areaRect.height - this.iconSize - 3 * this.padding;
+            //maxHeight = this.areaRect.height - this.iconSize - 3 * this.padding;
             definitionWidth = this.isVertical ? this.areaRect.width : Math.round((this.areaRect.width - this.padding) / 2);
 
             for (let step = 1; step <= 2; step++) {
-                let defSize;
+                let defSize, ansSize;
                 this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
                     (fontSize) => {
                         defSize = this.createDefinition(0, 0, definitionWidth, 0, true, fontSize,
@@ -591,17 +593,19 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                         if (defSize[0] > definitionWidth) {
                             return 1;
                         }
-                        let ansSize = this.createAnswer(0, 0, definitionWidth, true, fontSize, false);
+                        ansSize = this.createAnswer(0, 0, definitionWidth, true, fontSize, false);
                         if (ansSize[0] > definitionWidth) {
                             return 1;
                         }
                         if (this.isVertical) {
                             return defSize[1] + ansSize[1] < maxHeight ? -1 : 1;
                         } else {
+console.log("defSize=",fontSize,ansSize,"ret=",defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1);
                             return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
                         }
                     });
-                if (defSize[0] <= definitionWidth && defSize[1] <= this.areaRect.height) {
+                if (defSize[0] <= definitionWidth && defSize[1] <= maxHeight && ansSize[1] <= maxHeight) {
+                    console.log("break608");
                     break;
                 }
             }
