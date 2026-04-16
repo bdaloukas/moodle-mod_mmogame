@@ -142,12 +142,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     this.user = option.value;
                 }
             } else {
-                this.kinduser = user;
+                this.user = user;
             }
             this.gateCreateScreen();
         }
 
         gateSendGetAssets() {
+            console.log("gateSendGetAssets");
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -181,9 +182,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
 
         gateCreateScreen() {
+            document.body.innerHTML = '';
+            this.body = document.getElementsByTagName("body")[0];
+/*
             while (this.body.firstChild) {
                 this.body.removeChild(this.body.firstChild);
             }
+*/
             this.area = undefined;
 
             this.gateCompute();
@@ -240,7 +245,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             const countYavatars = Math.floor(Math.floor(maxHeight - top - this.padding) / this.iconSize);
             const gridHeightAvatars = countYavatars * this.iconSize;
-
             this.addEventListenerRefresh(btnPalette, topGridPalette, countX, countYpalette,
                 top, countX, countYavatars, true, false);
 
@@ -391,6 +395,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         gateSendGetColorsAvatars(leftPalette, topPalette, countXpalette, countYpalette,
                                  leftAvatars, topAvatars, countXavatars, countYavatars,
                                  updatePalette = true, updateAvatars = true) {
+            console.log("gateSendGetColorsAvatars");
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -408,6 +413,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 // Handling the response
                 getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes}) => {
+                    console.log(avatarids, avatars, colorpaletteids, colorpalettes);
                     if (updatePalette) {
                         this.gateShowColorPalettes(this.area, leftPalette, topPalette, countXpalette, countYpalette,
                             colorpaletteids, colorpalettes);
@@ -417,6 +423,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                             avatarids, avatars);
                     }
                 }).fail((error) => {
+                    console.log(error);
                     return error;
                 });
             });
@@ -866,6 +873,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * Calls the Moodle Web Service 'mmogame_get_state' and returns the response.
          */
         async callGetState() {
+            console.log("callGetState");
             return new Promise((resolve, reject) => {
                 // Calling the service through the Moodle AJAX API
                 require(['core/ajax'], (Ajax) => {

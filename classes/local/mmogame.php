@@ -150,12 +150,12 @@ abstract class mmogame {
     }
 
     /**
-     * Return the variable rgame->model.
+     * Return the variable rgame->mode.
      *
      * @return string
      */
-    public function get_model(): string {
-        return $this->rgame->model;
+    public function get_mode(): string {
+        return $this->rgame->mode;
     }
 
     /**
@@ -362,8 +362,7 @@ abstract class mmogame {
         if ($rgame === false) {
             return null;
         }
-
-        $classname = 'mmogametype_' . $rgame->type.'\local\mmogametype_' . $rgame->type.'_'.$rgame->model;
+        $classname = 'mmogametype_' . $rgame->type.'\local\mmogametype_' . $rgame->type.'_'.$rgame->mode;
 
         if (!class_exists($classname)) {
             throw new coding_exception("Class $classname does not exist for type: $rgame->type");

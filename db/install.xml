@@ -13,10 +13,11 @@
         <FIELD NAME="language" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="qbank" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="qbankparams" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="modelparams" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="subcategories" TYPE="int" LENGTH="1" NOTNULL="true"  SEQUENCE="false" DEFAULT="0"/>
+        <FIELD NAME="modeparams" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="type" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="model" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="mode" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="kinduser" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="pin" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
@@ -27,8 +28,10 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <INDEX NAME="fastjson" UNIQUE="true" FIELDS="fastjson"/>
       </KEYS>
+        <INDEXES>
+            <INDEX NAME="fastjson" UNIQUE="true" FIELDS="fastjson"/>
+        </INDEXES>
     </TABLE>
 
     <TABLE NAME="mmogame_aa_users" COMMENT="mmogame_aa_users">
@@ -38,7 +41,7 @@
         <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="splitnum" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="lastlogin" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="lastip" TYPE="char" LENGTH="15" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="lastip" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -62,6 +65,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="guid" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="lastlogin" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -250,5 +254,73 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
+
+      <TABLE NAME="mmogame_aa_irt_key" COMMENT="mmogame_aa_irt_key">
+      <FIELDS>
+         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+          <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+          <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+          <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+          <FIELD NAME="timecomputed" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+          <FIELD NAME="filter" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+          <KEYS>
+              <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+          </KEYS>
+      </TABLE>
+
+    <TABLE NAME="mmogame_aa_irt_queries" COMMENT="mmogame_aa_irt_queries">
+        <FIELDS>
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+            <FIELD NAME="keyid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+            <FIELD NAME="position" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+            <FIELD NAME="queryid" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+            <FIELD NAME="name" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="querytext" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="b" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="b_online" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="seb" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="infit" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="std_infit" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="outfit" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="std_outfit" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+            <FIELD NAME="corrects" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+            <FIELD NAME="wrongs" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+            <FIELD NAME="nulls" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+            <FIELD NAME="percent" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+        </FIELDS>
+        <KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="keyid" UNIQUE="true" FIELDS="keyid"/>
+        </INDEXES>
+    </TABLE>
+
+      <TABLE NAME="mmogame_aa_irt_ausers" COMMENT="mmogame_aa_irt_ausers">
+          <FIELDS>
+              <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+              <FIELD NAME="keyid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+              <FIELD NAME="position" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+              <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+              <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+              <FIELD NAME="auserid" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+              <FIELD NAME="theta" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+              <FIELD NAME="theta_online" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+              <FIELD NAME="corrects" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+              <FIELD NAME="wrongs" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+              <FIELD NAME="nulls" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+              <FIELD NAME="queries" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+              <FIELD NAME="percent" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+          </FIELDS>
+          <KEYS>
+              <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+          </KEYS>
+          <INDEXES>
+              <INDEX NAME="keyid" UNIQUE="true" FIELDS="keyid"/>
+          </INDEXES>
+      </TABLE>
+
   </TABLES>
+
 </XMLDB>

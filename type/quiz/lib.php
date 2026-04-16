@@ -71,16 +71,16 @@ function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
 }
 
 /**
- * Return the models that this sub-plugin implements.
+ * Return the modes that this sub-plugin implements.
  *
- * @return array (model => name)
+ * @return array (mode => name)
  * @throws coding_exception
  */
-function mmogametype_quiz_get_models(): array {
+function mmogametype_quiz_get_modes(): array {
     return [
-        'alone' => get_string( 'model_alone', 'mmogametype_quiz'),
-        'aduel' => get_string( 'model_aduel', 'mmogametype_quiz'),
-        'split' => get_string( 'model_split', 'mmogametype_quiz'),
+        'alone' => get_string( 'mode_alone', 'mmogametype_quiz'),
+        'aduel' => get_string( 'mode_aduel', 'mmogametype_quiz'),
+        'split' => get_string( 'mode_split', 'mmogametype_quiz'),
     ];
 }
 
@@ -136,6 +136,13 @@ function mmogametype_quiz_extend_settings_navigation(settings_navigation $settin
     $mmogamenode->add_node(navigation_node::create("IRT", $url,
         navigation_node::TYPE_SETTING,
         null, 'mmogame_irt', new pix_icon('i/report', '')));
+
+    $url = new moodle_url('/mod/mmogame/import.php',
+        ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist), 'compute' => 1]);
+    $mmogamenode->add_node(navigation_node::create("Import", $url,
+        navigation_node::TYPE_SETTING,
+        null, 'mmogame_import', new pix_icon('i/report', '')));
+
 }
 
 /**

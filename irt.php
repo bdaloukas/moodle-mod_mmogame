@@ -49,7 +49,6 @@ use mod_mmogame\local\irt\mmogame_irt_1pl;
 use mod_mmogame\local\mmogame;
 
 $mmogame = mmogame::create( new mmogame_database_moodle(), $cm->instance);
-$model = $mmogame->get_model();
 
 $context = context_module::instance( $cm->id);
 require_capability('mod/mmogame:view', $context);
@@ -126,12 +125,12 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
  * @param string $pagetitle
  * @param mmogame $mmogame
  * @param context $context
- * @param string $filter
+ * @param ?string $filter
  * @return void
  * @throws \core\exception\coding_exception
  * @throws coding_exception
  */
-function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $context, string $filter): void {
+function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $context, ?string $filter): void {
     global $PAGE, $OUTPUT;
     $PAGE->set_pagelayout('report');
     $PAGE->set_title($pagetitle);

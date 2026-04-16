@@ -49,7 +49,6 @@ class get_attempts_split extends external_api {
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
             'avatarids' => new external_value(PARAM_RAW, 'The user data'),
             'splits' => new external_value(PARAM_RAW, 'The user data'),
-            'subcommand' => new external_value(PARAM_ALPHANUMEXT, 'Subcommands like tool1, tool2, tool3'),
         ]);
     }
 
@@ -61,7 +60,6 @@ class get_attempts_split extends external_api {
      * @param string $user
      * @param ?string $avatarids
      * @param ?string $splits
-     * @param string $subcommand
      * @return array
      * @throws coding_exception
      * @throws invalid_parameter_exception
@@ -70,9 +68,7 @@ class get_attempts_split extends external_api {
      */
     public static function execute(int $mmogameid, string $kinduser, string $user,
                                    ?string $avatarids = null,
-                                   ?string $splits = null, string $subcommand = ''): array {
-        $start = microtime(true);
-
+                                   ?string $splits = null): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
@@ -80,7 +76,6 @@ class get_attempts_split extends external_api {
             'user' => $user,
             'avatarids' => $avatarids,
             'splits' => $splits,
-            'subcommand' => $subcommand,
         ]);
 
         $splits = explode(',', $splits);
@@ -104,12 +99,11 @@ class get_attempts_split extends external_api {
             $auserids[] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create, $split);
         }
         if (count($auserids) == 0) {
-            $ret = ['avatars' => [], 'attempts' => [], 'attemptqueryids' => [],
+            return  ['avatars' => [], 'attempts' => [], 'attemptqueryids' => [],
                 'numattempts' => [], 'querydefinitions' => [],
                 'queryanswerids' => [], 'answertexts' => [],
                 'aduels' => [], 'aduelavatars' => [], 'aduelcorrects' => [],
                 'auserids' => [], 'queryanswerids0' => [], 'grades' => []];
-            return $ret;
         }
         if ($avatarids !== null) {
             foreach ($splits as $pos => $split) {
@@ -119,9 +113,9 @@ class get_attempts_split extends external_api {
             }
         }
         $isaduel = $onlygroup = false;
-        $modelparams = $mmogame->get_rgame()->modelparams;
-        if ($modelparams != '') {
-            $data = json_decode($modelparams, true);
+        $modeparams = $mmogame->get_rgame()->modeparams;
+        if ($modeparams != '') {
+            $data = json_decode($modeparams, true);
             if (isset($data['isaduel']) && $data['isaduel'] > 0) {
                 $isaduel = true;
             }
@@ -131,13 +125,172 @@ class get_attempts_split extends external_api {
         }
         $aduelauserids = $onlygroup ? $mmogame->get_auserids_split($kinduser, $user) : [];
 
-        $recs = $mmogame->get_attempts($auserids, $isaduel, $aduelauserids);
+        for (;;) {
+            $numgame = $aduels = 0;
+            $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips = $answerids = $answertexts = null;
+            $aduelavatars = $aduelcorrects = $queryanswerids0 = null;
 
+            $countquestions = $countcorrect = 0;
+            $islastcorrect = [];
+            $queryranks = [];
+            $retry = self::get_attempts($mmogame, $auserids, $isaduel, $aduelauserids, $numgame, $attemptids,
+                $attemptqueryids, $attemptnums, $definitions, $tips, $answerids, $answertexts, $aduels,
+                $aduelavatars, $aduelcorrects, $queryanswerids0, $countquestions, $countcorrect, $islastcorrect, $queryranks);
+            if (!$retry) {
+                // Have to compute again. It is not computed in get_attempts.
+                break;
+            }
+        }
+
+        [$insql, $inparams] = $mmogame->get_db()->get_in_or_equal($auserids);
+        $sql = "SELECT g.auserid, g.sumscore, a.directory, a.filename,
+            (SELECT COUNT(*)
+                FROM {mmogame_aa_grades} g2
+                WHERE g2.mmogameid=g.mmogameid AND g2.numgame=g.numgame AND g2.sumscore > g.sumscore
+            ) as numrank
+            FROM {mmogame_aa_grades} g
+            LEFT JOIN {mmogame_aa_avatars} a ON a.id=g.avatarid
+            WHERE g.mmogameid=? AND g.numgame=? AND g.auserid $insql";
+
+        $recs = $mmogame->get_db()->get_records_sql( $sql,
+            array_merge([$mmogameid, $numgame], $inparams));
+        $grades = $avatars = $ranks = [];
+        foreach ($auserids as $auserid) {
+            foreach ($recs as $rec) {
+                if ($rec->auserid == $auserid) {
+                    $grades[] = $rec->sumscore;
+                    $ranks[] = $rec->numrank + 1;
+                    $avatars[] = $rec->directory.'/'.$rec->filename;
+                    break;
+                }
+            }
+        }
+
+        $ret = ['avatars' => $avatars, 'attempts' => $attemptids, 'attemptqueryids' => $attemptqueryids,
+            'numattempts' => $attemptnums, 'querydefinitions' => $definitions, 'querytips' => $tips,
+            'queryanswerids' => $answerids, 'answertexts' => $answertexts,
+            'aduels' => $aduels, 'aduelavatars' => $aduelavatars, 'aduelcorrects' => $aduelcorrects,
+            'auserids' => $auserids, 'queryanswerids0' => $queryanswerids0, 'grades' => $grades,
+            'countquestion' => $countquestions, 'countcorrect' => $countcorrect, 'islastcorrect' => $islastcorrect,
+            'ranks' => $ranks, 'queryranks' => $queryranks];
+
+        return $ret;
+    }
+
+    /**
+     * Describe the return types.
+     *
+     * @return external_single_structure
+     */
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+            'avatars' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Avatar IDs')
+            ),
+            'attempts' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Attempts data')
+            ),
+            'attemptqueryids' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Query IDs of attempts')
+            ),
+            'querydefinitions' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Query definitions')
+            ),
+            'querytips' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Query tips')
+            ),
+            'queryanswerids' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Answer IDs')
+            ),
+            'numattempts' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Answer IDs')
+            ),
+            'answertexts' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Answer texts')
+            ),
+            'aduels' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Aduels')
+            ),
+            'aduelavatars' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Avatars')
+            ),
+            'aduelcorrects' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Corrects')
+            ),
+            'auserids' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'ausers')
+            ),
+            'queryanswerids0' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Original queryids')
+            ),
+            'grades' => new external_multiple_structure(
+                new external_value(PARAM_FLOAT, 'Grades per user')
+            ),
+            'countquestion' => new external_value(
+                PARAM_INT,
+                'Total number of questions'
+            ),
+            'countcorrect' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Total number of corrects')
+            ),
+            'islastcorrect' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Correct answers array')
+            ),
+            'ranks' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Rank array')
+            ),
+            'queryranks' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Rank array')
+            ),
+        ]);
+    }
+
+    /**
+     * Call get_attempts of mmogame.
+     *
+     * @param mmogame $mmogame
+     * @param array $auserids
+     * @param bool $isaduel
+     * @param array|null $aduelauserids
+     * @param int $numgame
+     * @param $attemptids
+     * @param $attemptqueryids
+     * @param $attemptnums
+     * @param $definitions
+     * @param $tips
+     * @param $answerids
+     * @param $answertexts
+     * @param $aduels
+     * @param $aduelavatars
+     * @param $aduelcorrects
+     * @param $queryanswerids0
+     * @param int $countquestions
+     * @param int $countcorrect
+     * @param array $islastcorrect
+     * @param array $queryranks
+     * @return bool
+     */
+    private static function get_attempts(mmogame $mmogame, array $auserids, bool $isaduel, ?array $aduelauserids,
+            int &$numgame, &$attemptids, &$attemptqueryids, &$attemptnums, &$definitions, &$tips,
+            &$answerids, &$answertexts, &$aduels, &$aduelavatars, &$aduelcorrects, &$queryanswerids0,
+            int &$countquestions, int &$countcorrect, array &$islastcorrect, array &$queryranks): bool {
+
+        $queryranks = [];
+        $recs = $mmogame->get_attempts(
+            $auserids,
+            $isaduel,
+            $aduelauserids,
+            $countquestions,
+            $countcorrect,
+            $islastcorrect,
+            $queryranks
+        );
         $queryids = [];  /* Queries that are used */
         $attemptqueryids = []; /* Which query has every attempt */
         $attemptids = $attemptnums = [];
         $querypositions = [];
         $aduelavatars = $aduels = $aduelcorrects = [];
+        $querytoatttempt = [];
         $numgame = 0;
         foreach ($recs as $position => $attempts) {
             $nums = $ids = $newids = [];
@@ -171,13 +324,15 @@ class get_attempts_split extends external_api {
                 $newids[] = $pos;
                 $queryids[$attempt->queryid] = $attempt->queryid;
 
+                $querytoatttempt[$attempt->queryid] = $attempt->id;
+
                 if (!$isaduel) {
                     $corrects[] = '';
                 } else {
                     $attempt2 = $mmogame->get_db()->get_record_select( 'mmogame_quiz_attempts',
                         "mmogameid=? AND numgame=? AND numteam=? AND auserid=? AND numattempt=?",
                         [$attempt->mmogameid, $attempt->numgame, $attempt->numteam, $aduel->auserid1, $attempt->numattempt]);
-                    $corrects[] = $attempt2->iscorrect;
+                        $corrects[] = $attempt2->iscorrect;
                 }
             }
             $attemptnums[] = implode( ',', $nums);
@@ -192,10 +347,19 @@ class get_attempts_split extends external_api {
         $newanserids = [];
         $answerids = [];
         $answertexts = [];
+        $tips = [];
         $queryanswerids0 = [];
         foreach ($querypositions as $queryid => $position) {
+            if (!array_key_exists($queryid, $queries)) {
+                // Maybe deleted from question database.
+                $mmogame->delete_attempt($querytoatttempt[$queryid]);
+                return true;
+            }
+
             $query = $queries[$queryid];
             $definitions[] = $query->definition;
+            $tips[] = $query->generalfeedback;
+
             $a = [];
             $queryanswerids = [];
             foreach ($query->answerids as $pos => $answerid) {
@@ -213,79 +377,6 @@ class get_attempts_split extends external_api {
             $queryanswerids0[] = implode( ',', $queryanswerids);
         }
 
-        [$insql, $inparams] = $mmogame->get_db()->get_in_or_equal($auserids);
-        $sql = "SELECT g.auserid, g.sumscore, a.directory, a.filename
-            FROM {mmogame_aa_grades} g
-            LEFT JOIN {mmogame_aa_avatars} a ON a.id=g.avatarid
-            WHERE g.mmogameid=? AND g.numgame=? AND g.auserid $insql";
-        $recs = $mmogame->get_db()->get_records_sql( $sql,
-            array_merge([$mmogameid, $numgame], $inparams));
-        $grades = $avatars = [];
-        foreach ($auserids as $auserid) {
-            foreach ($recs as $rec) {
-                if ($rec->auserid == $auserid) {
-                    $grades[] = $rec->sumscore;
-                    $avatars[] = $rec->directory.'/'.$rec->filename;
-                    break;
-                }
-            }
-        }
-
-        $ret = ['avatars' => $avatars, 'attempts' => $attemptids, 'attemptqueryids' => $attemptqueryids,
-            'numattempts' => $attemptnums, 'querydefinitions' => $definitions,
-            'queryanswerids' => $answerids, 'answertexts' => $answertexts,
-            'aduels' => $aduels, 'aduelavatars' => $aduelavatars, 'aduelcorrects' => $aduelcorrects,
-            'auserids' => $auserids, 'queryanswerids0' => $queryanswerids0, 'grades' => $grades];
-
-        return $ret;
-    }
-
-    /**
-     * Describe the return types.
-     *
-     * @return external_single_structure
-     */
-    public static function execute_returns(): external_single_structure {
-        return new external_single_structure([
-            'avatars' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Avatar IDs')
-            ),
-            'attempts' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Attempts data')
-            ),
-            'attemptqueryids' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Query IDs of attempts')
-            ),
-            'querydefinitions' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Query definitions')
-            ),
-            'queryanswerids' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Answer IDs')
-            ),
-            'numattempts' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Answer IDs')
-            ),
-            'answertexts' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Answer texts')
-            ),
-            'aduels' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Aduels')
-            ),
-            'aduelavatars' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Avatars')
-            ),
-            'aduelcorrects' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Corrects')
-            ),
-            'auserids' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'ausers')
-            ),
-            'queryanswerids0' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Original queryids')
-            ),
-            'grades' => new external_multiple_structure(
-                new external_value(PARAM_FLOAT, 'Grades per user')
-            ),
-        ]);
+        return false;
     }
 }

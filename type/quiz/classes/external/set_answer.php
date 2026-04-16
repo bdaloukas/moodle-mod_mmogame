@@ -98,7 +98,7 @@ class set_answer extends external_api {
 
         $mmogame->login_user( $auserid);
 
-        $mmogame->set_answer_model( $ret, $attempt, $answer, $answerid, $subcommand);
+        $mmogame->set_answer_mode( $ret, $attempt, $answer, $answerid, $subcommand);
 
         return json_encode( $ret);
     }

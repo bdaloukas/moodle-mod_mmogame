@@ -63,7 +63,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         // Create mmoGame.
         $rgame = $this->getDataGenerator()->create_module('mmogame',
             ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
-                'numgame' => 1, 'type' => 'quiz', 'model' => 'alone', 'typemodel' => 'quiz,alone',
+                'numgame' => 1, 'type' => 'quiz', 'mode' => 'alone', 'typemode' => 'quiz,alone',
                 'kinduser' => 'guid', 'enabled' => 1]);
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertCount(1, $records);
@@ -132,7 +132,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
         $rgame = $this->getDataGenerator()->create_module('mmogame',
             ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
-                'numgame' => 1, 'type' => 'quiz', 'model' => 'aduel', 'typemodel' => 'quiz,aduel',
+                'numgame' => 1, 'type' => 'quiz', 'mode' => 'aduel', 'typemode' => 'quiz,aduel',
                 'kinduser' => 'guid', 'enabled' => 1]);
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertEquals(1, count($records));

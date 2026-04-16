@@ -15,26 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the model ADuel
+ * This file contains the mode ADuel
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_mmogame\local\model;
+namespace mod_mmogame\local\mode;
 
 use mod_mmogame\local\mmogame;
 use stdClass;
 
 /**
- * The class mmogame_model_aduel has the code for model ADuel
+ * The class mmogame_mode_aduel has the code for mode ADuel
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mmogame_model_aduel {
+class mmogame_mode_aduel {
 
     /**
      * Administrator can change numgame or state
@@ -89,12 +89,17 @@ class mmogame_model_aduel {
             return reset( $recs);
         }
 
+        if (!$isaduel) {
+            $newplayer1 = true;
+            return self::get_aduel_new($mmogame);
+        }
+
         // Computes the theta of current user.
         $grade = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
         $theta = $grade != null ? $grade->theta : 0;
 
-        if ($isaduel && $grade->countalone > 0) {
+        if ($grade->countalone > 0) {
             $select = 'mmogameid=? AND numgame=? AND auserid1 <> ? AND isclosed1 = 1 AND isclosed2 = 0 AND auserid2 IS NULL';
             $params = [$mmogame->get_id(), $mmogame->get_numgame(), $auserid];
             if (count($auserids)) {
@@ -226,7 +231,7 @@ class mmogame_model_aduel {
      * @param int $aduelid
      * @param float $score
      */
-    public static function close_user1(mmogame $mmogame, int $aduelid, float $score) {
+    public static function close_user1(mmogame $mmogame, int $aduelid, float $score): void {
         $params = ['id' => $aduelid, 'isclosed1' => 1, 'score' => $score];
 
         $mmogame->get_db()->update_record( 'mmogame_am_aduel_pairs', $params);

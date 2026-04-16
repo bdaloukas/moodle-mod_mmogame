@@ -510,17 +510,6 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2024110911)) {
-        $table = new xmldb_table('mmogame');
-        $field = new xmldb_field('modelparams');
-
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
-        }
-
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
-    }
-
     if ($oldversion < ($ver = 2024110912)) {
         $table = new xmldb_table('mmogame');
         $field = new xmldb_field('enablejson');
@@ -934,7 +923,58 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2025082809)) {
+    if ($oldversion < ($ver = 2025102601)) {
+        // Define field enabled to be added to mmogame.
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('modelparams', XMLDB_TYPE_TEXT, null, null, null, null, null, 'qbankparams');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2025102907)) {
+        // Define field type to be added to mmogame.
+        $table = new xmldb_table('mmogame_aa_users');
+        $field = new xmldb_field('lastip', XMLDB_TYPE_CHAR, '50');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_type($table, $field);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2025102909)) {
+        // Define field numgame to be added to mmogame.
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('subcategories', XMLDB_TYPE_INTEGER, '1', null, null, null, 0, 'qbankparams');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026010800)) {
+        $table = new xmldb_table( 'mmogame');
+        $field = new xmldb_field( 'model', XMLDB_TYPE_CHAR, 30, null, true, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'mode');
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026010801)) {
+        $table = new xmldb_table( 'mmogame');
+        $field = new xmldb_field( 'modelparams', XMLDB_TYPE_TEXT);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'modeparams');
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026011600)) {
         $table = new xmldb_table('mmogame_aa_irt_key');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
@@ -952,7 +992,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2025082810)) {
+    if ($oldversion < ($ver = 2026011603)) {
         $table = new xmldb_table('mmogame_aa_irt_ausers');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
@@ -978,14 +1018,14 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2025082816)) {
+    if ($oldversion < ($ver = 2026011604)) {
         $table = new xmldb_table('mmogame_aa_irt_queries');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
         $table->add_field('keyid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
         $table->add_field('position', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
         $table->add_field('queryid', XMLDB_TYPE_INTEGER, 10);
-        $table->add_field('name', XMLDB_TYPE_CHAR, 20);
+        $table->add_field('name', XMLDB_TYPE_CHAR, 40);
         $table->add_field('querytext', XMLDB_TYPE_TEXT);
         $table->add_field('b', XMLDB_TYPE_FLOAT);
         $table->add_field('b_online', XMLDB_TYPE_FLOAT);
@@ -1008,5 +1048,14 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
+    if ($oldversion < ($ver = 2026040300)) {
+        $table = new xmldb_table('mmogame_aa_users_guid');
+        $field = new xmldb_field('lastlogin', XMLDB_TYPE_INTEGER, 10, true, XMLDB_NOTNULL, null, '0');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
     return true;
 }

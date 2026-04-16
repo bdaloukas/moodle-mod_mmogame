@@ -106,10 +106,10 @@ function mmogame_before_add_or_update(stdClass $mform): void {
         return;
     }
 
-    $a = explode( '-', $mform->typemodel);
+    $a = explode( '-', $mform->typemode);
     if (count( $a) == 2) {
         $mform->type = $a[0];
-        $mform->model = $a[1];
+        $mform->mode = $a[1];
     }
 
     $mform->timemodified = time();
@@ -294,7 +294,7 @@ function mmogame_attempt_summary_link_to_reports(stdClass $mmogame, stdClass $cm
 function mmogame_extend_settings_navigation(settings_navigation $settings, navigation_node $mmogamenode): void {
     global $CFG;
 
-    $model = 'quiz';
+    $mode = 'quiz';
 
     // Included here as we only ever want to include this file if we really need to.
     require_once($CFG->libdir . '/questionlib.php');
@@ -324,7 +324,7 @@ function mmogame_extend_settings_navigation(settings_navigation $settings, navig
 
         foreach ($reportlist as $report) {
             $url = new moodle_url('/mod/mmogame/report.php', ['id' => $settings->get_page()->cm->id, 'mode' => $report]);
-            $reportnode->add_node(navigation_node::create(get_string('report_' . $report, 'mmogametype_' . $model), $url,
+            $reportnode->add_node(navigation_node::create(get_string('report_' . $report, 'mmogametype_' . $mode), $url,
                 navigation_node::TYPE_SETTING,
                 null, 'mmogame_report_' . $report, new pix_icon('i/item', '')));
         }

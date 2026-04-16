@@ -72,7 +72,7 @@ class mmogametype_quiz_alone_admin extends moodleform {
         if ($state == 0) {
             $statename = get_string( 'state0', 'mmogametype_quiz');
         } else {
-            $statename = get_string( $rgame->model.'_state'.$state, 'mmogametype_quiz');
+            $statename = get_string( $rgame->mode.'_state'.$state, 'mmogametype_quiz');
         }
 
         $mform->addElement('hidden', 'id', $this->_id);

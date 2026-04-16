@@ -73,18 +73,20 @@ $PAGE->requires->strings_for_js(
         'js_aduel_wizard', 'js_aduel_skip', 'js_aduel_help', 'js_aduel_cut'],
     'mmogametype_quiz');
 
-$url = $CFG->wwwroot.'/mod/mmogame';
-$classname = "MmoGameType".ucfirst( $rgame->type).ucfirst( $rgame->model);
+$classname = "MmoGameType".ucfirst( $rgame->type).ucfirst( $rgame->mode);
 $PAGE->requires->js_call_amd('mmogametype_'.$rgame->type.'/'.strtolower( $classname));
-$modelparams = $rgame->modelparams === null || $rgame->modelparams === [] ? 'null' : "'$rgame->modelparams'";
+$modeparams = $rgame->modeparams === null || $rgame->modeparams === [] ? 'null' : "'$rgame->modeparams'";
 $PAGE->requires->js_init_code("
     require(['mmogametype_" . $rgame->type."/" . strtolower( $classname)."'], function(".$classname.") {
         const obj = new ".$classname."();
+        console.log($colors);
         obj.setColors( obj.sortColors( $colors));
-        obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modelparams, '$url');
+        console.log( $rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modeparams);
+        obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modeparams);
     });
 ");
 
 // Output the page.
+$PAGE->set_title($rgame->name);
 echo $OUTPUT->header();
 echo $OUTPUT->footer();

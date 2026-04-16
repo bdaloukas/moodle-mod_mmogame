@@ -126,16 +126,17 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             this.updateScreen();
         }
 
-        computeSizes(offsetY) {
+        computeSizes(offsetY, minIconSize = 0) {
             const cIcons = 3;
 
             const maxIconWidth = Math.floor(window.innerWidth / (this.countX * cIcons + 1.2 + this.countX / 10.0));
             const maxIconHeight = Math.floor(window.innerHeight / (this.countY + 0.5));
             const bodyFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
 
-            this.iconSize = Math.min(maxIconWidth, maxIconHeight, 4 * bodyFontSize);
+            this.iconSize = Math.max(minIconSize, Math.min(maxIconWidth, maxIconHeight, 4 * bodyFontSize));
             this.padding = Math.round(this.iconSize / 10);
             this.iconSize -= this.padding;
+console.log("mmogamesplit.iconSize=",this.iconSize);
             this.split = {
                 offsetY: offsetY * this.iconSize,
                 width: Math.round((window.innerWidth - this.iconSize - 3 * this.padding) / this.countX),
@@ -534,6 +535,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
         }
 
         gateSendGetAssets() {
+            console.log("before gateSendGetAssets");
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -560,6 +562,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                     };
                     this.gateCreateScreen();
                 }).fail((error) => {
+                    console.log('AJAX fail mod_mmogame_get_assets_split', {params, error});
                     this.showError('gateSendGetAssets', error);
                     return error;
                 });
@@ -573,7 +576,8 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             this.screen = 0;
 
             if (this.kinduser === 'guid') {
-                const option = await this.getOption('guid' + mmogameid);
+                let option = await this.getOption('guid' + mmogameid);
+
                 if (option === null) {
                     this.user = crypto.randomUUID();
                     this.setOption('guid' + mmogameid, {value: this.user});
@@ -585,6 +589,5 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             }
             this.gateSendGetAssets();
         }
-
     };
 });

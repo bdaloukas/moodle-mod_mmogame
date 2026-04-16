@@ -54,6 +54,7 @@ $functions = [
         'classname'     => 'mod_mmogame\external\get_assets_split',
         'description'   => 'Gets the list of avatars and colorpalettes.',
         'type'          => 'read',
+        'methodname'    => 'execute',
         'ajax'          => true,
         'loginrequired' => false,
     ],

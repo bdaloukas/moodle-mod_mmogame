@@ -195,12 +195,13 @@ define([''], function() {
 
         /**
          * Compute sizes for icons and padding based on the screen dimensions.
+         * @param minIconSize
          */
-        computeSizes() {
+        computeSizes(minIconSize = 0) {
             const cIcons = Math.max(this.cIcons || 5, 5);
             const maxIconWidth = window.innerWidth / cIcons;
             const maxIconHeight = window.innerHeight / 5;
-            this.iconSize = Math.min(maxIconWidth, maxIconHeight);
+            this.iconSize = Math.max(minIconSize, Math.min(maxIconWidth, maxIconHeight));
             const adjustment = this.iconSize / 10 / cIcons;
             this.iconSize = Math.round(this.iconSize - adjustment);
             this.padding = Math.round(this.iconSize / 10);
@@ -686,5 +687,28 @@ define([''], function() {
             };
         }
 
+        formatText(text, prefix) {
+
+            // Removes data-start and data-end in <p> </p>
+            text = text.replace(/<p[^>]*>/g, (tag) =>
+                tag.replace(/\sdata-start="[^"]*"/g, "")
+                    .replace(/\sdata-end="[^"]*"/g, "")
+            );
+
+            // 1) Check if the whole string is exactly one <p>...</p> block
+            //    If yes, remove the <p> tags completely
+            const match = text.match(/^<p>(.*)<\/p>$/i);
+            if (match) {
+                return prefix + match[1]; // Return the inner text without <p>.
+            }
+
+            // 2) If a <p> exists, insert the prefix only into the first <p>
+            if (text.includes("<p>")) {
+                return text.replace("<p>", `<p>${prefix}`);
+            }
+
+            // 3) If no <p> exists at all, simply add the prefix at the beginning
+            return prefix + text;
+        }
     };
 });

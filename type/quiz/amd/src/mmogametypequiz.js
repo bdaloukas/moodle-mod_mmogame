@@ -17,7 +17,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
     return class MmoGameTypeQuiz extends MmoGameUI {
         kinduser;
         user;
-        url;
+        //url;
         pin;
         labelTimer;
         timeForSendFastJson = 3000;
@@ -65,7 +65,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @param {boolean} disabled - Whether user input should be disabled.
          */
         createAnswer(left, top, width, onlyMetrics, fontSize, disabled) {
-            return this.createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled);
+            return this.createAnswerMultichoice(left + this.padding, top, width - this.padding, onlyMetrics, fontSize, disabled);
         }
 
         /**
@@ -244,9 +244,13 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     const formData = new URLSearchParams();
                     formData.append("fastjson", this.fastjson.toString());
                     formData.append("type", this.type);
-
+                    // Parse the URL, replace the last path segment with "state.php", and drop all query params
+                    const url = new URL(window.location.href);
+                    url.pathname = url.pathname.replace(/\/[^/]*$/, "/state.php");
+                    url.search = ""; // Remove query parameters.
+                    url.hash = ""; // Remove fragment (if any).
                     // Send POST request with application/x-www-form-urlencoded format
-                    const response = await fetch(`${this.url}/state.php`, {
+                    const response = await fetch(url.toString(), {
                         method: 'POST',
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                         body: formData.toString(),
@@ -615,17 +619,22 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         }
 
         async processFastJson(response) {
+return;
             if (response === '') {
                 response = await this.callGetState();
             }
             let a = response.split('-'); // Are state,timefastjson.
-            let newstate = a.length > 0 ? parseInt(a[0]) : 0;
+            let newstate = a.length > 0 ? a[0] : 0;
             let newTimeFastJSON = a.length > 1 ? parseInt(a[1]) : 0;
-
+            if (a[0].length > 0) {
+                a[0] = parseInt( a[0]);
+            }
+            if (newstate === '') {
+                newstate = this.state;
+            }
             if (this.timefastjson === null) {
                 this.timefastjson = 0;
             }
-
             if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
                 this.removeMessageDivs();
                 await this.callGetAttempt();

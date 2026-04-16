@@ -305,8 +305,6 @@ class mmogame_irt_1pl {
             return $rec->id;
         }
 
-        $select = '';
-
         $rec = new stdClass();
         $rec->mmogameid = $mmogame->get_id();
         $rec->numgame = $mmogame->get_numgame();
@@ -327,7 +325,8 @@ class mmogame_irt_1pl {
      * @throws dml_exception
      * @throws dml_transaction_exception
      */
-    public static function save(int $keyid, string $wheresnippet, array $irtq, array $irtu, array $mapqueries, array $mapusers): void {
+    public static function save(int $keyid, string $wheresnippet, array $irtq, array $irtu, array $mapqueries,
+        array $mapusers): void {
         global $DB;
 
         $positionsq = array_keys($mapqueries);
@@ -348,7 +347,7 @@ class mmogame_irt_1pl {
             $new->keyid = $keyid;
             $new->position = $query->position;
             $new->queryid = $query->queryid;
-            $new->name = $query->name;
+            $new->name = mb_substr( $query->name, 0, 40);
             $new->querytext = $query->querytext;
             $new->b = $irt->b;
             $new->b_online = $query->b_online;

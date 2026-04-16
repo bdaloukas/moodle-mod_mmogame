@@ -91,7 +91,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $usersoptions[MMOGAME_KINDUSER_MOODLE] = get_string('kinduser_moodle', 'mmogame');
         $mform->addElement('select', 'kinduser', get_string('kinduser', 'mmogame'), $usersoptions);
 
-        $this->definition_models( $mform);
+        $this->definition_modes( $mform);
 
         $this->standard_coursemodule_elements();
 
@@ -99,26 +99,26 @@ class mod_mmogame_mod_form extends moodleform_mod {
     }
 
     /**
-     * Definition for params about models
+     * Definition for params about modes
      *
      * @param object $mform
      * @throws coding_exception
      */
-    protected function definition_models(object $mform): void {
+    protected function definition_modes(object $mform): void {
         $types = mmogame_get_types();
         $dir = __DIR__.'/type';
-        $models = [];
+        $modes = [];
         foreach ($types as $type) {
             require_once( $dir.'/'.$type.'/lib.php');
-            $function = 'mmogametype_'.$type.'_get_models';
+            $function = 'mmogametype_'.$type.'_get_modes';
             $map = $function();
-            foreach ($map as $model => $value) {
-                $models[$type.'-'.$model] = $value;
+            foreach ($map as $mode => $value) {
+                $modes[$type.'-'.$mode] = $value;
             }
             echo $function;
         }
 
-        $mform->addElement('select', 'typemodel', get_string('type', 'mmogame'), $models);
+        $mform->addElement('select', 'typemode', get_string('type', 'mmogame'), $modes);
 
         // Pin.
         $mform->addElement('text', 'pin', "PIN", ['size' => '10']);
@@ -197,6 +197,8 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * Computes the categories of all question of the current course;
      *
      * @return bool|array of question categories
+     * @throws coding_exception
+     * @throws ddl_exception
      * @throws dml_exception
      */
     public function get_array_question_categories(): ?array {
@@ -222,7 +224,8 @@ class mod_mmogame_mod_form extends moodleform_mod {
             return [];
         }
 
-        $a = [];
+        $ret = [null => ''];
+
         $table = "{question} q, {qtype_multichoice_options} qmo";
         $select = " AND q.qtype='multichoice' AND qmo.single = 1 AND qmo.questionid=q.id";
         $sql2 = "SELECT COUNT(DISTINCT questionbankentryid) FROM $table,{question_bank_entries} qbe,".
@@ -232,11 +235,16 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $sql = "SELECT id,name,($sql2) as c FROM {question_categories} qc WHERE contextid ".$insql;
         if ($recs = $DB->get_records_sql( $sql, $params)) {
             foreach ($recs as $rec) {
-                $a[$rec->id] = $rec->name.' ('.$rec->c.')';
+                $s = $rec->name.' ('.$rec->c;
+                $count = $this->get_questions_count($rec->id);
+                if ($count != $rec->c) {
+                    $s .= ' - '.$count;
+                }
+                $ret[$rec->id] = $s . ')';
             }
         }
 
-        return $a;
+        return $ret;
     }
 
     /**
@@ -247,8 +255,8 @@ class mod_mmogame_mod_form extends moodleform_mod {
     public function set_data($defaultvalues): void {
         $mmogameid = isset( $defaultvalues->id) ? intval($defaultvalues->id) : 0;
 
-        if (isset( $defaultvalues->type) && isset( $defaultvalues->model)) {
-            $defaultvalues->typemodel = $defaultvalues->type.'-'.$defaultvalues->model;
+        if (isset( $defaultvalues->type) && isset( $defaultvalues->mode)) {
+            $defaultvalues->typemode = $defaultvalues->type.'-'.$defaultvalues->mode;
         }
         if (!isset( $defaultvalues->pin) || $defaultvalues->pin == 0) {
             $db = new mmogame_database_moodle();
@@ -304,5 +312,55 @@ class mod_mmogame_mod_form extends moodleform_mod {
             $mform->setType($name1, PARAM_INT);
             $mform->hideIf($name1, 'qbank', 'neq', MMOGAME_QBANK_MOODLEQUESTION);
         }
+
+        // Subcategories.
+        $mform->addElement('selectyesno', 'subcategories', get_string('include_subcategories', 'mod_mmogame'));
+    }
+
+    /**
+     * Computes the count of question of this category and sub-categories.
+     * @param $categoryid
+     * @return int
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    private function get_questions_count($categoryid): int {
+        global $DB;
+
+        $categoryids = [$categoryid];
+        list($insql, $inparams) = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'p');
+
+        // Append sub categories.
+        for (;;) {
+            $sql = "SELECT id, name, parent, contextid FROM {question_categories} WHERE parent $insql";
+
+            $childrenids = array_keys($DB->get_records_sql($sql, $inparams));
+            if (count($childrenids) === 0) {
+                break;
+            }
+            foreach ($childrenids as $id) {
+                if (!array_search($id, $categoryids)) {
+                    $categoryids[] = $id;
+                }
+            }
+            list($insql, $inparams) = $DB->get_in_or_equal($childrenids, SQL_PARAMS_NAMED, 'p');
+        }
+
+        [$insql1, $inparams1] = $DB->get_in_or_equal( $categoryids);
+
+        $sql = "SELECT COUNT(*) as c
+            FROM {question_bank_entries} qbe
+            JOIN {question_versions} qv ON qbe.id = qv.questionbankentryid
+            JOIN {question} q ON qv.questionid = q.id
+            WHERE qv.version = (
+                SELECT MAX(subqv.version)
+                FROM {question_versions} subqv
+                WHERE subqv.questionbankentryid = qv.questionbankentryid
+            )
+            AND qbe.questioncategoryid $insql1
+            AND q.qtype='multichoice'";
+        $rec = $DB->get_record_sql( $sql, array_merge($inparams1));
+
+        return $rec->c;
     }
 }

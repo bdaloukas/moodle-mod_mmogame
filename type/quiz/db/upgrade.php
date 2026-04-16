@@ -39,6 +39,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/**
+ * Repair queries (use questionbankentryid instead of questionid).
+ */
 function mmogametype_quiz_repair_queries() {
     global $DB;
 
@@ -47,20 +50,20 @@ function mmogametype_quiz_repair_queries() {
 
     $tables = ['mmogame_quiz_attempts', 'mmogame_aa_stats'];
     foreach ($tables as $table) {
-        $sql = 'UPDATE {'.$table.'} AS a
+        $sql = 'UPDATE {'.$table.'} a
             SET queryid = (
                 SELECT v.questionbankentryid
-                FROM {question_versions} AS v
+                FROM {question_versions} v
                 WHERE v.questionid = a.queryid
             )
             WHERE EXISTS (
                 SELECT 1
-                FROM {question_versions} AS v
+                FROM {question_versions} v
                 WHERE v.questionid = a.queryid
             )
             AND queryid <> (
                 SELECT v.questionbankentryid
-                FROM {question_versions} AS v
+                FROM {question_versions} v
                 WHERE v.questionid = a.queryid)';
         $DB->execute($sql);
     }
@@ -138,6 +141,39 @@ function xmldb_mmogametype_quiz_upgrade( string $oldversion): bool {
         // Rename model value 'aduelsplit' -> 'split' safely using DML helper.
         $DB->set_field('mmogame', 'model', 'split', ['type' => 'quiz', 'model' => 'aduelsplit']);
 
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2025110100)) {
+        // Define field numattempt to be added to mmogame.
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('theta', XMLDB_TYPE_FLOAT);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2025110101)) {
+        // Define field numattempt to be added to mmogame.
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('difficulty', XMLDB_TYPE_FLOAT);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2025110200)) {
+        // Define field numattempt to be added to mmogame.
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('tools', XMLDB_TYPE_INTEGER, 2, null, true, null, 0);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 

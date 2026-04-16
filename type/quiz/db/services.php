@@ -65,6 +65,7 @@ $functions = [
         'classname'     => 'mmogametype_quiz\external\get_attempts_split',
         'description'   => 'Starts a new attempt or continues the last attempt.',
         'type'          => 'write',
+        'methodname'    => 'execute',
         'ajax'          => true,
         'loginrequired' => false,
     ],

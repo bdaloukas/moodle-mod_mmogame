@@ -29,12 +29,13 @@ use invalid_parameter_exception as invalid_parameter_exceptionAlias;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
 use required_capability_exception;
+use function get_coursemodule_from_instance;
 
 /**
  * External function to get the list of avatars and color palettes.
  *
  * @package    mod_mmogame
- * @copyright 2025 Vasilis Daloukas
+ * @copyright 2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_assets_split extends external_api {
@@ -77,8 +78,8 @@ class get_assets_split extends external_api {
             'kinduser' => $kinduser,
             'user' => $user,
             'countsplit' => $countsplit,
-            'countpalettes' => $colorpalettes ?? 0,
-            'countavatars' => $numavatars ?? 0,
+            'countpalettes' => $countpalettes ?? 0,
+            'countavatars' => $countavatars ?? 0,
         ]);
         // Perform security checks.
         $cm = get_coursemodule_from_instance('mmogame', $mmogameid);

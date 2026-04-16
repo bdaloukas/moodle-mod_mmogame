@@ -105,7 +105,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
 
             this.removeAreaChildren();
-
             // Render the screen layout based on orientation (vertical or horizontal)
             if (this.isVertical) {
                 this.createScreenVertical(json, disabled);

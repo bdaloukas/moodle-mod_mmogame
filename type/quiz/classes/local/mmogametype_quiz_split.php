@@ -26,18 +26,20 @@
 
 namespace mmogametype_quiz\local;
 
+use coding_exception;
+use dml_exception;
 use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\mmogame;
-use mod_mmogame\local\model\mmogame_model_aduel;
+use mod_mmogame\local\mode\mmogame_mode_aduel;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../../lib.php');
-require_once( 'mmogametype_quiz_algorithm_irt.php');
+require_once('mmogametype_quiz_algorithm_irt.php');
 
-define( 'ERRORCODE_NO_QUERIES', 'no_questions');
-define( 'ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');
+define('ERRORCODE_NO_QUERIES', 'no_questions');
+define('ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');
 
 /**
  * mmogametype_quiz_split is responsible for managing and facilitating quiz gameplay
@@ -49,7 +51,7 @@ class mmogametype_quiz_split extends mmogame {
     protected int $numquestions;
 
     /** @var int $maxalone: maximum number of questions that a user can play withoyt an oponent. */
-    protected int $maxalone = 200;
+    protected int $maxalone = -1;
 
     /**
      * Constructor.
@@ -60,7 +62,7 @@ class mmogametype_quiz_split extends mmogame {
     public function __construct(mmogame_database $db, stdClass $rgame) {
         $rgame->usemultichoice = true;
 
-        parent::__construct( $db, $rgame);
+        parent::__construct($db, $rgame);
 
         $this->numquestions = 4;
         $this->timelimit = 300;
@@ -84,35 +86,51 @@ class mmogametype_quiz_split extends mmogame {
      * @param array $auserids
      * @param bool $isaduel
      * @param array $adueluserids
-     * @return array|null
+     * @param int $countquestions
+     * @param int $corrects
+     * @param array $islastcorrect
+     * @param array $queryranks
+     * @return ?array
+     * @throws coding_exception
+     * @throws dml_exception
      */
-    public function get_attempts(array $auserids, bool $isaduel, array $adueluserids): ?array {
+    public function get_attempts(array $auserids, bool $isaduel, array $adueluserids,
+                                 int &$countquestions, int &$corrects, array &$islastcorrect, array &$queryranks): ?array {
         $ids = $qs0 = null;
+        $countcorrect = 0;
 
-        $ret = $ignore = [];
+        $ret = $ignore = $corrects = [];
         foreach ($auserids as $auserid) {
-            $this->login_user( $auserid);
+            $this->login_user($auserid);
             $newplayer1 = $newplayer2 = false;
 
-            $aduel = mmogame_model_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2, $adueluserids, $isaduel);
+            $aduel = mmogame_mode_aduel::get_aduel($this, $this->maxalone,  $newplayer1, $newplayer2, $adueluserids, $isaduel);
             if ($aduel === null) {
-                $this->set_errorcode( ERRORCODE_ADUEL_NO_RIVALS);
+                $this->set_errorcode(ERRORCODE_ADUEL_NO_RIVALS);
                 return null;
             }
             if (!$newplayer1 && !$newplayer2) {
-                $recs = mmogame_model_aduel::get_attempts( $this, $aduel);
+                // Continue previous attempt.
+                $ids = $this->qbank->get_queries_ids();
+
+                // Have to recompute some statistics info.
+                $countquestions = count($ids);
+                $countcorrect = $this->db->count_records_select(
+                    'mmogame_aa_stats',
+                    'mmogameid=? AND numgame=? AND auserid=? AND serialcorrects >= 1',
+                    [$this->get_id(), $this->get_numgame(), $auserid]);
+
+                // Reads attempts from database.
+                $recs = mmogame_mode_aduel::get_attempts($this, $aduel);
                 if (count($recs) > 0) {
                     $ret[] = $recs;
+                    $corrects[] = $countcorrect;
+                    $this->compute_queryranks($recs, $queryranks);
                     continue;
                 } else {
                     // Have to repair.
-                    $temps = mmogame_model_aduel::get_attempts( $this, $aduel, true);
-                    if (count($temps) == 0) {
-                        $newplayer1 = true;
-                    } else {
-                        // Append new questions.
-                        $newplayer1 = true;
-                    }
+                    mmogame_mode_aduel::get_attempts($this, $aduel, true);
+                    $newplayer1 = true;
                 }
             }
 
@@ -122,8 +140,9 @@ class mmogametype_quiz_split extends mmogame {
                 if ($ids === null || count($ids) == 0) {
                     return null;
                 }
+
                 // Initializes data.
-                $qs = [];
+                /*$qs = [];
                 foreach ($ids as $id) {
                     $q = new stdClass();
                     $q->id = $id;
@@ -131,19 +150,36 @@ class mmogametype_quiz_split extends mmogame {
 
                     $qs[$id] = $q;
                 }
-                $qs0 = $qs;
+                $qs0 = $qs;*/
             } else {
-                $qs = $qs0;
+                //$qs = $qs0;
             }
 
             if ($newplayer1) {
-                $ret[] = $this->get_attempts_new1($ids, $qs, $aduel, $ignore);
+                $ret[] = $this->get_attempts_new1(
+                    $ids,
+                    $aduel,
+                    $ignore,
+                    $countquestions,
+                    $countcorrect,
+                    $islastcorrect,
+                    $queryranks
+                );
             } else {
                 $ret[] = $this->get_attempts_new2($aduel);
             }
+            $corrects[] = $countcorrect;
         }
-
         return $ret;
+    }
+
+    /**
+     * Deletes an attempt from database.
+     *
+     * @param int $attemptid
+     */
+    public function delete_attempt(int $attemptid): void {
+        $this->db->delete_records_select('mmogame_quiz_attempts', 'id=?', [$attemptid]);
     }
 
     /**
@@ -152,19 +188,19 @@ class mmogametype_quiz_split extends mmogame {
      * @param stdClass $aduel
      * @return array (a new attempt of false if no attempt)
      */
-    protected function get_attempts_new2($aduel): array {
-        $recs = $this->db->get_records_select( 'mmogame_quiz_attempts',
+    protected function get_attempts_new2(stdClass $aduel): array {
+        $recs = $this->db->get_records_select('mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=?',
             [$this->rgame->id, $this->rgame->numgame, $this->auserid],
             'numquery DESC', 'numquery', 0, 1);
         if (count($recs) === 0) {
             $numquery = 1;
         } else {
-            $rec = reset( $recs);
+            $rec = reset($recs);
             $numquery = $rec->numquery + 1;
         }
 
-        $recs = $this->db->get_records_select( 'mmogame_quiz_attempts',
+        $recs = $this->db->get_records_select('mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND numteam=? AND auserid=?',
             [$this->rgame->id, $this->rgame->numgame, $aduel->id, $aduel->auserid1], 'numattempt');
         $ids = [];
@@ -174,7 +210,7 @@ class mmogametype_quiz_split extends mmogame {
                 'timestart' => 0, 'numteam' => $rec->numteam, 'numquery' => $numquery++,
                 'numattempt' => $rec->numattempt, 'layout' => $rec->layout, 'timeanswer' => 0, ];
             $a['timeclose'] = 0;
-            $id = $this->db->insert_record( 'mmogame_quiz_attempts', $a);
+            $id = $this->db->insert_record('mmogame_quiz_attempts', $a);
             $ids[] = $id;
         }
         [$insql, $inparams] = $this->db->get_in_or_equal($ids);
@@ -186,26 +222,31 @@ class mmogametype_quiz_split extends mmogame {
      * Creates a new attempt for the first player. Also select which question will be contained in the attempt.
      *
      * @param array $ids
-     * @param array $qs
      * @param stdClass $aduel
      * @param array $ignore
+     * @param int $countquestions
+     * @param int $corrects
+     * @param array $islastcorrect
+     * @param array $queryranks
      * @return ?array (a new attempt of false if no attempt)
      */
-    protected function get_attempts_new1(array $ids, array $qs, stdClass $aduel, array &$ignore): ?array {
-        $recs = $this->db->get_records_select( 'mmogame_quiz_attempts',
+    protected function get_attempts_new1(array $ids, stdClass $aduel, array &$ignore,
+                                         int &$countquestions, int &$corrects, array &$islastcorrect, array &$queryranks): ?array {
+        $recs = $this->db->get_records_select('mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=?',
             [$this->rgame->id, $this->rgame->numgame, $this->auserid],
             'numquery DESC', 'numquery',    0, 1);
         if (count($recs) === 0) {
             $numquery = 1;
         } else {
-            $rec = reset( $recs);
+            $rec = reset($recs);
             $numquery = $rec->numquery + 1;
         }
 
         $queries = mmogametype_quiz_algorithm_irt::get_queries(
             $this->get_db(), $this->rgame->id, $this->rgame->numgame,
-            $this->auserid, $ids, 4, $numquery, $ignore);
+            $this->auserid, $ids, 1, 4, $numquery, $ignore,
+            $countquestions, $corrects, $islastcorrect, $queryranks);
         if ($queries === null) {
             return null;
         }
@@ -222,7 +263,7 @@ class mmogametype_quiz_split extends mmogame {
             $a['timeanswer'] = 0;
             $a['timeclose'] = 0;
             $a['numquery'] = $numquery++;
-            $ids[] = $this->db->insert_record( 'mmogame_quiz_attempts', $a);
+            $ids[] = $this->db->insert_record('mmogame_quiz_attempts', $a);
 
             $ignore[$queryid] = $queryid;
         }
@@ -233,7 +274,7 @@ class mmogametype_quiz_split extends mmogame {
 
         $sql = 'UPDATE {mmogame_aa_grades} SET countalone=countalone + 1 WHERE
                 mmogameid=? AND numgame=? AND auserid=?';
-        $this->db->execute( $sql, [$this->rgame->id, $this->rgame->numgame, $this->auserid]);
+        $this->db->execute($sql, [$this->rgame->id, $this->rgame->numgame, $this->auserid]);
 
         return $ret;
     }
@@ -248,13 +289,13 @@ class mmogametype_quiz_split extends mmogame {
      */
     public function get_queries_aduel(array $ids, array $qs, int $count): ?array {
 
-        $grade = $this->get_grade( $this->auserid);
+        $grade = $this->get_grade($this->auserid);
 
         // Computes statistics per question.
-        [$insql, $inparams] = $this->db->get_in_or_equal( $ids);
-        $recs = $this->db->get_records_select( 'mmogame_aa_stats',
+        [$insql, $inparams] = $this->db->get_in_or_equal($ids);
+        $recs = $this->db->get_records_select('mmogame_aa_stats',
             "mmogameid=? AND numgame=? AND auserid IS NULL AND queryid $insql",
-            array_merge( [$this->rgame->id, $this->rgame->numgame], $inparams),
+            array_merge([$this->rgame->id, $this->rgame->numgame], $inparams),
             '', 'id,queryid,percent,countused');
         foreach ($recs as $rec) {
             $q = $qs[$rec->queryid];
@@ -264,7 +305,7 @@ class mmogametype_quiz_split extends mmogame {
         }
 
         // Computes statistics per question and user.
-        $recs = $this->db->get_records_select( 'mmogame_aa_stats',
+        $recs = $this->db->get_records_select('mmogame_aa_stats',
             "mmogameid=? AND numgame=? AND auserid = ? AND queryid $insql",
             array_merge([$this->rgame->id, $this->rgame->numgame, $this->auserid], $inparams),
             '', 'queryid,countused,countcorrect,counterror,timeerror,percent,islastcorrect');
@@ -292,7 +333,7 @@ class mmogametype_quiz_split extends mmogame {
 
         $percent = $grade !== null ? $grade->percent : 0;
         foreach ($qs as $q) {
-            $key = sprintf( "%10d %10d %10d %5d %10d %5d %10d",
+            $key = sprintf("%10d %10d %10d %5d %10d %5d %10d",
                 // If it has big negative score give priority to them.
                 $q->uscore < 0 ? -$min + $q->uscore : 999999999,
                 // If it has negative score more priority has the older question.
@@ -300,47 +341,47 @@ class mmogametype_quiz_split extends mmogame {
                 // Fewer times used by user higher priority has.
                 $q->ucountused,
                 // Sorts by distance.
-                $q->qpercent < $percent ? abs( round( 100 * $percent - 100 * $q->qpercent)) : 0,
+                $q->qpercent < $percent ? abs(round(100 * $percent - 100 * $q->qpercent)) : 0,
                 // Prioritizes question that fewer times by everyone.
-                round( 100 * $q->qcountused),
+                round(100 * $q->qcountused),
                 rand(1, 9999),
                 $q->id
             );
             $map[$key] = $q;
         }
-        ksort( $map);
+        ksort($map);
 
         $map2 = [];
         // Selects 3 * count of needed.
         foreach ($map as $q) {
-            if (count( $map2) >= 3 * $count) {
+            if (count($map2) >= 3 * $count) {
                 break;
             }
-            $key2 = sprintf( "%10.6f %10d", $q->qpercent, $q->id);
+            $key2 = sprintf("%10.6f %10d", $q->qpercent, $q->id);
             $map2[$key2] = $q;
         }
         // Remove items so to remain $count.
-        while (count( $map2) > $count) {
-            $key = array_rand( $map2);
-            unset( $map2[$key]);
+        while (count($map2) > $count) {
+            $key = array_rand($map2);
+            unset($map2[$key]);
         }
 
-        ksort( $map2);
+        ksort($map2);
         $ret = [];
         foreach ($map2 as $q) {
-            $q2 = $this->qbank->load( $q->id);
+            $q2 = $this->qbank->load($q->id);
             $ret[] = $q2;
         }
 
         // Update statistics.
         foreach ($ret as $q) {
-            $this->qbank->update_stats($this->auserid, null, $q->id, 1, 0, 0);
-            $this->qbank->update_stats(null, null, $q->id, 1, 0, 0);
+            $this->qbank->update_stats($this->auserid, null, $q->id, 1, 0, 0, 0, null);
+            $this->qbank->update_stats(null, null, $q->id, 1, 0, 0, 0, null);
         }
-        $this->db->update_record( 'mmogame_aa_grades',
-            ['id' => $grade->id, 'countquestions' => count( $ids), 'percent' => $corrects / count($ids)]);
+        $this->db->update_record('mmogame_aa_grades',
+            ['id' => $grade->id, 'countquestions' => count($ids), 'percent' => $corrects / count($ids)]);
 
-        return count( $ret) ? $ret : null;
+        return count($ret) ? $ret : null;
     }
 
     /**
@@ -354,29 +395,29 @@ class mmogametype_quiz_split extends mmogame {
      * Returns question types that uses (multichoice).
      * @return string[]
      */
-    public function get_qtypes() {
+    public function get_qtypes(): array {
         return ['multichoice'];
     }
 
     /**
-     * Set answer model.
+     * Set answer mode.
      *
      * @param array $ret
      * @param int|null $attemptid
      * @param string|null $answer
      * @param int $timestart
      * @param int $timeanswer
-     * @param int|null $answerid
-     * @param string $subcommand
-     * @return stdClass|null
+     * @param ?int $answerid
+     * @param ?int $tools
+     * @return ?stdClass
      */
-    public function set_answer_model(array  &$ret, ?int $attemptid, ?string $answer, int $timestart, int $timeanswer,
-                                     ?int $answerid = null, string $subcommand = ''): ?stdClass {
+    public function set_answer_mode(array  &$ret, ?int $attemptid, ?string $answer, int $timestart, int $timeanswer,
+                                     ?int $answerid = null, ?int $tools = 0): ?stdClass {
         if ($attemptid === null) {
             return null;
         }
 
-        $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=? AND id=?',
+        $attempt = $this->db->get_record_select('mmogame_quiz_attempts', 'mmogameid=? AND auserid=? AND id=?',
             [$this->get_id(), $this->auserid, $attemptid]);
         if ($attempt === null) {
             return null;
@@ -386,15 +427,17 @@ class mmogametype_quiz_split extends mmogame {
             || $attempt->numgame != $this->rgame->numgame) {
             return null;
         }
-        $aduel = $this->db->get_record_select( 'mmogame_am_aduel_pairs', 'id=?', [$attempt->numteam]);
+        $aduel = $this->db->get_record_select('mmogame_am_aduel_pairs', 'id=?', [$attempt->numteam]);
 
         $autograde = true;
-        $query = $this->qbank->load( $attempt->queryid);
-        if (isset( $subcommand) && $subcommand == 'tool2') {
+        $query = $this->qbank->load($attempt->queryid);
+        if (isset($subcommand) && $subcommand == 'tool2') {
             $autograde = false;
             $ret['tool2'] = 1;
         }
-        $this->set_answer( $attempt, $query, $answer, $timestart, $timeanswer, $answerid, $autograde, $ret, $aduel);
+
+        $this->set_answer($attempt, $query, $answer, $timestart, $timeanswer, $answerid,
+            $tools !== null ? $tools : 0, $autograde, $ret, $aduel);
 
         $ret['iscorrect'] = $attempt->iscorrect ? 1 : 0;
 
@@ -410,16 +453,17 @@ class mmogametype_quiz_split extends mmogame {
      * @param int $timestart
      * @param int $timeanswer
      * @param ?int $useranswerid
+     * @param int $tools
      * @param bool $autograde
      * @param array $ret (will contain all information)
      */
     public function set_answer_alone(stdClass $attempt, stdClass $query, ?string $useranswer,
-                                     int $timestart, int $timeanswer, ?int $useranswerid,
+                                     int $timestart, int $timeanswer, ?int $useranswerid, int $tools,
                                      bool $autograde, array &$ret): void {
         // If auto-grading is enabled, check if the answer is correct and set iscorrect.
         if ($autograde) {
             $fraction = 0.0;
-            $attempt->iscorrect = $this->qbank->is_correct( $query, $useranswer, $useranswerid, $this, $fraction);
+            $attempt->iscorrect = $this->qbank->is_correct($query, $useranswer, $useranswerid, $this, $fraction);
             $attempt->iscorrect = $attempt->iscorrect ? 1 : 0;
         }
         $istimeout = false;
@@ -427,7 +471,7 @@ class mmogametype_quiz_split extends mmogame {
         $a = ['id' => $attempt->id];
 
         if (!$istimeout) {
-            if ($this->qbank->is_multichoice( $query)) {
+            if ($this->qbank->is_multichoice($query)) {
                 // Handle multiple-choice answers.
                 $a['useranswerid'] = $attempt->useranswerid = $useranswerid;
                 $a['useranswer'] = null;
@@ -443,19 +487,19 @@ class mmogametype_quiz_split extends mmogame {
 
         if ($autograde) {
             // Update the score based on the correctness of the answer.
-            $a['score'] = $attempt->score = $this->get_score_query( $attempt->iscorrect, $query);
+            $a['score'] = $attempt->score = $this->get_score_query($attempt->iscorrect, $query);
 
             // Update statistics for the user and the question.
-            $this->qbank->update_grades( $attempt->auserid, $attempt->score, 0, 1);
+                $this->qbank->update_grades($attempt->auserid, $attempt->score, 1);
             $ret['addscore'] = $attempt->score >= 0 ? '+'.$attempt->score : $attempt->score;
 
             if ($attempt->iscorrect) {
                 $nextquery = $attempt->numquery + 10;
             } else {
-                $irt = $this->db->get_record_select( 'mmogame_aa_irt',
+                $irt = $this->db->get_record_select('mmogame_aa_irt',
                     'mmogameid=? AND numgame=? AND queryid=?',
                     [$attempt->mmogameid, $attempt->numgame, $attempt->queryid]);
-                $grade = $this->db->get_record_select( 'mmogame_aa_grades',
+                $grade = $this->db->get_record_select('mmogame_aa_grades',
                     'mmogameid=? AND numgame=? AND auserid=?',
                     [$attempt->mmogameid, $attempt->numgame, $attempt->auserid]);
                 if ($grade === null || $irt === null) {
@@ -468,26 +512,33 @@ class mmogametype_quiz_split extends mmogame {
                     $nextquery = $attempt->numquery + 7;
                 }
             }
-            $this->qbank->update_stats( $attempt->auserid, null, $attempt->queryid, 1,
+            $this->qbank->update_stats($attempt->auserid, null, $attempt->queryid, 1,
                 $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0, $nextquery, null);
 
-            $this->qbank->update_stats( null, null, $attempt->queryid, 1,
+            $this->qbank->update_stats(null, null, $attempt->queryid, 1,
                 $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0, 0, null);
+        }
 
+        // Update the database record for the attempt.
+        if ($autograde) {
+            $theta = $difficulty = null;
             mmogametype_quiz_algorithm_irt::update(
                 $this->get_db(),
                 $this->rgame->id,
                 $this->rgame->numgame,
                 $this->auserid,
                 $attempt->queryid,
-                $attempt->iscorrect
+                $attempt->iscorrect,
+                $theta,
+                $difficulty,
             );
-        }
 
-        // Update the database record for the attempt.
-        if ($autograde) {
             $a['iscorrect'] = $attempt->iscorrect;
-            $this->db->update_record( 'mmogame_quiz_attempts', $a);
+            $a['theta'] = $theta;
+            $a['difficulty'] = $difficulty;
+            $a['tools'] = $tools;
+
+            $this->db->update_record('mmogame_quiz_attempts', $a);
         }
     }
 
@@ -501,17 +552,20 @@ class mmogametype_quiz_split extends mmogame {
      * @param int $timestart
      * @param int $timeanswer
      * @param ?int $useranswerid Optional user answer ID.
+     * @param int $tools
      * @param bool $autograde Whether autograding is enabled.
      * @param array $ret Output array for additional information.
      * @param stdClass $aduel Output array for additional information.
      */
     public function set_answer(stdClass $attempt, stdClass $query, ?string $useranswer,
                                int $timestart, int $timeanswer, ?int $useranswerid,
-                               bool $autograde, array &$ret, stdClass $aduel): void {
-        $this->set_answer_alone( $attempt, $query, $useranswer, $timestart, $timeanswer, $useranswerid, $autograde, $ret);
+                               int $tools, bool $autograde, array &$ret, stdClass $aduel): void {
+
+        $this->set_answer_alone($attempt, $query, $useranswer, $timestart, $timeanswer, $useranswerid, $tools, $autograde, $ret);
+
         $ret['iscorrect'] = $attempt->iscorrect;
         if ($this->auserid == $aduel->auserid1) {
-            $recs = $this->db->get_records_select( 'mmogame_quiz_attempts',
+            $recs = $this->db->get_records_select('mmogame_quiz_attempts',
                 'mmogameid=? AND numgame=? AND numteam=? AND timeanswer = 0 AND auserid=?',
                 [$attempt->mmogameid, $attempt->numgame, $aduel->id, $this->auserid], 'id',
             '*', 0, 1);
@@ -522,7 +576,7 @@ class mmogametype_quiz_split extends mmogame {
                     'mmogameid=? AND numgame=? AND auserid=?',
                     [$attempt->mmogameid, $attempt->numgame, $this->auserid]);
                 $score = $grade !== null ? $grade->theta : 0;
-                mmogame_model_aduel::close_user1($this, $aduel->id, $score);
+                mmogame_mode_aduel::close_user1($this, $aduel->id, $score);
             }
 
             return;
@@ -531,7 +585,7 @@ class mmogametype_quiz_split extends mmogame {
         if ($attempt->score < 0) {
             $attempt->score = 0;
         }
-        $opposite = $this->db->get_record_select( 'mmogame_quiz_attempts',
+        $opposite = $this->db->get_record_select('mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND numteam=? AND numattempt=? AND auserid = ?',
             [$attempt->mmogameid, $attempt->numgame, $aduel->id, $attempt->numattempt, $aduel->auserid1]
         );
@@ -545,33 +599,33 @@ class mmogametype_quiz_split extends mmogame {
                         $attempt->score -= 2;
                     }
                     $ret['addscore'] = '+'.$attempt->score;
-                    $this->db->update_record( 'mmogame_quiz_attempts',
+                    $this->db->update_record('mmogame_quiz_attempts',
                         ['id' => $attempt->id, 'score' => $attempt->score]);
-                    $this->qbank->update_grades( $attempt->auserid, $attempt->score, 0, 0);
+                    $this->qbank->update_grades($attempt->auserid, $attempt->score, 0);
                 }
             } else if ($attempt->iscorrect == 0) {
                 // Check the answer of opposite. If is right duplicate other points.
                 if ($opposite->iscorrect) {
-                    $this->db->update_record( 'mmogame_quiz_attempts',
+                    $this->db->update_record('mmogame_quiz_attempts',
                         ['id' => $opposite->id, 'score' => 2 * $opposite->score]);
-                    $this->qbank->update_grades( $opposite->auserid, $opposite->score, 0, 0);
+                    $this->qbank->update_grades($opposite->auserid, $opposite->score, 0);
                 }
             }
         } else if ($aduel->tool3numattempt2 == $attempt->numattempt) {
             // The wizard tool.
             $attempt->score -= 1;
             $ret['addscore'] = '+'.$attempt->score;
-            $this->db->update_record( 'mmogame_quiz_attempts',
+            $this->db->update_record('mmogame_quiz_attempts',
                 ['id' => $attempt->id, 'score' => $attempt->score]);
-            $this->qbank->update_grades( $attempt->auserid, -1, 0, 0);
+            $this->qbank->update_grades($attempt->auserid, -1, 0);
         }
 
-        $recs = $this->db->get_records_select( 'mmogame_quiz_attempts',
+        $recs = $this->db->get_records_select('mmogame_quiz_attempts',
             'mmogameid =? AND numgame=? AND numteam=? AND timeanswer = 0 AND auserid=?',
             [$attempt->mmogameid, $attempt->numgame, $aduel->id, $aduel->auserid2], 'id', 'id', 0, 1);
         if ($recs === null || count($recs) == 0) {
             // We finished.
-            $this->db->update_record( 'mmogame_am_aduel_pairs', ['id' => $aduel->id, 'isclosed2' => 1]);
+            $this->db->update_record('mmogame_am_aduel_pairs', ['id' => $aduel->id, 'isclosed2' => 1]);
         }
     }
 
@@ -583,7 +637,7 @@ class mmogametype_quiz_split extends mmogame {
      * @return int (now uses negative grading, in the future user will change it)
      */
     protected function get_score_query(bool $iscorrect, object $query): int {
-        return $this->get_score_query_negative( $iscorrect, $query);
+        return $this->get_score_query_negative($iscorrect, $query);
     }
 
     /**
@@ -594,11 +648,11 @@ class mmogametype_quiz_split extends mmogame {
      * @return int
      */
     protected function get_score_query_negative(bool $iscorrect, stdClass $query): int {
-        if (!$this->qbank->is_multichoice( $query)) {
+        if (!$this->qbank->is_multichoice($query)) {
             return $iscorrect ? 1 : 0;
         }
 
-        return $iscorrect ? count( $query->answers) - 1 : -1;
+        return $iscorrect ? count($query->answers) - 1 : -1;
     }
 
     /**
@@ -608,7 +662,7 @@ class mmogametype_quiz_split extends mmogame {
      * @return string
      */
     public function set_state(int $state): string {
-        $timefastjson = round( 10 * microtime( true));
+        $timefastjson = round(10 * microtime(true));
 
         $statecontents = $state . "-" . $timefastjson;
         $filecontents = '';
@@ -616,5 +670,50 @@ class mmogametype_quiz_split extends mmogame {
         $this->save_state($state, $statecontents, $filecontents, $timefastjson);
 
         return $statecontents;
+    }
+
+    /**
+     * Calls irt idea.
+     *
+     * @return array
+     */
+    public function idea(): array {
+        return mmogametype_quiz_algorithm_irt::idea(
+            $this->get_db(), $this->rgame->id, $this->rgame->numgame, $this->auserid);
+    }
+
+    private function compute_queryranks(array $recs, array &$queryranks): void {
+        global $DB;
+
+        $queryids = [];
+
+        foreach ($recs as $rec) {
+            $queryids[] = $rec->queryid;
+        }
+        [$insql, $inparams] = $this->db->get_in_or_equal($queryids);
+
+        $sql = "SELECT queryid,
+            1 + (SELECT COUNT(*)
+                FROM {mmogame_aa_irt} irt2
+                WHERE irt2.mmogameid=irt.mmogameid AND irt.numgame=irt2.numgame 
+                    AND irt2.difficulty < irt.difficulty) as c
+            FROM {mmogame_aa_irt} irt
+            WHERE mmogameid=? AND numgame=? AND queryid $insql";
+        $recranks = $DB->get_records_sql(
+            $sql,
+            array_merge([$this->get_id(), $this->get_numgame()], $inparams)
+        );
+        $map = [];
+        foreach ($recranks as $recrank) {
+            $map[$recrank->queryid] = (int )$recrank->c;
+        }
+
+        foreach ($recs as $rec) {
+            if (isset($map[$rec->queryid])) {
+                $queryranks[] = $map[$rec->queryid];
+            } else {
+                $queryranks[] = null;
+            }
+        }
     }
 }

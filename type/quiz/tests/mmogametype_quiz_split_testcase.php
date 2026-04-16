@@ -69,7 +69,7 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
 
         $rgame = $this->getDataGenerator()->create_module('mmogame',
             ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
-                'numgame' => 1, 'type' => 'quiz', 'model' => 'split', 'typemodel' => 'quiz,split',
+                'numgame' => 1, 'type' => 'quiz', 'mode' => 'split', 'typemode' => 'quiz,split',
                 'kinduser' => 'guid', 'enabled' => 1]);
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertEquals(1, count($records));
@@ -82,8 +82,6 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
         // Set state to playing.
         $mmogame->update_state( 1);
 
-        global $USER;
-
         for ($step = 1; $step <= 100; $step++) {
             $classgetattempt = new mmogametype_quiz\external\get_attempts_split();
             $result = $classgetattempt->execute($rgame->id, 'guid', 'testq',
@@ -93,6 +91,7 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
             $attempts = $timestarts = $timeanswers = $answers = [];
             $pos = -1;
             $newsplits = [];
+            $tools = [];
             foreach ($splits as $split) {
                 $pos++;
                 $a = explode(',', $result['attempts'][$split]);
@@ -113,13 +112,14 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
 
                 $timestarts[] = time() - 3000;
                 $timeanswers[] = time();
+                $tools[] = 0;
             }
             $classsendanswers = new mmogametype_quiz\external\send_answers_split();
             $classsendanswers->execute($rgame->id, 'guid', 'testq',
                 implode(',', $splits), implode(',', $attempts),
                 implode(',', $iscorrects), implode(',', $answers),
                 implode(',', $timestarts), implode(',', $timeanswers),
-                implode(',', $newsplits));
+                implode(',', $newsplits), implode(',', $tools));
         }
         $rec = $DB->get_record_sql( "SELECT COUNT(*) FROM {mmogame_quiz_attempts}");
     }

@@ -54,6 +54,7 @@ class send_answers_split extends external_api {
             'timestarts' => new external_value(PARAM_RAW, 'The user data'),
             'timeanswers' => new external_value(PARAM_RAW, 'The user data'),
             'returnsplits' => new external_value(PARAM_RAW, 'The split that wants new questions'),
+            'tools' => new external_value(PARAM_RAW, 'The user data'),
         ]);
     }
 
@@ -63,13 +64,14 @@ class send_answers_split extends external_api {
      * @param int $mmogameid
      * @param string $kinduser
      * @param string $user
-     * @param string|null $splits
-     * @param string|null $attempts
-     * @param string|null $iscorrects
-     * @param string|null $answers
-     * @param string|null $timestarts
+     * @param ?string $splits
+     * @param ?string $attempts
+     * @param ?string $iscorrects
+     * @param ?string $answers
+     * @param ?string $timestarts
      * @param string $timeanswers
      * @param ?string $returnsplits
+     * @param ?string $tools
      * @return array
      * @throws coding_exception
      * @throws invalid_parameter_exception
@@ -80,9 +82,8 @@ class send_answers_split extends external_api {
                                    ?string $splits = null,
                                    ?string $attempts = null, ?string $iscorrects = null,
                                    ?string $answers = null, ?string $timestarts = '',
-                                   string $timeanswers = '', ?string $returnsplits = null): array {
-        global $DB;
-        $start = microtime(true);
+                                   string $timeanswers = '', ?string $returnsplits = null,
+                                   ?string $tools = null): array {
 
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
@@ -96,6 +97,7 @@ class send_answers_split extends external_api {
             'timestarts' => $timestarts,
             'timeanswers' => $timeanswers,
             'returnsplits' => $returnsplits,
+            'tools' => $tools,
         ]);
 
         $splits = explode(',', $splits);
@@ -104,6 +106,7 @@ class send_answers_split extends external_api {
         $answers = explode(',', $answers);
         $timeanswers = explode(',', $timeanswers);
         $timestarts = explode(',', $timestarts);
+        $tools = explode(',', $tools);
 
         // Perform security checks.
         $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
@@ -131,21 +134,35 @@ class send_answers_split extends external_api {
                 break;
             }
         }
+
+        $idea = 0;
         foreach ($attempts as $attemptid) {
             $pos++;
-            $ids[] = $auserids[$pos];
+            $tool = $tools[$pos];
+
             $mmogame->login_user_nolog( $auserids[$pos]);
 
-            $mmogame->set_answer_model( $ret, $attemptid, $answers[$pos], $timestarts[$pos], $timeanswers[$pos],
-                intval($answers[$pos]), '');
+            if ($tool & 4) {
+                // Special case (Idea button).
+                $idea = $auserids[$pos];
+                continue;
+            }
+
+            $ids[] = $auserids[$pos];
+            $mmogame->set_answer_mode( $ret, $attemptid, $answers[$pos], $timestarts[$pos], $timeanswers[$pos],
+                intval($answers[$pos]), $tools[$pos]);
+        }
+        if ($idea > 0) {
+            $mmogame->login_user_nolog( $idea);
+            $queryids = $mmogame->idea();
+            return self::pack_idea( $mmogame, $queryids);
         }
 
         $mmogame->login_user_log( $ids);
 
         $classgetattempt = new get_attempts_split();
         $result = $classgetattempt->execute($mmogameid, $kinduser, $user,
-            null, $returnsplits, '', implode(',', $splits));
-
+            null, $returnsplits, implode(',', $splits));
         // Attempts that saved to database.
         $result['savedattempts'] = $attempts !== null ? $attempts : [];
         $result['auserids'] = $auserids;
@@ -175,6 +192,9 @@ class send_answers_split extends external_api {
             'querydefinitions' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Query definitions')
             ),
+            'querytips' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Query tips')
+            ),
             'queryanswerids' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Answer IDs')
             ),
@@ -202,7 +222,53 @@ class send_answers_split extends external_api {
             'savedattempts' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'attempts')
             ),
-        ]);
+            'countquestion' => new external_value(
+                PARAM_INT,
+                'Total number of questions'
+            ),
+            'countcorrect' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Total number of corrects')
+            ),
+            'islastcorrect' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Correct answers array')
+            ),
+            'ranks' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Rank array')
+            ),
+            'queryranks' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Rank array')
+            ),        ]);
     }
 
+    /**
+     * Packs as an array the results of idea button.
+     *
+     * @param $mmogame
+     * @param $queryids
+     * @return array
+     */
+    protected static function pack_idea($mmogame, $queryids): array {
+        $queries = $mmogame->get_qbank()->load_many($queryids);
+        foreach ($queries as $query) {
+            $definitions[] = $query->definition;
+            $tips[] = $query->generalfeedback;
+
+            $a = [];
+            $queryanswerids = [];
+            foreach ($query->answerids as $pos => $answerid) {
+                $queryanswerids[$answerid] = $answerid;
+                $answertexts[] = $query->answers[$pos];
+            }
+            $answerids[] = implode(',', $a);
+            $queryanswerids0[] = implode(',', $queryanswerids);
+        }
+
+        return ['avatars' => [], 'attempts' => [], 'attemptqueryids' => [],
+            'numattempts' => [], 'querydefinitions' => $definitions, 'querytips' => $tips,
+            'queryanswerids' => $answerids, 'answertexts' => $answertexts,
+            'aduels' => [], 'aduelavatars' => [], 'aduelcorrects' => [],
+            'auserids' => [], 'queryanswerids0' => $queryanswerids0,
+            'countquestion' => 0, 'countcorrect' => [], 'islastcorrect' => [],
+            'ranks' => [], 'grades' => [], 'savedattempts' => []];
+    }
 }

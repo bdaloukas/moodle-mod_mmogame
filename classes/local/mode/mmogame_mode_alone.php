@@ -15,28 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the model Alone
+ * This file contains the mode Alone
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_mmogame\local\model;
+namespace mod_mmogame\local\mode;
 
 use mod_mmogame\local\mmogame;
 use stdClass;
 
-define('STATE_LAST', 1);
+define('STATE_LAST', 2);
 
 /**
- * The class mmogame_model_alone has the code for model Alone
+ * The class mmogame_mode_alone has the code for mode Alone
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mmogame_model_alone {
+class mmogame_mode_alone {
     /**
      * Administrator can change numgame or state
      *

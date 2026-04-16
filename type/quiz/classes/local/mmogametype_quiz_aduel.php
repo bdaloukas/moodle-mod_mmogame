@@ -26,11 +26,13 @@
 
 namespace mmogametype_quiz\local;
 
-use mod_mmogame\local\model\mmogame_model_aduel;
+use coding_exception;
+use dml_exception;
+use mod_mmogame\local\mode\mmogame_mode_aduel;
 use mod_mmogame\local\database\mmogame_database;
 use stdClass;
 
-/** Identifier the state for "play" of model Aduel */
+/** Identifier the state for "play" of mode Aduel */
 const STATE_PLAY = 1;
 
 /**
@@ -83,14 +85,14 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
 
         $newplayer1 = $newplayer2 = false;
         for ($step = 1; $step <= 2; $step++) {
-            $this->aduel = mmogame_model_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2, null, false);
+            $this->aduel = mmogame_mode_aduel::get_aduel( $this, $this->maxalone,  $newplayer1, $newplayer2, null, false);
             if ($this->aduel === null) {
                 $this->set_errorcode( ERRORCODE_ADUEL_NO_RIVALS);
                 return null;
             }
 
             if (!$newplayer1 && !$newplayer2) {
-                $rec = mmogame_model_aduel::get_attempt( $this, $this->aduel);
+                $rec = mmogame_mode_aduel::get_attempt( $this, $this->aduel);
                 if ($rec !== null) {
                     if ($rec->timestart == 0) {
                         $rec->timestart = time();
@@ -121,7 +123,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         if ($queries === null) {
             return null;
         }
-
         $num = 0;
         $ret = 0;
         $a = [];
@@ -400,24 +401,25 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      *
      * @param int $count (how many)
      * @return ?array or false
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_queries_aduel(int $count): ?array {
+        $count = 1;
         // Get the ids of all the queries.
         $ids = $this->qbank->get_queries_ids();
         if ($ids === null || count( $ids) == 0) {
             return null;
         }
-
         // Initializes data.
         $qs = [];
-        foreach ($ids as $id) {
+        foreach ($ids as $id => $categoryid) {
             $q = new stdClass();
             $q->id = $id;
             $q->qpercent = $q->qcountused = $q->ucountused  = $q->utimeerror = $q->uscore = $q->upercent = 0;
 
             $qs[$id] = $q;
         }
-
         $grade = $this->get_grade( $this->auserid);
 
         // Computes statistics per question.
@@ -522,9 +524,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param string $subcommand
      * @return ?stdClass: the attempt
      */
-    public function set_answer_model(array &$ret, ?int $attemptid, ?string $answer, ?int $answerid = null,
+    public function set_answer_mode(array &$ret, ?int $attemptid, ?string $answer, ?int $answerid = null,
                                      string $subcommand = ''): ?stdClass {
-        $attempt = parent::set_answer_model($ret, $attemptid, $answer, $answerid, $subcommand);
+        $attempt = parent::set_answer_mode($ret, $attemptid, $answer, $answerid, $subcommand);
 
         $aduel = $this->aduel;
 

@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_mmogame\local\qbank;
+use coding_exception;
+use dml_exception;
 use mod_mmogame;
 use mod_mmogame\local\mmogame;
 use stdClass;
@@ -54,6 +56,8 @@ abstract class mmogame_qbank {
      * @param int $countquestions
      * @param int $corrects
      * @return ?array
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_attempt_new(int $count, bool $usenumattempt, int &$countquestions, int &$corrects): ?array {
         $db = $this->mmogame->get_db();
@@ -102,6 +106,8 @@ abstract class mmogame_qbank {
      * @param int $countquestions return the count of questions
      * @param int $corrects returns the correct questions
      * @return ?array of int or false if no queries found.
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function get_queries(int $auserid, ?int $numteam, int $count, int &$countquestions, int &$corrects): ?array {
         $ids = $this->get_queries_ids();
@@ -165,10 +171,9 @@ abstract class mmogame_qbank {
      *
      * @param int $auserid
      * @param int $score
-     * @param int $score2
      * @param int $countscore (how to increase the score)
      */
-    public function update_grades(int $auserid, int $score, int $score2, int $countscore): void {
+    public function update_grades(int $auserid, int $score, int $countscore): void {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
         $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
@@ -187,9 +192,6 @@ abstract class mmogame_qbank {
             if ($score != 0) {
                 $a['sumscore'] = max( 0, $rec->sumscore + $score);
             }
-            if ($score2 != 0) {
-                $a['sumscore2'] = max( 0, $rec->sumscore2 + $score2);
-            }
             if (count( $a) > 1) {
                 $db->update_record( 'mmogame_aa_grades', $a);
             }
@@ -197,7 +199,7 @@ abstract class mmogame_qbank {
             $db->insert_record( 'mmogame_aa_grades',
                 ['mmogameid' => $rgame->id, 'numgame' => $rgame->numgame, 'auserid' => $auserid, 'sumscore' => max( 0, $score),
                     'countscore' => $countscore,
-                    'score' => max( 0, $score), 'sumscore2' => max( 0, $score2), 'timemodified' => time(), ]);
+                    'score' => max( 0, $score), 'timemodified' => time(), ]);
         }
     }
 

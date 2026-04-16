@@ -45,7 +45,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      */
     public function load(int $id, bool $loadextra = true, string $fields = ''): ?stdClass {
         if ($fields == '') {
-            $fields = 'qbe.id, q.id as questionid, q.qtype,q.name,q.questiontext as definition';
+            $fields = 'qbe.id, q.id as questionid, q.qtype,q.name,q.questiontext as definition,q.generalfeedback';
         }
         $db = $this->mmogame->get_db();
         $sql = "SELECT $fields
@@ -82,7 +82,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      */
     public function load_many(array $ids, bool $loadextra = true, string $fields = ''): ?array {
         if ($fields == '') {
-            $fields = 'qbe.id, q.id as questionid,q.qtype,q.name,q.questiontext as definition';
+            $fields = 'qbe.id, q.id as questionid,q.qtype,q.name,q.questiontext as definition,q.generalfeedback';
         }
         $db = $this->mmogame->get_db();
         [$insql, $inparams] = $db->get_in_or_equal( $ids);
@@ -109,6 +109,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             $info->definition = $rec->definition;
             $info->qtype = $rec->qtype;
             $info->questionid = $rec->questionid;
+            $info->generalfeedback = $rec->generalfeedback;
             $map[$info->id] = $info;
         }
 
@@ -434,8 +435,12 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * Return the id of all questions
      *
      * @return ?array
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function get_queries_ids(): ?array {
+        global $DB;
+
         $rgame = $this->mmogame->get_rgame();
         $qtypes = $this->mmogame->get_qtypes();
 
@@ -445,10 +450,29 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
         $db = $this->mmogame->get_db();
 
         $categoryids = !empty($rgame->qbankparams) ? explode(',', $rgame->qbankparams) : ['0'];
+        $categoryids = array_map('intval', $categoryids); // Extra security.
+        list($insql, $inparams) = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'p');
+
+        // Append sub categories.
+        for (;;) {
+            $sql = "SELECT id, name, parent, contextid FROM {question_categories} WHERE parent $insql";
+
+            $childrenids = array_keys($DB->get_records_sql($sql, $inparams));
+            if (count($childrenids) === 0) {
+                break;
+            }
+            foreach ($childrenids as $id) {
+                if (!array_search($id, $categoryids)) {
+                    $categoryids[] = $id;
+                }
+            }
+            list($insql, $inparams) = $DB->get_in_or_equal($childrenids, SQL_PARAMS_NAMED, 'p');
+        }
+
         [$insql1, $inparams1] = $db->get_in_or_equal( $categoryids);
         [$insql2, $inparams2] = $db->get_in_or_equal( $qtypes);
 
-        $sql = "SELECT qbe.id
+        $sql = "SELECT qbe.id, qbe.questioncategoryid
             FROM {question_bank_entries} qbe
             JOIN {question_versions} qv ON qbe.id = qv.questionbankentryid
             JOIN {question} q ON qv.questionid = q.id
@@ -462,7 +486,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
         $recs = $db->get_records_sql( $sql, array_merge($inparams1, $inparams2));
         $map = [];
         foreach ($recs as $rec) {
-            $map[$rec->id] = $rec->id;
+            $map[$rec->id] = $rec->questioncategoryid;
         }
 
         return $map;

@@ -63,6 +63,8 @@ function xmldb_mmogame_install() {
  * Function copy data from .cvs file to a table.
  *
  * @param string $table
+ * @return bool
+ * @throws dml_exception
  */
 function xmldb_mmogame_install_import( $table) {
     global $DB;

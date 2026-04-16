@@ -35,7 +35,7 @@ global $course, $cm, $id, $mmogame, $CFG, $PAGE;
 // Check login and get context.
 require_login($course->id, false, $cm);
 
-$model = $mmogame->get_model();
+$mode = $mmogame->get_mode();
 
 $context = context_module::instance( $cm->id);
 require_capability('mod/mmogame:view', $context);
@@ -72,7 +72,7 @@ function mmogame_quiz_manage(int $id, mmogame $mmogame, string $url): void {
     }
 
     // Create form.
-    $classname = 'mmogametype_quiz\local\mmogametype_quiz_' . $mmogame->get_model().'_admin';
+    $classname = 'mmogametype_quiz\local\mmogametype_quiz_' . $mmogame->get_mode().'_admin';
     $mform = new $classname( $id, $mmogame);
 
     echo $OUTPUT->header();
@@ -97,7 +97,7 @@ function mmogame_quiz_manage_submit(mmogame $mmogame): void {
     if (array_key_exists( 'prevstate', $_POST) && $state > 0) {
         $state--;
         $changestate = true;
-    } else if (array_key_exists( 'nextstate', $_POST) && $state < 1) {
+    } else if (array_key_exists( 'nextstate', $_POST) && $state < 2) {
         $state++;
         $changestate = true;
     }
@@ -117,14 +117,14 @@ function mmogame_quiz_manage_submit(mmogame $mmogame): void {
     if ($changenumgame) {
         $data->numgame = $numgame;
     }
-    $model = $mmogame->get_model();
-    if (substr( $model, '-5') == 'split' && $model != 'split') {
-        $model = substr( $model, 0, strlen($model) - 5);
+    $mode = $mmogame->get_mode();
+    if (substr( $mode, '-5') == 'split' && $mode != 'split') {
+        $mode = substr( $mode, 0, strlen($mode) - 5);
     }
-    if ($model == 'split') {
-        $model = 'alone';
+    if ($mode == 'split') {
+        $mode = 'alone';
     }
-    $class = "mod_mmogame\local\model\mmogame_model_".$model;
+    $class = "mod_mmogame\local\mode\mmogame_mode_".$mode;
 
     $class::setadmin( $data, $mmogame);
 }
