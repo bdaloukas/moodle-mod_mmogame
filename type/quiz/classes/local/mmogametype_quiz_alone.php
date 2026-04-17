@@ -72,6 +72,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             $this->set_errorcode( ERRORCODE_NO_QUERIES);
             return null;
         }
+        unset( $a['queries']);
 
         // Update field countquestions in table mmogame_aa_grades.
         $grade = $this->db->get_record_select( 'mmogame_aa_grades',

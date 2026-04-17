@@ -129,9 +129,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.radioSize = Math.round(this.fontSize);
             this.labelWidth = width - this.padding;
             const topCreate = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
-
-            this.createDefinition(0, 0, width - this.padding, topCreate - this.padding,
+console.log("topCreate=",topCreate, "minFontSize=", this.minFontSize);
+            const retDefinition = this.createDefinition(0, 0, width - this.padding, 0,
                 false, this.fontSize, json.definition);
+            if (retDefinition[1] < topCreate - this.padding) {
+                retDefinition[2].style.height = (topCreate - this.padding) + "px";
+            }
 
             // Adjust strip dimensions
             this.stripLeft = width + this.padding;

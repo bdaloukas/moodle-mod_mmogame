@@ -148,7 +148,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateSendGetAssets() {
-            console.log("gateSendGetAssets");
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -395,7 +394,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         gateSendGetColorsAvatars(leftPalette, topPalette, countXpalette, countYpalette,
                                  leftAvatars, topAvatars, countXavatars, countYavatars,
                                  updatePalette = true, updateAvatars = true) {
-            console.log("gateSendGetColorsAvatars");
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -413,7 +411,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                 // Handling the response
                 getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes}) => {
-                    console.log(avatarids, avatars, colorpaletteids, colorpalettes);
                     if (updatePalette) {
                         this.gateShowColorPalettes(this.area, leftPalette, topPalette, countXpalette, countYpalette,
                             colorpaletteids, colorpalettes);

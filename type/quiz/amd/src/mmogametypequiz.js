@@ -168,7 +168,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @param {string} color - The color for the radio button when selected.
          */
         onClickRadio(index, colorBack, color) {
-console.log('onClickRadio');
             if (this.aItemAnswer[index].classList.contains("disabled")) {
                 return;
             }
@@ -185,7 +184,6 @@ console.log('onClickRadio');
 
                 this.drawRadio(item, isDisabled ? colorBack : 0xFFFFFF, color);
             });
-console.log("callSetAnswer");
             // Send the answer
             this.callSetAnswer();
         }
@@ -451,6 +449,7 @@ console.log("callSetAnswer");
          * @returns {Array} The width and height of the definition area.
          */
         createDefinition(left, top, width, height, onlyMetrics, fontSize, definition) {
+            console.log("createDefinition height=",height);
             const definitionDiv = this.createDOMElement(
                 'div',
                 {
@@ -466,11 +465,11 @@ console.log("callSetAnswer");
             definitionDiv.innerHTML = definition;
 
             if (onlyMetrics) {
-                document.body.appendChild(definitionDiv);
+                this.area.appendChild(definitionDiv);
 
                 const size = [definitionDiv.scrollWidth, definitionDiv.scrollHeight];
-
-                document.body.removeChild(definitionDiv);
+console.log("onlyMetrics",fontSize,size);
+                this.area.removeChild(definitionDiv);
                 return size;
             }
 
@@ -485,8 +484,8 @@ console.log("callSetAnswer");
             definitionDiv.style.padding = `0 ${this.padding}px`;
 
             this.area.appendChild(definitionDiv);
-
-            return [definitionDiv.scrollWidth, definitionDiv.scrollHeight];
+console.log("definitionDiv ",definitionDiv.scrollWidth,definitionDiv.scrollHeight);
+            return [definitionDiv.scrollWidth, definitionDiv.scrollHeight, definitionDiv];
         }
 
         /**
@@ -578,7 +577,6 @@ console.log("callSetAnswer");
         }
 
         computeBestFontSize(json, maxHeight) {
-console.log("computeBestFontSize", "maxHeight=",maxHeight);
             let definitionWidth;
 
             //maxHeight = this.areaRect.height - this.iconSize - 3 * this.padding;
@@ -589,7 +587,7 @@ console.log("computeBestFontSize", "maxHeight=",maxHeight);
                 this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
                     (fontSize) => {
                         defSize = this.createDefinition(0, 0, definitionWidth, 0, true, fontSize,
-                            json);
+                            json.definition);
                         if (defSize[0] > definitionWidth) {
                             return 1;
                         }
@@ -600,12 +598,11 @@ console.log("computeBestFontSize", "maxHeight=",maxHeight);
                         if (this.isVertical) {
                             return defSize[1] + ansSize[1] < maxHeight ? -1 : 1;
                         } else {
-console.log("defSize=",fontSize,ansSize,"ret=",defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1);
                             return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
                         }
                     });
                 if (defSize[0] <= definitionWidth && defSize[1] <= maxHeight && ansSize[1] <= maxHeight) {
-                    console.log("break608");
+                    console.log("break604", defSize, ansSize,"fontSize=",this.fontSize);
                     break;
                 }
             }
