@@ -46,13 +46,13 @@ function xmldb_mmogame_install() {
     global $DB;
 
     // Check if it needed to insert data at table mmogame_aa_colorpalettes.
-    $recs = $DB->get_records_select( 'mmogame_aa_colorpalettes', '', null, '', '*', 0, 1);
-    if (count( $recs) == 0) {
-        xmldb_mmogame_install_import( 'mmogame_aa_colorpalettes');
+    $recs = $DB->get_records_select('mmogame_aa_colorpalettes', '', null, '', '*', 0, 1);
+    if (count($recs) == 0) {
+        xmldb_mmogame_install_import('mmogame_aa_colorpalettes');
     }
 
-    $recs = $DB->get_records_select( 'mmogame_aa_avatars', '', null, '', '*', 0, 1);
-    if (count( $recs) == 0) {
+    $recs = $DB->get_records_select('mmogame_aa_avatars', '', null, '', '*', 0, 1);
+    if (count($recs) == 0) {
         xmldb_mmogame_install_avatars();
     }
 
@@ -66,14 +66,14 @@ function xmldb_mmogame_install() {
  * @return bool
  * @throws dml_exception
  */
-function xmldb_mmogame_install_import( $table) {
+function xmldb_mmogame_install_import($table) {
     global $DB;
 
     // Path to the CSV file.
     $file = dirname(__FILE__).DIRECTORY_SEPARATOR.$table.'.csv';
 
     // Open the CSV file.
-    if (($handle = fopen( $file, "r")) === false) {
+    if (($handle = fopen($file, "r")) === false) {
         return false;
     }
 
@@ -91,9 +91,9 @@ function xmldb_mmogame_install_import( $table) {
             $rec->$fieldname = $data[$index];
         }
         // Insert the record into the Moodle database table.
-        $DB->insert_record( $table, $rec);
+        $DB->insert_record($table, $rec);
     }
-    fclose( $handle);
+    fclose($handle);
 
     return true;
 }
@@ -105,17 +105,20 @@ function xmldb_mmogame_install_avatars() {
     global $DB;
 
     $dir = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'avatars';
-    $d = dir( $dir);
+    $d = dir($dir);
 
     while (false !== ($entry = $d->read())) {
-        if (substr( $entry, 0, 1) != '.') {
-            $d2 = dir( $dir.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$entry);
+        if (substr($entry, 0, 1) != '.') {
+            $d2 = dir($dir.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$entry);
             while (false !== ($entry2 = $d2->read())) {
-                if (substr( $entry2, 0, 1) == '.') {
+                if (substr($entry2, 0, 1) == '.') {
                     continue;
                 }
-                $rec = $DB->get_record_select( 'mmogame_aa_avatars', 'directory=? AND filename=?',
-                    [$entry, $entry2]);
+                $rec = $DB->get_record_select(
+                    'mmogame_aa_avatars',
+                    'directory=? AND filename=?',
+                    [$entry, $entry2]
+                );
                 if ($rec != false) {
                     continue;
                 }
@@ -124,7 +127,7 @@ function xmldb_mmogame_install_avatars() {
                 $rec->filename = $entry2;
                 $rec->numused = 0;
                 $rec->randomkey = mt_rand();
-                $DB->insert_record( 'mmogame_aa_avatars', $rec);
+                $DB->insert_record('mmogame_aa_avatars', $rec);
             }
             $d2->close();
         }

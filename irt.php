@@ -41,22 +41,22 @@ if (! $mmogame = $DB->get_record('mmogame', ['id' => $cm->instance])) {
 // Require login to the course.
 require_course_login($course);
 
-require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 use core\notification;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\irt\mmogame_irt_1pl;
 use mod_mmogame\local\mmogame;
 
-$mmogame = mmogame::create( new mmogame_database_moodle(), $cm->instance);
+$mmogame = mmogame::create(new mmogame_database_moodle(), $cm->instance);
 
-$context = context_module::instance( $cm->id);
+$context = context_module::instance($cm->id);
 require_capability('mod/mmogame:view', $context);
 
 // Initialize $PAGE, compute blocks.
 $PAGE->set_url('/mod/mmogame/irt.php', ['id' => $cm->id]);
 
-mmogame_irt( $mmogame, $context);
+mmogame_irt($mmogame, $context);
 
 /**
  * Computes IRT.
@@ -74,7 +74,7 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
     $wheresnippet = optional_param('wheresnippet', '', PARAM_RAW_TRIMMED);
 
     $filter = '';
-    $keyid = mmogame_irt_1pl::keyid( $mmogame, $filter);
+    $keyid = mmogame_irt_1pl::keyid($mmogame,$filter);
 
     if ($recompute) {
         require_sesskey();
@@ -84,11 +84,11 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
             $safewhere = mmogame_compile_where_snippet($wheresnippet, $filterparams);
 
             $responses = $mapqueries = $mapusers = [];
-            $function = 'mmogametype_'.$mmogame->get_type().'_irt_read';
+            $function = 'mmogametype_' . $mmogame->get_type() . '_irt_read';
             if (function_exists($function)) {
                 $function($mmogame, $context, $responses, $mapqueries, $mapusers, $safewhere, $filterparams);
             } else {
-                die("function does not exist ".$function."()");
+                die("function does not exist " . $function . "()");
             }
 
             $irtq = $irtu = [];
@@ -143,7 +143,6 @@ function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $co
             'class' => 'btn btn-primary',
             'id'    => 'toggle-recompute',
         ]);
-
     }
 
     // Hidden inline form (shows on button click).
@@ -155,16 +154,22 @@ function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $co
 
     echo html_writer::start_div('form-group mb-2');
     echo html_writer::tag('label', 'irt_wheresnippet', ['for' => 'id_wheresnippet']);
-    echo html_writer::tag('textarea', $filter,
+    echo html_writer::tag(
+        'textarea',
+        $filter,
         ['id' => 'id_wheresnippet', 'name' => 'wheresnippet', 'rows' => 3, 'class' => 'form-control',
-            'placeholder' => 'a.mmogameid = '.$mmogame->get_id().' AND a.numgame='.$mmogame->get_numgame()]);
+            'placeholder' => 'a.mmogameid = ' . $mmogame->get_id() . ' AND a.numgame=' . $mmogame->get_numgame()]
+    );
     echo html_writer::tag('small', 'irt_wheresnippet_help', ['class' => 'form-text text-muted']);
     echo html_writer::end_div();
 
     echo html_writer::start_div('mt-2');
     echo html_writer::tag('button', 'recompute', ['type' => 'submit', 'class' => 'btn btn-primary']);
-    echo html_writer::tag('button', get_string('cancel'),
-        ['type' => 'button', 'class' => 'btn btn-secondary', 'id' => 'cancel-recompute']);
+    echo html_writer::tag(
+        'button',
+        get_string('cancel'),
+        ['type' => 'button', 'class' => 'btn btn-secondary', 'id' => 'cancel-recompute']
+    );
     echo html_writer::end_div();
 
     echo html_writer::end_tag('form');
@@ -193,6 +198,8 @@ function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $co
 /**
  * End page
  *
+ * @package mod_mmogame
+ *
  * @return void
  */
 function mmogame_irt_end_page(): void {
@@ -202,6 +209,8 @@ function mmogame_irt_end_page(): void {
 
 /**
  * Shows tables + exports Moodle-style
+ *
+ * @package mod_mmogame
  *
  * @param int $keyid
  * @param ?string $download
@@ -216,7 +225,7 @@ function mmogame_irt_print_b_moodle(int $keyid, ?string $download): void {
 
     $sort = optional_param('sort', 'id', PARAM_ALPHA);
 
-    $recs = $DB->get_records_select( 'mmogame_aa_irt_queries', 'keyid=?', [$keyid], $sort);
+    $recs = $DB->get_records_select('mmogame_aa_irt_queries', 'keyid=?', [$keyid], $sort);
     $columns = ['num', 'name', 'questiontext', 'b', 'b_rt', 'se', 'infit', 'std_infit', 'outfit',
         'std_outfit', 'corrects', 'wrongs', 'queries', 'nulls', 'percent'];
     $headers = ['#', 'Name', 'Question', 'b', 'Online (b)', 'SE', 'Infit MNSQ', 'Std.Infit', 'Outfit MNSQ',
@@ -261,6 +270,8 @@ function mmogame_irt_print_b_moodle(int $keyid, ?string $download): void {
 /**
  * Shows theta
  *
+ * @package mod_mmogame
+ *
  * @param int $keyid
  * @param string|null $download
  * @throws coding_exception
@@ -288,7 +299,7 @@ function mmogame_irt_print_theta_moodle(int $keyid, ?string $download): void {
     $table->is_downloading(optional_param('download', null, PARAM_ALPHA), 'persons_theta', 'Persons (θ)');
 
     $sort = 'id';
-    $recs = $DB->get_records_select( 'mmogame_aa_irt_ausers', 'keyid=?', [$keyid], $sort);
+    $recs = $DB->get_records_select('mmogame_aa_irt_ausers', 'keyid=?', [$keyid], $sort);
 
     $i = 1;
     foreach ($recs as $rec) {
@@ -298,7 +309,7 @@ function mmogame_irt_print_theta_moodle(int $keyid, ?string $download): void {
             s($rec->numgame ?? ''),
             s($rec->auserid ?? ''),
             is_null($rec->theta) ? '' : format_float($rec->theta, 2),
-            is_null($rec->theta_online) ? '' : format_float($rec->theta_online,  2),
+            is_null($rec->theta_online) ? '' : format_float($rec->theta_online, 2),
             $rec->corrects ?? '',
             $rec->wrongs ?? '',
             $rec->nulls ?? '',
@@ -316,6 +327,8 @@ function mmogame_irt_print_theta_moodle(int $keyid, ?string $download): void {
  * Allowed ops: =, !=, <>, <, <=, >, >=
  * Allowed logic: AND, OR, parentheses
  * Integers only for values.
+ *
+ * @package mod_mmogame
  *
  * @param string $snippet
  * @param array  $outparams Filled with integer params for the ? placeholders
@@ -373,14 +386,12 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
         if (!preg_match($re, $s, $m, 0, $i)) {
             throw new \moodle_exception('invalidfilter', 'mod_mmogame');
         }
-
         if (!empty($m['field'])) {
             if ($state !== $expectfieldorlp) {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
             }
             $parts[] = strtolower($m['field']);
             $state = $expectop;
-
         } else if (!empty($m['op'])) {
             if ($state !== $expectop) {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
@@ -391,7 +402,6 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
             }
             $parts[] = $op;
             $state = $expectnum;
-
         } else if (!empty($m['in'])) {
             if ($state !== $expectop) {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
@@ -399,54 +409,45 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
             // Enter IN(...) mode.
             $inqmarks = [];
             $state = $expectlpforin;
-
         } else if (!empty($m['num'])) {
             if ($state === $expectnum) {
                 // Normal comparison with a single number.
                 $parts[] = '?';
                 $outparams[] = (int)$m['num'];
                 $state = $expectlogicorrp;
-
             } else if ($state === $expectnumin) {
                 // Number inside IN(...).
                 $outparams[] = (int)$m['num'];
                 $inqmarks[] = '?';
                 $state = $expectcommanorclosein;
-
             } else {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
             }
-
         } else if (!empty($m['lp'])) {
             if ($state === $expectfieldorlp) {
                 // Outer grouping parenthesis.
                 $parts[] = '(';
                 $parens++;
                 $state = $expectfieldorlp;
-
             } else if ($state === $expectlpforin) {
                 // Opening parenthesis of IN(...).
                 // Does not affect $parens (only grouping parentheses count).
                 $state = $expectnumin;
-
             } else {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
             }
-
         } else if (!empty($m['comma'])) {
             if ($state !== $expectcommanorclosein) {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
             }
             // Expect another number in IN(...).
             $state = $expectnumin;
-
         } else if (!empty($m['rp'])) {
             if ($state === $expectlogicorrp && $parens > 0) {
                 // Closing outer grouping parenthesis.
                 $parts[] = ')';
                 $parens--;
                 $state = $expectlogicorrp;
-
             } else if ($state === $expectcommanorclosein && is_array($inqmarks)) {
                 // Closing IN list.
                 if (count($inqmarks) === 0) {
@@ -456,11 +457,9 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
                 $parts[] = 'IN (' . implode(',', $inqmarks) . ')';
                 $inqmarks = null;
                 $state = $expectlogicorrp;
-
             } else {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');
             }
-
         } else if (!empty($m['logic'])) {
             if ($state !== $expectlogicorrp) {
                 throw new \moodle_exception('invalidfilter', 'mod_mmogame');

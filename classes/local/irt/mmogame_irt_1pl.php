@@ -176,7 +176,7 @@ class mmogame_irt_1pl {
                 $thetaj -= $meanb;
             }
         }
-        unset( $thetaj);
+        unset($thetaj);
 
         // Computes SE for b.
         for ($j = 0; $j < $numitems; $j++) {
@@ -191,7 +191,7 @@ class mmogame_irt_1pl {
                     continue;
                 }
 
-                if ( $x == 0) {
+                if ($x == 0) {
                     $count0++;
                 } else if ($x == 1) {
                     $count1++;
@@ -207,7 +207,7 @@ class mmogame_irt_1pl {
             $info->nulls = $countnullvalue;
             $info->percent = $count0 + $count1 === 0 ? null : $count1 / ($count0 + $count1) * 100;
             $irtq[] = $info;
-            unset( $info);
+            unset($info);
         }
 
         // Improved Infit and Outfit.
@@ -239,7 +239,7 @@ class mmogame_irt_1pl {
             $info = &$irtq[$j];
             $info->infit = ($sumw > 0) ? $sumwz2 / $sumw : null;
             $info->outfit = ($count > 0) ? $sumz2 / $count : null;
-            unset( $info);
+            unset($info);
         }
 
         self::compute_std_fit($numitems, $numstudents, $responses, $irtq);
@@ -297,9 +297,11 @@ class mmogame_irt_1pl {
     public static function keyid(mmogame $mmogame, string &$filter): int {
         global $DB, $USER;
 
-        $rec = $DB->get_record_select( 'mmogame_aa_irt_key',
+        $rec = $DB->get_record_select(
+            'mmogame_aa_irt_key',
             'mmogameid=? AND numgame=? AND userid=?',
-            [$mmogame->get_id(), $mmogame->get_numgame(), $USER->id]);
+            [$mmogame->get_id(), $mmogame->get_numgame(), $USER->id]
+        );
         if ($rec !== false) {
             $filter = $rec->filter;
             return $rec->id;
@@ -310,7 +312,7 @@ class mmogame_irt_1pl {
         $rec->numgame = $mmogame->get_numgame();
         $rec->userid = $USER->id;
 
-        return $DB->insert_record( 'mmogame_aa_irt_key', $rec);
+        return $DB->insert_record('mmogame_aa_irt_key', $rec);
     }
 
     /**
@@ -325,8 +327,14 @@ class mmogame_irt_1pl {
      * @throws dml_exception
      * @throws dml_transaction_exception
      */
-    public static function save(int $keyid, string $wheresnippet, array $irtq, array $irtu, array $mapqueries,
-        array $mapusers): void {
+    public static function save(
+        int $keyid,
+        string $wheresnippet,
+        array $irtq,
+        array $irtu,
+        array $mapqueries,
+        array $mapusers
+    ): void {
         global $DB;
 
         $positionsq = array_keys($mapqueries);
@@ -347,7 +355,7 @@ class mmogame_irt_1pl {
             $new->keyid = $keyid;
             $new->position = $query->position;
             $new->queryid = $query->queryid;
-            $new->name = mb_substr( $query->name, 0, 40);
+            $new->name = mb_substr($query->name, 0, 40);
             $new->querytext = $query->querytext;
             $new->b = $irt->b;
             $new->b_online = $query->b_online;
@@ -388,7 +396,7 @@ class mmogame_irt_1pl {
         $upd->id = $keyid;
         $upd->filter = $wheresnippet;
         $upd->timecomputed = time();
-        $DB->update_record( 'mmogame_aa_irt_key', $upd);
+        $DB->update_record('mmogame_aa_irt_key', $upd);
 
         // Commit (will auto-rollback on exception).
         $tx->allow_commit();

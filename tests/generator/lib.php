@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_mmogame_generator extends testing_module_generator {
-
     /**
      * Creates instance of game record with default values.
      *
@@ -43,7 +42,7 @@ class mod_mmogame_generator extends testing_module_generator {
      */
     public function create_instance($record = null, ?array $options = null): object {
         global $CFG;
-        require_once($CFG->libdir.'/resourcelib.php');
+        require_once($CFG->libdir . '/resourcelib.php');
 
         return parent::create_instance($record, (array)$options);
     }
@@ -60,8 +59,14 @@ class mod_mmogame_generator extends testing_module_generator {
      * @return int question id
      * @throws dml_exception
      */
-    public function create_multichoice_question(int   $categoryid, string $name, string $questiontext, array $answers,
-                                                array &$answerids, array &$answertexts): int {
+    public function create_multichoice_question(
+        int $categoryid,
+        string $name,
+        string $questiontext,
+        array $answers,
+        array &$answerids,
+        array &$answertexts
+    ): int {
         global $DB, $USER;
 
         $answerids = $answertexts = [];

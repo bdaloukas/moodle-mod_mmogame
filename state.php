@@ -35,11 +35,11 @@ global $CFG;
 $fastjson = filter_input(INPUT_POST, 'fastjson', FILTER_SANITIZE_NUMBER_INT);
 $ret = '';
 $subdir = $fastjson % 100;
-$filemain = $CFG->tempdir. '/mmogame/states/'.$subdir."/$fastjson";
+$filemain = $CFG->tempdir . '/mmogame/states/' . $subdir . "/$fastjson";
 
-if (!file_exists( $filemain.'.txt')) {
+if (!file_exists($filemain . '.txt')) {
     die('');
 }
 
-$ret = file_get_contents( $filemain.'.txt');
-die( $ret);
+$ret = file_get_contents($filemain . '.txt');
+die($ret);

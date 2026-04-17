@@ -65,25 +65,25 @@ abstract class mmogame {
         $this->db = $db;
 
         if ($rgame->numgame == 0) {
-            $this->db->update_record( 'mmogame', ['id' => $rgame->id, 'numgame' => 1]);
-            $rgame = $this->db->get_record_select( 'mmogame', 'id=?', [$rgame->id]);
+            $this->db->update_record('mmogame', ['id' => $rgame->id, 'numgame' => 1]);
+            $rgame = $this->db->get_record_select('mmogame', 'id=?', [$rgame->id]);
         }
 
         $this->rgame = $rgame;
 
-        $this->rstate = $this->db->get_record_select( 'mmogame_aa_states', 'mmogameid=? AND numgame=?',
+        $this->rstate = $this->db->get_record_select('mmogame_aa_states', 'mmogameid=? AND numgame=?',
             [$this->rgame->id, $this->rgame->numgame]);
         if ($this->rstate === null) {
-            $id = $this->db->insert_record( 'mmogame_aa_states',
+            $id = $this->db->insert_record('mmogame_aa_states',
                 ['mmogameid' => $this->rgame->id,
                     'numgame' => $this->rgame->numgame, 'state' => 0,
                 ]);
-            $this->rstate = $this->db->get_record_select( 'mmogame_aa_states', 'id=?', [$id]);
+            $this->rstate = $this->db->get_record_select('mmogame_aa_states', 'id=?', [$id]);
         }
 
         if ($rgame->qbank != '') {
             $classname = 'mod_mmogame\local\qbank\mmogame_qbank_'.$rgame->qbank;
-            $this->qbank = new $classname( $this);
+            $this->qbank = new $classname($this);
         }
     }
 
@@ -217,12 +217,12 @@ abstract class mmogame {
      * @return ?int
      */
     public static function get_auserid_from_guid(mmogame_database $db, string $guid, bool $create, int $split): ?int {
-        $rec = $db->get_record_select( 'mmogame_aa_users_guid', 'guid=?', [$guid]);
+        $rec = $db->get_record_select('mmogame_aa_users_guid', 'guid=?', [$guid]);
         if ($rec === null) {
             if (!$create) {
                 return null;
             }
-            $userid = $db->insert_record( 'mmogame_aa_users_guid', ['guid' => $guid, 'lastlogin' => time()]);
+            $userid = $db->insert_record('mmogame_aa_users_guid', ['guid' => $guid, 'lastlogin' => time()]);
         } else {
             $userid = $rec->id;
         }
@@ -237,7 +237,7 @@ abstract class mmogame {
      * @return ?int
      */
     public static function get_auserid_from_usercode(mmogame_database $db, string $code, int $split): ?int {
-        $rec = $db->get_record_select( 'mmogame_aa_users_code', 'code=?', [$code]);
+        $rec = $db->get_record_select('mmogame_aa_users_code', 'code=?', [$code]);
         if ($rec === false) {
             return false;
         }
@@ -255,14 +255,14 @@ abstract class mmogame {
      * @return ?int
      */
     public static function get_auserid_from_db(mmogame_database $db, string $kind, int $userid, bool $create, int $split): ?int {
-        $rec = $db->get_record_select( 'mmogame_aa_users', 'kind = ? AND instanceid=? AND splitnum=?', [$kind, $userid, $split]);
+        $rec = $db->get_record_select('mmogame_aa_users', 'kind = ? AND instanceid=? AND splitnum=?', [$kind, $userid, $split]);
         if ($rec !== null) {
             return $rec->id;
         }
         if (!$create) {
             return null;
         }
-        return $db->insert_record( 'mmogame_aa_users',
+        return $db->insert_record('mmogame_aa_users',
             ['kind' => $kind, 'instanceid' => $userid, 'splitnum' => $split, 'lastlogin' => time(), 'lastip' => self::get_ip()]);
     }
 
@@ -279,9 +279,9 @@ abstract class mmogame {
         if ($kinduser == 'usercode') {
             return self::get_auserid_from_usercode($db, $user, $split);
         } else if ($kinduser == 'guid') {
-            return self::get_auserid_from_guid( $db, $user, $create, $split);
+            return self::get_auserid_from_guid($db, $user, $create, $split);
         } else {
-            return self::get_auserid_from_db( $db, $kinduser, $user, $create, $split);
+            return self::get_auserid_from_db($db, $kinduser, $user, $create, $split);
         }
     }
 
@@ -295,20 +295,20 @@ abstract class mmogame {
         if ($kinduser == 'usercode') {
             die("Problem");
         } else if ($kinduser == 'guid') {
-            $rec = $this->db->get_record_select( 'mmogame_aa_users_guid', 'guid=?', [$user]);
+            $rec = $this->db->get_record_select('mmogame_aa_users_guid', 'guid=?', [$user]);
             if ($rec === null) {
                 return null;
             }
             $instanceid = $rec->id;
         } else {
-            $instanceid = intval( $user);
+            $instanceid = intval($user);
         }
 
         if ($instanceid == 0) {
             return null;
         }
 
-        $recs = $this->db->get_records_select( 'mmogame_aa_users', 'kind=? AND instanceid=?', [$kinduser, $instanceid]);
+        $recs = $this->db->get_records_select('mmogame_aa_users', 'kind=? AND instanceid=?', [$kinduser, $instanceid]);
         $ret = [];
         foreach ($recs as $rec) {
             $ret[] = $rec->id;
@@ -322,8 +322,10 @@ abstract class mmogame {
      * @param int $auserid
      */
     public function login_user(int $auserid): void {
-        $this->db->update_record( 'mmogame_aa_users',
-            ['id' => $auserid, 'lastlogin' => time(), 'lastip' => self::get_ip()]);
+        $this->db->update_record(
+            'mmogame_aa_users',
+            ['id' => $auserid, 'lastlogin' => time(), 'lastip' => self::get_ip()]
+        );
 
         $this->auserid = $auserid;
     }
@@ -376,8 +378,12 @@ abstract class mmogame {
      * @return int
      */
     public function compute_next_numattempt(): int {
-        $rec = $this->db->get_record_select( $this->get_table_attempts(), 'mmogameid=? AND numgame=? AND auserid=?',
-            [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()], 'MAX(numattempt) as maxnum');
+        $rec = $this->db->get_record_select(
+            $this->get_table_attempts(),
+            'mmogameid=? AND numgame=? AND auserid=?',
+            [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()],
+            'MAX(numattempt) as maxnum'
+        );
         return $rec->maxnum + 1;
     }
 
@@ -396,17 +402,19 @@ abstract class mmogame {
             LEFT JOIN {mmogame_aa_grades} g ON g.avatarid=a.id AND g.mmogameid=? AND g.numgame=?
             WHERE g.id IS NULL
             ORDER BY a.numused,a.randomkey";
-        $recs = $db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame], 0, 1);
+        $recs = $db->get_records_sql($sql, [$this->rgame->id, $this->rgame->numgame], 0, 1);
         if (count($recs) === 0) {
             // All avatars are used in this numgame (players > avatars).
             $recs = $db->get_records_select('mmogame_aa_avatars', '', null, 'numused, randomkey', '*', 0, 1);
-            if (count( $recs) == 0) {
+            if (count($recs) == 0) {
                 return 0;
             }
         }
         $rec = reset($recs);
-        $db->update_record( 'mmogame_aa_avatars',
-            ['id' => $rec->id, 'numused' => $rec->numused + 1, 'randomkey' => mt_rand()]);
+        $db->update_record(
+            'mmogame_aa_avatars',
+            ['id' => $rec->id, 'numused' => $rec->numused + 1, 'randomkey' => mt_rand()]
+        );
 
         return $rec->id;
     }
@@ -420,41 +428,47 @@ abstract class mmogame {
     public function get_grade(int $auserid): ?stdClass {
         $db = $this->db;
 
-        $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
+        $rec = $db->get_record_select('mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
             [$this->rgame->id, $this->rgame->numgame, $auserid]);
         if ($rec !== null) {
             return $rec;
         }
 
-        $grades = $db->get_records_select( 'mmogame_aa_grades', 'mmogameid=? AND auserid=? AND numgame < ?',
-            [$this->rgame->id, $auserid, $this->rgame->numgame], 'numgame DESC', '*', 1);
+        $grades = $db->get_records_select(
+            'mmogame_aa_grades',
+            'mmogameid=? AND auserid=? AND numgame < ?',
+            [$this->rgame->id, $auserid, $this->rgame->numgame],
+            'numgame DESC',
+            '*',
+            1
+        );
         $a = ['mmogameid' => $this->rgame->id, 'numgame' => $this->rgame->numgame, 'auserid' => $auserid,
             'timemodified' => time(), 'sumscore' => 0,
         ];
-        if (count( $grades) > 0) {
-            $grade = reset( $grades);
+        if (count($grades) > 0) {
+            $grade = reset($grades);
             $a['avatarid'] = $grade->avatarid;
             $a['usercode'] = $grade->usercode;
             $a['nickname'] = $grade->nickname;
             $a['colorpaletteid'] = $grade->colorpaletteid;
         } else {
             $a['avatarid'] = $this->get_avatar_default();
-            $recs = $this->db->get_records_select( 'mmogame_aa_colorpalettes', '', [], 'id', 'id', 1);
-            $a['colorpaletteid'] = reset( $recs)->id;
+            $recs = $this->db->get_records_select('mmogame_aa_colorpalettes', '', [], 'id', 'id', 1);
+            $a['colorpaletteid'] = reset($recs)->id;
 
-            $user = $db->get_record_select( 'mmogame_aa_users', 'id=?', [$auserid]);
+            $user = $db->get_record_select('mmogame_aa_users', 'id=?', [$auserid]);
             if ($user !== null) {
                 if ($user->kind == 'usercode') {
-                    $rec = $db->get_record_select( 'mmogame_aa_users_code', 'id=?', [$user->instanceid]);
+                    $rec = $db->get_record_select('mmogame_aa_users_code', 'id=?', [$user->instanceid]);
                     if ($rec !== false && $rec->code != 0) {
                         $a['usercode'] = $rec->code;
                     }
                 }
             }
         }
-        $id = $db->insert_record( 'mmogame_aa_grades', $a);
+        $id = $db->insert_record('mmogame_aa_grades', $a);
 
-        return $db->get_record_select( 'mmogame_aa_grades', 'id=?', [$id]);
+        return $db->get_record_select('mmogame_aa_grades', 'id=?', [$id]);
     }
 
     /**
@@ -475,19 +489,21 @@ abstract class mmogame {
             $sql .= " LEFT JOIN {mmogame_aa_colorpalettes} c ON c.id=g.colorpaletteid ";
         }
         $sql .= " WHERE g.mmogameid=? AND g.numgame=? AND g.auserid=?";
-        $grades = $this->db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
+        $grades = $this->db->get_records_sql($sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
         if (count($grades) == 0) {
-            $grade = $this->get_grade( $auserid);
+            $grade = $this->get_grade($auserid);
             if ($grade === false) {
                 return null;
             }
-            $grades = $this->db->get_records_sql( $sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
+            $grades = $this->db->get_records_sql($sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
         }
-        $grade = reset( $grades);
+        $grade = reset($grades);
         if ($grade->aid == null) {
-            $this->db->update_record( 'mmogame_aa_grades',
-                ['id' => $grade->id, 'avatarid' => $this->get_avatar_default()]);
-            $grade = $this->db->get_record_sql( $sql, [$this->rgame->id, $this->rgame->numgame, $auserid]);
+            $this->db->update_record(
+                'mmogame_aa_grades',
+                ['id' => $grade->id, 'avatarid' => $this->get_avatar_default()]
+            );
+            $grade = $this->db->get_record_sql($sql, [$this->rgame->id, $this->rgame->numgame, $auserid]);
         }
         $grade->avatar = $grade->directory.'/'.$grade->filename;
         if ($computepalette) {
@@ -505,9 +521,11 @@ abstract class mmogame {
      * @return int
      */
     public function get_rank($value, string $field): int {
-        return $this->db->count_records_select( 'mmogame_aa_grades',
-                "mmogameid=? AND numgame=? AND $field > ?",
-                [$this->rgame->id, $this->rgame->numgame, $value]) + 1;
+        return $this->db->count_records_select(
+            'mmogame_aa_grades',
+            "mmogameid=? AND numgame=? AND $field > ?",
+            [$this->rgame->id, $this->rgame->numgame, $value]
+            ) + 1;
     }
 
     /**
@@ -516,7 +534,7 @@ abstract class mmogame {
      * @return string
      */
     public static function get_ip(): string {
-        return array_key_exists( 'REMOTE_ADDR', $_SERVER) ? $_SERVER['REMOTE_ADDR'] : '';
+        return array_key_exists('REMOTE_ADDR', $_SERVER) ? $_SERVER['REMOTE_ADDR'] : '';
     }
 
     /**
@@ -533,7 +551,7 @@ abstract class mmogame {
                 FROM {mmogame_aa_grades} WHERE mmogameid=? AND numgame=? AND auserid<>?)";
             $params[] = $auserid;
         }
-        $grades = $this->db->get_records_select( 'mmogame_aa_avatars', $where, $params);
+        $grades = $this->db->get_records_select('mmogame_aa_avatars', $where, $params);
         $ret = [];
         foreach ($grades as $grade) {
             $ret[$grade->id] = $grade->directory.'/'.$grade->filename;
@@ -548,7 +566,7 @@ abstract class mmogame {
      * @return array with id in key and 5 colors at value
      */
     public function get_palettes(): array {
-        $recs = $this->db->get_records_select( 'mmogame_aa_colorpalettes', '', null, 'hue');
+        $recs = $this->db->get_records_select('mmogame_aa_colorpalettes', '', null, 'hue');
         $ret = [];
         foreach ($recs as $rec) {
             $ret[$rec->id] = [$rec->colorsort1, $rec->colorsort2, $rec->colorsort3, $rec->colorsort4, $rec->colorsort5];
@@ -568,19 +586,19 @@ abstract class mmogame {
         // Creates an upload directory in temp directory.
         // This directory is used for checking of state without opening database.
         $file = $this->rgame->fastjson === null ? '00' : $this->rgame->fastjson;
-        $newdir = 'mmogame/states/'.substr( $file, -2);
-        $newdir = make_temp_directory( $newdir);
+        $newdir = 'mmogame/states/'.substr($file, -2);
+        $newdir = make_temp_directory($newdir);
 
         if ($filecontents != '') {
             $file = "$newdir/$file-$state.txt";
-            if (!file_exists( $file) || file_get_contents( $file) != $filecontents) {
-                file_put_contents( $file, $filecontents);
+            if (!file_exists($file) || file_get_contents($file) != $filecontents) {
+                file_put_contents($file, $filecontents);
             }
         }
 
         $file = sprintf("%s/%s.txt", $newdir, $this->rgame->fastjson);
-        if (!file_exists( $file)) {
-            file_put_contents( $file, $this->rstate->state.'-'.$this->rgame->timefastjson);
+        if (!file_exists($file)) {
+            file_put_contents($file, $this->rstate->state.'-'.$this->rgame->timefastjson);
         }
 
         return $newdir;
@@ -596,24 +614,26 @@ abstract class mmogame {
      */
     public function save_state(int $state, string $statecontents, string $filecontents, int $timefastjson): void {
 
-        $newdir = $this->save_state_file( $state, $filecontents);
+        $newdir = $this->save_state_file($state, $filecontents);
 
         $file = $this->rgame->fastjson;
-        file_put_contents( "$newdir/$file.txt", $statecontents);
+        file_put_contents("$newdir/$file.txt", $statecontents);
 
         for ($i = 0; $i <= 4; $i++) {
             if ($i == $state) {
                 continue;
             }
             $f = "$newdir/$file-$i.txt";
-            if (file_exists( $f)) {
-                unlink( $f);
+            if (file_exists($f)) {
+                unlink($f);
             }
         }
         if ($timefastjson != 0) {
             $this->rgame->timefastjson = $timefastjson;
-            $this->db->update_record( 'mmogame',
-                ['id' => $this->rgame->id, 'timefastjson' => $timefastjson]);
+            $this->db->update_record(
+                'mmogame',
+                ['id' => $this->rgame->id, 'timefastjson' => $timefastjson]
+            );
         }
     }
 
@@ -624,7 +644,7 @@ abstract class mmogame {
      */
     public function update_state(int $state): void {
         $this->rstate->state = $state;
-        $this->db->update_record( 'mmogame_aa_states', ['id' => $this->rstate->id, 'state' => $state]);
+        $this->db->update_record('mmogame_aa_states', ['id' => $this->rstate->id, 'state' => $state]);
     }
 
     /**
@@ -636,14 +656,14 @@ abstract class mmogame {
      * @return int (the new pin)
      */
     public static function get_newpin(int $mmogameid, mmogame_database $db, int $digits): int {
-        $min = pow( 10, $digits - 1) + 1;
-        $max = pow( 10, $digits) - 1;
+        $min = pow(10, $digits - 1) + 1;
+        $max = pow(10, $digits) - 1;
         for (;;) {
-            $pin = mt_rand( $min, $max);
+            $pin = mt_rand($min, $max);
             if ($mmogameid == 0) {
                 return $pin;
             }
-            $rec = $db->get_record_select( 'mmogame', 'pin=?', [$pin]);
+            $rec = $db->get_record_select('mmogame', 'pin=?', [$pin]);
             if ($rec === false) {
                 return $pin;
             }
@@ -666,22 +686,22 @@ abstract class mmogame {
             $params[] = $auserid;
         }
 
-        $db->delete_records_select( 'mmogame_aa_grades', $select, $params);
-        $db->delete_records_select( 'mmogame_aa_stats', $select, $params);
+        $db->delete_records_select('mmogame_aa_grades', $select, $params);
+        $db->delete_records_select('mmogame_aa_stats', $select, $params);
 
-        $select = 'mmogameid=?'.( $auserid !== null ? ' AND (auserid1=? OR auserid2=?)' : '');
+        $select = 'mmogameid=?'.($auserid !== null ? ' AND (auserid1=? OR auserid2=?)' : '');
         $params[] = $rgame->id;
         if ($auserid !== null) {
             $params[] = $auserid;
             $params[] = $auserid;
         }
-        $db->delete_records_select( 'mmogame_am_aduel_pairs', $select, $params);
+        $db->delete_records_select('mmogame_am_aduel_pairs', $select, $params);
 
-        require_once( 'type/'.$rgame->type.'/'.$rgame->type.'.php');
-        $class = 'mmogame_'.$rgame->type;
-        $class::delete_auser( $db, $rgame, $auserid);
+        require_once('type/' . $rgame->type . '/' . $rgame->type . '.php');
+        $class = 'mmogame_' . $rgame->type;
+        $class::delete_auser($db, $rgame, $auserid);
 
-        $db->delete_records_select( 'mmogame_aa_users', 'id=?', [$auserid]);
+        $db->delete_records_select('mmogame_aa_users', 'id=?', [$auserid]);
     }
 
     /**
@@ -708,7 +728,7 @@ abstract class mmogame {
         }
 
         $retpalettes = [];
-        $random = array_rand( $palettes, min( $countpalettes, count( $palettes)));
+        $random = array_rand($palettes, min($countpalettes, count($palettes)));
         foreach ($random as $r) {
             $retpalettes[$r] = $palettes[$r];
         }
@@ -723,32 +743,32 @@ abstract class mmogame {
         for ($i = 0; $i < $countsplit; ++$i) {
             $auserid = self::get_asuerid($this->db, $kinduser, $user, false, $i);
             if ($auserid !== null) {
-                $info = $this->get_avatar_info( $auserid, false);
+                $info = $this->get_avatar_info($auserid, false);
                 $avatarid = $info->avatarid;
-                if (array_key_exists( $avatarid, $avatars) ) {
+                if (array_key_exists($avatarid, $avatars) ) {
                     $currentids[$i] = $avatarid;
                     $currentfiles[$i] = $avatars[$avatarid];
                     unset($avatars[$avatarid]);
                 }
             }
         }
-        $maxavatars = count( $avatars);
+        $maxavatars = count($avatars);
         $retavatars = $avatars2 = [];
         for ($i = 0; $i < $countsplit; ++$i) {
-            if (array_key_exists( $i, $currentids)) {
+            if (array_key_exists($i, $currentids)) {
                 $set = [$currentids[$i] => $currentfiles[$i]];
             } else {
                 $set = [];
             }
 
-            $maxcount = min( $maxavatars, $countavatars);
-            while (count( $set) < $maxcount ) {
-                $n = min( $maxcount - count( $set), count( $avatars));
+            $maxcount = min($maxavatars, $countavatars);
+            while (count($set) < $maxcount ) {
+                $n = min($maxcount - count($set), count($avatars));
                 $keys = array_rand($avatars, $n);
                 if ($n == 1) {
                     $keys = [$keys];
                 }
-                shuffle( $keys);
+                shuffle($keys);
 
                 $temp = [];
                 foreach ($keys as $key) {
@@ -758,10 +778,10 @@ abstract class mmogame {
                     $set[$key] = $value;
                 }
                 foreach ($temp as $key) {
-                    unset( $avatars[$key]);
+                    unset($avatars[$key]);
                 }
 
-                if (count( $avatars) == 0) {
+                if (count($avatars) == 0) {
                     $avatars = $avatars2;
                     $avatars2 = [];
                 }

@@ -62,7 +62,7 @@ function mmogame_remove_table_instances(database_manager $dbman): void {
     foreach ($mmogames as $mmogame) {
         $sql = "SELECT * FROM {mmogame_aa_instances} i
             WHERE mmogameid = ? AND NOT EXISTS (SELECT * FROM {mmogame} m WHERE m.old_ginstanceid=i.id)";
-        $instances = $DB->get_records_sql( $sql, [$mmogame->id]);
+        $instances = $DB->get_records_sql($sql, [$mmogame->id]);
 
         foreach ($instances as $instance) {
             $new = new stdClass();
@@ -312,8 +312,11 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
     if ($oldversion < ($ver = 2024102908)) {
         $table = new xmldb_table('mmogame_am_aduel_pairs');
-        $index = new xmldb_index('ginstanceidnumgameauserid1isclosed1timestart1', XMLDB_INDEX_NOTUNIQUE,
-            ['ginstanceid', 'numgame', 'auserid1', 'isclosed1', 'timestart1']);
+        $index = new xmldb_index(
+            'ginstanceidnumgameauserid1isclosed1timestart1',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['ginstanceid', 'numgame', 'auserid1', 'isclosed1', 'timestart1']
+        );
 
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
@@ -416,9 +419,9 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     if ($oldversion < ($ver = 2024102931)) {
         $table = new xmldb_table('mmogame_aa_instances');
         if ($dbman->table_exists($table)) {
-            $mmogames = $DB->get_records( 'mmogame');
+            $mmogames = $DB->get_records('mmogame');
             foreach ($mmogames as $mmogame) {
-                $recs = $DB->get_records_select( 'mmogame_aa_instances', 'mmogameid=?', [$mmogame->id], 'id', '*', 0, 1);
+                $recs = $DB->get_records_select('mmogame_aa_instances', 'mmogameid=?', [$mmogame->id], 'id', '*', 0, 1);
                 foreach ($recs as $rec) {
                     $updrec = new stdClass();
                     $updrec->id = $mmogame->id;
@@ -428,7 +431,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
                     $updrec->enabled = $rec->enabled;
                     $updrec->pin = $rec->pin;
                     $updrec->striptags = $rec->striptags;
-                    $DB->update_record( 'mmogame', $updrec);
+                    $DB->update_record('mmogame', $updrec);
                 }
             }
         }
@@ -589,8 +592,8 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2024111915)) {
-        $table = new xmldb_table( 'mmogame_aa_stats');
-        $field = new xmldb_field( 'teamid', XMLDB_TYPE_INTEGER, 10, null, null, null, '0');
+        $table = new xmldb_table('mmogame_aa_stats');
+        $field = new xmldb_field('teamid', XMLDB_TYPE_INTEGER, 10, null, null, null, '0');
         if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, 'numteam');
         }
@@ -599,13 +602,16 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
     if ($oldversion < ($ver = 2024111916)) {
         $table = new xmldb_table('mmogame_aa_stats');
-        $field = new xmldb_field( 'numteam', XMLDB_TYPE_INTEGER, 10, null, null, null, '0');
+        $field = new xmldb_field('numteam', XMLDB_TYPE_INTEGER, 10, null, null, null, '0');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        $index = new xmldb_index('index_unique', XMLDB_INDEX_UNIQUE,
-            ['mmogameid', 'numgame', 'queryid', 'auserid', 'numteam']);
+        $index = new xmldb_index(
+            'index_unique',
+            XMLDB_INDEX_UNIQUE,
+            ['mmogameid', 'numgame', 'queryid', 'auserid', 'numteam']
+        );
 
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
@@ -667,8 +673,8 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2025021510)) {
-        $table = new xmldb_table( 'mmogame_aa_stats');
-        $field = new xmldb_field( 'islastcorrect', XMLDB_TYPE_INTEGER, 1, null, null, null, '0');
+        $table = new xmldb_table('mmogame_aa_stats');
+        $field = new xmldb_field('islastcorrect', XMLDB_TYPE_INTEGER, 1, null, null, null, '0');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -731,8 +737,8 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2025021601)) {
-        $table = new xmldb_table( 'mmogame_aa_grades');
-        $field = new xmldb_field( 'countquestions', XMLDB_TYPE_INTEGER, 10, null, null, null, '0');
+        $table = new xmldb_table('mmogame_aa_grades');
+        $field = new xmldb_field('countquestions', XMLDB_TYPE_INTEGER, 10, null, null, null, '0');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -751,7 +757,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2025050600)) {
-        $table = new xmldb_table( 'mmogame_am_aduel_pairs');
+        $table = new xmldb_table('mmogame_am_aduel_pairs');
         $field = new xmldb_field('percent', XMLDB_TYPE_FLOAT, null, null, XMLDB_NOTNULL, null, '0');
         if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, 'score');
@@ -957,8 +963,8 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2026010800)) {
-        $table = new xmldb_table( 'mmogame');
-        $field = new xmldb_field( 'model', XMLDB_TYPE_CHAR, 30, null, true, null);
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('model', XMLDB_TYPE_CHAR, 30, null, true, null);
         if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, 'mode');
         }
@@ -966,8 +972,8 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2026010801)) {
-        $table = new xmldb_table( 'mmogame');
-        $field = new xmldb_field( 'modelparams', XMLDB_TYPE_TEXT);
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('modelparams', XMLDB_TYPE_TEXT);
         if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, 'modeparams');
         }

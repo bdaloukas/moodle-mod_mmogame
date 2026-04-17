@@ -38,7 +38,6 @@ global $CFG;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogame_generator_testcase extends advanced_testcase {
-
     /**
      * Test the get_services web service.
      */
@@ -51,10 +50,12 @@ class mmogame_generator_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
 
         $categoryid = 1;
-        $rgame = $this->getDataGenerator()->create_module('mmogame',
+        $rgame = $this->getDataGenerator()->create_module(
+            'mmogame',
             ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
                 'numgame' => 1, 'type' => 'quiz', 'mode' => 'aduel', 'typemode' => 'quiz,aduel',
-                'kinduser' => 'guid', 'enabled' => 1]);
+                'kinduser' => 'guid', 'enabled' => 1]
+        );
         // Test 1: Call without optional parameter avatars, colorpalettes.
         $class = new get_assets();
         $result = $class->execute($rgame->id, 'moodle', $USER->id);

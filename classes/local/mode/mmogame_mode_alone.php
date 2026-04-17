@@ -46,16 +46,18 @@ class mmogame_mode_alone {
     public static function setadmin(stdClass $data, mmogame $mmogame): void {
         $rgame = $mmogame->get_rgame();
 
-        if (isset( $data->numgame) && $data->numgame > 0) {
+        if (isset($data->numgame) && $data->numgame > 0) {
             $rgame->numgame = $data->numgame;
-            $mmogame->get_db()->update_record( 'mmogame',
-                ['id' => $rgame->id, 'numgame' => $rgame->numgame]);
-            $mmogame->update_state( $mmogame->get_rstate()->state);
-            $mmogame->set_state( $mmogame->get_rstate()->state);
-        } else if (isset( $data->state)) {
+            $mmogame->get_db()->update_record(
+                'mmogame',
+                ['id' => $rgame->id, 'numgame' => $rgame->numgame]
+            );
+            $mmogame->update_state($mmogame->get_rstate()->state);
+            $mmogame->set_state($mmogame->get_rstate()->state);
+        } else if (isset($data->state)) {
             if ($data->state >= 0 && $data->state <= STATE_LAST) {
-                $mmogame->update_state( $data->state);
-                $mmogame->set_state( $data->state);
+                $mmogame->update_state($data->state);
+                $mmogame->set_state($data->state);
             }
         }
     }
