@@ -65,7 +65,6 @@ abstract class mmogame_database {
      * @return ?stdClass The database record as an object, or false if not found.
      */
     abstract public function get_record_select(string $table, string $select, ?array $params = null, string $fields = '*'): ?stdClass;
-
     /**
      * Returns a list of records as an array of objects where the specified conditions are used in the WHERE clause.
      *
@@ -99,8 +98,8 @@ abstract class mmogame_database {
     abstract public function count_records_select(
         string $table,
         string $select,
-        ?array $params=null,
-        string $countitem="COUNT('*')"
+        ?array $params = null,
+        string $countitem = "COUNT('*')"
     ): int;
     /**
      * Returns a single database record as an object using a custom SELECT query.

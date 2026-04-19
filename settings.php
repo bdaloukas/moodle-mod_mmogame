@@ -27,7 +27,7 @@ if ($ADMIN->fulltree) {
     require_once(dirname(__FILE__) . '/lib.php');
 
     // General settings.
-    $names = core_component::get_plugin_list( 'mmogametype');
+    $names = core_component::get_plugin_list('mmogametype');
     foreach ($names as $name => $path) {
         if (file_exists($path . '/lib.php')) {
             require_once($path . '/settings.php');

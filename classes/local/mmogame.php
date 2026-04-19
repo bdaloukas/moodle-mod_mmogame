@@ -369,7 +369,7 @@ abstract class mmogame {
         if ($rgame === false) {
             return null;
         }
-        $classname = 'mmogametype_' . $rgame->type . '\local\mmogametype_' . $rgame->type.'_' . $rgame->mode;
+        $classname = 'mmogametype_' . $rgame->type . '\local\mmogametype_' . $rgame->type . '_' . $rgame->mode;
 
         if (!class_exists($classname)) {
             throw new coding_exception("Class $classname does not exist for type: $rgame->type");
@@ -436,7 +436,7 @@ abstract class mmogame {
         $rec = $db->get_record_select(
             'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
-            [$this->rgame->id, $this->rgame->numgame,$auserid]
+            [$this->rgame->id, $this->rgame->numgame, $auserid]
         );
         if ($rec !== null) {
             return $rec;
@@ -533,7 +533,7 @@ abstract class mmogame {
             'mmogame_aa_grades',
             "mmogameid=? AND numgame=? AND $field > ?",
             [$this->rgame->id, $this->rgame->numgame, $value]
-            ) + 1;
+        ) + 1;
     }
 
     /**

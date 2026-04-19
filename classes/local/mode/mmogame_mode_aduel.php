@@ -134,7 +134,7 @@ class mmogame_mode_aduel {
         } else {
             $pairs = [];
         }
-        if (count($pairs ) == 0) {
+        if (count($pairs) == 0) {
             // There are no open aduel. Create a new one.
             $count = $db->count_records_select(
                 'mmogame_am_aduel_pairs',

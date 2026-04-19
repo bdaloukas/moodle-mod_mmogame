@@ -76,7 +76,7 @@ class mmogame_database_moodle extends mmogame_database {
     public function insert_record_raw(string $table, array $a, int $returnid, bool $customsequence): ?int {
         global $DB;
 
-        $rec = new StdClass;
+        $rec = new StdClass();
         foreach ($a as $name => $value) {
             $rec->$name = $value;
         }
@@ -208,7 +208,7 @@ class mmogame_database_moodle extends mmogame_database {
     public function update_record(string $table, array $a): void {
         global $DB;
 
-        $rec = new stdClass;
+        $rec = new stdClass();
         foreach ($a as $name => $value) {
             $rec->$name = $value;
         }
@@ -253,6 +253,6 @@ class mmogame_database_moodle extends mmogame_database {
     ): array {
         global $DB;
 
-        return $DB->get_in_or_equal($items, $type,  $prefix,  $equal, $onemptyitems);
+        return $DB->get_in_or_equal($items, $type, $prefix, $equal, $onemptyitems);
     }
 }

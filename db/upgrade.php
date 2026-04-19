@@ -580,7 +580,8 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     if ($oldversion < ($ver = 2024111903)) {
         $table = new xmldb_table('mmogame_aa_stats');
         $index = new xmldb_index(
-            'index_unique', XMLDB_INDEX_UNIQUE,
+            'index_unique',
+            XMLDB_INDEX_UNIQUE,
             ['mmogameid', 'numgame', 'queryid', 'auserid', 'teamid']
         );
 

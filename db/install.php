@@ -109,7 +109,7 @@ function xmldb_mmogame_install_avatars() {
 
     while (false !== ($entry = $d->read())) {
         if (substr($entry, 0, 1) != '.') {
-            $d2 = dir($dir.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR . $entry);
+            $d2 = dir($dir . DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR . $entry);
             while (false !== ($entry2 = $d2->read())) {
                 if (substr($entry2, 0, 1) == '.') {
                     continue;
