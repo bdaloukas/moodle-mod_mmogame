@@ -106,7 +106,7 @@ class mmogame_irt_1pl {
                         continue;
                     }
                     $p = 1 / (1 + exp(-($theta[$i] - $b[$j])));
-                    $num += (int )$x - $p;
+                    $num += (int)$x - $p;
                     $den += $p * (1 - $p);
                 }
                 if ($den > 1e-8) {

@@ -327,8 +327,11 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
     if ($oldversion < ($ver = 2024102909)) {
         $table = new xmldb_table('mmogame_am_aduel_pairs');
-        $index = new xmldb_index('mmogameidnumgameauserid1isclosed1timestart1', XMLDB_INDEX_NOTUNIQUE,
-            ['mmogameid', 'numgame', 'auserid1', 'isclosed1', 'timestart1']);
+        $index = new xmldb_index(
+            'mmogameidnumgameauserid1isclosed1timestart1',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['mmogameid', 'numgame', 'auserid1', 'isclosed1', 'timestart1']
+        );
 
         if (!$DB->get_manager()->index_exists($table, $index)) {
             $DB->get_manager()->add_index($table, $index);
@@ -339,8 +342,11 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
     if ($oldversion < ($ver = 2024102910)) {
         $table = new xmldb_table('mmogame_am_aduel_pairs');
-        $index = new xmldb_index('ginstanceidnumgameauserid2isclosed2timestart2', XMLDB_INDEX_NOTUNIQUE,
-            ['ginstanceid', 'numgame', 'auserid2', 'isclosed2', 'timestart2']);
+        $index = new xmldb_index(
+            'ginstanceidnumgameauserid2isclosed2timestart2',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['ginstanceid', 'numgame', 'auserid2', 'isclosed2', 'timestart2']
+        );
 
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
@@ -351,8 +357,11 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
     if ($oldversion < ($ver = 2024102911)) {
         $table = new xmldb_table('mmogame_am_aduel_pairs');
-        $index = new xmldb_index('mmogameididnumgameauserid2isclosed2timestart2', XMLDB_INDEX_NOTUNIQUE,
-            ['mmogameid', 'numgame', 'auserid2', 'isclosed2', 'timestart2']);
+        $index = new xmldb_index(
+            'mmogameididnumgameauserid2isclosed2timestart2',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['mmogameid', 'numgame', 'auserid2', 'isclosed2', 'timestart2']
+        );
 
         if (!$DB->get_manager()->index_exists($table, $index)) {
             $DB->get_manager()->add_index($table, $index);
@@ -570,8 +579,10 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
     if ($oldversion < ($ver = 2024111903)) {
         $table = new xmldb_table('mmogame_aa_stats');
-        $index = new xmldb_index('index_unique', XMLDB_INDEX_UNIQUE,
-            ['mmogameid', 'numgame', 'queryid', 'auserid', 'teamid']);
+        $index = new xmldb_index(
+            'index_unique', XMLDB_INDEX_UNIQUE,
+            ['mmogameid', 'numgame', 'queryid', 'auserid', 'teamid']
+        );
 
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);

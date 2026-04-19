@@ -33,7 +33,6 @@ use stdClass;
  * This class extends the mmogame_database with code explicit with Moodle.
  */
 class mmogame_database_moodle extends mmogame_database {
-
     /**
      * The prefix of tables.
      *
@@ -61,7 +60,7 @@ class mmogame_database_moodle extends mmogame_database {
     public function insert_record(string $table, array $a): ?int {
         global $DB;
 
-        return $DB->insert_record( $table, (object )$a);
+        return $DB->insert_record($table, (object)$a);
     }
 
     /**
@@ -81,7 +80,7 @@ class mmogame_database_moodle extends mmogame_database {
         foreach ($a as $name => $value) {
             $rec->$name = $value;
         }
-        return $DB->insert_record_raw( $table, $rec, $returnid, false, $customsequence);
+        return $DB->insert_record_raw($table, $rec, $returnid, false, $customsequence);
     }
 
     /**
@@ -92,10 +91,10 @@ class mmogame_database_moodle extends mmogame_database {
      * @param ?array $params
      * @throws dml_exception
      */
-    public function execute(string $sql, ?array $params=null): void {
+    public function execute(string $sql, ?array $params = null): void {
         global $DB;
 
-        $DB->execute( $sql, $params);
+        $DB->execute($sql, $params);
     }
 
     /**
@@ -108,8 +107,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @return ?stdClass The database record as an object, or false if not found.
      * @throws dml_exception
      */
-    public function get_record_select(string $table, string $select, ?array $params=null, string $fields='*'): ?stdClass {
-
+    public function get_record_select(string $table, string $select, ?array $params = null, string $fields = '*'): ?stdClass {
         global $DB;
 
         try {
@@ -133,12 +131,18 @@ class mmogame_database_moodle extends mmogame_database {
      * @return array An array of database records as objects.
      * @throws dml_exception
      */
-    public function get_records_select(string $table, string $select, ?array $params=null, string $sort='',
-                                       string $fields='*', int $limitfrom=0, int $limitnum=0): array {
-
+    public function get_records_select(
+        string $table,
+        string $select,
+        ?array $params = null,
+        string $sort = '',
+        string $fields = '*',
+        int $limitfrom = 0,
+        int $limitnum = 0
+    ): array {
         global $DB;
 
-        return $DB->get_records_select( $table, $select, $params, $sort, $fields, $limitfrom, $limitnum);
+        return $DB->get_records_select($table, $select, $params, $sort, $fields, $limitfrom, $limitnum);
     }
 
     /**
@@ -151,11 +155,15 @@ class mmogame_database_moodle extends mmogame_database {
      * @return int The number of records that match the given conditions.
      * @throws dml_exception
      */
-    public function count_records_select(string $table, string $select, ?array $params=null,
-                                         string $countitem="COUNT('*')"): int {
+    public function count_records_select(
+        string $table,
+        string $select,
+        ?array $params = null,
+        string $countitem = "COUNT('*')"
+    ): int {
         global $DB;
 
-        return $DB->count_records_select( $table, $select, $params, $countitem);
+        return $DB->count_records_select($table, $select, $params, $countitem);
     }
 
     /**
@@ -166,7 +174,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @return ?stdClass :mixed The database record as an object, or false if no record is found.
      * @throws dml_exception
      */
-    public function get_record_sql(string $sql, ?array $params=null): ?stdClass {
+    public function get_record_sql(string $sql, ?array $params = null): ?stdClass {
         global $DB;
 
         $rec = $DB->get_record_sql($sql, $params);
@@ -184,7 +192,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @return array An array of database records as objects.
      * @throws dml_exception
      */
-    public function get_records_sql(string $sql, ?array $params=null, int $limitfrom=0, int $limitnum=0): array {
+    public function get_records_sql(string $sql, ?array $params = null, int $limitfrom = 0, int $limitnum = 0): array {
         global $DB;
 
         return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
@@ -205,7 +213,7 @@ class mmogame_database_moodle extends mmogame_database {
             $rec->$name = $value;
         }
 
-        $DB->update_record( $table, $rec);
+        $DB->update_record($table, $rec);
     }
 
     /**
@@ -217,7 +225,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @return bool
      * @throws dml_exception
      */
-    public function delete_records_select(string $table, string $select, ?array $params=null): bool {
+    public function delete_records_select(string $table, string $select, ?array $params = null): bool {
         global $DB;
 
         return $DB->delete_records_select($table, $select, $params);
@@ -236,11 +244,15 @@ class mmogame_database_moodle extends mmogame_database {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function get_in_or_equal($items, int $type = SQL_PARAMS_QM, string $prefix = 'param',
-        bool $equal = true, bool $onemptyitems = false): array {
-
+    public function get_in_or_equal(
+        $items,
+        int $type = SQL_PARAMS_QM,
+        string $prefix = 'param',
+        bool $equal = true,
+        bool $onemptyitems = false
+    ): array {
         global $DB;
 
-        return $DB->get_in_or_equal( $items, $type,  $prefix,  $equal, $onemptyitems);
+        return $DB->get_in_or_equal($items, $type,  $prefix,  $equal, $onemptyitems);
     }
 }

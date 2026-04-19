@@ -70,7 +70,7 @@ function xmldb_mmogame_install_import($table) {
     global $DB;
 
     // Path to the CSV file.
-    $file = dirname(__FILE__).DIRECTORY_SEPARATOR.$table.'.csv';
+    $file = dirname(__FILE__) . DIRECTORY_SEPARATOR . $table . '.csv';
 
     // Open the CSV file.
     if (($handle = fopen($file, "r")) === false) {
@@ -104,12 +104,12 @@ function xmldb_mmogame_install_import($table) {
 function xmldb_mmogame_install_avatars() {
     global $DB;
 
-    $dir = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'avatars';
+    $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'avatars';
     $d = dir($dir);
 
     while (false !== ($entry = $d->read())) {
         if (substr($entry, 0, 1) != '.') {
-            $d2 = dir($dir.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$entry);
+            $d2 = dir($dir.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR . $entry);
             while (false !== ($entry2 = $d2->read())) {
                 if (substr($entry2, 0, 1) == '.') {
                     continue;

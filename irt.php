@@ -74,7 +74,7 @@ function mmogame_irt(mmogame $mmogame, context $context): void {
     $wheresnippet = optional_param('wheresnippet', '', PARAM_RAW_TRIMMED);
 
     $filter = '';
-    $keyid = mmogame_irt_1pl::keyid($mmogame,$filter);
+    $keyid = mmogame_irt_1pl::keyid($mmogame, $filter);
 
     if ($recompute) {
         require_sesskey();
@@ -174,7 +174,7 @@ function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $co
 
     echo html_writer::end_tag('form');
     echo html_writer::end_div();
-?>
+    echo "
 <script>
     (function() {
         let toggleBtn = document.getElementById('toggle-recompute');
@@ -191,8 +191,7 @@ function mmogame_irt_begin_page(string $pagetitle, mmogame $mmogame, context $co
         toggleBtn.addEventListener('click', toggle);
         if (cancelBtn) cancelBtn.addEventListener('click', hide);
     })();
-</script>
-    <?php
+</script>";
 }
 
 /**
@@ -358,15 +357,15 @@ function mmogame_compile_where_snippet(string $snippet, array &$outparams): stri
 
     // Added: IN and comma (,) as tokens.
     $re = '/(*UTF8)(*UCP)\G(?:\h|\v)*(?:'
-        .'(?<field>a\.(?:auserid|mmogameid|numgame))'
-        .'|(?<op><=|>=|<>|!=|=|<|>)'
-        .'|(?<in>IN)'
-        .'|(?<lp>\()'
-        .'|(?<rp>\))'
-        .'|(?<comma>,)'
-        .'|(?<logic>AND|OR)'
-        .'|(?<num>-?\d+)'
-        .')(?:\h|\v)*/Ai';    // State machine values.
+        . '(?<field>a\.(?:auserid|mmogameid|numgame))'
+        . '|(?<op><=|>=|<>|!=|=|<|>)'
+        . '|(?<in>IN)'
+        . '|(?<lp>\()'
+        . '|(?<rp>\))'
+        . '|(?<comma>,)'
+        . '|(?<logic>AND|OR)'
+        . '|(?<num>-?\d+)'
+        . ')(?:\h|\v)*/Ai';    // State machine values.
     $expectfieldorlp = 0;
     $expectop = 1;
     $expectnum = 2;

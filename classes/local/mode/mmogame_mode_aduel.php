@@ -35,7 +35,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogame_mode_aduel {
-
     /**
      * Administrator can change numgame or state
      *
@@ -68,14 +67,20 @@ class mmogame_mode_aduel {
      * @param bool $isaduel
      * @return ?stdClass
      */
-    public static function get_aduel(mmogame $mmogame, int $maxalone, bool &$newplayer1, bool &$newplayer2, ?array $auserids,
-            bool $isaduel): ?stdClass {
+    public static function get_aduel(
+        mmogame $mmogame,
+        int $maxalone,
+        bool &$newplayer1,
+        bool &$newplayer2,
+        ?array $auserids,
+        bool $isaduel
+    ): ?stdClass {
         $newplayer1 = $newplayer2 = false;
         $auserid = $mmogame->get_auserid();
         $db = $mmogame->get_db();
 
         // Returns one that is started and not finished.
-        $select = 'mmogameid=? AND numgame=? AND '.
+        $select = 'mmogameid=? AND numgame=? AND ' .
             '(auserid1=? AND timestart1 <> 0 AND isclosed1 = 0 OR auserid2=? AND timestart2 <> 0 AND isclosed2 = 0)';
         $params = [$mmogame->get_id(), $mmogame->get_numgame(), $auserid, $auserid];
         if ($auserids !== null && count($auserids)) {
@@ -83,8 +88,15 @@ class mmogame_mode_aduel {
             $select .= " AND auserid1 $insql";
             $params = array_merge($params, $inparams);
         }
-        $recs = $db->get_records_select('mmogame_am_aduel_pairs',
-            $select, $params, 'id', '*', 0, 1);
+        $recs = $db->get_records_select(
+            'mmogame_am_aduel_pairs',
+            $select,
+            $params,
+            'id',
+            '*',
+            0,
+            1
+        );
         if (count($recs) > 0) {
             return reset($recs);
         }
@@ -124,9 +136,11 @@ class mmogame_mode_aduel {
         }
         if (count($pairs ) == 0) {
             // There are no open aduel. Create a new one.
-            $count = $db->count_records_select('mmogame_am_aduel_pairs',
+            $count = $db->count_records_select(
+                'mmogame_am_aduel_pairs',
                 'mmogameid=? AND numgame=? AND auserid1 = ? AND auserid2 IS NULL',
-                [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
+                [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]
+            );
             if ($count > $maxalone) {
                 return null;   // Wait an opponent.
             }
@@ -225,7 +239,7 @@ class mmogame_mode_aduel {
 
         return $mmogame->get_db()->get_records_select(
             $table,
-            "auserid=? AND numgame=? AND numteam=? ".($all ? "" : " AND timeanswer=0"),
+            "auserid=? AND numgame=? AND numteam=? " . ($all ? "" : " AND timeanswer=0"),
             [$mmogame->get_auserid(), $mmogame->get_numgame(), $aduel->id],
             'numattempt'
         );
