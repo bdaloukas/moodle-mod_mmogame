@@ -210,11 +210,11 @@ function mmogame_guidv4(bool $trim = true): string {
     $hyphen = chr(45);                  // Is "-".
     $lbrace = $trim ? "" : chr(123);    // Is "{".
     $rbrace = $trim ? "" : chr(125);    // Is "}".
-    return $lbrace.
-              substr($charid,  0,  8) . $hyphen .
-              substr($charid,  8,  4) . $hyphen .
-              substr($charid, 12,  4) . $hyphen .
-              substr($charid, 16,  4) . $hyphen .
+    return $lbrace .
+              substr($charid, 0, 8) . $hyphen .
+              substr($charid, 8, 4) . $hyphen .
+              substr($charid, 12, 4) . $hyphen .
+              substr($charid, 16, 4) . $hyphen .
               substr($charid, 20, 12) .
               $rbrace;
 }
@@ -330,9 +330,16 @@ function mmogame_extend_settings_navigation(settings_navigation $settings, navig
             '/mod/mmogame/report.php',
             ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist)]
         );
-        $reportnode = $mmogamenode->add_node(navigation_node::create(get_string('results', 'quiz'), $url,
-            navigation_node::TYPE_SETTING,
-            null, 'mmogame_report', new pix_icon('i/report', '')));
+        $reportnode = $mmogamenode->add_node(
+            navigation_node::create(
+                get_string('results', 'quiz'),
+                $url,
+                navigation_node::TYPE_SETTING,
+                null,
+                'mmogame_report',
+                new pix_icon('i/report', '')
+            )
+        );
 
         foreach ($reportlist as $report) {
             $url = new moodle_url('/mod/mmogame/report.php', ['id' => $settings->get_page()->cm->id, 'mode' => $report]);

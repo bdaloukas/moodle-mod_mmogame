@@ -138,10 +138,14 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
                 $rgame->id,
                 'guid',
                 'testq',
-                implode(',', $splits), implode(',', $attempts),
-                implode(',', $iscorrects), implode(',', $answers),
-                implode(',', $timestarts), implode(',', $timeanswers),
-                implode(',', $newsplits), implode(',', $tools)
+                implode(',', $splits),
+                implode(',', $attempts),
+                implode(',', $iscorrects),
+                implode(',', $answers),
+                implode(',', $timestarts),
+                implode(',', $timeanswers),
+                implode(',', $newsplits),
+                implode(',', $tools)
             );
         }
         $rec = $DB->get_record_sql("SELECT COUNT(*) FROM {mmogame_quiz_attempts}");

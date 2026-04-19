@@ -125,7 +125,8 @@ class mmogametype_quiz_split extends mmogame {
                 $countcorrect = $this->db->count_records_select(
                     'mmogame_aa_stats',
                     'mmogameid=? AND numgame=? AND auserid=? AND serialcorrects >= 1',
-                    [$this->get_id(), $this->get_numgame(), $auserid]);
+                    [$this->get_id(), $this->get_numgame(), $auserid]
+                );
 
                 // Reads attempts from database.
                 $recs = mmogame_mode_aduel::get_attempts($this, $aduel);
@@ -196,7 +197,8 @@ class mmogametype_quiz_split extends mmogame {
      * @return array (a new attempt of false if no attempt)
      */
     protected function get_attempts_new2(stdClass $aduel): array {
-        $recs = $this->db->get_records_select('mmogame_quiz_attempts',
+        $recs = $this->db->get_records_select(
+            'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=?',
             [$this->rgame->id, $this->rgame->numgame, $this->auserid],
             'numquery DESC',
@@ -272,7 +274,11 @@ class mmogametype_quiz_split extends mmogame {
         $queries = mmogametype_quiz_algorithm_irt::get_queries(
             $this->get_db(), $this->rgame->id, $this->rgame->numgame,
             $this->auserid, $ids, 1, 4, $numquery, $ignore,
-            $countquestions, $corrects, $islastcorrect, $queryranks);
+            $countquestions,
+            $corrects,
+            $islastcorrect,
+            $queryranks
+        );
         if ($queries === null) {
             return null;
         }
@@ -334,7 +340,8 @@ class mmogametype_quiz_split extends mmogame {
         }
 
         // Computes statistics per question and user.
-        $recs = $this->db->get_records_select('mmogame_aa_stats',
+        $recs = $this->db->get_records_select(
+            'mmogame_aa_stats',
             "mmogameid=? AND numgame=? AND auserid = ? AND queryid $insql",
             array_merge(
                 [$this->rgame->id, $this->rgame->numgame, $this->auserid],
@@ -449,7 +456,7 @@ class mmogametype_quiz_split extends mmogame {
      * @return ?stdClass
      */
     public function set_answer_mode(
-        array  &$ret,
+        array &$ret,
         ?int $attemptid,
         ?string $answer,
         int $timestart,
@@ -566,9 +573,11 @@ class mmogametype_quiz_split extends mmogame {
                 $irt = $this->db->get_record_select('mmogame_aa_irt',
                     'mmogameid=? AND numgame=? AND queryid=?',
                     [$attempt->mmogameid, $attempt->numgame, $attempt->queryid]);
-                $grade = $this->db->get_record_select('mmogame_aa_grades',
+                $grade = $this->db->get_record_select(
+                    'mmogame_aa_grades',
                     'mmogameid=? AND numgame=? AND auserid=?',
-                    [$attempt->mmogameid, $attempt->numgame, $attempt->auserid]);
+                    [$attempt->mmogameid, $attempt->numgame, $attempt->auserid]
+                );
                 if ($grade === null || $irt === null) {
                     $nextquery = 0;
                 } else if ($irt->difficulty > $grade->theta) {

@@ -98,7 +98,7 @@ class mmogametype_quiz_alone_admin extends moodleform {
 
         // Second line state.
         $mform->addElement('html', '<tr>');
-        $mform->addElement('html', '<td>'  .get_string('state', 'mmogame') . ':</td>');
+        $mform->addElement('html', '<td>' . get_string('state', 'mmogame') . ':</td>');
         $mform->addElement('html', '<td>');
         if ($state > 0) {
             $mform->addElement('html', '<button id="prevstate" name="prevstate">⟪</button>');

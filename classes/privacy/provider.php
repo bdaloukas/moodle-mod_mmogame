@@ -36,7 +36,6 @@ use core_privacy\local\request\userlist;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\metadata\collection;
 use core_privacy\manager;
-
 use dml_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
@@ -51,11 +50,9 @@ use mod_mmogame\local\mmogame;
 class provider implements
     // This plugin has data.
     \core_privacy\local\metadata\provider,
-    core_userlist_provider,
-
     // This plugin currently implements the original plugin_provider interface.
-    \core_privacy\local\request\plugin\provider {
-
+    \core_privacy\local\request\plugin\provider,
+    core_userlist_provider {
     /** Interface for all assign submission sub-plugins. */
     const MMOGAMETYPE_INTERFACE = 'mod_mmogame\privacy\mmogametype_provider';
 
@@ -216,7 +213,8 @@ class provider implements
             unset($rec->id);
             writer::with_context($context)->export_data($newpath, $rec);
 
-            manager::component_class_callback('mmogametype_' . $type,
+            manager::component_class_callback(
+                'mmogametype_' . $type,
                 self::MMOGAMETYPE_INTERFACE,
                 'export_type_user_data',
                 [$context, $mmogameid, $model, $auserid, $rec->numgame, $newpath]

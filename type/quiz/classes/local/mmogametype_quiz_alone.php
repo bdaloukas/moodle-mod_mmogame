@@ -53,7 +53,8 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @return ?stdClass (a new attempt of false if no attempt)
      */
     public function get_attempt(): ?stdClass {
-        $attempt = $this->db->get_record_select('mmogame_quiz_attempts',
+        $attempt = $this->db->get_record_select(
+            'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
             [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]
         );
@@ -339,7 +340,6 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @param stdClass $attempt
      */
     public function set_attempt(stdClass $attempt): void {
-
     }
 
     /**
@@ -374,7 +374,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
 
         if (
             $attempt->auserid != $this->auserid || $attempt->mmogameid != $this->rgame->id
-        || $attempt->numgame != $this->rgame->numgame
+            || $attempt->numgame != $this->rgame->numgame
         ) {
             return null;
         }

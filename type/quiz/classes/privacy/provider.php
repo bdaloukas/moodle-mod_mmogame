@@ -45,8 +45,8 @@ class provider implements
     \core_privacy\local\metadata\provider,
 
     // This plugin is a subplugin of mmogame and must meet that contract.
-    mmogametype_provider,
-    core_userlist_provider {
+    core_userlist_provider,
+    mmogametype_provider {
     /**
      * Return metadata about this plugin.
      *
@@ -97,8 +97,14 @@ class provider implements
      * @throws coding_exception
      * @throws dml_exception
      */
-    public static function export_type_user_data(context $context, int $mmogameid, string $model, int $auserid,
-                                                 int     $numgame, array $path): void {
+    public static function export_type_user_data(
+        context $context,
+        int $mmogameid,
+        string $model,
+        int $auserid,
+        int $numgame,
+        array $path
+    ): void {
         global $DB;
 
         $recs = $DB->get_records_select(
@@ -111,8 +117,9 @@ class provider implements
         );
         $i = 0;
         foreach ($recs as $rec) {
-            $newpath = array_merge($path,
-                [get_string('privacy:metadata:mmogame_quiz_attempts', 'mmogametype_quiz').(++$i)]
+            $newpath = array_merge(
+                $path,
+                [get_string('privacy:metadata:mmogame_quiz_attempts', 'mmogametype_quiz') . (++$i)]
             );
             unset($rec->id);
             writer::with_context($context)->export_data($newpath, $rec);

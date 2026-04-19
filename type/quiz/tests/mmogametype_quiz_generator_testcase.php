@@ -61,7 +61,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $categoryid = $DB->insert_record('question_categories', $new);
 
         // Create mmoGame.
-        $rgame = $this->getDataGenerator()->create_module('mmogame',
+        $rgame = $this->getDataGenerator()->create_module(
+            'mmogame',
             [
                 'course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
                 'numgame' => 1, 'type' => 'quiz', 'mode' => 'alone', 'typemode' => 'quiz,alone',
@@ -191,7 +192,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         // Gives the correct answer.
         $classsetanswer = new mmogametype_quiz\external\set_answer();
         $result = json_decode(
-            $classsetanswer->execute($rgame->id,
+            $classsetanswer->execute(
+                $rgame->id,
                 'moodle',
                 $USER->id,
                 $result->attempt,

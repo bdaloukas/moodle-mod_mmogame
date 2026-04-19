@@ -93,8 +93,11 @@ function mmogametype_quiz_get_modes(): array {
  * @throws \core\exception\moodle_exception
  * @throws coding_exception
  */
-function mmogametype_quiz_extend_navigation_course(navigation_node $parentnode,  stdClass $course,
-                                                    context_course $context): void {
+function mmogametype_quiz_extend_navigation_course(
+    navigation_node $parentnode,
+    stdClass $course,
+    context_course $context
+): void {
     // Destination : page IRT of subplugin (course-level).
     $url   = new moodle_url('/mod/mmogame/type/quiz/irt/index.php', ['courseid' => $course->id]);
     $label = get_string('menulabel_irt', 'mmogametype_quiz');
@@ -126,18 +129,33 @@ function mmogametype_quiz_extend_navigation_course(navigation_node $parentnode, 
  */
 function mmogametype_quiz_extend_settings_navigation(settings_navigation $settings, navigation_node $mmogamenode): void {
     $reportlist = mmogame_report_list($settings->get_page()->cm->context);
-    $url = new moodle_url('/mod/mmogame/irt.php',
-        ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist), 'compute' => 1]);
-    $mmogamenode->add_node(navigation_node::create("IRT", $url,
-        navigation_node::TYPE_SETTING,
-        null, 'mmogame_irt', new pix_icon('i/report', '')));
+    $url = new moodle_url(
+        '/mod/mmogame/irt.php',
+        ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist), 'compute' => 1]
+    );
+    $mmogamenode->add_node(
+        navigation_node::create(
+            "IRT",
+            $url,
+            navigation_node::TYPE_SETTING,
+            null,
+            'mmogame_irt',
+            new pix_icon('i/report', '')
+        )
+    );
 
     $url = new moodle_url('/mod/mmogame/import.php',
         ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist), 'compute' => 1]);
-    $mmogamenode->add_node(navigation_node::create("Import", $url,
-        navigation_node::TYPE_SETTING,
-        null, 'mmogame_import', new pix_icon('i/report', '')));
-
+    $mmogamenode->add_node(
+        navigation_node::create(
+            "Import",
+            $url,
+            navigation_node::TYPE_SETTING,
+            null,
+            'mmogame_import',
+            new pix_icon('i/report', '')
+        )
+    );
 }
 
 /**

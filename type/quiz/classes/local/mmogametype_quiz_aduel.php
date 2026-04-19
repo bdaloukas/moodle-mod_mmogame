@@ -371,7 +371,8 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         $attemptid = $attempt !== false ? $attempt->id : 0;
         if (
             $player == 1 && $this->aduel->tool1numattempt1 == $numattempt
-            || $player == 2 && $this->aduel->tool1numattempt2 == $numattempt) {
+            || $player == 2 && $this->aduel->tool1numattempt2 == $numattempt
+        ) {
             $this->append_json_5050($ret, $query, $attemptid);
         } else if (
             $player == 1 && $this->aduel->tool3numattempt1 == $numattempt

@@ -197,7 +197,8 @@ class mmogametype_quiz_algorithm_irt {
         // Get player's skill rating (theta).
         $rec = $db->get_record_select('mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
-            [$mmogameid, $numgame, $auserid]);
+            [$mmogameid, $numgame, $auserid]
+        );
         $theta = $rec !== null ? $rec->theta : 0;
 
         $islastcorrect = [];
@@ -462,7 +463,7 @@ class mmogametype_quiz_algorithm_irt {
             $questions[$qid] = $q;
         }
 
-        uasort($questions, static function($a, $b) {
+        uasort($questions, static function ($a, $b) {
             // 1) serialcorrects ASC.
             if ($a->serialcorrects !== $b->serialcorrects) {
                 return $a->serialcorrects <=> $b->serialcorrects;
@@ -501,7 +502,7 @@ class mmogametype_quiz_algorithm_irt {
             $questions[$qid] = $q;
         }
 
-        uasort($questions, static function($a, $b) {
+        uasort($questions, static function ($a, $b) {
             // 1) serialcorrects ASC.
             if ($a->serialcorrects !== $b->serialcorrects) {
                 return $a->serialcorrects <=> $b->serialcorrects;
