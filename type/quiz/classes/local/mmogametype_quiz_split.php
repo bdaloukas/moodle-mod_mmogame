@@ -273,7 +273,12 @@ class mmogametype_quiz_split extends mmogame {
 
         $queries = mmogametype_quiz_algorithm_irt::get_queries(
             $this->get_db(), $this->rgame->id, $this->rgame->numgame,
-            $this->auserid, $ids, 1, 4, $numquery, $ignore,
+            $this->auserid,
+            $ids,
+            1,
+            4,
+            $numquery,
+            $ignore,
             $countquestions,
             $corrects,
             $islastcorrect,
@@ -570,9 +575,11 @@ class mmogametype_quiz_split extends mmogame {
             if ($attempt->iscorrect) {
                 $nextquery = $attempt->numquery + 10;
             } else {
-                $irt = $this->db->get_record_select('mmogame_aa_irt',
+                $irt = $this->db->get_record_select(
+                    'mmogame_aa_irt',
                     'mmogameid=? AND numgame=? AND queryid=?',
-                    [$attempt->mmogameid, $attempt->numgame, $attempt->queryid]);
+                    [$attempt->mmogameid, $attempt->numgame, $attempt->queryid]
+                );
                 $grade = $this->db->get_record_select(
                     'mmogame_aa_grades',
                     'mmogameid=? AND numgame=? AND auserid=?',

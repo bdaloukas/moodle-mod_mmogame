@@ -64,7 +64,7 @@ function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
 
     if (!empty($data->reset_mmogame_deleted_course)) {
         foreach ($a as $table) {
-            $sql = "DELETE FROM {".$table."} t WHERE NOT EXISTS (SELECT * FROM {mmogame} g WHERE t.mmogameid=g.id)";
+            $sql = "DELETE FROM {" . $table . "} t WHERE NOT EXISTS (SELECT * FROM {mmogame} g WHERE t.mmogameid=g.id)";
             $DB->execute($sql);
         }
     }
@@ -144,8 +144,10 @@ function mmogametype_quiz_extend_settings_navigation(settings_navigation $settin
         )
     );
 
-    $url = new moodle_url('/mod/mmogame/import.php',
-        ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist), 'compute' => 1]);
+    $url = new moodle_url(
+        '/mod/mmogame/import.php',
+        ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist), 'compute' => 1]
+    );
     $mmogamenode->add_node(
         navigation_node::create(
             "Import",

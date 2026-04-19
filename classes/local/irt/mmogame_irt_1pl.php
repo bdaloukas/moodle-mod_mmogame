@@ -290,7 +290,7 @@ class mmogame_irt_1pl {
      * Compute id used for saving.
      *
      * @param mmogame $mmogame
-     * @param string &$filter
+     * @param string $filter
      * @return int
      * @throws dml_exception
      */
