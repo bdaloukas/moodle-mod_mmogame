@@ -126,7 +126,8 @@ abstract class mmogame_qbank {
         $fields = 'queryid,countused,countcorrect,counterror,islastcorrect';
         if ($numteam === null) {
             $stats = $db->get_records_select(
-                'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=?',
+                'mmogame_aa_stats',
+                'mmogameid=? AND numgame=? AND auserid=?',
                 [$rgame->id, $rgame->numgame, $auserid],
                 '',
                 $fields
@@ -218,7 +219,10 @@ abstract class mmogame_qbank {
             $db->insert_record('mmogame_aa_grades',
                 ['mmogameid' => $rgame->id, 'numgame' => $rgame->numgame, 'auserid' => $auserid, 'sumscore' => max(0, $score),
                     'countscore' => $countscore,
-                    'score' => max(0, $score), 'timemodified' => time(), ]);
+                    'score' => max(0, $score),
+                    'timemodified' => time(),
+                    ]
+            );
         }
     }
 
@@ -236,9 +240,16 @@ abstract class mmogame_qbank {
      * @param int $nextquery
      * @param ?array $values
      */
-    public function update_stats(?int $auserid, ?int $numteam, ?int $queryid, bool $isused, bool $iscorrect, bool $iserror,
-                                      int $nextquery, ?array $values): void {
-
+    public function update_stats(
+        ?int $auserid,
+        ?int $numteam,
+        ?int $queryid,
+        bool $isused,
+        bool $iscorrect,
+        bool $iserror,
+        int $nextquery,
+        ?array $values
+    ): void {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
         $select = 'mmogameid=? AND numgame=? ';
@@ -298,7 +309,8 @@ abstract class mmogame_qbank {
             $a = ['mmogameid' => $rgame->id,
                 'numgame' => $rgame->numgame, 'queryid' => $queryid != 0 ? $queryid : null, 'auserid' => $auserid,
                 'numteam' => $numteam != 0 ? $numteam : null, 'percent' => $percent, 'countused' => $isused ? 1 : 0,
-                'countcorrect' => $iscorrect ? 1 : 0, 'counterror' => $iserror ? 1 : 0 ,
+                'countcorrect' => $iscorrect ? 1 : 0,
+                'counterror' => $iserror ? 1 : 0 ,
                 'islastcorrect' => $iscorrect ? 1 : 0,
                 'serialcorrects' => ($iscorrect ? 1 : 0),
                 'nextquery' => $nextquery,
