@@ -34,7 +34,6 @@ use core_privacy\local\request\approved_contextlist;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface mmogameaccess_provider extends \core_privacy\local\request\plugin\subplugin_provider {
-
     /**
      * Export all user data for the specified user, for the specified game.
      *

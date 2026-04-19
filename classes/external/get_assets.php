@@ -38,7 +38,6 @@ use required_capability_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_assets extends external_api {
-
     /**
      * Returns description of method parameters
      * @return external_function_parameters
@@ -86,8 +85,8 @@ class get_assets extends external_api {
 
         $result = [];
 
-        $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid( $mmogame->get_db(), $kinduser, $user, false, 0);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
+        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
         // Generate avatars array if avatars > 0.
         if ($avatars > 0) {
             self::compute_avatars($mmogame, $auserid, $avatars, $result);
@@ -139,22 +138,22 @@ class get_assets extends external_api {
      * @return void
      */
     private static function compute_avatars(mmogame $mmogame, ?int $auserid, int $count, array &$result): void {
-        $info = $auserid !== null ? $mmogame->get_avatar_info( $auserid) : null;
-        $a = $mmogame->get_avatars( $auserid);
+        $info = $auserid !== null ? $mmogame->get_avatar_info($auserid) : null;
+        $a = $mmogame->get_avatars($auserid);
         $avatars = $ids = [];
 
-        if ($info !== null && $info->avatarid != 0 && array_key_exists( $info->avatarid, $avatars)) {
+        if ($info !== null && $info->avatarid != 0 && array_key_exists($info->avatarid, $avatars)) {
             $avatars[] = $avatars[$info->avatarid];
             $ids[] = $info->avatarid;
-            unset( $avatars[$info->avatarid]);
+            unset($avatars[$info->avatarid]);
             $count--;
         }
         if ($count == 1) {
-            $ids[] = $id = array_rand( $a, min($count, count($a)));
+            $ids[] = $id = array_rand($a, min($count, count($a)));
             $avatars[] = $a[$id];
         } else if ($count > 1) {
-            $keys = array_rand( $a, min($count, count($a)));
-            shuffle( $keys);
+            $keys = array_rand($a, min($count, count($a)));
+            shuffle($keys);
             foreach ($keys as $key) {
                 $ids[] = $key;
                 $avatars[] = $a[$key];
@@ -176,17 +175,17 @@ class get_assets extends external_api {
     private static function compute_colorpalettes(mmogame $mmogame, int $count, array &$result): void {
         $pals = $mmogame->get_palettes();
 
-        while (count( $pals) > $count) {
-            $id = array_rand( $pals);
-            unset( $pals[$id]);
+        while (count($pals) > $count) {
+            $id = array_rand($pals);
+            unset($pals[$id]);
         }
 
         $colorpalettes = [];
         foreach ($pals as $pal) {
-            $colorpalettes[] = implode( ',', $pal);
+            $colorpalettes[] = implode(',', $pal);
         }
 
-        $result['colorpaletteids'] = array_keys( $pals);
+        $result['colorpaletteids'] = array_keys($pals);
         $result['colorpalettes'] = $colorpalettes;
     }
 }

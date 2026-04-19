@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-define( 'MMOGAME_RESTORE_QBANK_MOODLEQUESTION', 1);
+define('MMOGAME_RESTORE_QBANK_MOODLEQUESTION', 1);
 
 /**
  * Structure step to restore one mmogame activity
@@ -74,18 +74,18 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data->course = $this->get_courseid();
 
         if ($data->qbank == MMOGAME_QBANK_MOODLEQUESTION) {
-            $a = explode( ',', $data->qbankparams);
+            $a = explode(',', $data->qbankparams);
             $new = '';
             foreach ($a as $id) {
-                if (intval( $id) != 0) {
-                    $new .= ($new != '' ? ',' : '').$this->get_mappingid( 'question_category', $id);
+                if (intval($id) != 0) {
+                    $new .= ($new != '' ? ',' : '').$this->get_mappingid('question_category', $id);
                 }
             }
             $data->qbankparams = $new;
         }
 
         for (;;) {
-            if ($DB->count_records_select( 'mmogame', 'fastjson=?', [$data->fastjson]) === 0) {
+            if ($DB->count_records_select('mmogame', 'fastjson=?', [$data->fastjson]) === 0) {
                 break;
             }
 
@@ -126,12 +126,12 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $oldid = $data->id;
 
         if ($data->kind == 'guid') {
-            $data->instanceid = $this->get_mapping( 'mmogame_uguid', $data->instanceid, $data->instanceid);
+            $data->instanceid = $this->get_mapping('mmogame_uguid', $data->instanceid, $data->instanceid);
         } else if ($data->kind == 'moodle') {
             $data->instanceid = $this->get_mappingid('user', $data->instanceid);
         }
 
-        $rec = $DB->get_record_select( 'mmogame_aa_users',
+        $rec = $DB->get_record_select('mmogame_aa_users',
             'kind=? AND instanceid=?', [$data->kind, $data->instanceid]);
         if ($rec === false) {
             $newitemid = $DB->insert_record('mmogame_aa_users', $data);
@@ -165,7 +165,7 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data = (object)$data;
         $oldid = $data->id;
 
-        $rec = $DB->get_record_select( 'mmogame_aa_users_guid', 'guid=?', [$data->guid]);
+        $rec = $DB->get_record_select('mmogame_aa_users_guid', 'guid=?', [$data->guid]);
         if ($rec === false) {
             $newitemid = $DB->insert_record('mmogame_aa_users_guid', $data);
         } else {
@@ -186,7 +186,7 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data = (object)$data;
         $oldid = $data->id;
 
-        $rec = $DB->get_record_select( 'mmogame_aa_avatars',
+        $rec = $DB->get_record_select('mmogame_aa_avatars',
             'directory=? AND filename=?', [$data->directory, $data->filename]);
         if ($rec === false) {
             $newitemid = $DB->insert_record('mmogame_aa_avatars', $data);
@@ -208,7 +208,7 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data = (object)$data;
         $oldid = $data->id;
 
-        $rec = $DB->get_record_select( 'mmogame_aa_colorpalettes',
+        $rec = $DB->get_record_select('mmogame_aa_colorpalettes',
             'colorsort1=? AND colorsort2=? AND colorsort3=? AND colorsort4=? AND colorsort5=?',
             [$data->colorsort1, $data->colorsort2, $data->colorsort3, $data->colorsort4, $data->colorsort5]);
         if ($rec === false) {

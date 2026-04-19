@@ -21,7 +21,6 @@ use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
-
 use core_external\restricted_context_exception;
 use invalid_parameter_exception as invalid_parameter_exceptionAlias;
 use mod_mmogame\local\database\mmogame_database_moodle;
@@ -36,7 +35,6 @@ use required_capability_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_state extends external_api {
-
     /**
      * Returns description of method parameters
      * @return external_function_parameters
@@ -68,8 +66,8 @@ class get_state extends external_api {
         self::validate_context($context);
         require_capability('mod/mmogame:play', $context);
 
-        $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
-        return $mmogame->set_state( $mmogame->get_state());
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
+        return $mmogame->set_state($mmogame->get_state());
     }
 
     /**
@@ -80,5 +78,4 @@ class get_state extends external_api {
     public static function execute_returns(): external_value {
         return new external_value(PARAM_TEXT, 'The serialized state of the mmogame');
     }
-
 }

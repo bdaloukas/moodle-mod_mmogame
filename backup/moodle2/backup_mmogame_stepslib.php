@@ -54,13 +54,30 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
             ['numgame', 'state', 'param1']);
 
         $pairs = new backup_nested_element('aduel_pairs');
-        $pair = new backup_nested_element('aduel_pair', ['id'],
-            ['numgame', 'auserid1', 'auserid2', 'timestart1', 'timestart2', 'timeclose', 'timelimit', 'isclosed1',
-            'isclosed2', 'tool1numattempt1', 'tool1numattempt2', 'tool2numattempt1', 'tool2numattempt2',
-            'tool3numattempt1', 'tool3numattempt2', ]);
+        $pair = new backup_nested_element(
+            'aduel_pair',
+            ['id'],
+            [
+                'numgame',
+                'auserid1',
+                'auserid2',
+                'timestart1',
+                'timestart2',
+                'timeclose',
+                'timelimit',
+                'isclosed1',
+                'isclosed2',
+                'tool1numattempt1',
+                'tool1numattempt2',
+                'tool2numattempt1',
+                'tool2numattempt2',
+                'tool3numattempt1',
+                'tool3numattempt2',
+                ]
+            );
 
-        $types = new backup_nested_element( 'types');
-        $type = new backup_nested_element( 'type');
+        $types = new backup_nested_element('types');
+        $type = new backup_nested_element('type');
 
         $ausers = new backup_nested_element('ausers');
         $ausermoodle = new backup_nested_element('auser_moodle', ['id'],
@@ -68,16 +85,22 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
         $auser = new backup_nested_element('auser', ['id'],
             ['kind', 'instanceid', 'lastlogin', 'lastip']);
 
-        $avatars = new backup_nested_element( 'avatars');
-        $avatar = new backup_nested_element('avatar', ['id'],
-            ['directory', 'filename', 'numused', 'randomkey', 'ishidden']);
+        $avatars = new backup_nested_element('avatars');
+        $avatar = new backup_nested_element(
+            'avatar',
+            ['id'],
+            ['directory', 'filename', 'numused', 'randomkey', 'ishidden']
+        );
 
-        $palettes = new backup_nested_element( 'palettes');
-        $palette = new backup_nested_element('palette', ['id'],
-            ['category', 'name', 'color1', 'color2', 'color3', 'color4', 'color5',
-            'colorsort1', 'colorsort2', 'colorsort3', 'colorsort4', 'colorsort5', 'hue']);
+        $palettes = new backup_nested_element('palettes');
+        $palette = new backup_nested_element(
+            'palette',
+            ['id'],
+            [
+                'category', 'name', 'color1', 'color2', 'color3', 'color4', 'color5',
+                'colorsort1', 'colorsort2', 'colorsort3', 'colorsort4', 'colorsort5', 'hue']);
 
-        $uguids = new backup_nested_element( 'uguids');
+        $uguids = new backup_nested_element('uguids');
         $uguid = new backup_nested_element('uguid', ['id'],
             ['guid']);
 
@@ -127,25 +150,25 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
             $sql = "SELECT * FROM {mmogame_aa_users} u
                 WHERE kind='moodle'
                 AND id IN (SELECT DISTINCT auserid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
-            $ausermoodle->set_source_sql( $sql, $params);
+            $ausermoodle->set_source_sql($sql, $params);
 
             $sql = "SELECT * FROM {mmogame_aa_users} u
                 WHERE kind<>'moodle'
                 AND id IN (SELECT DISTINCT auserid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
-            $auser->set_source_sql( $sql, $params);
+            $auser->set_source_sql($sql, $params);
 
             $sql = "SELECT uq.* FROM {mmogame_aa_users_guid} uq, {mmogame_aa_users} u
                 WHERE uq.id = u.instanceid AND u.id IN
                 (SELECT DISTINCT auserid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
-            $uguid->set_source_sql( $sql, $params);
+            $uguid->set_source_sql($sql, $params);
 
             $sql = "SELECT * FROM {mmogame_aa_avatars}
                 WHERE id IN (SELECT DISTINCT avatarid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
-            $avatar->set_source_sql( $sql, $params);
+            $avatar->set_source_sql($sql, $params);
 
             $sql = "SELECT * FROM {mmogame_aa_colorpalettes}
                 WHERE id IN (SELECT DISTINCT colorpaletteid FROM {mmogame_aa_grades} g WHERE mmogameid=?)";
-            $palette->set_source_sql( $sql, $params);
+            $palette->set_source_sql($sql, $params);
 
             $params = ['mmogameid' => backup::VAR_PARENTID];
             $grade->set_source_table('mmogame_aa_grades', $params);

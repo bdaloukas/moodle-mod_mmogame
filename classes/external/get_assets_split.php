@@ -23,7 +23,6 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-
 use core_external\restricted_context_exception;
 use invalid_parameter_exception as invalid_parameter_exceptionAlias;
 use mod_mmogame\local\database\mmogame_database_moodle;
@@ -39,7 +38,6 @@ use function get_coursemodule_from_instance;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_assets_split extends external_api {
-
     /**
      * Returns description of method parameters
      * @return external_function_parameters
@@ -70,8 +68,14 @@ class get_assets_split extends external_api {
      * @throws required_capability_exception
      * @throws restricted_context_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user, int $countsplit,
-                                   int $countpalettes = 0, int $countavatars = 0): array {
+    public static function execute(
+        int $mmogameid,
+        string $kinduser,
+        string $user,
+        int $countsplit,
+        int $countpalettes = 0,
+        int $countavatars = 0
+    ): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
@@ -92,8 +96,16 @@ class get_assets_split extends external_api {
         $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
         $retpalettes = $retavatars = [];
         $maxavatars = 0;
-        $mmogame->get_assets_split($countsplit, $countpalettes, $countavatars, $retpalettes,
-            $retavatars, $maxavatars, $kinduser, $user);
+        $mmogame->get_assets_split(
+            $countsplit,
+            $countpalettes,
+            $countavatars,
+            $retpalettes,
+            $retavatars,
+            $maxavatars,
+            $kinduser,
+            $user
+        );
         $avatarids = $avatars = $paletteids = $palettes = [];
         foreach ($retpalettes as $key => $value) {
             $paletteids[] = $key;
@@ -105,9 +117,12 @@ class get_assets_split extends external_api {
                 $avatars[] = $value;
             }
         }
-        return ['avatars' => $avatars, 'avatarids' => $avatarids,
-            'colorpalettes' => $palettes, 'colorpaletteids' => $paletteids,
-            'numavatars' => min( $maxavatars, $countavatars)];
+        return ['avatars' => $avatars,
+            'avatarids' => $avatarids,
+            'colorpalettes' => $palettes,
+            'colorpaletteids' => $paletteids,
+            'numavatars' => min( $maxavatars, $countavatars)
+        ];
     }
 
     /**

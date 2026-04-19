@@ -27,10 +27,10 @@ use mod_mmogame\local\mmogame;
 
 defined('MOODLE_INTERNAL') || die();
 
-define( 'MMOGAME_PIN_DIGITS', 6);
+define('MMOGAME_PIN_DIGITS', 6);
 
-define( 'MMOGAME_KINDUSER_GUID', 'guid');
-define( 'MMOGAME_KINDUSER_MOODLE', 'moodle');
+define('MMOGAME_KINDUSER_GUID', 'guid');
+define('MMOGAME_KINDUSER_MOODLE', 'moodle');
 
 require_once(__DIR__ . '/../../course/moodleform_mod.php');
 
@@ -72,8 +72,8 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        if (!isset( $g)) {
-            $mform->setDefault('name', get_string( 'pluginname', 'mmogame'));
+        if (!isset($g)) {
+            $mform->setDefault('name', get_string('pluginname', 'mmogame'));
         }
 
         // Introduction.
@@ -84,14 +84,14 @@ class mod_mmogame_mod_form extends moodleform_mod {
 
         $mform->addElement('select', 'qbank', get_string('sourcemodule', 'mmogame'), $qbankoptions);
 
-        $this->definition_question( $mform);
+        $this->definition_question($mform);
 
         $usersoptions = [];
         $usersoptions[MMOGAME_KINDUSER_GUID] = get_string('kinduser_guid', 'mmogame');
         $usersoptions[MMOGAME_KINDUSER_MOODLE] = get_string('kinduser_moodle', 'mmogame');
         $mform->addElement('select', 'kinduser', get_string('kinduser', 'mmogame'), $usersoptions);
 
-        $this->definition_modes( $mform);
+        $this->definition_modes($mform);
 
         $this->standard_coursemodule_elements();
 
@@ -109,11 +109,11 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $dir = __DIR__.'/type';
         $modes = [];
         foreach ($types as $type) {
-            require_once( $dir.'/'.$type.'/lib.php');
-            $function = 'mmogametype_'.$type.'_get_modes';
+            require_once($dir . '/' . $type . '/lib.php');
+            $function = 'mmogametype_' . $type . '_get_modes';
             $map = $function();
             foreach ($map as $mode => $value) {
-                $modes[$type.'-'.$mode] = $value;
+                $modes[$type . '-' . $mode] = $value;
             }
             echo $function;
         }
@@ -126,11 +126,11 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $mform->hideIf('pin', 'user', 'neq', MMOGAME_KINDUSER_GUID);
 
         // Enabled.
-        $mform->addElement('advcheckbox', 'enabled', get_string( 'enabled', 'mmogame'),
+        $mform->addElement('advcheckbox', 'enabled', get_string('enabled', 'mmogame'),
             get_string('yesno', 'mmogame'), ['group' => 1], [0, 1]);
 
         // Strip tags.
-        $mform->addElement('advcheckbox', 'striptags', get_string( 'striptags', 'mmogame'),
+        $mform->addElement('advcheckbox', 'striptags', get_string('striptags', 'mmogame'),
             get_string('yesno', 'mmogame'), ['group' => 1], [0, 1]);
     }
 
@@ -160,14 +160,14 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $errors = parent::validation($data, $files);
 
         if ($data['qbank'] == 'question') {
-            if (!array_key_exists( 'questioncategoryid', $data) || $data['questioncategoryid'] == 0) {
-                $errors['questioncategoryid'] = get_string( 'sourcemodule_questioncategory', 'mmogame');
+            if (!array_key_exists('questioncategoryid', $data) || $data['questioncategoryid'] == 0) {
+                $errors['questioncategoryid'] = get_string('sourcemodule_questioncategory', 'mmogame');
             }
         }
 
         if ($data['kinduser'] == MMOGAME_KINDUSER_GUID) {
-            if (intval( $data['pin']) == 0) {
-                $errors['pin'] = get_string( 'missing_pin', 'mmogame');
+            if (intval($data['pin']) == 0) {
+                $errors['pin'] = get_string('missing_pin', 'mmogame');
             }
         }
 
@@ -212,15 +212,15 @@ class mod_mmogame_mod_form extends moodleform_mod {
                 JOIN {course_modules} cm ON cm.id = ctx.instanceid
                 JOIN {modules} m ON m.id = cm.module
                 WHERE ctx.contextlevel = 70 AND cm.course = ? AND m.name = ?";
-            $recs = $DB->get_records_sql( $sql, [$courseid, 'qbank']);
+            $recs = $DB->get_records_sql($sql, [$courseid, 'qbank']);
             $contextids = [];
             foreach ($recs as $rec) {
                 $contextids[] = $rec->contextid;
             }
         } else {
-            $contextids = [game_get_context_course_instance( $courseid)->id];
+            $contextids = [game_get_context_course_instance($courseid)->id];
         }
-        if (count( $contextids) == 0) {
+        if (count($contextids) == 0) {
             return [];
         }
 
@@ -233,7 +233,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
             " WHERE qbe.questioncategoryid = qc.id AND qbe.id=qv.questionbankentryid AND q.id=qv.questionid $select";
         [$insql, $params] = $DB->get_in_or_equal($contextids);
         $sql = "SELECT id,name,($sql2) as c FROM {question_categories} qc WHERE contextid ".$insql;
-        if ($recs = $DB->get_records_sql( $sql, $params)) {
+        if ($recs = $DB->get_records_sql($sql, $params)) {
             foreach ($recs as $rec) {
                 $s = $rec->name.' ('.$rec->c;
                 $count = $this->get_questions_count($rec->id);
@@ -253,21 +253,21 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @param object $defaultvalues
      */
     public function set_data($defaultvalues): void {
-        $mmogameid = isset( $defaultvalues->id) ? intval($defaultvalues->id) : 0;
+        $mmogameid = isset($defaultvalues->id) ? intval($defaultvalues->id) : 0;
 
-        if (isset( $defaultvalues->type) && isset( $defaultvalues->mode)) {
+        if (isset($defaultvalues->type) && isset($defaultvalues->mode)) {
             $defaultvalues->typemode = $defaultvalues->type.'-'.$defaultvalues->mode;
         }
-        if (!isset( $defaultvalues->pin) || $defaultvalues->pin == 0) {
+        if (!isset($defaultvalues->pin) || $defaultvalues->pin == 0) {
             $db = new mmogame_database_moodle();
-            $defaultvalues->pin = mmogame::get_newpin( $mmogameid, $db, MMOGAME_PIN_DIGITS);
+            $defaultvalues->pin = mmogame::get_newpin($mmogameid, $db, MMOGAME_PIN_DIGITS);
         }
 
-        if (!isset( $defaultvalues->enabled)) {
+        if (!isset($defaultvalues->enabled)) {
             $defaultvalues->enabled = 1;
         }
 
-        $this->set_data_categories( $defaultvalues);
+        $this->set_data_categories($defaultvalues);
 
         parent::set_data($defaultvalues);
     }
@@ -278,12 +278,12 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @param object $defaultvalues
      */
     public function set_data_categories(object $defaultvalues): void {
-        if (!isset( $defaultvalues->instance)) {
+        if (!isset($defaultvalues->instance)) {
             $defaultvalues->instance = 0;
         }
 
-        if (isset( $defaultvalues->qbankparams)) {
-            $a = explode( ',', $defaultvalues->qbankparams);
+        if (isset($defaultvalues->qbankparams)) {
+            $a = explode(',', $defaultvalues->qbankparams);
             if ($defaultvalues->qbank == MMOGAME_QBANK_MOODLEQUESTION) {
                 $n = 0;
                 foreach ($a as $s) {
@@ -346,7 +346,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
             list($insql, $inparams) = $DB->get_in_or_equal($childrenids, SQL_PARAMS_NAMED, 'p');
         }
 
-        [$insql1, $inparams1] = $DB->get_in_or_equal( $categoryids);
+        [$insql1, $inparams1] = $DB->get_in_or_equal($categoryids);
 
         $sql = "SELECT COUNT(*) as c
             FROM {question_bank_entries} qbe
@@ -359,7 +359,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
             )
             AND qbe.questioncategoryid $insql1
             AND q.qtype='multichoice'";
-        $rec = $DB->get_record_sql( $sql, array_merge($inparams1));
+        $rec = $DB->get_record_sql($sql, array_merge($inparams1));
 
         return $rec->c;
     }

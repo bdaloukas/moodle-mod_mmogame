@@ -34,7 +34,6 @@ use stdClass;
  * The mod_mmogame course module viewed event class.
  */
 class course_module_played extends \core\event\course_module_viewed {
-
     /**
      * Create instance of event.
      *

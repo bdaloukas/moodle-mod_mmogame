@@ -310,7 +310,7 @@ abstract class mmogame_qbank {
                 'numgame' => $rgame->numgame, 'queryid' => $queryid != 0 ? $queryid : null, 'auserid' => $auserid,
                 'numteam' => $numteam != 0 ? $numteam : null, 'percent' => $percent, 'countused' => $isused ? 1 : 0,
                 'countcorrect' => $iscorrect ? 1 : 0,
-                'counterror' => $iserror ? 1 : 0 ,
+                'counterror' => $iserror ? 1 : 0,
                 'islastcorrect' => $iscorrect ? 1 : 0,
                 'serialcorrects' => ($iscorrect ? 1 : 0),
                 'nextquery' => $nextquery,

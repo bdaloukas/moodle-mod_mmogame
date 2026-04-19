@@ -56,20 +56,20 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
                 FROM {question_versions} subqv
                 WHERE subqv.questionbankentryid = qv.questionbankentryid
             )";
-        $rec = $db->get_record_sql( $sql, [$id]);
+        $rec = $db->get_record_sql($sql, [$id]);
         if ($rec === null) {
             return null;
         }
 
         if ($this->mmogame->get_rgame()->striptags) {
-            $rec->definition = strip_tags( $rec->definition);
+            $rec->definition = strip_tags($rec->definition);
         }
 
         if (!$loadextra) {
             return $rec;
         }
 
-        return $this->load2( $rec);
+        return $this->load2($rec);
     }
 
     /**
@@ -85,7 +85,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             $fields = 'qbe.id, q.id as questionid,q.qtype,q.name,q.questiontext as definition,q.generalfeedback';
         }
         $db = $this->mmogame->get_db();
-        [$insql, $inparams] = $db->get_in_or_equal( $ids);
+        [$insql, $inparams] = $db->get_in_or_equal($ids);
         $sql = "SELECT $fields
             FROM {question} q, {question_bank_entries} qbe,{question_versions} qv
             WHERE qbe.id=qv.questionbankentryid AND qv.questionid=q.id AND qbe.id $insql
@@ -94,15 +94,15 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
                 FROM {question_versions} subqv
                 WHERE subqv.questionbankentryid = qv.questionbankentryid
             )";
-        $recs = $db->get_records_sql( $sql, $inparams);
-        if (count( $recs) == 0) {
+        $recs = $db->get_records_sql($sql, $inparams);
+        if (count($recs) == 0) {
             return null;
         }
         $striptags = $this->mmogame->get_rgame()->striptags;
         $map = [];
         foreach ($recs as $rec) {
             if ($striptags) {
-                $rec->definition = strip_tags( $rec->definition);
+                $rec->definition = strip_tags($rec->definition);
             }
             $info = new stdClass();
             $info->id = $rec->id;
@@ -117,7 +117,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             return $map;
         }
 
-        $this->load2_many( $map);
+        $this->load2_many($map);
 
         return $map;
     }
@@ -129,25 +129,30 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @return stdClass $query
      */
     private function load2(stdClass $query): stdClass {
-        $recs = $this->mmogame->get_db()->get_records_select( 'question_answers', 'question=?',
-            [$query->questionid], 'fraction DESC', 'id,answer,fraction');
-        unset( $query->correctid);
+        $recs = $this->mmogame->get_db()->get_records_select(
+            'question_answers',
+            'question=?',
+            [$query->questionid],
+            'fraction DESC',
+            'id,answer,fraction'
+        );
+        unset($query->correctid);
         $first = true;
         $striptags = $this->mmogame->get_rgame()->striptags;
 
         foreach ($recs as $rec) {
             if ($striptags) {
-                $rec->answer = strip_tags( $rec->answer);
+                $rec->answer = strip_tags($rec->answer);
             }
 
             if ($query->qtype == 'shortanswer') {
                 $query->concept = $rec->answer;
                 break;
             }
-            if (!isset( $query->answers)) {
+            if (!isset($query->answers)) {
                 $query->answers = [];
             }
-            if (!isset( $query->correctid)) {
+            if (!isset($query->correctid)) {
                 $query->correctid = $rec->id;
             }
             $info = new stdClass();
@@ -161,7 +166,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             $query->answers[] = $info;
         }
         if ($query->qtype == 'multichoice') {
-            $rec = $this->mmogame->get_db()->get_record_select( 'qtype_multichoice_options', 'questionid=?',
+            $rec = $this->mmogame->get_db()->get_record_select('qtype_multichoice_options', 'questionid=?',
                 [$query->questionid]);
             $query->multichoice = $rec;
         }
@@ -181,8 +186,8 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             $map[$info->questionid] = $info;
         }
 
-        [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal( $questionids);
-        $recs = $this->mmogame->get_db()->get_records_select( 'question_answers', "question $insql",
+        [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal($questionids);
+        $recs = $this->mmogame->get_db()->get_records_select('question_answers', "question $insql",
             $inparams, 'fraction DESC,id', 'id,question,answer,fraction');
         $ids = [];
         $striptags = $this->mmogame->get_rgame()->striptags;
@@ -212,10 +217,13 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             }
         }
 
-        if (count( $ids)) {
-            [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal( $ids);
-            $recs = $this->mmogame->get_db()->get_records_select( 'qtype_multichoice_options',
-                'questionid '.$insql, $inparams);
+        if (count($ids)) {
+            [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal($ids);
+            $recs = $this->mmogame->get_db()->get_records_select(
+                'qtype_multichoice_options',
+                'questionid ' . $insql,
+                $inparams
+            );
             foreach ($recs as $rec) {
                 $info = $map[$rec->questionid];
                 $info->multichoice = $rec;
@@ -234,20 +242,20 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @return stdClass
      */
     public function load_json(array &$ret, string $num, int $id, ?string $layout, bool $fillconcept): stdClass {
-        $rec = $this->load( $id);
+        $rec = $this->load($id);
 
         $ret['qtype'.$num] = $rec->qtype;
         $definition = $rec->definition;
 
-        $ret['definition'.$num] = $definition;
-        if ($this->is_shortanswer( $rec)) {
+        $ret['definition' . $num] = $definition;
+        if ($this->is_shortanswer($rec)) {
             if ($fillconcept) {
-                $ret['concept'.$num] = $rec->concept;
+                $ret['concept' . $num] = $rec->concept;
             }
-        } else if ($this->is_multichoice( $rec)) {
+        } else if ($this->is_multichoice($rec)) {
             $ret['single'] = $rec->multichoice->single;
-            $l = $layout == '' ? [] : explode( ',', $layout);
-            for ($i = 1; $i <= count( $rec->answers); $i++) {
+            $l = $layout == '' ? [] : explode(',', $layout);
+            for ($i = 1; $i <= count($rec->answers); $i++) {
                 if (!in_array($i, $l)) {
                     $l[] = $i;
                 }
@@ -276,8 +284,8 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      */
     protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition'): array {
 
-        [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal( explode( ',', $ids));
-        $recs = $this->mmogame->get_db()->get_records_select( 'question', $insql, $inparams, '', $fields);
+        [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal(explode(',', $ids));
+        $recs = $this->mmogame->get_db()->get_records_select('question', $insql, $inparams, '', $fields);
 
         if ($loadextra) {
             foreach ($recs as $rec) {
@@ -301,9 +309,9 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      */
     public function is_correct(stdClass $query, ?string $useranswer, ?int $useranswerid, mmogame $mmogame, float &$fraction): bool {
         if ($query->qtype == 'shortanswer') {
-            return $this->is_correct_shortanswer( $query, $useranswer, $mmogame);
+            return $this->is_correct_shortanswer($query, $useranswer, $mmogame);
         } else {
-            return $this->is_correct_multichoice( $query, $useranswer, $useranswerid, $fraction);
+            return $this->is_correct_multichoice($query, $useranswer, $useranswerid, $fraction);
         }
     }
 
@@ -320,7 +328,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
         if ($mmogame->get_rgame()->casesensitive) {
             return $query->concept == $useranswer;
         } else {
-            return strtoupper( $query->concept) == strtoupper( $useranswer);
+            return strtoupper($query->concept) == strtoupper($useranswer);
         }
     }
 
@@ -336,9 +344,9 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      */
     protected function is_correct_multichoice(stdClass $query, ?string $useranswer, ?int $useranswerid, float &$fraction): bool {
         if ($query->multichoice->single) {
-            return $this->is_correct_multichoice_single1( $query, $useranswerid, $fraction);
+            return $this->is_correct_multichoice_single1($query, $useranswerid, $fraction);
         } else {
-            return $this->is_correct_multichoice_single0( $query, $useranswer, $fraction);
+            return $this->is_correct_multichoice_single0($query, $useranswer, $fraction);
         }
     }
 
@@ -354,13 +362,13 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     protected function is_correct_multichoice_single1(stdClass $query, ?int $useranswerid, float &$fraction): bool {
         $fraction = null;
         foreach ($query->answers as $answer) {
-            if (intval( $answer->id) == $useranswerid) {
+            if (intval($answer->id) == $useranswerid) {
                 $fraction = $answer->fraction;
                 break;
             }
         }
 
-        return abs( $fraction - 1) < 0.0000001;
+        return abs($fraction - 1) < 0.0000001;
     }
 
     /**
@@ -373,7 +381,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      */
     protected function is_correct_multichoice_single0(stdClass $query, string $useranswer, float &$fraction): bool {
         $fraction = 0.0;
-        $aids = explode( ',', $useranswer);
+        $aids = explode(',', $useranswer);
         foreach ($query->answers as $answer) {
             if (!in_array($answer->id, $aids)) {
                 continue;
@@ -381,7 +389,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             $fraction += $answer->fraction;
         }
 
-        return abs( $fraction - 1) < 0.0000001;
+        return abs($fraction - 1) < 0.0000001;
     }
 
     /**
@@ -395,18 +403,18 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             return null;
         }
         $items = [];
-        $n = count( $query->answers);
+        $n = count($query->answers);
         for ($i = 1; $i <= $n; $i++) {
             $items[] = $i;
         }
         $layout = '';
-        while (count( $items)) {
-            $pos = random_int( 0, count( $items) - 1);
+        while (count($items)) {
+            $pos = random_int(0, count($items) - 1);
             if ($layout != '') {
                 $layout .= ',';
             }
             $layout .= $items[$pos];
-            array_splice( $items, $pos, 1);
+            array_splice($items, $pos, 1);
         }
         return $layout;
     }
@@ -444,7 +452,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
         $rgame = $this->mmogame->get_rgame();
         $qtypes = $this->mmogame->get_qtypes();
 
-        if ( count($qtypes) === 0) {
+        if (count($qtypes) === 0) {
             return null;
         }
         $db = $this->mmogame->get_db();
@@ -469,8 +477,8 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             list($insql, $inparams) = $DB->get_in_or_equal($childrenids, SQL_PARAMS_NAMED, 'p');
         }
 
-        [$insql1, $inparams1] = $db->get_in_or_equal( $categoryids);
-        [$insql2, $inparams2] = $db->get_in_or_equal( $qtypes);
+        [$insql1, $inparams1] = $db->get_in_or_equal($categoryids);
+        [$insql2, $inparams2] = $db->get_in_or_equal($qtypes);
 
         $sql = "SELECT qbe.id, qbe.questioncategoryid
             FROM {question_bank_entries} qbe
@@ -483,7 +491,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             )
             AND qbe.questioncategoryid $insql1
             AND q.qtype $insql2";
-        $recs = $db->get_records_sql( $sql, array_merge($inparams1, $inparams2));
+        $recs = $db->get_records_sql($sql, array_merge($inparams1, $inparams2));
         $map = [];
         foreach ($recs as $rec) {
             $map[$rec->id] = $rec->questioncategoryid;

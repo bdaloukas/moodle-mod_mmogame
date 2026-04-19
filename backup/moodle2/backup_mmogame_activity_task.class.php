@@ -49,7 +49,7 @@ class backup_mmogame_activity_task extends backup_activity_task {
         // Process all the annotated questions to calculate the question
         // categories needing to be included in backup for this activity
         // plus the categories belonging to the activity context itself.
-        $this->add_step( new mmogame_backup_calculate_question_categories('activity_question_categories'));
+        $this->add_step(new mmogame_backup_calculate_question_categories('activity_question_categories'));
 
         // Clean backup_temp_ids table from questions. We already
         // have used them to detect question_categories and aren't
@@ -100,13 +100,13 @@ class mmogame_backup_calculate_question_categories extends backup_calculate_ques
     protected static function calculate_question_categories($backupid, $contextid) {
         global $DB;
 
-        $context = $DB->get_record_select( 'context', 'id=?', [$contextid]);
-        $cm = $DB->get_record_select( 'course_modules', 'id=?', [$context->instanceid]);
+        $context = $DB->get_record_select('context', 'id=?', [$contextid]);
+        $cm = $DB->get_record_select('course_modules', 'id=?', [$context->instanceid]);
 
         $sql = "SELECT g.*, m.name as modulename
           FROM {context} c, {course_modules} cm, {mmogame} g, {modules} m
           WHERE c.id=? AND cm.id=c.instanceid AND g.id=cm.instance AND cm.module=m.id AND m.name=?";
-        $game = $DB->get_record_sql( $sql, [$contextid, 'mmogame']);
+        $game = $DB->get_record_sql($sql, [$contextid, 'mmogame']);
         if ($game === false) {
             return;
         }
@@ -116,16 +116,16 @@ class mmogame_backup_calculate_question_categories extends backup_calculate_ques
             WHERE stats.mmogameid=?
             AND qv.questionid=stats.queryid
             AND qbe.id=qv.questionbankentryid AND qbe.id=qv.questionbankentryid";
-        $recs = $DB->get_records_sql( $sql, [$cm->instance]);
+        $recs = $DB->get_records_sql($sql, [$cm->instance]);
         $ids = [];
         foreach ($recs as $rec) {
             $ids[$rec->id] = $rec->id;
         }
 
         if ($game->qbank == 'moodlequestion') {
-            $a = explode( ',', $game->qbankparams);
+            $a = explode(',', $game->qbankparams);
             foreach ($a as $id) {
-                $id = intval( $id);
+                $id = intval($id);
                 $ids[$id] = $id;
             }
         }
@@ -135,7 +135,7 @@ class mmogame_backup_calculate_question_categories extends backup_calculate_ques
             $rec->backupid = $backupid;
             $rec->itemname = 'question_category';
             $rec->itemid = $id;
-            $DB->insert_record( 'backup_ids_temp', $rec);
+            $DB->insert_record('backup_ids_temp', $rec);
         }
     }
 }

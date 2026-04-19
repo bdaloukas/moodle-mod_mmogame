@@ -179,7 +179,7 @@ class provider implements
             writer::with_context($context)->export_data([], $data);
 
             $path = [get_string('privacy:metadata:mmogame:numgame', 'mod_mmogame')];
-            static::export_numgames( $context, $cm->instance, $auserid, $cm->type, $cm->model, $path);
+            static::export_numgames($context, $cm->instance, $auserid, $cm->type, $cm->model, $path);
         }
     }
 
@@ -199,17 +199,17 @@ class provider implements
         global $DB;
 
         $sql = "SELECT gg.id, gg.numgame, gg.nickname, gg.usercode, gg.sumscore,
-            gg.numteam, gg.timemodified, CONCAT( a.directory, '/', a.filename) as avatar,
+            gg.numteam, gg.timemodified, CONCAT(a.directory, '/', a.filename) as avatar,
             mc.color1, mc.color2, mc.color3, mc.color4, mc.color5
             FROM {mmogame_aa_grades} gg
             LEFT JOIN {mmogame_aa_avatars} a ON gg.avatarid = a.id
             LEFT JOIN {mmogame_aa_colorpalettes} mc ON gg.colorpaletteid = mc.id
             WHERE gg.mmogameid=? AND gg.auserid=?";
-        $recs = $DB->get_records_sql( $sql, [$mmogameid, $auserid]);
+        $recs = $DB->get_records_sql($sql, [$mmogameid, $auserid]);
         foreach ($recs as $rec) {
-            $newpath = array_merge( $path, [$rec->numgame]);
-            unset( $rec->id);
-            writer::with_context($context)->export_data( $newpath, $rec);
+            $newpath = array_merge($path, [$rec->numgame]);
+            unset($rec->id);
+            writer::with_context($context)->export_data($newpath, $rec);
 
             manager::component_class_callback('mmogametype_'.$type, self::MMOGAMETYPE_INTERFACE,
                 'export_type_user_data',
@@ -237,7 +237,7 @@ class provider implements
         }
 
         // This will delete all attempts and mmogame grades for this game.
-        mmogame::delete_auser( new mmogame_database_moodle(), $cm->instance, null);
+        mmogame::delete_auser(new mmogame_database_moodle(), $cm->instance, null);
     }
 
     /**
@@ -264,11 +264,11 @@ class provider implements
 
             // Fetch the details of the data to be removed.
             $user = $contextlist->get_user();
-            $auserid = mmogame::get_auserid_from_db( $db, 'moodle', $user->id, false);
+            $auserid = mmogame::get_auserid_from_db($db, 'moodle', $user->id, false);
             if ($auserid != 0) {
-                $rgame = $db->get_record_select( 'mmogame', 'id=?', [$cm->instance]);
+                $rgame = $db->get_record_select('mmogame', 'id=?', [$cm->instance]);
                 // This will delete all attempts and mmogame grades for this mmogame.
-                mmogame::delete_auser( $db, $rgame, $auserid);
+                mmogame::delete_auser($db, $rgame, $auserid);
             }
         }
     }
@@ -321,13 +321,13 @@ class provider implements
         }
         $cm = get_coursemodule_from_id('mmogame', $context->instanceid);
 
-        $rgame = $db->get_record_select( 'mmogame', 'id=?', [$cm->instance]);
+        $rgame = $db->get_record_select('mmogame', 'id=?', [$cm->instance]);
 
         $userids = $userlist->get_userids();
         foreach ($userids as $userid) {
-            $auserid = mmogame::get_auserid_from_db( $db, 'moodle', $userid, false);
+            $auserid = mmogame::get_auserid_from_db($db, 'moodle', $userid, false);
             if ($auserid != 0) {
-                mmogame::delete_auser( $db, $rgame, $auserid);
+                mmogame::delete_auser($db, $rgame, $auserid);
             }
         }
     }
