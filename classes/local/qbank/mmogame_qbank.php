@@ -64,14 +64,18 @@ abstract class mmogame_qbank {
         $rgame = $this->mmogame->get_rgame();
         $auserid = $this->mmogame->get_auserid();
 
-        $queries = $this->get_queries( $auserid, null, $count, $countquestions, $corrects);
+        $queries = $this->get_queries($auserid, null, $count, $countquestions, $corrects);
         if ($queries === null) {
             return null;
         }
 
         if ($usenumattempt) {
-            $rec = $db->get_record_select( $this->mmogame->get_table_attempts(), 'mmogameid=? AND numgame=? AND auserid=?',
-                [$rgame->id, $rgame->numgame, $auserid], 'max(numattempt) as num');
+            $rec = $db->get_record_select(
+                $this->mmogame->get_table_attempts(),
+                'mmogameid=? AND numgame=? AND auserid=?',
+                [$rgame->id, $rgame->numgame, $auserid],
+                'max(numattempt) as num'
+            );
             $numattempt = $rec->num + 1;
         }
 
@@ -86,7 +90,7 @@ abstract class mmogame_qbank {
         $a['timeclose'] = 0;
         if ($count == 1) {
             $a['queryid'] = $queries[0]->id;
-            $a['layout'] = $this->get_layout( $queries[0]);
+            $a['layout'] = $this->get_layout($queries[0]);
         }
         $a['queries'] = $queries;
         $a['useranswerid'] = 0;
@@ -111,7 +115,7 @@ abstract class mmogame_qbank {
      */
     protected function get_queries(int $auserid, ?int $numteam, int $count, int &$countquestions, int &$corrects): ?array {
         $ids = $this->get_queries_ids();
-        $countquestions = count( $ids );
+        $countquestions = count($ids);
         if ($ids === false) {
             return null;
         }
@@ -121,47 +125,56 @@ abstract class mmogame_qbank {
 
         $fields = 'queryid,countused,countcorrect,counterror,islastcorrect';
         if ($numteam === null) {
-            $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=?',
-                [$rgame->id, $rgame->numgame, $auserid], '', $fields);
+            $stats = $db->get_records_select(
+                'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND auserid=?',
+                [$rgame->id, $rgame->numgame, $auserid],
+                '',
+                $fields
+            );
         } else {
-            $stats = $db->get_records_select( 'mmogame_aa_stats', 'mmogameid=? AND numgame=? AND numteam=?',
-                [$rgame->id, $rgame->numgame, $numteam], '', $fields);
+            $stats = $db->get_records_select(
+                'mmogame_aa_stats',
+                'mmogameid=? AND numgame=? AND numteam=?',
+                [$rgame->id, $rgame->numgame, $numteam],
+                '',
+                $fields
+            );
         }
 
         $map = [];
         $corrects = 0;
         foreach ($ids as $id => $qtype) {
-            $r = mt_rand( 0, 1000 * 1000 - 1);
-            $stat = array_key_exists( $id, $stats) ? $stats[$id] : false;
+            $r = mt_rand(0, 1000 * 1000 - 1);
+            $stat = array_key_exists($id, $stats) ? $stats[$id] : false;
             $group = 0;
 
             $countused = $stat ? $stat->countused : 0;
             $countcorrect = $stat !== false ? $stat->countcorrect : 0;
-            $key = sprintf( "%10d-%10d-%10d-%10d-%10d", $countcorrect, $countused, $group, $r, $id);
+            $key = sprintf("%10d-%10d-%10d-%10d-%10d", $countcorrect, $countused, $group, $r, $id);
             $map[$key] = $id;
 
             if ($stat !== false && $stat->islastcorrect) {
                 $corrects++;
             }
         }
-        ksort( $map);
+        ksort($map);
 
         $ret = [];
         foreach ($map as $id) {
-            if (count( $ret) >= $count) {
+            if (count($ret) >= $count) {
                 break;
             }
-            $q = $this->load( $id);
+            $q = $this->load($id);
             $ret[] = $q;
         }
-        shuffle( $ret);
+        shuffle($ret);
 
         foreach ($ret as $q) {
-            $this->update_stats( $auserid, null, $q->id, true, false, false, 0, null);
+            $this->update_stats($auserid, null, $q->id, true, false, false, 0, null);
             $this->update_stats(null, null, $q->id, true, false, false, 0, null);
         }
 
-        return count( $ret) ? $ret : null;
+        return count($ret) ? $ret : null;
     }
 
     /**
@@ -176,30 +189,36 @@ abstract class mmogame_qbank {
     public function update_grades(int $auserid, int $score, int $countscore): void {
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
-        $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
-            [$rgame->id, $rgame->numgame, $auserid]);
+        $rec = $db->get_record_select(
+            'mmogame_aa_grades',
+            'mmogameid=? AND numgame=? AND auserid=?',
+            [$rgame->id, $rgame->numgame, $auserid]
+        );
         if ($rec === null) {
-            $this->mmogame->get_grade( $auserid);
-            $rec = $db->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
-                [$rgame->id, $rgame->numgame, $auserid]);
+            $this->mmogame->get_grade($auserid);
+            $rec = $db->get_record_select(
+                'mmogame_aa_grades',
+                'mmogameid=? AND numgame=? AND auserid=?',
+                [$rgame->id, $rgame->numgame, $auserid]
+            );
         }
         if ($rec !== null) {
             $a = ['id' => $rec->id];
             if ($countscore > 0) {
                 $a['countscore'] = $rec->countscore + $countscore;
-                $a['score'] = max( 0, $rec->sumscore + $score) / ($rec->countscore + $countscore);
+                $a['score'] = max(0, $rec->sumscore + $score) / ($rec->countscore + $countscore);
             }
             if ($score != 0) {
-                $a['sumscore'] = max( 0, $rec->sumscore + $score);
+                $a['sumscore'] = max(0, $rec->sumscore + $score);
             }
-            if (count( $a) > 1) {
-                $db->update_record( 'mmogame_aa_grades', $a);
+            if (count($a) > 1) {
+                $db->update_record('mmogame_aa_grades', $a);
             }
         } else {
-            $db->insert_record( 'mmogame_aa_grades',
-                ['mmogameid' => $rgame->id, 'numgame' => $rgame->numgame, 'auserid' => $auserid, 'sumscore' => max( 0, $score),
+            $db->insert_record('mmogame_aa_grades',
+                ['mmogameid' => $rgame->id, 'numgame' => $rgame->numgame, 'auserid' => $auserid, 'sumscore' => max(0, $score),
                     'countscore' => $countscore,
-                    'score' => max( 0, $score), 'timemodified' => time(), ]);
+                    'score' => max(0, $score), 'timemodified' => time(), ]);
         }
     }
 
@@ -243,7 +262,7 @@ abstract class mmogame_qbank {
             $select .= ' AND queryid IS NULL';
         }
 
-        $rec = $db->get_record_select( 'mmogame_aa_stats', $select, $a);
+        $rec = $db->get_record_select('mmogame_aa_stats', $select, $a);
         if ($rec !== null) {
             $a = ['id' => $rec->id];
             if ($nextquery > 0) {
@@ -272,7 +291,7 @@ abstract class mmogame_qbank {
                 }
             }
 
-            $db->update_record( 'mmogame_aa_stats', $a);
+            $db->update_record('mmogame_aa_stats', $a);
         } else {
             $count = $iscorrect + ($iserror ? 1 : 0);
             $percent = $count == 0 ? null : ($iscorrect ? 1 : 0) / $count;
@@ -294,7 +313,7 @@ abstract class mmogame_qbank {
                 }
             }
 
-            $db->insert_record( 'mmogame_aa_stats', $a);
+            $db->insert_record('mmogame_aa_stats', $a);
         }
     }
 

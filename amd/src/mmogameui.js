@@ -183,11 +183,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         gateCreateScreen() {
             document.body.innerHTML = '';
             this.body = document.getElementsByTagName("body")[0];
-/*
-            while (this.body.firstChild) {
-                this.body.removeChild(this.body.firstChild);
-            }
-*/
             this.area = undefined;
 
             this.gateCompute();

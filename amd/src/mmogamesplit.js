@@ -136,7 +136,6 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             this.iconSize = Math.max(minIconSize, Math.min(maxIconWidth, maxIconHeight, 4 * bodyFontSize));
             this.padding = Math.round(this.iconSize / 10);
             this.iconSize -= this.padding;
-console.log("mmogamesplit.iconSize=",this.iconSize);
             this.split = {
                 offsetY: offsetY * this.iconSize,
                 width: Math.round((window.innerWidth - this.iconSize - 3 * this.padding) / this.countX),

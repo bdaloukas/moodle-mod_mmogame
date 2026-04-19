@@ -64,7 +64,12 @@ abstract class mmogame_database {
      * @param string $fields Fields to return, defaults to '*'.
      * @return ?stdClass The database record as an object, or false if not found.
      */
-    abstract public function get_record_select(string $table, string $select, ?array $params = null, string $fields = '*'): ?stdClass;
+    abstract public function get_record_select(
+        string $table,
+        string $select,
+        ?array $params = null,
+        string $fields = '*'
+    ): ?stdClass;
     /**
      * Returns a list of records as an array of objects where the specified conditions are used in the WHERE clause.
      *

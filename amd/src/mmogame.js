@@ -195,7 +195,7 @@ define([''], function() {
 
         /**
          * Compute sizes for icons and padding based on the screen dimensions.
-         * @param minIconSize
+         * @param {number} minIconSize
          */
         computeSizes(minIconSize = 0) {
             const cIcons = Math.max(this.cIcons || 5, 5);
