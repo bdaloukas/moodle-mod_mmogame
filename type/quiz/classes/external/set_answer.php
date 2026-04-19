@@ -90,17 +90,17 @@ class set_answer extends external_api {
 
         $ret = [];
 
-        $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid( $mmogame->get_db(), $kinduser, $user, false, 0);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
+        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
         if ($auserid == null) {
-            return json_encode( ['errorcode' => 'no_user']);
+            return json_encode(['errorcode' => 'no_user']);
         }
 
-        $mmogame->login_user( $auserid);
+        $mmogame->login_user($auserid);
 
-        $mmogame->set_answer_mode( $ret, $attempt, $answer, $answerid, $subcommand);
+        $mmogame->set_answer_mode($ret, $attempt, $answer, $answerid, $subcommand);
 
-        return json_encode( $ret);
+        return json_encode($ret);
     }
 
     /**

@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir . '/formslib.php');
 
 /**
  * The class mmogame_quiz_alone_admin extentes the class moodleform
@@ -70,40 +70,40 @@ class mmogametype_quiz_split_admin extends moodleform {
 
         $state = $this->_mmogame->get_state();
         if ($state == 0) {
-            $statename = get_string( 'state0', 'mmogametype_quiz');
+            $statename = get_string('state0', 'mmogametype_quiz');
         } else {
-            $statename = get_string( $rgame->mode.'_state'.$state, 'mmogametype_quiz');
+            $statename = get_string($rgame->mode . '_state' . $state, 'mmogametype_quiz');
         }
 
         $mform->addElement('hidden', 'id', $this->_id);
-        $mform->setType( 'id', PARAM_INT);
+        $mform->setType('id', PARAM_INT);
 
         // Name of the game.
-        $mform->addElement('static', 'gamename', '', get_string('js_name', 'mmogame') . ': '.$rgame->name);
+        $mform->addElement('static', 'gamename', '', get_string('js_name', 'mmogame') . ': ' . $rgame->name);
         $mform->addElement('html', '<br>');
 
         $mform->addElement('html', '<table border=1>');
 
         // First line numgame.
         $mform->addElement('html', '<tr>');
-        $mform->addElement('html', '<td>'.get_string('numgame', 'mmogame').':</td>');
+        $mform->addElement('html', '<td>' . get_string('numgame', 'mmogame') . ':</td>');
         $mform->addElement('html', '<td>');
         if ($rgame->numgame > 1) {
             $mform->addElement('html', '<button id="prevnumgame" name="prevnumgame">⟪</button>');
         }
-        $mform->addElement('html', '<span class="value" id="numgame">'.$rgame->numgame.'</span>');
+        $mform->addElement('html', '<span class="value" id="numgame">' . $rgame->numgame . '</span>');
         $mform->addElement('html', '<button id="nextnumgame" name="nextnumgame">⟫</button>');
         $mform->addElement('html', '<td>');
         $mform->addElement('html', '</tr>');
 
         // Second line state.
         $mform->addElement('html', '<tr>');
-        $mform->addElement('html', '<td>'.get_string('state', 'mmogame').':</td>');
+        $mform->addElement('html', '<td>' . get_string('state', 'mmogame') . ':</td>');
         $mform->addElement('html', '<td>');
         if ($state > 0) {
             $mform->addElement('html', '<button id="prevstate" name="prevstate">⟪</button>');
         }
-        $mform->addElement('html', '<span class="value" id="state">'.$statename.'</span>');
+        $mform->addElement('html', '<span class="value" id="state">' . $statename . '</span>');
         if ($state < 2) {
             $mform->addElement('html', '<button id="nextstate" name="nextstate">⟫</button><td>');
         }
@@ -111,13 +111,13 @@ class mmogametype_quiz_split_admin extends moodleform {
 
         // Number of attempts.
         $mform->addElement('html', '<tr>');
-        $mform->addElement('html', '<td>'."Number of attempts  mmogameid={$rgame->id} AND numgame={$rgame->numgame}".':</td>');
+        $mform->addElement('html', '<td>' . "Number of attempts  mmogameid={$rgame->id} AND numgame={$rgame->numgame}" . ':</td>');
 
         global $DB;
         $sql = 'SELECT COUNT(*) as c FROM {mmogame_quiz_attempts} WHERE mmogameid=? AND numgame=?';
-        $rec = $DB->get_record_sql( $sql, [$rgame->id, $rgame->numgame]);
+        $rec = $DB->get_record_sql($sql, [$rgame->id, $rgame->numgame]);
         $attempts = $rec->c;
-        $mform->addElement('html', '<td>'.$rec->c.'</td>');
+        $mform->addElement('html', '<td>' . $rec->c . '</td>');
         $mform->addElement('html', '</tr>');
 
         // Count of users.
@@ -126,8 +126,8 @@ class mmogametype_quiz_split_admin extends moodleform {
 
         global $DB;
         $sql = 'SELECT COUNT(*) as c FROM {mmogame_aa_grades} WHERE mmogameid=? AND numgame=?';
-        $rec = $DB->get_record_sql( $sql, [$rgame->id, $rgame->numgame]);
-        $mform->addElement('html', '<td>'.$rec->c.'</td>');
+        $rec = $DB->get_record_sql($sql, [$rgame->id, $rgame->numgame]);
+        $mform->addElement('html', '<td>' . $rec->c . '</td>');
         $mform->addElement('html', '</tr>');
 
         if ($attempts > 0) {
@@ -163,9 +163,9 @@ class mmogametype_quiz_split_admin extends moodleform {
             $recs = $DB->get_records_sql($sql, [$rgame->id, $rgame->numgame]);
             $a = [];
             foreach ($recs as $rec) {
-                $a[$rec->auserid] = $rec->auserid.':'.$rec->sumscore.'-'.$rec->answers;
+                $a[$rec->auserid] = $rec->auserid . ':' . $rec->sumscore . '-' . $rec->answers;
             }
-            $mform->addElement('html', '<td>' . implode( ', ', $a) . '</td>');
+            $mform->addElement('html', '<td>' . implode(', ', $a) . '</td>');
             $mform->addElement('html', '</tr>');
 
             // Info.
@@ -174,7 +174,7 @@ class mmogametype_quiz_split_admin extends moodleform {
             $mform->addElement('html', '<tr>');
             $mform->addElement('html', '<td>Info:</td>');
 
-            $mform->addElement('html', '<td>' . $rec->info. '</td>');
+            $mform->addElement('html', '<td>' . $rec->info . '</td>');
             $mform->addElement('html', '</tr>');
         }
 

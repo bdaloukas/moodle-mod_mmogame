@@ -33,25 +33,42 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated.
-        $mmogame = new backup_nested_element('mmogame', ['id'],
-            ['name', 'intro', 'introformat', 'language', 'qbank', 'qbankparams', 'modelparams', 'numgame',
-            'type', 'model', 'kinduser', 'pin', 'enabled', 'numattempt', 'fastjson', 'timefastjson', 'striptags', ]);
+        $mmogame = new backup_nested_element(
+            'mmogame',
+            ['id'],
+            [
+                'name', 'intro', 'introformat', 'language', 'qbank', 'qbankparams', 'modelparams', 'numgame',
+                'type', 'model', 'kinduser', 'pin', 'enabled', 'numattempt', 'fastjson', 'timefastjson', 'striptags',
+            ]
+        );
 
         $grades = new backup_nested_element('grades');
 
-        $grade = new backup_nested_element('grade', ['id'],
-            ['numgame', 'auserid', 'timemodified', 'avatarid', 'usercode', 'nickname', 'colorpaletteid',
-            'sumscore', 'countscore', 'score', 'sumscore2', 'numteam', 'percentcompleted', ]);
+        $grade = new backup_nested_element(
+            'grade',
+            ['id'],
+            [
+                'numgame', 'auserid', 'timemodified', 'avatarid', 'usercode', 'nickname', 'colorpaletteid',
+                'sumscore', 'countscore', 'score', 'sumscore2', 'numteam', 'percentcompleted',
+            ]
+        );
 
         $stats = new backup_nested_element('stats');
 
-        $stat = new backup_nested_element('stat', ['id'],
+        $stat = new backup_nested_element(
+            'stat',
+            ['id'],
             ['numgame', 'queryid', 'auserid', 'numteam', 'counterror', 'timeerror', 'countcorrect',
-            'countused', 'position', 'count1', 'count2', 'percent', 'countanswers', 'countcompleted', ]);
+            'countused', 'position', 'count1', 'count2', 'percent', 'countanswers', 'countcompleted',
+            ]
+        );
 
         $states = new backup_nested_element('states');
-        $state = new backup_nested_element('state', ['id'],
-            ['numgame', 'state', 'param1']);
+        $state = new backup_nested_element(
+            'state',
+            ['id'],
+            ['numgame', 'state', 'param1']
+        );
 
         $pairs = new backup_nested_element('aduel_pairs');
         $pair = new backup_nested_element(
@@ -73,17 +90,23 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
                 'tool2numattempt2',
                 'tool3numattempt1',
                 'tool3numattempt2',
-                ]
-            );
+            ]
+        );
 
         $types = new backup_nested_element('types');
         $type = new backup_nested_element('type');
 
         $ausers = new backup_nested_element('ausers');
-        $ausermoodle = new backup_nested_element('auser_moodle', ['id'],
-            ['instanceid', 'lastlogin', 'lastip']);
-        $auser = new backup_nested_element('auser', ['id'],
-            ['kind', 'instanceid', 'lastlogin', 'lastip']);
+        $ausermoodle = new backup_nested_element(
+            'auser_moodle',
+            ['id'],
+            ['instanceid', 'lastlogin', 'lastip']
+        );
+        $auser = new backup_nested_element(
+            'auser',
+            ['id'],
+            ['kind', 'instanceid', 'lastlogin', 'lastip']
+        );
 
         $avatars = new backup_nested_element('avatars');
         $avatar = new backup_nested_element(
@@ -98,11 +121,12 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
             ['id'],
             [
                 'category', 'name', 'color1', 'color2', 'color3', 'color4', 'color5',
-                'colorsort1', 'colorsort2', 'colorsort3', 'colorsort4', 'colorsort5', 'hue']);
+                'colorsort1', 'colorsort2', 'colorsort3', 'colorsort4', 'colorsort5', 'hue',
+            ]
+        );
 
         $uguids = new backup_nested_element('uguids');
-        $uguid = new backup_nested_element('uguid', ['id'],
-            ['guid']);
+        $uguid = new backup_nested_element('uguid', ['id'], ['guid']);
 
         // This module is using questions, so produce the related question states and sessions
         // attaching them to the $attempt element based in 'uniqueid' matching.

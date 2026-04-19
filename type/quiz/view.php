@@ -37,22 +37,22 @@ require_login($course->id, false, $cm);
 
 $mode = $mmogame->get_mode();
 
-$context = context_module::instance( $cm->id);
+$context = context_module::instance($cm->id);
 require_capability('mod/mmogame:view', $context);
 
 // Initialize $PAGE, compute blocks.
 $PAGE->set_url('/mod/mmogame/view.php', ['id' => $cm->id]);
 
-$url = $CFG->wwwroot.'/mod/mmogame/gate.php?id='.$id.'&pin='.$mmogame->get_rgame()->pin;
+$url = $CFG->wwwroot . '/mod/mmogame/gate.php?id=' . $id . '&pin=' . $mmogame->get_rgame()->pin;
 
-$context = context_module::instance( $cm->id);
+$context = context_module::instance($cm->id);
 require_capability('mod/mmogame:view', $context);
 
 if (has_capability('mod/mmogame:manage', $context)) {
     course_module_viewed::viewed($mmogame->get_rgame(), $context)->trigger();
-    mmogame_quiz_manage( $id, $mmogame, $url);
+    mmogame_quiz_manage($id, $mmogame, $url);
 } else {
-    redirect( $url);
+    redirect($url);
 }
 
 /**
@@ -66,20 +66,20 @@ if (has_capability('mod/mmogame:manage', $context)) {
 function mmogame_quiz_manage(int $id, mmogame $mmogame, string $url): void {
     global $CFG, $OUTPUT;
 
-    if (count( $_POST) > 0) {
+    if (count($_POST) > 0) {
         mmogame_quiz_manage_submit($mmogame);
         redirect($CFG->wwwroot . '/mod/mmogame/view.php?id=' . $id);
     }
 
     // Create form.
-    $classname = 'mmogametype_quiz\local\mmogametype_quiz_' . $mmogame->get_mode().'_admin';
-    $mform = new $classname( $id, $mmogame);
+    $classname = 'mmogametype_quiz\local\mmogametype_quiz_' . $mmogame->get_mode() . '_admin';
+    $mform = new $classname($id, $mmogame);
 
     echo $OUTPUT->header();
 
     $mform->display();
 
-    echo '<br>'.get_string( 'url_for_playing', 'mmogame', ": <a href=\"$url\" target=\"_blank\">$url</a><br>");
+    echo '<br>'.get_string('url_for_playing', 'mmogame', ": <a href=\"$url\" target=\"_blank\">$url</a><br>");
 
     echo $OUTPUT->footer();
 }
@@ -94,18 +94,18 @@ function mmogame_quiz_manage_submit(mmogame $mmogame): void {
     $numgame = $mmogame->get_numgame();
 
     $changestate = $changenumgame = false;
-    if (array_key_exists( 'prevstate', $_POST) && $state > 0) {
+    if (array_key_exists('prevstate', $_POST) && $state > 0) {
         $state--;
         $changestate = true;
-    } else if (array_key_exists( 'nextstate', $_POST) && $state < 2) {
+    } else if (array_key_exists('nextstate', $_POST) && $state < 2) {
         $state++;
         $changestate = true;
     }
 
-    if (array_key_exists( 'prevnumgame', $_POST) && $numgame > 0) {
+    if (array_key_exists('prevnumgame', $_POST) && $numgame > 0) {
         $numgame--;
         $changenumgame = true;
-    } else if (array_key_exists( 'nextnumgame', $_POST)) {
+    } else if (array_key_exists('nextnumgame', $_POST)) {
         $numgame++;
         $changenumgame = true;
     }
@@ -118,13 +118,13 @@ function mmogame_quiz_manage_submit(mmogame $mmogame): void {
         $data->numgame = $numgame;
     }
     $mode = $mmogame->get_mode();
-    if (substr( $mode, '-5') == 'split' && $mode != 'split') {
-        $mode = substr( $mode, 0, strlen($mode) - 5);
+    if (substr($mode, '-5') == 'split' && $mode != 'split') {
+        $mode = substr($mode, 0, strlen($mode) - 5);
     }
     if ($mode == 'split') {
         $mode = 'alone';
     }
-    $class = "mod_mmogame\local\mode\mmogame_mode_".$mode;
+    $class = "mod_mmogame\local\mode\mmogame_mode_" . $mode;
 
-    $class::setadmin( $data, $mmogame);
+    $class::setadmin($data, $mmogame);
 }

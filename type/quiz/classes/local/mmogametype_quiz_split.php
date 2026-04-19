@@ -557,24 +557,39 @@ class mmogametype_quiz_split extends mmogame {
      * @param array $ret Output array for additional information.
      * @param stdClass $aduel Output array for additional information.
      */
-    public function set_answer(stdClass $attempt, stdClass $query, ?string $useranswer,
-                               int $timestart, int $timeanswer, ?int $useranswerid,
-                               int $tools, bool $autograde, array &$ret, stdClass $aduel): void {
-
+    public function set_answer(
+        stdClass $attempt,
+        stdClass $query,
+        ?string $useranswer,
+        int $timestart,
+        int $timeanswer,
+        ?int $useranswerid,
+        int $tools,
+        bool $autograde,
+        array &$ret,
+        stdClass $aduel
+    ): void {
         $this->set_answer_alone($attempt, $query, $useranswer, $timestart, $timeanswer, $useranswerid, $tools, $autograde, $ret);
 
         $ret['iscorrect'] = $attempt->iscorrect;
         if ($this->auserid == $aduel->auserid1) {
-            $recs = $this->db->get_records_select('mmogame_quiz_attempts',
+            $recs = $this->db->get_records_select(
+                'mmogame_quiz_attempts',
                 'mmogameid=? AND numgame=? AND numteam=? AND timeanswer = 0 AND auserid=?',
-                [$attempt->mmogameid, $attempt->numgame, $aduel->id, $this->auserid], 'id',
-            '*', 0, 1);
+                [$attempt->mmogameid, $attempt->numgame, $aduel->id, $this->auserid],
+                'id',
+                '*',
+                0,
+                1
+            );
             $rec = reset($recs);
             if ($rec === false) {
                 // We finished.
-                $grade = $this->db->get_record_select('mmogame_aa_grades',
+                $grade = $this->db->get_record_select(
+                    'mmogame_aa_grades',
                     'mmogameid=? AND numgame=? AND auserid=?',
-                    [$attempt->mmogameid, $attempt->numgame, $this->auserid]);
+                    [$attempt->mmogameid, $attempt->numgame, $this->auserid]
+                );
                 $score = $grade !== null ? $grade->theta : 0;
                 mmogame_mode_aduel::close_user1($this, $aduel->id, $score);
             }
@@ -585,7 +600,8 @@ class mmogametype_quiz_split extends mmogame {
         if ($attempt->score < 0) {
             $attempt->score = 0;
         }
-        $opposite = $this->db->get_record_select('mmogame_quiz_attempts',
+        $opposite = $this->db->get_record_select(
+            'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND numteam=? AND numattempt=? AND auserid = ?',
             [$attempt->mmogameid, $attempt->numgame, $aduel->id, $attempt->numattempt, $aduel->auserid1]
         );
@@ -599,15 +615,19 @@ class mmogametype_quiz_split extends mmogame {
                         $attempt->score -= 2;
                     }
                     $ret['addscore'] = '+'.$attempt->score;
-                    $this->db->update_record('mmogame_quiz_attempts',
-                        ['id' => $attempt->id, 'score' => $attempt->score]);
+                    $this->db->update_record(
+                        'mmogame_quiz_attempts',
+                        ['id' => $attempt->id, 'score' => $attempt->score]
+                    );
                     $this->qbank->update_grades($attempt->auserid, $attempt->score, 0);
                 }
             } else if ($attempt->iscorrect == 0) {
                 // Check the answer of opposite. If is right duplicate other points.
                 if ($opposite->iscorrect) {
-                    $this->db->update_record('mmogame_quiz_attempts',
-                        ['id' => $opposite->id, 'score' => 2 * $opposite->score]);
+                    $this->db->update_record(
+                        'mmogame_quiz_attempts',
+                        ['id' => $opposite->id, 'score' => 2 * $opposite->score]
+                    );
                     $this->qbank->update_grades($opposite->auserid, $opposite->score, 0);
                 }
             }
@@ -615,14 +635,21 @@ class mmogametype_quiz_split extends mmogame {
             // The wizard tool.
             $attempt->score -= 1;
             $ret['addscore'] = '+'.$attempt->score;
-            $this->db->update_record('mmogame_quiz_attempts',
-                ['id' => $attempt->id, 'score' => $attempt->score]);
+            $this->db->update_record(
+                'mmogame_quiz_attempts',
+                ['id' => $attempt->id, 'score' => $attempt->score]
+            );
             $this->qbank->update_grades($attempt->auserid, -1, 0);
         }
 
-        $recs = $this->db->get_records_select('mmogame_quiz_attempts',
+        $recs = $this->db->get_records_select(
+            'mmogame_quiz_attempts',
             'mmogameid =? AND numgame=? AND numteam=? AND timeanswer = 0 AND auserid=?',
-            [$attempt->mmogameid, $attempt->numgame, $aduel->id, $aduel->auserid2], 'id', 'id', 0, 1);
+            [$attempt->mmogameid, $attempt->numgame, $aduel->id, $aduel->auserid2],
+            'id',
+            'id',
+            0,
+            1);
         if ($recs === null || count($recs) == 0) {
             // We finished.
             $this->db->update_record('mmogame_am_aduel_pairs', ['id' => $aduel->id, 'isclosed2' => 1]);
@@ -679,9 +706,21 @@ class mmogametype_quiz_split extends mmogame {
      */
     public function idea(): array {
         return mmogametype_quiz_algorithm_irt::idea(
-            $this->get_db(), $this->rgame->id, $this->rgame->numgame, $this->auserid);
+            $this->get_db(),
+            $this->rgame->id,
+            $this->rgame->numgame,
+            $this->auserid
+        );
     }
 
+    /**
+     * Computes queryranks (how many queries are with smaller difficulty plus one).
+     *
+     * @param array $recs
+     * @param array $queryranks
+     * @return void
+     * @throws dml_exception
+     */
     private function compute_queryranks(array $recs, array &$queryranks): void {
         global $DB;
 
@@ -695,7 +734,7 @@ class mmogametype_quiz_split extends mmogame {
         $sql = "SELECT queryid,
             1 + (SELECT COUNT(*)
                 FROM {mmogame_aa_irt} irt2
-                WHERE irt2.mmogameid=irt.mmogameid AND irt.numgame=irt2.numgame 
+                WHERE irt2.mmogameid=irt.mmogameid AND irt.numgame=irt2.numgame
                     AND irt2.difficulty < irt.difficulty) as c
             FROM {mmogame_aa_irt} irt
             WHERE mmogameid=? AND numgame=? AND queryid $insql";
@@ -705,7 +744,7 @@ class mmogametype_quiz_split extends mmogame {
         );
         $map = [];
         foreach ($recranks as $recrank) {
-            $map[$recrank->queryid] = (int )$recrank->c;
+            $map[$recrank->queryid] = (int)$recrank->c;
         }
 
         foreach ($recs as $rec) {

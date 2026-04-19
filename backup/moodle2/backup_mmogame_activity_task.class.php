@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/mod/mmogame/backup/moodle2/backup_mmogame_stepsli
  * complete backup of the activity
  */
 class backup_mmogame_activity_task extends backup_activity_task {
-
     /**
      * Define (add) particular settings this activity can have
      */
@@ -69,11 +68,11 @@ class backup_mmogame_activity_task extends backup_activity_task {
         $base = preg_quote($CFG->wwwroot, "/");
 
         // Link to the list of choices.
-        $search = "/(".$base."\/mod\/mmogame\/index.php\?id\=)([0-9]+)/";
+        $search = "/(" . $base . "\/mod\/mmogame\/index.php\?id\=)([0-9]+)/";
         $content = preg_replace($search, '$@MMOGAMEINDEX*$2@$', $content);
 
         // Link to choice view by moduleid.
-        $search = "/(".$base."\/mod\/mmogame\/view.php\?id\=)([0-9]+)/";
+        $search = "/(" . $base . "\/mod\/mmogame\/view.php\?id\=)([0-9]+)/";
         $content = preg_replace($search, '$@MMOGAMEVIEWBYID*$2@$', $content);
 
         return $content;

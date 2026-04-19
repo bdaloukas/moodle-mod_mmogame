@@ -93,7 +93,7 @@ class get_assets_split extends external_api {
             require_capability('mod/mmogame:play', $context);
         }
 
-        $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
         $retpalettes = $retavatars = [];
         $maxavatars = 0;
         $mmogame->get_assets_split(
@@ -109,7 +109,7 @@ class get_assets_split extends external_api {
         $avatarids = $avatars = $paletteids = $palettes = [];
         foreach ($retpalettes as $key => $value) {
             $paletteids[] = $key;
-            $palettes[] = implode( ',', $value);
+            $palettes[] = implode(',', $value);
         }
         foreach ($retavatars as $map) {
             foreach ($map as $key => $value) {
@@ -121,7 +121,7 @@ class get_assets_split extends external_api {
             'avatarids' => $avatarids,
             'colorpalettes' => $palettes,
             'colorpaletteids' => $paletteids,
-            'numavatars' => min( $maxavatars, $countavatars)
+            'numavatars' => min($maxavatars, $countavatars),
         ];
     }
 

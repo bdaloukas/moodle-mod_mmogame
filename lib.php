@@ -38,12 +38,12 @@ const MMOGAME_QBANK_MOODLEGLOSSARY = 'moodleglossary';
 function mmogame_add_instance(object $mform): int {
     global $DB;
 
-    mmogame_before_add_or_update( $mform);
+    mmogame_before_add_or_update($mform);
 
-    if (!isset( $mform->guid)) {
+    if (!isset($mform->guid)) {
         $mform->guidgame = mmogame_guidv4();
     }
-    if (!isset( $mform->fastjson)) {
+    if (!isset($mform->fastjson)) {
         for (;;) {
             // Generate a random number with 10 digits.
             $mform->fastjson = random_int(1000000000, 9999999999); // Generates a 10-digit number.
@@ -55,13 +55,13 @@ function mmogame_add_instance(object $mform): int {
         }
     }
 
-    if (!isset( $mform->numgame)) {
+    if (!isset($mform->numgame)) {
         $mform->numgame = 1;
     }
-    if (!isset( $mform->numattempt)) {
+    if (!isset($mform->numattempt)) {
         $mform->numattempt = 1;
     }
-    if (!isset( $mform->timefastjson)) {
+    if (!isset($mform->timefastjson)) {
         $mform->timefastjson = 0;
     }
     $mform->id = $DB->insert_record("mmogame", $mform);
@@ -79,19 +79,19 @@ function mmogame_add_instance(object $mform): int {
 function mmogame_delete_instance(int $mmogameid): bool {
     global $CFG, $DB;
 
-    $rgame = $DB->get_record_select( 'mmogame', 'id=?', [$mmogameid]);
+    $rgame = $DB->get_record_select('mmogame', 'id=?', [$mmogameid]);
     if ($rgame === false) {
         return true;
     }
 
     $function = 'mmogametype_'.$rgame->type.'_delete_instance';
-    require_once( $CFG->dirroot.'/mod/mmogame/type/'.$rgame->type.'/lib.php');
-    $function( $mmogameid);
+    require_once($CFG->dirroot.'/mod/mmogame/type/'.$rgame->type.'/lib.php');
+    $function($mmogameid);
 
-    $DB->delete_records_select( 'mmogame', 'id=?', [$mmogameid]);
-    $DB->delete_records_select( 'mmogame_aa_grades', 'mmogameid=?', [$mmogameid]);
-    $DB->delete_records_select( 'mmogame_aa_stats', 'mmogameid=?', [$mmogameid]);
-    $DB->delete_records_select( 'mmogame_am_aduel_pairs', 'mmogameid=?', [$mmogameid]);
+    $DB->delete_records_select('mmogame', 'id=?', [$mmogameid]);
+    $DB->delete_records_select('mmogame_aa_grades', 'mmogameid=?', [$mmogameid]);
+    $DB->delete_records_select('mmogame_aa_stats', 'mmogameid=?', [$mmogameid]);
+    $DB->delete_records_select('mmogame_am_aduel_pairs', 'mmogameid=?', [$mmogameid]);
 
     return true;
 }
@@ -102,12 +102,12 @@ function mmogame_delete_instance(int $mmogameid): bool {
  * @param stdClass $mform
  */
 function mmogame_before_add_or_update(stdClass $mform): void {
-    if (!isset( $mform->qbank)) {
+    if (!isset($mform->qbank)) {
         return;
     }
 
-    $a = explode( '-', $mform->typemode);
-    if (count( $a) == 2) {
+    $a = explode('-', $mform->typemode);
+    if (count($a) == 2) {
         $mform->type = $a[0];
         $mform->mode = $a[1];
     }
@@ -116,10 +116,10 @@ function mmogame_before_add_or_update(stdClass $mform): void {
 
     switch ($mform->qbank) {
         case MMOGAME_QBANK_MOODLEGLOSSARY:
-            mmogame_before_add_or_update_glossary( $mform);
+            mmogame_before_add_or_update_glossary($mform);
             break;
         case MMOGAME_QBANK_MOODLEQUESTION:
-            mmogame_before_add_or_update_question( $mform);
+            mmogame_before_add_or_update_question($mform);
             break;
     }
 }
@@ -130,10 +130,10 @@ function mmogame_before_add_or_update(stdClass $mform): void {
  * @param stdClass $mmogame
  */
 function mmogame_before_add_or_update_glossary(stdClass $mmogame): void {
-    if (!isset( $mmogame->glossaryid)) {
+    if (!isset($mmogame->glossaryid)) {
         $mmogame->glossaryid = 0;
     }
-    if (!isset( $mmogame->glossarycategoryid)) {
+    if (!isset($mmogame->glossarycategoryid)) {
         $mmogame->glossarycategoryid = 0;
     }
 
@@ -145,7 +145,7 @@ function mmogame_before_add_or_update_glossary(stdClass $mmogame): void {
  *
  * @param stdClass $mmogame
  */
-function mmogame_before_add_or_update_question( stdClass $mmogame): void {
+function mmogame_before_add_or_update_question(stdClass $mmogame): void {
     $a = [];
 
     // Iterate over all properties of the $mmogame object.
@@ -156,7 +156,7 @@ function mmogame_before_add_or_update_question( stdClass $mmogame): void {
         }
     }
 
-    $mmogame->qbankparams = implode( ',', $a);
+    $mmogame->qbankparams = implode(',', $a);
 }
 
 /**
@@ -171,9 +171,9 @@ function mmogame_update_instance(object $mmogame): bool {
 
     $mmogame->id = $mmogame->instance;
 
-    mmogame_before_add_or_update( $mmogame);
+    mmogame_before_add_or_update($mmogame);
 
-    if (!$DB->update_record("mmogame", $mmogame)) {
+    if (!$DB->update_record('mmogame', $mmogame)) {
         return false;
     }
 
@@ -232,7 +232,7 @@ function mmogame_get_types(): array {
 
         foreach ($files as $file) {
             if ($file != "." && $file != "..") {
-                if (is_dir( $dir.'/'.$file)) {
+                if (is_dir($dir . '/' . $file)) {
                     $types[] = $file;
                 }
             }

@@ -21,7 +21,6 @@ use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
-
 use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
@@ -86,7 +85,7 @@ class get_highscore extends external_api {
 
         $mmogame->get_highscore($count, $ret);
 
-        return json_encode( $ret);
+        return json_encode($ret);
     }
 
     /**

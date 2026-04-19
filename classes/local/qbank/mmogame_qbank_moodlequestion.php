@@ -282,8 +282,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @param string $fields
      * @return array
      */
-    protected function loads(string $ids, bool $loadextra = true, string $fields='id,qtype,questiontext as definition'): array {
-
+    protected function loads(string $ids, bool $loadextra = true, string $fields = 'id,qtype,questiontext as definition'): array {
         [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal(explode(',', $ids));
         $recs = $this->mmogame->get_db()->get_records_select('question', $insql, $inparams, '', $fields);
 
@@ -459,7 +458,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
 
         $categoryids = !empty($rgame->qbankparams) ? explode(',', $rgame->qbankparams) : ['0'];
         $categoryids = array_map('intval', $categoryids); // Extra security.
-        list($insql, $inparams) = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'p');
+        [$insql, $inparams] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'p');
 
         // Append sub categories.
         for (;;) {
@@ -474,7 +473,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
                     $categoryids[] = $id;
                 }
             }
-            list($insql, $inparams) = $DB->get_in_or_equal($childrenids, SQL_PARAMS_NAMED, 'p');
+            [$insql, $inparams] = $DB->get_in_or_equal($childrenids, SQL_PARAMS_NAMED, 'p');
         }
 
         [$insql1, $inparams1] = $db->get_in_or_equal($categoryids);

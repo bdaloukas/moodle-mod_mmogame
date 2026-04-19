@@ -121,13 +121,13 @@ class send_answers_split extends external_api {
         foreach ($splits as $split) {
             $auserids[] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, true, $split);
         }
-        $mmogame = mmogame::create( new mmogame_database_moodle(), $mmogameid);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
 
         $pos = -1;
         $ret = [];
         $ids = [];
 
-        while (count( $attempts)) {
+        while (count($attempts)) {
             if (intval(reset($attempts)) == 0) {
                 array_shift($attempts);
             } else {
@@ -140,7 +140,7 @@ class send_answers_split extends external_api {
             $pos++;
             $tool = $tools[$pos];
 
-            $mmogame->login_user_nolog( $auserids[$pos]);
+            $mmogame->login_user_nolog($auserids[$pos]);
 
             if ($tool & 4) {
                 // Special case (Idea button).
@@ -149,16 +149,22 @@ class send_answers_split extends external_api {
             }
 
             $ids[] = $auserids[$pos];
-            $mmogame->set_answer_mode( $ret, $attemptid, $answers[$pos], $timestarts[$pos], $timeanswers[$pos],
-                intval($answers[$pos]), $tools[$pos]);
+            $mmogame->set_answer_mode(
+                $ret,
+                $attemptid,
+                $answers[$pos],
+                $timestarts[$pos],
+                $timeanswers[$pos],
+                intval($answers[$pos]), $tools[$pos]
+            );
         }
         if ($idea > 0) {
-            $mmogame->login_user_nolog( $idea);
+            $mmogame->login_user_nolog($idea);
             $queryids = $mmogame->idea();
-            return self::pack_idea( $mmogame, $queryids);
+            return self::pack_idea($mmogame, $queryids);
         }
 
-        $mmogame->login_user_log( $ids);
+        $mmogame->login_user_log($ids);
 
         $classgetattempt = new get_attempts_split();
         $result = $classgetattempt->execute($mmogameid, $kinduser, $user,
@@ -237,7 +243,9 @@ class send_answers_split extends external_api {
             ),
             'queryranks' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'Rank array')
-            ),        ]);
+            ),
+        ]
+        );
     }
 
     /**

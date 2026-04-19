@@ -53,13 +53,18 @@ class mmogametype_quiz_algorithm_irt {
      * - Adds default question objects for those missing queryids into $questions.
      *
      * @param mmogame_database $db
-     * * @param int $mmogameid
-     * * @param int $numgame
-     * * @param array<int,object> &$questions List of question objects (by reference).
-     * * @param array<int,int> $ids Map: queryid => categoryid.
+     * @param int $mmogameid
+     * @param int $numgame
+     * @param array<int,object> &$questions List of question objects (by reference).
+     * @param array<int,int> $ids Map: queryid => categoryid.
      */
-    protected static function repair_stats(mmogame_database $db, int $mmogameid, int $numgame,
-                                           array &$questions, array $ids): void {
+    protected static function repair_stats(
+        mmogame_database $db,
+        int $mmogameid,
+        int $numgame,
+        array &$questions,
+        array $ids
+    ): void {
         // Map of questions to delete (indexes in $questions) and existing queryids.
         $mapdelete = $mapq = [];
 
@@ -86,9 +91,9 @@ class mmogametype_quiz_algorithm_irt {
 
         // 3. Add missing IRT entries and create default question objects for queryids not in $questions.
         foreach ($ids as $queryid => $categoryid) {
-            if (!array_key_exists( $queryid, $mapq)) {
+            if (!array_key_exists($queryid, $mapq)) {
                 // Insert a new IRT record into the database.
-                $a = [ 'mmogameid' => $mmogameid, 'numgame' => $numgame, 'queryid' => $queryid, 'timemodified' => time()];
+                $a = ['mmogameid' => $mmogameid, 'numgame' => $numgame, 'queryid' => $queryid, 'timemodified' => time()];
                 $db->insert_record('mmogame_aa_irt', $a);
 
                 // Create a default question object so the algorithm can use it.
@@ -168,13 +173,13 @@ class mmogametype_quiz_algorithm_irt {
             FROM {mmogame_aa_irt} irt
             LEFT JOIN {mmogame_aa_stats} st ON st.queryid = irt.queryid AND st.mmogameid=? AND st.numgame=? AND st.auserid = ?
             WHERE irt.mmogameid=? AND irt.numgame=?";
-        $questions = $db->get_records_sql( $sql, [$theta, $mmogameid, $numgame, $auserid, $mmogameid, $numgame]);
+        $questions = $db->get_records_sql($sql, [$theta, $mmogameid, $numgame, $auserid, $mmogameid, $numgame]);
         self::repair_stats($db, $mmogameid, $numgame, $questions, $ids);
 
-        //self::sort_questions( $questions);
-        self::sort_questions_difficulty( $questions);
+        //self::sort_questions($questions);
+        self::sort_questions_difficulty($questions);
 
-        $countquestions = count( $questions);
+        $countquestions = count($questions);
         $corrects = 0;
         $mapdifficulty  = [];
         foreach ($questions as $question) {
@@ -183,7 +188,7 @@ class mmogametype_quiz_algorithm_irt {
                 $corrects++;
             }
         }
-        asort( $mapdifficulty);
+        asort($mapdifficulty);
 
         $categories = [];
         $countsearch = 2 * $count;
@@ -225,17 +230,17 @@ class mmogametype_quiz_algorithm_irt {
         }
 
         while ($countsearch > 0 && count($questions) > 0) {
-            $id = array_rand( $questions);
+            $id = array_rand($questions);
             $queryid = $questions[$id]->queryid;
             if (!isset($ids[$queryid])) {
-                unset( $questions[$id]);
+                unset($questions[$id]);
                 continue;
             }
             $categoryid = $ids[$queryid];
             $categories[$categoryid][] = $queryid;
             $maplastcorrect[$queryid] = $questions[$id]->serialcorrects == 0 ? 0 : 1;
 
-            unset( $questions[$id]);
+            unset($questions[$id]);
             $countsearch--;
         }
 
@@ -310,17 +315,29 @@ class mmogametype_quiz_algorithm_irt {
      * @param ?float $difficulty
      * @return void
      */
-    public static function update(mmogame_database $db, int $mmogameid, int $numgame, int $auserid,
-                                  int $queryid, bool $iscorrect, ?float &$theta, ?float &$difficulty): void {
+    public static function update(
+        mmogame_database $db,
+        int $mmogameid,
+        int $numgame,
+        int $auserid,
+        int $queryid,
+        bool $iscorrect,
+        ?float &$theta,
+        ?float &$difficulty
+    ): void {
         // Read parameters from database.
-        $recg = $db->get_record_select( 'mmogame_aa_grades',
+        $recg = $db->get_record_select(
+            'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
-            [$mmogameid, $numgame, $auserid]);
+            [$mmogameid, $numgame, $auserid]
+        );
         $theta = $recg !== null ? $recg->theta : 0;
 
-        $reci = $db->get_record_select( 'mmogame_aa_irt',
+        $reci = $db->get_record_select(
+            'mmogame_aa_irt',
             'mmogameid=? AND numgame=? AND queryid=?',
-            [$mmogameid, $numgame, $queryid]);
+            [$mmogameid, $numgame, $queryid]
+        );
         $difficulty = $reci !== null ? $reci->difficulty : 0;
 
         // Updates parameters.
@@ -329,11 +346,11 @@ class mmogametype_quiz_algorithm_irt {
         // Saves new values.
         if ($recg !== null) {
             $sql = "UPDATE {mmogame_aa_grades} SET theta=?,timemodified=? WHERE id=?";
-            $db->execute( $sql, [$theta, time(), $recg->id]);
+            $db->execute($sql, [$theta, time(), $recg->id]);
         }
         if ($reci !== null) {
             $sql = "UPDATE {mmogame_aa_irt} SET difficulty=?, timemodified=? WHERE id=?";
-            $db->execute( $sql, [$difficulty, time(), $reci->id]);
+            $db->execute($sql, [$difficulty, time(), $reci->id]);
         }
     }
 
@@ -358,8 +375,10 @@ class mmogametype_quiz_algorithm_irt {
     private static function log(mmogame_database $db, int $mmogameid, int $numgame, int $auserid,
                                 mixed $theta, int $queryid, float $difficulty, ?int $serialcorrects,
                                 ?int $nextquery, int $step, int $numquery, float $bestscore, string $info): void {
-        $db->insert_record( 'mmogame_aa_irt_log',
-            ['mmogameid' => $mmogameid,
+        $db->insert_record(
+            'mmogame_aa_irt_log',
+            [
+                'mmogameid' => $mmogameid,
                 'numgame' => $numgame,
                 'auserid' => $auserid,
                 'theta' => $theta,
@@ -372,11 +391,13 @@ class mmogametype_quiz_algorithm_irt {
                 'numquery' => $numquery,
                 'bestscore' => $bestscore,
                 'info' => $info,
-                ]);
+                ]
+        );
     }
 
 
     /**
+     *
      * Sort questions
      *
      * // SORT serialcorrects ASC, counterror DESC, countused ASC, difficulty difference ASC

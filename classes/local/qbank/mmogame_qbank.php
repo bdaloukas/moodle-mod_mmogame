@@ -216,7 +216,8 @@ abstract class mmogame_qbank {
                 $db->update_record('mmogame_aa_grades', $a);
             }
         } else {
-            $db->insert_record('mmogame_aa_grades',
+            $db->insert_record(
+                'mmogame_aa_grades',
                 ['mmogameid' => $rgame->id, 'numgame' => $rgame->numgame, 'auserid' => $auserid, 'sumscore' => max(0, $score),
                     'countscore' => $countscore,
                     'score' => max(0, $score),

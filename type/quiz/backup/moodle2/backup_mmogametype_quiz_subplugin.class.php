@@ -43,9 +43,12 @@ class backup_mmogametype_quiz_subplugin extends backup_subplugin {
         // Create XML elements.
         $subplugin = $this->get_subplugin_element();
         $subpluginwrapper = new backup_nested_element($this->get_recommended_name());
-        $attempts = new backup_nested_element('mmogame_quiz_attempts', null,
+        $attempts = new backup_nested_element(
+            'mmogame_quiz_attempts',
+            null,
             ['auserid', 'numgame', 'numteam', 'numattempt', 'queryid', 'useranswerid', 'useranswer', 'iscorrect',
-            'layout', 'timestart', 'timeclose', 'timeanswer', 'fraction', 'score', 'score2', 'iscorrect2', ]);
+            'layout', 'timestart', 'timeclose', 'timeanswer', 'fraction', 'score', 'score2', 'iscorrect2', ]
+        );
 
         // Connect XML elements into the tree.
         $subplugin->add_child($subpluginwrapper);

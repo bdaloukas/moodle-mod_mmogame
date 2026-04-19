@@ -94,22 +94,26 @@ class get_attempt extends external_api {
         $create = $nickname !== null && $avatarid !== null && $colorpaletteid !== null;
         $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create, 0);
         if ($auserid === null) {
-            return json_encode( ['errorcode' => 'no_user']);
+            return json_encode(['errorcode' => 'no_user']);
         }
 
         // No selection of avatar and colorpalettes yet.
-        $grade = $mmogame->get_db()->get_record_select( 'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
-            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]);
+        $grade = $mmogame->get_db()->get_record_select(
+            'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
+            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]
+        );
         if (!$create && $grade === null) {
-            return json_encode( ['errorcode' => 'no_user']);
+            return json_encode(['errorcode' => 'no_user']);
         }
 
         $mmogame->login_user($auserid);
 
         if ($nickname !== null && $avatarid !== null && $colorpaletteid != null) {
             $info = $mmogame->get_avatar_info($auserid);
-            $mmogame->get_db()->update_record('mmogame_aa_grades',
-                ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid,  'colorpaletteid' => $colorpaletteid]);
+            $mmogame->get_db()->update_record(
+                'mmogame_aa_grades',
+                ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid,  'colorpaletteid' => $colorpaletteid]
+            );
         }
         if ($mmogame->get_state() != 0) {
             $attempt = $mmogame->get_attempt();
@@ -119,7 +123,7 @@ class get_attempt extends external_api {
 
         $mmogame->append_json($ret, $attempt !== false ? $attempt : null, $subcommand);
 
-        return json_encode( $ret);
+        return json_encode($ret);
     }
 
     /**

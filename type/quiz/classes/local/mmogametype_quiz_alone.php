@@ -53,42 +53,48 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @return ?stdClass (a new attempt of false if no attempt)
      */
     public function get_attempt(): ?stdClass {
-        $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts',
+        $attempt = $this->db->get_record_select('mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
             [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
 
         if ($attempt !== null) {
             if ($attempt->timestart == 0) {
                 $attempt->timestart = time();
-                $this->db->update_record( 'mmogame_quiz_attempts',
-                    ['id' => $attempt->id, 'timestart' => $attempt->timestart]);
+                $this->db->update_record(
+                    'mmogame_quiz_attempts',
+                    ['id' => $attempt->id, 'timestart' => $attempt->timestart]
+                );
             }
             return $attempt;
         }
 
         $countquestions = $corrects = 0;
-        $a = $this->qbank->get_attempt_new( 1, true, $countquestions, $corrects);
+        $a = $this->qbank->get_attempt_new(1, true, $countquestions, $corrects);
         if ($a === null) {
-            $this->set_errorcode( ERRORCODE_NO_QUERIES);
+            $this->set_errorcode(ERRORCODE_NO_QUERIES);
             return null;
         }
-        unset( $a['queries']);
+        unset($a['queries']);
 
         // Update field countquestions in table mmogame_aa_grades.
-        $grade = $this->db->get_record_select( 'mmogame_aa_grades',
+        $grade = $this->db->get_record_select(
+            'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
-            [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
+            [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]
+        );
         if ($grade !== null) {
-            $this->db->update_record( 'mmogame_aa_grades',
-                ['id' => $grade->id, 'countquestions' => $countquestions, 'percent' => $corrects / $countquestions]);
+            $this->db->update_record(
+                'mmogame_aa_grades',
+                ['id' => $grade->id, 'countquestions' => $countquestions, 'percent' => $corrects / $countquestions]
+            );
         }
 
         $a['numquery'] = $a['numattempt'] = $this->compute_next_numattempt();
         $a['timestart'] = time();
 
         // Insert data to mmogame_quiz_attempts table.
-        $id = $this->db->insert_record( 'mmogame_quiz_attempts', $a);
-        return $this->db->get_record_select( 'mmogame_quiz_attempts', 'id=?', [$id]);
+        $id = $this->db->insert_record('mmogame_quiz_attempts', $a);
+        return $this->db->get_record_select('mmogame_quiz_attempts', 'id=?', [$id]);
     }
 
     /**
@@ -106,7 +112,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         // If auto-grading is enabled, check if the answer is correct and set iscorrect.
         if ($autograde) {
             $fraction = 0.0;
-            $attempt->iscorrect = $this->qbank->is_correct( $query, $useranswer, $useranswerid, $this, $fraction);
+            $attempt->iscorrect = $this->qbank->is_correct($query, $useranswer, $useranswerid, $this, $fraction);
             $attempt->iscorrect = $attempt->iscorrect ? 1 : 0;
         }
 
@@ -116,7 +122,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         $a = ['id' => $attempt->id];
 
         if (!$istimeout) {
-            if ($this->qbank->is_multichoice( $query)) {
+            if ($this->qbank->is_multichoice($query)) {
                 // Handle multiple-choice answers.
                 $a['useranswerid'] = $attempt->useranswerid = $useranswerid;
                 $a['useranswer'] = null;
@@ -133,14 +139,14 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         if ($autograde) {
             if ($this->callupdategrades) {
                 // Update the score based on the correctness of the answer.
-                $a['score'] = $attempt->score = $this->get_score_query( $attempt->iscorrect, $query);
+                $a['score'] = $attempt->score = $this->get_score_query($attempt->iscorrect, $query);
 
                 // Updates the percent of completed questions.
                 $sql = "SELECT s.islastcorrect, g.countquestions, g.percent,g.id as gradeid, s.id as statid
                     FROM {mmogame_aa_grades} g, {mmogame_aa_stats} s
                     WHERE g.mmogameid=? AND g.numgame = ? AND g.auserid=? AND s.queryid=?
                         AND s.mmogameid=g.mmogameid AND s.numgame = g.numgame AND s.auserid=g.auserid";
-                $stat = $this->db->get_record_sql( $sql,
+                $stat = $this->db->get_record_sql($sql,
                     [$attempt->mmogameid, $attempt->numgame, $attempt->auserid, $attempt->queryid]);
                 if ($stat->countquestions > 0) {
                     $mul = 0;
@@ -150,27 +156,45 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                         $mul = -1;
                     }
                     if ($mul !== 0) {
-                        $this->db->update_record( 'mmogame_aa_grades',
-                            ['id' => $stat->gradeid, 'percent' => $stat->percent + $mul / $stat->countquestions]);
+                        $this->db->update_record(
+                            'mmogame_aa_grades',
+                            ['id' => $stat->gradeid, 'percent' => $stat->percent + $mul / $stat->countquestions]
+                        );
                     }
                 }
 
                 // Update statistics for the user and the question.
-                $this->qbank->update_grades( $attempt->auserid, $attempt->score, 0, 1);
+                $this->qbank->update_grades($attempt->auserid, $attempt->score, 0, 1);
                 $ret['addscore'] = $attempt->score >= 0 ? '+'.$attempt->score : $attempt->score;
 
-                $this->qbank->update_stats( $attempt->auserid, null, $attempt->queryid, 0,
-                    $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0, 0, null);
+                $this->qbank->update_stats(
+                    $attempt->auserid,
+                    null,
+                    $attempt->queryid,
+                    0,
+                    $attempt->iscorrect == 1 ? 1 : 0,
+                    $attempt->iscorrect == 0 ? 1 : 0,
+                    0,
+                    null
+                );
 
-                $this->qbank->update_stats( null, null, $attempt->queryid, 0,
-                    $attempt->iscorrect == 1 ? 1 : 0, $attempt->iscorrect == 0 ? 1 : 0, 0, null);
+                $this->qbank->update_stats(
+                    null,
+                    null,
+                    $attempt->queryid,
+                    0,
+                    $attempt->iscorrect == 1 ? 1 : 0,
+                    $attempt->iscorrect == 0 ? 1 : 0,
+                    0,
+                    null
+                );
             }
         }
 
         // Update the database record for the attempt.
         if ($autograde) {
             $a['iscorrect'] = $attempt->iscorrect;
-            $this->db->update_record( 'mmogame_quiz_attempts', $a);
+            $this->db->update_record('mmogame_quiz_attempts', $a);
         }
     }
 
@@ -182,7 +206,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @return int (now uses negative grading, in the future user will change it)
      */
     protected function get_score_query(bool $iscorrect, object $query): int {
-        return $this->get_score_query_negative( $iscorrect, $query);
+        return $this->get_score_query_negative($iscorrect, $query);
     }
 
     /**
@@ -325,8 +349,11 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             return null;
         }
 
-        $attempt = $this->db->get_record_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=? AND id=?',
-            [$this->get_id(), $this->auserid, $attemptid]);
+        $attempt = $this->db->get_record_select(
+            'mmogame_quiz_attempts',
+            'mmogameid=? AND auserid=? AND id=?',
+            [$this->get_id(), $this->auserid, $attemptid]
+        );
         if ($attempt === null) {
             return null;
         }
@@ -335,26 +362,26 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         || $attempt->numgame != $this->rgame->numgame) {
             return null;
         }
-        $this->set_attempt( $attempt);
+        $this->set_attempt($attempt);
 
         $autograde = true;
-        $query = $this->qbank->load( $attempt->queryid);
-        if (isset( $subcommand) && $subcommand == 'tool2') {
+        $query = $this->qbank->load($attempt->queryid);
+        if (isset($subcommand) && $subcommand == 'tool2') {
             $autograde = false;
             $ret['tool2'] = 1;
         }
-        $this->set_answer( $attempt, $query, $answer, $answerid, $autograde, $ret);
+        $this->set_answer($attempt, $query, $answer, $answerid, $autograde, $ret);
 
         $ret['iscorrect'] = $attempt->iscorrect ? 1 : 0;
         $ret['correct'] = $query->concept;
         $ret['attempt'] = $attempt->id;
 
-        $info = $this->get_avatar_info( $this->auserid);
+        $info = $this->get_avatar_info($this->auserid);
         $ret['sumscore'] = $info->sumscore;
-        $ret['rank'] = $this->get_rank( $info->sumscore, 'sumscore');
+        $ret['rank'] = $this->get_rank($info->sumscore, 'sumscore');
 
         $ret['percent'] = $info->percent;
-        $ret['percentrank'] = $this->get_rank( $info->percent, 'percent');
+        $ret['percentrank'] = $this->get_rank($info->percent, 'percent');
 
         return $attempt;
     }

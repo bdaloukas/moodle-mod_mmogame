@@ -37,7 +37,7 @@ function mmogametype_quiz_delete_instance(int $mmogameid): void {
 
     $a = ['mmogame_quiz_attempts'];
     foreach ($a as $table) {
-        $DB->delete_records_select( $table, 'mmogameid=?', [$mmogameid]);
+        $DB->delete_records_select($table, 'mmogameid=?', [$mmogameid]);
     }
 }
 
@@ -54,7 +54,7 @@ function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
 
     $a = ['mmogame_quiz_attempts', 'mmogame_aa_grades'];
 
-    [$insql, $inparams] = $DB->get_in_or_equal( explode(',', $ids));
+    [$insql, $inparams] = $DB->get_in_or_equal(explode(',', $ids));
 
     if (!empty($data->reset_mmogame_all)) {
         foreach ($a as $table) {
@@ -64,7 +64,7 @@ function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
 
     if (!empty($data->reset_mmogame_deleted_course)) {
         foreach ($a as $table) {
-            $sql = "DELETE FROM {".$table."} t WHERE NOT EXISTS ( SELECT * FROM {mmogame} g WHERE t.mmogameid=g.id)";
+            $sql = "DELETE FROM {".$table."} t WHERE NOT EXISTS (SELECT * FROM {mmogame} g WHERE t.mmogameid=g.id)";
             $DB->execute($sql);
         }
     }
@@ -78,9 +78,9 @@ function mmogametype_quiz_reset_userdata(object $data, string $ids): void {
  */
 function mmogametype_quiz_get_modes(): array {
     return [
-        'alone' => get_string( 'mode_alone', 'mmogametype_quiz'),
-        'aduel' => get_string( 'mode_aduel', 'mmogametype_quiz'),
-        'split' => get_string( 'mode_split', 'mmogametype_quiz'),
+        'alone' => get_string('mode_alone', 'mmogametype_quiz'),
+        'aduel' => get_string('mode_aduel', 'mmogametype_quiz'),
+        'split' => get_string('mode_split', 'mmogametype_quiz'),
     ];
 }
 
@@ -93,13 +93,8 @@ function mmogametype_quiz_get_modes(): array {
  * @throws \core\exception\moodle_exception
  * @throws coding_exception
  */
-function mmogametype_quiz_extend_navigation_course( navigation_node $parentnode,  stdClass $course,
+function mmogametype_quiz_extend_navigation_course(navigation_node $parentnode,  stdClass $course,
                                                     context_course $context): void {
-    /* (1) Capability gate (προσαρμόσ’ το αν θέλεις να το βλέπουν και άλλοι ρόλοι)
-    if (!has_capability('mmogametype_quiz:viewirt', $context)) {
-           return;
-    }*/
-
     // Destination : page IRT of subplugin (course-level).
     $url   = new moodle_url('/mod/mmogame/type/quiz/irt/index.php', ['courseid' => $course->id]);
     $label = get_string('menulabel_irt', 'mmogametype_quiz');
@@ -182,7 +177,7 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
             )";
 
     if ($safewhere !== '') {
-        $sql .= " AND ( $safewhere )";
+        $sql .= " AND ($safewhere )";
         $params = $filterparams;
     } else {
         $sql .= ' AND a.mmogameid=? AND a.numgame=?';
@@ -211,7 +206,7 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
         );
 
     foreach ($recs as $rec) {
-        if (!array_key_exists( $rec->queryid, $mapqueries)) {
+        if (!array_key_exists($rec->queryid, $mapqueries)) {
             $q = $questions[$rec->questionid] ?? null;
 
             $infoq = new stdClass;
@@ -245,7 +240,7 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
             $mapusers[$key] = $info;
         }
 
-        if (!array_key_exists( $position, $info->first)) {
+        if (!array_key_exists($position, $info->first)) {
             $info->first[$position] = $rec->iscorrect;
 
             if ($rec->iscorrect == 0) {
@@ -258,7 +253,7 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
         }
     }
 
-    $numitems = count( $mapqueries);
+    $numitems = count($mapqueries);
     $empty = [];
     for ($i = 0; $i < $numitems; $i++) {
         $empty[] = null;
@@ -275,10 +270,10 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
     for ($i = 1; $i <= $numitems; $i++) {
         $header[] = 'query'.$i;
     }
-    $lines = [implode( ';', $header)];
+    $lines = [implode(';', $header)];
     foreach ($responses as $response) {
-        $lines[] = implode( ';', $response);
+        $lines[] = implode(';', $response);
     }
-    file_put_contents( "data.csv", implode( "\n", $lines));
+    file_put_contents("data.csv", implode("\n", $lines));
     return $mapusers;
 }

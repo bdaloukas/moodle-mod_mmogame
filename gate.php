@@ -28,7 +28,7 @@
 
 use mod_mmogame\event\course_module_played;
 
-require( "../../config.php");
+require("../../config.php");
 
 global $CFG, $DB, $USER, $OUTPUT, $PAGE;
 
@@ -42,14 +42,15 @@ $pin = required_param('pin', PARAM_INT);
 
 list ($course, $cm) = get_course_and_cm_from_cmid($id, 'mmogame');
 
-$color = $DB->get_record_select( 'mmogame_aa_colorpalettes', 'id=?', [2]);
-$colors = '['.$color->color1.', '.$color->color2.', '.$color->color3.', '.$color->color4.', '.$color->color5.']';
+$color = $DB->get_record_select('mmogame_aa_colorpalettes', 'id=?', [2]);
+$colors = '[' . $color->color1 . ', ' . $color->color2 . ', ' . $color->color3 . ', ' .
+    $color->color4 . ', ' . $color->color5 . ']';
 
 if (! $rgame = $DB->get_record('mmogame', ['id' => $cm->instance, 'pin' => $pin])) {
     throw new moodle_exception('invalid_mmogame_or_pin', 'mmogame', '', $cm->instance);
 }
-$context = context_module::instance( $cm->id);
-if ($rgame->kinduser == 'moodle' ) {
+$context = context_module::instance($cm->id);
+if ($rgame->kinduser == 'moodle') {
     require_login($course, true, $cm);
 }
 
@@ -66,23 +67,25 @@ $PAGE->requires->strings_for_js(
         'js_grade_last_question', 'js_grade_opponent', 'js_opponent', 'js_palette', 'js_percent',
         'js_question_time', 'js_wait_to_start',
         'js_ranking_grade', 'js_ranking_percent', 'js_sound'],
-    'mmogame');
+    'mmogame'
+);
 $PAGE->requires->strings_for_js(
     ['js_alone_help', 'js_aduel_example1', 'js_aduel_example2', 'js_ranking_order', 'js_next_question', 'js_wizard',
         'js_help_5050', 'js_help_skip',
         'js_aduel_wizard', 'js_aduel_skip', 'js_aduel_help', 'js_aduel_cut'],
-    'mmogametype_quiz');
+    'mmogametype_quiz'
+);
 
-$classname = "MmoGameType".ucfirst( $rgame->type).ucfirst( $rgame->mode);
-$PAGE->requires->js_call_amd('mmogametype_'.$rgame->type.'/'.strtolower( $classname));
+$classname = "MmoGameType" . ucfirst($rgame->type) . ucfirst($rgame->mode);
+$PAGE->requires->js_call_amd('mmogametype_' . $rgame->type . '/' . strtolower($classname));
 $modeparams = $rgame->modeparams === null || $rgame->modeparams === [] ? 'null' : "'$rgame->modeparams'";
 $PAGE->requires->js_init_code("
-    require(['mmogametype_" . $rgame->type."/" . strtolower( $classname)."'], function(".$classname.") {
-        const obj = new ".$classname."();
+    require(['mmogametype_" . $rgame->type."/" . strtolower($classname) . "'], function(" . $classname . ") {
+        const obj = new " . $classname . "();
         console.log($colors);
-        obj.setColors( obj.sortColors( $colors));
-        console.log( $rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modeparams);
-        obj.gateOpen( $rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modeparams);
+        obj.setColors(obj.sortColors($colors));
+        console.log($rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modeparams);
+        obj.gateOpen($rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modeparams);
     });
 ");
 

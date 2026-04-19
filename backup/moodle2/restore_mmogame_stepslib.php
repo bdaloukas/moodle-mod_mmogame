@@ -36,8 +36,10 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
 
         $paths[] = new restore_path_element('mmogame', '/activity/mmogame');
         if ($userinfo) {
-            $type = new restore_path_element('mmogame_type',
-                                                   '/activity/mmogame/types/type');
+            $type = new restore_path_element(
+                'mmogame_type',
+                '/activity/mmogame/types/type'
+            );
             $paths[] = $type;
             $this->add_subplugin_structure('mmogametype', $type);
 
@@ -78,7 +80,7 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
             $new = '';
             foreach ($a as $id) {
                 if (intval($id) != 0) {
-                    $new .= ($new != '' ? ',' : '').$this->get_mappingid('question_category', $id);
+                    $new .= ($new != '' ? ',' : '') . $this->get_mappingid('question_category', $id);
                 }
             }
             $data->qbankparams = $new;
@@ -97,8 +99,11 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         // Insert the mmogame record.
         $newitemid = $DB->insert_record('mmogame', $data);
 
-        $this->set_mapping('mmogame_qbank', $newitemid,
-            $data->qbank == MMOGAME_QBANK_MOODLEQUESTION ? MMOGAME_RESTORE_QBANK_MOODLEQUESTION : 0);
+        $this->set_mapping(
+            'mmogame_qbank',
+            $newitemid,
+            $data->qbank == MMOGAME_QBANK_MOODLEQUESTION ? MMOGAME_RESTORE_QBANK_MOODLEQUESTION : 0
+        );
 
         // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
@@ -118,6 +123,8 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
      * Process a auser restore
      * @param object $data The data in object form
      * @return void
+     * @throws dml_exception
+     * @throws restore_step_exception
      */
     protected function process_mmogame_auser($data) {
         global $DB;
@@ -131,8 +138,11 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
             $data->instanceid = $this->get_mappingid('user', $data->instanceid);
         }
 
-        $rec = $DB->get_record_select('mmogame_aa_users',
-            'kind=? AND instanceid=?', [$data->kind, $data->instanceid]);
+        $rec = $DB->get_record_select(
+            'mmogame_aa_users',
+            'kind=? AND instanceid=?',
+            [$data->kind, $data->instanceid]
+        );
         if ($rec === false) {
             $newitemid = $DB->insert_record('mmogame_aa_users', $data);
         } else {
@@ -186,8 +196,11 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data = (object)$data;
         $oldid = $data->id;
 
-        $rec = $DB->get_record_select('mmogame_aa_avatars',
-            'directory=? AND filename=?', [$data->directory, $data->filename]);
+        $rec = $DB->get_record_select(
+            'mmogame_aa_avatars',
+            'directory=? AND filename=?',
+            [$data->directory, $data->filename]
+        );
         if ($rec === false) {
             $newitemid = $DB->insert_record('mmogame_aa_avatars', $data);
         } else {
@@ -208,9 +221,11 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
         $data = (object)$data;
         $oldid = $data->id;
 
-        $rec = $DB->get_record_select('mmogame_aa_colorpalettes',
+        $rec = $DB->get_record_select(
+            'mmogame_aa_colorpalettes',
             'colorsort1=? AND colorsort2=? AND colorsort3=? AND colorsort4=? AND colorsort5=?',
-            [$data->colorsort1, $data->colorsort2, $data->colorsort3, $data->colorsort4, $data->colorsort5]);
+            [$data->colorsort1, $data->colorsort2, $data->colorsort3, $data->colorsort4, $data->colorsort5]
+        );
         if ($rec === false) {
             $newitemid = $DB->insert_record('mmogame_aa_colorpalettes', $data);
         } else {
@@ -308,6 +323,5 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
      * @param int $newusageid
      */
     protected function inform_new_usage_id($newusageid) {
-
     }
 }

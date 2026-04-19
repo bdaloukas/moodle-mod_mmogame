@@ -58,34 +58,54 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
         $new->context = 1;
         $new->info = 'Info';
         $new->stamp = rand();
-        $categoryid = $DB->insert_record( 'question_categories', $new);
+        $categoryid = $DB->insert_record('question_categories', $new);
 
         $answerids = $answertexts = [];
-        $generator->create_multichoice_question($categoryid, '1', '1',
-            ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'], $answerids, $answertexts);
+        $generator->create_multichoice_question(
+            $categoryid,
+            '1',
+            '1',
+            ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'],
+            $answerids,
+            $answertexts
+        );
 
-        $generator->create_multichoice_question($categoryid, '2', '1',
-            ['TWO', 'ONE', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'], $answerids, $answertexts);
+        $generator->create_multichoice_question(
+            $categoryid,
+            '2',
+            '1',
+            ['TWO', 'ONE', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'],
+            $answerids,
+            $answertexts
+        );
 
-        $rgame = $this->getDataGenerator()->create_module('mmogame',
+        $rgame = $this->getDataGenerator()->create_module(
+            'mmogame',
             ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
                 'numgame' => 1, 'type' => 'quiz', 'mode' => 'split', 'typemode' => 'quiz,split',
-                'kinduser' => 'guid', 'enabled' => 1]);
+                'kinduser' => 'guid', 'enabled' => 1,
+            ]
+        );
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertEquals(1, count($records));
         $this->assertArrayHasKey($rgame->id, $records);
-        $rgame = reset( $records);
+        $rgame = reset($records);
         $this->assertEquals($rgame->qbankparams, $categoryid);
 
-        $mmogame = mod_mmogame\local\mmogame::create( new mmogame_database_moodle(), $rgame->id);
+        $mmogame = mod_mmogame\local\mmogame::create(new mmogame_database_moodle(), $rgame->id);
 
         // Set state to playing.
-        $mmogame->update_state( 1);
+        $mmogame->update_state(1);
 
         for ($step = 1; $step <= 100; $step++) {
             $classgetattempt = new mmogametype_quiz\external\get_attempts_split();
-            $result = $classgetattempt->execute($rgame->id, 'guid', 'testq',
-                '1,2,3,4', '0,1,2,3');
+            $result = $classgetattempt->execute(
+                $rgame->id,
+                'guid',
+                'testq',
+                '1,2,3,4',
+                '0,1,2,3'
+            );
             $splits = [0, 1, 2, 2];
             $iscorrects = [0, 1, 1, 1];
             $attempts = $timestarts = $timeanswers = $answers = [];
@@ -121,6 +141,6 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
                 implode(',', $timestarts), implode(',', $timeanswers),
                 implode(',', $newsplits), implode(',', $tools));
         }
-        $rec = $DB->get_record_sql( "SELECT COUNT(*) FROM {mmogame_quiz_attempts}");
+        $rec = $DB->get_record_sql("SELECT COUNT(*) FROM {mmogame_quiz_attempts}");
     }
 }

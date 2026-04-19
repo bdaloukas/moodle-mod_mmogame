@@ -152,8 +152,10 @@ class get_attempts_split extends external_api {
             LEFT JOIN {mmogame_aa_avatars} a ON a.id=g.avatarid
             WHERE g.mmogameid=? AND g.numgame=? AND g.auserid $insql";
 
-        $recs = $mmogame->get_db()->get_records_sql( $sql,
-            array_merge([$mmogameid, $numgame], $inparams));
+        $recs = $mmogame->get_db()->get_records_sql(
+            $sql,
+            array_merge([$mmogameid, $numgame], $inparams)
+        );
         $grades = $avatars = $ranks = [];
         foreach ($auserids as $auserid) {
             foreach ($recs as $rec) {
@@ -251,7 +253,7 @@ class get_attempts_split extends external_api {
      * @param mmogame $mmogame
      * @param array $auserids
      * @param bool $isaduel
-     * @param array|null $aduelauserids
+     * @param ?array $aduelauserids
      * @param int $numgame
      * @param $attemptids
      * @param $attemptqueryids
@@ -270,11 +272,28 @@ class get_attempts_split extends external_api {
      * @param array $queryranks
      * @return bool
      */
-    private static function get_attempts(mmogame $mmogame, array $auserids, bool $isaduel, ?array $aduelauserids,
-            int &$numgame, &$attemptids, &$attemptqueryids, &$attemptnums, &$definitions, &$tips,
-            &$answerids, &$answertexts, &$aduels, &$aduelavatars, &$aduelcorrects, &$queryanswerids0,
-            int &$countquestions, int &$countcorrect, array &$islastcorrect, array &$queryranks): bool {
-
+    private static function get_attempts(
+        mmogame $mmogame,
+        array $auserids,
+        bool $isaduel,
+        ?array $aduelauserids,
+        int &$numgame,
+        &$attemptids,
+        &$attemptqueryids,
+        &$attemptnums,
+        &$definitions,
+        &$tips,
+        &$answerids,
+        &$answertexts,
+        &$aduels,
+        &$aduelavatars,
+        &$aduelcorrects,
+        &$queryanswerids0,
+        int &$countquestions,
+        int &$countcorrect,
+        array &$islastcorrect,
+        array &$queryranks
+    ): bool {
         $queryranks = [];
         $recs = $mmogame->get_attempts(
             $auserids,
@@ -316,7 +335,7 @@ class get_attempts_split extends external_api {
                 if (array_key_exists($attempt->queryid, $querypositions)) {
                     $pos = $querypositions[$attempt->queryid];
                 } else {
-                    $pos = count( $querypositions);
+                    $pos = count($querypositions);
                     $querypositions[$attempt->queryid] = $pos;
                 }
                 $nums[] = $attempt->numattempt;
@@ -329,16 +348,18 @@ class get_attempts_split extends external_api {
                 if (!$isaduel) {
                     $corrects[] = '';
                 } else {
-                    $attempt2 = $mmogame->get_db()->get_record_select( 'mmogame_quiz_attempts',
+                    $attempt2 = $mmogame->get_db()->get_record_select(
+                        'mmogame_quiz_attempts',
                         "mmogameid=? AND numgame=? AND numteam=? AND auserid=? AND numattempt=?",
-                        [$attempt->mmogameid, $attempt->numgame, $attempt->numteam, $aduel->auserid1, $attempt->numattempt]);
-                        $corrects[] = $attempt2->iscorrect;
+                        [$attempt->mmogameid, $attempt->numgame, $attempt->numteam, $aduel->auserid1, $attempt->numattempt]
+                    );
+                    $corrects[] = $attempt2->iscorrect;
                 }
             }
-            $attemptnums[] = implode( ',', $nums);
-            $attemptids[] = implode( ',', $ids);
-            $attemptqueryids[] = implode( ',', $newids);
-            $aduelcorrects[] = $isaduel ? implode( ',', $corrects) : '';
+            $attemptnums[] = implode(',', $nums);
+            $attemptids[] = implode(',', $ids);
+            $attemptqueryids[] = implode(',', $newids);
+            $aduelcorrects[] = $isaduel ? implode(',', $corrects) : '';
         }
 
         $queries = $mmogame->get_qbank()->load_many($queryids);
@@ -363,8 +384,8 @@ class get_attempts_split extends external_api {
             $a = [];
             $queryanswerids = [];
             foreach ($query->answerids as $pos => $answerid) {
-                if (!array_key_exists( $answerid, $newanserids)) {
-                    $newid = count( $newanserids);
+                if (!array_key_exists($answerid, $newanserids)) {
+                    $newid = count($newanserids);
                 } else {
                     $newid = $newanserids[$answerid];
                 }
@@ -373,8 +394,8 @@ class get_attempts_split extends external_api {
                 $answertexts[] = $query->answers[$pos];
                 $a[] = $newid;
             }
-            $answerids[] = implode( ',', $a);
-            $queryanswerids0[] = implode( ',', $queryanswerids);
+            $answerids[] = implode(',', $a);
+            $queryanswerids0[] = implode(',', $queryanswerids);
         }
 
         return false;

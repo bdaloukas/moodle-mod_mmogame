@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/mod/mmogame/backup/moodle2/restore_mmogame_stepsl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_mmogame_activity_task extends restore_activity_task {
-
     /**
      * Define (add) particular settings this activity can have
      */
@@ -108,8 +107,15 @@ class restore_mmogame_activity_task extends restore_activity_task {
         $rules = [];
 
         // Fix old wrong uses (missing extension).
-        $rules[] = new restore_log_rule('mmogame', 'view all', 'index?id={course}', null,
-                                        null, null, 'index.php?id={course}');
+        $rules[] = new restore_log_rule(
+            'mmogame',
+            'view all',
+            'index?id={course}',
+            null,
+            null,
+            null,
+            'index.php?id={course}'
+        );
         $rules[] = new restore_log_rule('mmogame', 'view all', 'index.php?id={course}', null);
 
         return $rules;

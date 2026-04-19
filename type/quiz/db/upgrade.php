@@ -50,7 +50,7 @@ function mmogametype_quiz_repair_queries() {
 
     $tables = ['mmogame_quiz_attempts', 'mmogame_aa_stats'];
     foreach ($tables as $table) {
-        $sql = 'UPDATE {'.$table.'} a
+        $sql = 'UPDATE {' . $table . '} a
             SET queryid = (
                 SELECT v.questionbankentryid
                 FROM {question_versions} v
@@ -85,8 +85,7 @@ function mmogametype_quiz_repair_queries() {
  * @throws moodle_exception
  * @throws upgrade_exception
  */
-function xmldb_mmogametype_quiz_upgrade( string $oldversion): bool {
-
+function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
     global $DB;
 
     $dbman = $DB->get_manager();
