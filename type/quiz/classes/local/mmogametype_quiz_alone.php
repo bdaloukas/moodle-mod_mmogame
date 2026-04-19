@@ -55,7 +55,8 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     public function get_attempt(): ?stdClass {
         $attempt = $this->db->get_record_select('mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
-            [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]);
+            [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]
+        );
 
         if ($attempt !== null) {
             if ($attempt->timestart == 0) {
@@ -107,8 +108,14 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @param bool $autograde
      * @param array $ret (will contain all information)
      */
-    public function set_answer(stdClass $attempt, stdClass $query, ?string $useranswer, ?int $useranswerid,
-                               bool $autograde, array &$ret): void {
+    public function set_answer(
+        stdClass $attempt,
+        stdClass $query,
+        ?string $useranswer,
+        ?int $useranswerid,
+        bool $autograde,
+        array &$ret
+    ): void {
         // If auto-grading is enabled, check if the answer is correct and set iscorrect.
         if ($autograde) {
             $fraction = 0.0;
@@ -146,8 +153,10 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                     FROM {mmogame_aa_grades} g, {mmogame_aa_stats} s
                     WHERE g.mmogameid=? AND g.numgame = ? AND g.auserid=? AND s.queryid=?
                         AND s.mmogameid=g.mmogameid AND s.numgame = g.numgame AND s.auserid=g.auserid";
-                $stat = $this->db->get_record_sql($sql,
-                    [$attempt->mmogameid, $attempt->numgame, $attempt->auserid, $attempt->queryid]);
+                $stat = $this->db->get_record_sql(
+                    $sql,
+                    [$attempt->mmogameid, $attempt->numgame, $attempt->auserid, $attempt->queryid]
+                );
                 if ($stat->countquestions > 0) {
                     $mul = 0;
                     if ($attempt->iscorrect && $stat->islastcorrect == 0) {
@@ -165,7 +174,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
 
                 // Update statistics for the user and the question.
                 $this->qbank->update_grades($attempt->auserid, $attempt->score, 0, 1);
-                $ret['addscore'] = $attempt->score >= 0 ? '+'.$attempt->score : $attempt->score;
+                $ret['addscore'] = $attempt->score >= 0 ? '+' . $attempt->score : $attempt->score;
 
                 $this->qbank->update_stats(
                     $attempt->auserid,
@@ -343,8 +352,13 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @param string $subcommand
      * @return ?stdClass: the attempt
      */
-    public function set_answer_mode(array &$ret, ?int $attemptid, ?string $answer, ?int $answerid = null,
-                                     string $subcommand = ''): ?stdClass {
+    public function set_answer_mode(
+        array &$ret,
+        ?int $attemptid,
+        ?string $answer,
+        ?int $answerid = null,
+        string $subcommand = ''
+    ): ?stdClass {
         if ($attemptid === null) {
             return null;
         }
@@ -358,8 +372,10 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             return null;
         }
 
-        if ($attempt->auserid != $this->auserid || $attempt->mmogameid != $this->rgame->id
-        || $attempt->numgame != $this->rgame->numgame) {
+        if (
+            $attempt->auserid != $this->auserid || $attempt->mmogameid != $this->rgame->id
+        || $attempt->numgame != $this->rgame->numgame
+        ) {
             return null;
         }
         $this->set_attempt($attempt);

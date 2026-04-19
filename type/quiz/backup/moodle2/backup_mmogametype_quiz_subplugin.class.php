@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_mmogametype_quiz_subplugin extends backup_subplugin {
-
     /**
      * Returns the subplugin information to attach to game element
      *

@@ -82,11 +82,12 @@ class mmogametype_quiz_algorithm_irt {
         // 2. Remove all invalid questions from the list.
         foreach ($mapdelete as $id) {
             $queryid = $questions[$id]->queryid;
-            $db->delete_records_select('mmogame_aa_irt',
+            $db->delete_records_select(
+                'mmogame_aa_irt',
                 'mmogameid=? AND numgame=? AND queryid=?',
                 [$mmogameid, $numgame, $queryid]
-                    );
-            unset( $questions[$id]);
+            );
+            unset($questions[$id]);
         }
 
         // 3. Add missing IRT entries and create default question objects for queryids not in $questions.
@@ -131,11 +132,35 @@ class mmogametype_quiz_algorithm_irt {
      * @param array $rank
      * @return array
      */
-    public static function get_queries(mmogame_database $db, int $mmogameid, int $numgame, int $auserid, array $ids,
-                                                int $algorithm, int $count, int $numquery, array $ignore,
-                                                int &$countquestions, int &$corrects, array &$islastcorrect, array &$rank): array {
-        return self::get_queries_improvement($db, $mmogameid, $numgame, $auserid, $ids, $count, $numquery, $ignore,
-            $countquestions, $corrects, $islastcorrect, $rank);
+    public static function get_queries(
+        mmogame_database $db,
+        int $mmogameid,
+        int $numgame,
+        int $auserid,
+        array $ids,
+        int $algorithm,
+        int $count,
+        int $numquery,
+        array $ignore,
+        int &$countquestions,
+        int &$corrects,
+        array &$islastcorrect,
+        array &$rank
+    ): array {
+        return self::get_queries_improvement(
+            $db,
+            $mmogameid,
+            $numgame,
+            $auserid,
+            $ids,
+            $count,
+            $numquery,
+            $ignore,
+            $countquestions,
+            $corrects,
+            $islastcorrect,
+            $rank
+        );
     }
 
     /**
@@ -155,9 +180,20 @@ class mmogametype_quiz_algorithm_irt {
      * @param array $ranks
      * @return array
      */
-    public static function get_queries_improvement(mmogame_database $db, int $mmogameid, int $numgame, int $auserid, array $ids,
-                                       int $count, int $numquery, array $ignore, int &$countquestions,
-                                       int &$corrects, array &$islastcorrect, array &$ranks): array {
+    public static function get_queries_improvement(
+        mmogame_database $db,
+        int $mmogameid,
+        int $numgame,
+        int $auserid,
+        array $ids,
+        int $count,
+        int $numquery,
+        array $ignore,
+        int &$countquestions,
+        int &$corrects,
+        array &$islastcorrect,
+        array &$ranks
+    ): array {
         // Get player's skill rating (theta).
         $rec = $db->get_record_select('mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
@@ -291,8 +327,12 @@ class mmogametype_quiz_algorithm_irt {
      * @param float $learningrate
      * @return void
      */
-    protected static function update_parameters(float &$theta, float &$difficulty, float $response,
-                                                float $learningrate = 0.05): void {
+    protected static function update_parameters(
+        float &$theta,
+        float &$difficulty,
+        float $response,
+        float $learningrate = 0.05
+    ): void {
         // Computes probability.
         $prob = self::rasch_probability($theta, $difficulty);
         $error = $response - $prob;
@@ -372,9 +412,21 @@ class mmogametype_quiz_algorithm_irt {
      * @param string $info
      * @return void
      */
-    private static function log(mmogame_database $db, int $mmogameid, int $numgame, int $auserid,
-                                mixed $theta, int $queryid, float $difficulty, ?int $serialcorrects,
-                                ?int $nextquery, int $step, int $numquery, float $bestscore, string $info): void {
+    private static function log(
+        mmogame_database $db,
+        int $mmogameid,
+        int $numgame,
+        int $auserid,
+        mixed $theta,
+        int $queryid,
+        float $difficulty,
+        ?int $serialcorrects,
+        ?int $nextquery,
+        int $step,
+        int $numquery,
+        float $bestscore,
+        string $info
+    ): void {
         $db->insert_record(
             'mmogame_aa_irt_log',
             [
@@ -485,9 +537,11 @@ class mmogametype_quiz_algorithm_irt {
      */
     public static function idea(mmogame_database $db, int $mmogameid, int $numgame, int $auserid): array {
         // Get player's skill rating (theta).
-        $rec = $db->get_record_select('mmogame_aa_grades',
+        $rec = $db->get_record_select(
+            'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
-            [$mmogameid, $numgame, $auserid]);
+            [$mmogameid, $numgame, $auserid]
+        );
         $theta = $rec !== null ? $rec->theta : 0;
         // Retrieve all questions with player stats.
         $sql = "SELECT irt.queryid, irt.difficulty, st.counterror,
@@ -497,7 +551,7 @@ class mmogametype_quiz_algorithm_irt {
                 ON st.queryid = irt.queryid AND st.mmogameid=irt.mmogameid AND st.numgame=irt.numgame AND st.auserid = ?
             WHERE irt.mmogameid=? AND irt.numgame=?
             ORDER BY st.serialcorrects,st.counterror DESC,ABS(irt.difficulty - ?)";
-        $questions = $db->get_records_sql( $sql, [$auserid, $mmogameid, $numgame, $theta], 0, 10);
+        $questions = $db->get_records_sql($sql, [$auserid, $mmogameid, $numgame, $theta], 0, 10);
 
         $ret = [];
         foreach ($questions as $question) {

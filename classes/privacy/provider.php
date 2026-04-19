@@ -103,7 +103,6 @@ class provider implements
      * @return  contextlist     $contextlist The contextlist containing the list of contexts used in this plugin.
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
-
         $resultset = new contextlist();
 
         $sql = "SELECT DISTINCT c.id
@@ -146,7 +145,7 @@ class provider implements
         }
         $auserid = $rec->id;
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT DISTINCT cm.id, cm.instance, g.type, g.model
             FROM {context} c
@@ -194,8 +193,14 @@ class provider implements
      * @param array $path
      * @throws dml_exception
      */
-    protected static function export_numgames($context, int $mmogameid, int $auserid,
-                                              string $type, string $model, array $path): void {
+    protected static function export_numgames(
+        $context,
+        int $mmogameid,
+        int $auserid,
+        string $type,
+        string $model,
+        array $path
+    ): void {
         global $DB;
 
         $sql = "SELECT gg.id, gg.numgame, gg.nickname, gg.usercode, gg.sumscore,
@@ -211,9 +216,11 @@ class provider implements
             unset($rec->id);
             writer::with_context($context)->export_data($newpath, $rec);
 
-            manager::component_class_callback('mmogametype_'.$type, self::MMOGAMETYPE_INTERFACE,
+            manager::component_class_callback('mmogametype_' . $type,
+                self::MMOGAMETYPE_INTERFACE,
                 'export_type_user_data',
-                [$context, $mmogameid, $model, $auserid, $rec->numgame, $newpath]);
+                [$context, $mmogameid, $model, $auserid, $rec->numgame, $newpath]
+            );
         }
     }
 

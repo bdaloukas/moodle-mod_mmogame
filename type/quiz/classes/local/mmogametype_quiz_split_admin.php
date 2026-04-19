@@ -42,11 +42,11 @@ require_once($CFG->libdir . '/formslib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogametype_quiz_split_admin extends moodleform {
-    /** @var int $_id: the course_module id. */
-    protected int $_id;
+    /** @var int $id: the course_module id. */
+    protected int $id;
 
-    /** @var object _mmogame: the coresponding mmogame. */
-    protected object $_mmogame;
+    /** @var object mmogame: the coresponding mmogame. */
+    protected object $mmogame;
 
     /**
      * Constructor.
@@ -55,8 +55,8 @@ class mmogametype_quiz_split_admin extends moodleform {
      * @param object $mmogame
      */
     public function __construct($id, $mmogame) {
-        $this->_id = $id;
-        $this->_mmogame = $mmogame;
+        $this->id = $id;
+        $this->mmogame = $mmogame;
 
         parent::__construct();
     }
@@ -66,16 +66,16 @@ class mmogametype_quiz_split_admin extends moodleform {
      */
     public function definition(): void {
         $mform = $this->_form;
-        $rgame = $this->_mmogame->get_rgame();
+        $rgame = $this->mmogame->get_rgame();
 
-        $state = $this->_mmogame->get_state();
+        $state = $this->mmogame->get_state();
         if ($state == 0) {
             $statename = get_string('state0', 'mmogametype_quiz');
         } else {
             $statename = get_string($rgame->mode . '_state' . $state, 'mmogametype_quiz');
         }
 
-        $mform->addElement('hidden', 'id', $this->_id);
+        $mform->addElement('hidden', 'id', $this->id);
         $mform->setType('id', PARAM_INT);
 
         // Name of the game.

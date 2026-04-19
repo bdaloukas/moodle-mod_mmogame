@@ -21,7 +21,6 @@ use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
-
 use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
@@ -68,9 +67,15 @@ class get_attempt extends external_api {
      * @throws coding_exception
      * @throws invalid_parameter_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user,
-                                   ?string $nickname = null, ?int $avatarid = null, ?int $colorpaletteid = null,
-                                   string $subcommand = ''): string {
+    public static function execute(
+        int $mmogameid,
+        string $kinduser,
+        string $user,
+        ?string $nickname = null,
+        ?int $avatarid = null,
+        ?int $colorpaletteid = null,
+        string $subcommand = ''
+    ): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
@@ -99,7 +104,8 @@ class get_attempt extends external_api {
 
         // No selection of avatar and colorpalettes yet.
         $grade = $mmogame->get_db()->get_record_select(
-            'mmogame_aa_grades', 'mmogameid=? AND numgame=? AND auserid=?',
+            'mmogame_aa_grades',
+            'mmogameid=? AND numgame=? AND auserid=?',
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]
         );
         if (!$create && $grade === null) {
@@ -112,7 +118,7 @@ class get_attempt extends external_api {
             $info = $mmogame->get_avatar_info($auserid);
             $mmogame->get_db()->update_record(
                 'mmogame_aa_grades',
-                ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid,  'colorpaletteid' => $colorpaletteid]
+                ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid, 'colorpaletteid' => $colorpaletteid]
             );
         }
         if ($mmogame->get_state() != 0) {

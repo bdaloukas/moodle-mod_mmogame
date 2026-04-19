@@ -32,8 +32,8 @@ use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
-define( 'ERRORCODE_NO_QUERIES', 'no_questions');
-define( 'ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');
+define('ERRORCODE_NO_QUERIES', 'no_questions');
+define('ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');
 
 require_once(dirname(__FILE__) . '/../../lib.php');
 
@@ -64,18 +64,18 @@ abstract class mmogametype_quiz extends mmogame {
     public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass {
         $auserid = $this->get_auserid();
 
-        $info = $this->get_avatar_info( $auserid);
+        $info = $this->get_avatar_info($auserid);
         $ret['avatar'] = $info->avatar;
         $ret['nickname'] = $info->nickname;
-        $ret['colors'] = implode( ',', $info->colors);
+        $ret['colors'] = implode(',', $info->colors);
         $ret['fastjson'] = $this->rgame->fastjson;
         $ret['name'] = $this->rgame->name;
         $ret['state'] = $this->rstate->state;
-        $ret['rank'] = $this->get_rank( $info->sumscore, 'sumscore');
+        $ret['rank'] = $this->get_rank($info->sumscore, 'sumscore');
         $ret['sumscore'] = $info->sumscore;
         $ret['timefastjson'] = $this->rgame->timefastjson;
         $ret['percent'] = $info->percent;
-        $ret['percentrank'] = $this->get_rank( $info->percent, 'percent');
+        $ret['percentrank'] = $this->get_rank($info->percent, 'percent');
 
         if ($attempt === null) {
             $attempt = new stdClass();
@@ -89,7 +89,7 @@ abstract class mmogametype_quiz extends mmogame {
 
         $recquery = null;
         if ($attempt->queryid != 0) {
-            $recquery = $this->get_qbank()->load_json( $ret, '', $attempt->queryid, $attempt->layout, false);
+            $recquery = $this->get_qbank()->load_json($ret, '', $attempt->queryid, $attempt->layout, false);
         }
 
         $ret['timestart'] = $attempt->timestart;
@@ -106,11 +106,11 @@ abstract class mmogametype_quiz extends mmogame {
      * @return int
      */
     protected function get_score_query_negative(bool $iscorrect, stdClass $query): int {
-        if (!$this->qbank->is_multichoice( $query)) {
+        if (!$this->qbank->is_multichoice($query)) {
             return $iscorrect ? 1 : 0;
         }
 
-        return $iscorrect ? count( $query->answers) - 1 : -1;
+        return $iscorrect ? count($query->answers) - 1 : -1;
     }
 
     /**
@@ -121,7 +121,7 @@ abstract class mmogametype_quiz extends mmogame {
      * @param ?int $auserid
      */
     public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void {
-        $db->delete_records_select( 'mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
+        $db->delete_records_select('mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
     }
 
     /**
@@ -131,7 +131,7 @@ abstract class mmogametype_quiz extends mmogame {
      * @return string
      */
     public function set_state(int $state): string {
-        $timefastjson = round( 10 * microtime( true));
+        $timefastjson = round(10 * microtime(true));
 
         $statecontents = $state . "-" . $timefastjson;
         $filecontents = '';

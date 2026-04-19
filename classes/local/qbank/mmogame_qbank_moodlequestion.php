@@ -166,8 +166,11 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             $query->answers[] = $info;
         }
         if ($query->qtype == 'multichoice') {
-            $rec = $this->mmogame->get_db()->get_record_select('qtype_multichoice_options', 'questionid=?',
-                [$query->questionid]);
+            $rec = $this->mmogame->get_db()->get_record_select(
+                'qtype_multichoice_options',
+                'questionid=?',
+                [$query->questionid]
+            );
             $query->multichoice = $rec;
         }
 
@@ -187,8 +190,13 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
         }
 
         [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal($questionids);
-        $recs = $this->mmogame->get_db()->get_records_select('question_answers', "question $insql",
-            $inparams, 'fraction DESC,id', 'id,question,answer,fraction');
+        $recs = $this->mmogame->get_db()->get_records_select(
+            'question_answers',
+            "question $insql",
+            $inparams,
+            'fraction DESC,id',
+            'id,question,answer,fraction'
+        );
         $ids = [];
         $striptags = $this->mmogame->get_rgame()->striptags;
 
@@ -244,7 +252,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     public function load_json(array &$ret, string $num, int $id, ?string $layout, bool $fillconcept): stdClass {
         $rec = $this->load($id);
 
-        $ret['qtype'.$num] = $rec->qtype;
+        $ret['qtype' . $num] = $rec->qtype;
         $definition = $rec->definition;
 
         $ret['definition' . $num] = $definition;
@@ -267,8 +275,8 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
                 $answers[] = $info->answer;
                 $answerids[] = $info->id;
             }
-            $ret['answers'.$num] = $answers;
-            $ret['answerids'.$num] = $answerids;
+            $ret['answers' . $num] = $answers;
+            $ret['answerids' . $num] = $answerids;
         }
 
         return $rec;

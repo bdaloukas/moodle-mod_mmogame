@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir . '/formslib.php');
 
 /**
  * The class mmogame_quiz_alone_admin extentes the class moodleform
@@ -42,11 +42,11 @@ require_once($CFG->libdir.'/formslib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogametype_quiz_alone_admin extends moodleform {
-    /** @var int $_id: the course_module id. */
-    protected int $_id;
+    /** @var int $id: the course_module id. */
+    protected int $id;
 
-    /** @var object _mmogame: the coresponding mmogame. */
-    protected object $_mmogame;
+    /** @var object mmogame: the coresponding mmogame. */
+    protected object $mmogame;
 
     /**
      * Constructor.
@@ -55,8 +55,8 @@ class mmogametype_quiz_alone_admin extends moodleform {
      * @param object $mmogame
      */
     public function __construct($id, $mmogame) {
-        $this->_id = $id;
-        $this->_mmogame = $mmogame;
+        $this->id = $id;
+        $this->mmogame = $mmogame;
 
         parent::__construct();
     }
@@ -66,44 +66,44 @@ class mmogametype_quiz_alone_admin extends moodleform {
      */
     public function definition(): void {
         $mform = $this->_form;
-        $rgame = $this->_mmogame->get_rgame();
+        $rgame = $this->mmogame->get_rgame();
 
-        $state = $this->_mmogame->get_state();
+        $state = $this->mmogame->get_state();
         if ($state == 0) {
-            $statename = get_string( 'state0', 'mmogametype_quiz');
+            $statename = get_string('state0', 'mmogametype_quiz');
         } else {
-            $statename = get_string( $rgame->mode.'_state'.$state, 'mmogametype_quiz');
+            $statename = get_string($rgame->mode . '_state' . $state, 'mmogametype_quiz');
         }
 
-        $mform->addElement('hidden', 'id', $this->_id);
-        $mform->setType( 'id', PARAM_INT);
+        $mform->addElement('hidden', 'id', $this->id);
+        $mform->setType('id', PARAM_INT);
 
         // Name of the game.
-        $mform->addElement('static', 'gamename', '', get_string('js_name', 'mmogame') . ': '.$rgame->name);
+        $mform->addElement('static', 'gamename', '', get_string('js_name', 'mmogame') . ': ' . $rgame->name);
         $mform->addElement('html', '<br>');
 
         $mform->addElement('html', '<table border=1>');
 
         // First line numgame.
         $mform->addElement('html', '<tr>');
-        $mform->addElement('html', '<td>'.get_string('numgame', 'mmogame').':</td>');
+        $mform->addElement('html', '<td>' . get_string('numgame', 'mmogame') . ':</td>');
         $mform->addElement('html', '<td>');
         if ($rgame->numgame > 1) {
             $mform->addElement('html', '<button id="prevnumgame" name="prevnumgame">⟪</button>');
         }
-        $mform->addElement('html', '<span class="value" id="numgame">'.$rgame->numgame.'</span>');
+        $mform->addElement('html', '<span class="value" id="numgame">' . $rgame->numgame . '</span>');
         $mform->addElement('html', '<button id="nextnumgame" name="nextnumgame">⟫</button>');
         $mform->addElement('html', '<td>');
         $mform->addElement('html', '</tr>');
 
         // Second line state.
         $mform->addElement('html', '<tr>');
-        $mform->addElement('html', '<td>'.get_string('state', 'mmogame').':</td>');
+        $mform->addElement('html', '<td>'  .get_string('state', 'mmogame') . ':</td>');
         $mform->addElement('html', '<td>');
         if ($state > 0) {
             $mform->addElement('html', '<button id="prevstate" name="prevstate">⟪</button>');
         }
-        $mform->addElement('html', '<span class="value" id="state">'.$statename.'</span>');
+        $mform->addElement('html', '<span class="value" id="state">' . $statename . '</span>');
         if ($state < 1) {
             $mform->addElement('html', '<button id="nextstate" name="nextstate">⟫</button><td>');
         }

@@ -21,7 +21,6 @@ use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
-
 use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
@@ -36,7 +35,6 @@ use required_capability_exception;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class set_answer extends external_api {
-
     /**
      * Returns description of method parameters
      * @return external_function_parameters
@@ -69,8 +67,15 @@ class set_answer extends external_api {
      * @throws coding_exception
      * @throws invalid_parameter_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user, int $attempt, ?string $answer,
-                                   ?int $answerid, string $subcommand): string {
+    public static function execute(
+        int $mmogameid,
+        string $kinduser,
+        string $user,
+        int $attempt,
+        ?string $answer,
+        ?int $answerid,
+        string $subcommand
+    ): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,

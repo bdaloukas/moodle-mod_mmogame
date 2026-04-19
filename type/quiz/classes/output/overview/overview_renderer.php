@@ -54,21 +54,36 @@ class overview_renderer extends plugin_renderer_base {
         ]);
 
         // Add numgame.
-        $form .= html_writer::label(get_string('numgame', 'mod_mmogame').': ', 'numgame', false);
-        $form .= html_writer::select($report->get_numgame_options(), 'numgame', $report->numgame, false,
-                ['class' => 'me-2 mb-2']);
+        $form .= html_writer::label(get_string('numgame', 'mod_mmogame') . ': ', 'numgame', false);
+        $form .= html_writer::select(
+            $report->get_numgame_options(),
+            'numgame',
+            $report->numgame,
+            false,
+            ['class' => 'me-2 mb-2']
+        );
 
         // Add auserid.
         $auseridoptions = $report->get_auserid_options();
-        $form .= html_writer::label(get_string('user', 'mod_mmogame').': ', 'auserid', false);
-        $form .= html_writer::select($auseridoptions, 'auserid', $report->auserid, false,
-                ['class' => 'me-2 mb-2']);
+        $form .= html_writer::label(get_string('user', 'mod_mmogame') . ': ', 'auserid', false);
+        $form .= html_writer::select(
+            $auseridoptions,
+            'auserid',
+            $report->auserid,
+            false,
+            ['class' => 'me-2 mb-2']
+        );
 
         // Add queries.
         $queryoptions = $report->get_queries_options();
-        $form .= html_writer::label(get_string('question').':', 'queries', false);
-        $form .= html_writer::select($queryoptions, 'queries', $report->numgame, false,
-                ['class' => 'me-2 mb-2']);
+        $form .= html_writer::label(get_string('question') . ':', 'queries', false);
+        $form .= html_writer::select(
+            $queryoptions,
+            'queries',
+            $report->numgame,
+            false,
+            ['class' => 'me-2 mb-2']
+        );
 
         $form .= html_writer::empty_tag('input', [
             'type' => 'submit',
@@ -122,22 +137,22 @@ class overview_renderer extends plugin_renderer_base {
                 }
                 $table->data[] = [
                     $record->numgame,
-                    array_key_exists( $record->auserid, $auseridoptions) ? $auseridoptions[$record->auserid] : '',
+                    array_key_exists($record->auserid, $auseridoptions) ? $auseridoptions[$record->auserid] : '',
                     $record->numattempt,
-                    array_key_exists( $record->queryid, $queryoptions) ? $queryoptions[$record->queryid] : '',
-                    $report->get_answer( $record, $answers),
+                    array_key_exists($record->queryid, $queryoptions) ? $queryoptions[$record->queryid] : '',
+                    $report->get_answer($record, $answers),
                     $iscorrect,
                     $record->score,
                     $record->timeanswer != 0 ? userdate($record->timeanswer, $strftimedaydate) : '',
                 ];
             }
             if ($report->export == 'cvs') {
-                $this->export_table_to_csv( $table);
+                $this->export_table_to_csv($table);
                 exit;
             }
             $output .= html_writer::table($table);
         } else if (!is_null($report->auserid)) {
-            $output .= html_writer::div( 'norecords', 'alert alert-warning' );
+            $output .= html_writer::div('norecords', 'alert alert-warning');
         }
 
         return $output;

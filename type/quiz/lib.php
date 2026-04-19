@@ -154,9 +154,15 @@ function mmogametype_quiz_extend_settings_navigation(settings_navigation $settin
  * @throws coding_exception
  * @throws dml_exception
  */
-function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$responses,
-                                   ?array &$mapqueries, ?array &$mapusers,
-                                   string $safewhere = '', array $filterparams = []): array {
+function mmogametype_quiz_irt_read(
+    mmogame $mmogame,
+    context $context,
+    ?array &$responses,
+    ?array &$mapqueries,
+    ?array &$mapusers,
+    string $safewhere = '',
+    array $filterparams = []
+): array {
     global $DB;
 
     $responses = [];
@@ -209,7 +215,7 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
         if (!array_key_exists($rec->queryid, $mapqueries)) {
             $q = $questions[$rec->questionid] ?? null;
 
-            $infoq = new stdClass;
+            $infoq = new stdClass();
             $position = $infoq->position = count($mapqueries);
             $infoq->queryid = $rec->queryid;
             $infoq->name = $q->name;
@@ -268,7 +274,7 @@ function mmogametype_quiz_irt_read(mmogame $mmogame, context $context, ?array &$
 
     $header = [];
     for ($i = 1; $i <= $numitems; $i++) {
-        $header[] = 'query'.$i;
+        $header[] = 'query' . $i;
     }
     $lines = [implode(';', $header)];
     foreach ($responses as $response) {

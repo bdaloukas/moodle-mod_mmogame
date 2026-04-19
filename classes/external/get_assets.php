@@ -23,7 +23,6 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-
 use core_external\restricted_context_exception;
 use invalid_parameter_exception as invalid_parameter_exceptionAlias;
 use mod_mmogame\local\database\mmogame_database_moodle;
@@ -67,8 +66,13 @@ class get_assets extends external_api {
      * @throws invalid_parameter_exceptionAlias
      * @throws coding_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user, int $avatars = 0,
-                                   int $colorpalettes = 0): array {
+    public static function execute(
+        int $mmogameid,
+        string $kinduser,
+        string $user,
+        int $avatars = 0,
+        int $colorpalettes = 0
+    ): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,

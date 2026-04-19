@@ -23,7 +23,6 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-
 use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
@@ -66,9 +65,13 @@ class get_attempts_split extends external_api {
      * @throws required_capability_exception
      * @throws restricted_context_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user,
-                                   ?string $avatarids = null,
-                                   ?string $splits = null): array {
+    public static function execute(
+        int $mmogameid,
+        string $kinduser,
+        string $user,
+        ?string $avatarids = null,
+        ?string $splits = null
+    ): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
@@ -108,8 +111,10 @@ class get_attempts_split extends external_api {
         if ($avatarids !== null) {
             foreach ($splits as $pos => $split) {
                 $info = $mmogame->get_avatar_info($auserids[$pos], false);
-                $mmogame->get_db()->update_record('mmogame_aa_grades',
-                    ['id' => $info->id, 'avatarid' => $avatarids[$pos]]);
+                $mmogame->get_db()->update_record(
+                    'mmogame_aa_grades',
+                    ['id' => $info->id, 'avatarid' => $avatarids[$pos]]
+                );
             }
         }
         $isaduel = $onlygroup = false;
@@ -133,9 +138,28 @@ class get_attempts_split extends external_api {
             $countquestions = $countcorrect = 0;
             $islastcorrect = [];
             $queryranks = [];
-            $retry = self::get_attempts($mmogame, $auserids, $isaduel, $aduelauserids, $numgame, $attemptids,
-                $attemptqueryids, $attemptnums, $definitions, $tips, $answerids, $answertexts, $aduels,
-                $aduelavatars, $aduelcorrects, $queryanswerids0, $countquestions, $countcorrect, $islastcorrect, $queryranks);
+            $retry = self::get_attempts(
+                $mmogame,
+                $auserids,
+                $isaduel,
+                $aduelauserids,
+                $numgame,
+                $attemptids,
+                $attemptqueryids,
+                $attemptnums,
+                $definitions,
+                $tips,
+                $answerids,
+                $answertexts,
+                $aduels,
+                $aduelavatars,
+                $aduelcorrects,
+                $queryanswerids0,
+                $countquestions,
+                $countcorrect,
+                $islastcorrect,
+                $queryranks
+            );
             if (!$retry) {
                 // Have to compute again. It is not computed in get_attempts.
                 break;
@@ -162,7 +186,7 @@ class get_attempts_split extends external_api {
                 if ($rec->auserid == $auserid) {
                     $grades[] = $rec->sumscore;
                     $ranks[] = $rec->numrank + 1;
-                    $avatars[] = $rec->directory.'/'.$rec->filename;
+                    $avatars[] = $rec->directory . '/' . $rec->filename;
                     break;
                 }
             }

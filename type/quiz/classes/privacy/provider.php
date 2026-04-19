@@ -101,16 +101,21 @@ class provider implements
                                                  int     $numgame, array $path): void {
         global $DB;
 
-        $recs = $DB->get_records_select( 'mmogame_quiz_attempts',
-            'mmogameid=? AND auserid=? AND numgame=?', [$mmogameid, $auserid, $numgame], 'id',
-            'id,numattempt,queryid,useranswerid,useranswer,iscorrect,layout,timestart,timeclose,timeanswer,'.
-            'fraction, score, score2, iscorrect2');
+        $recs = $DB->get_records_select(
+            'mmogame_quiz_attempts',
+            'mmogameid=? AND auserid=? AND numgame=?',
+            [$mmogameid, $auserid, $numgame],
+            'id',
+            'id,numattempt,queryid,useranswerid,useranswer,iscorrect,layout,timestart,timeclose,timeanswer,' .
+            'fraction, score, score2, iscorrect2'
+        );
         $i = 0;
         foreach ($recs as $rec) {
-            $newpath = array_merge( $path,
-                [get_string('privacy:metadata:mmogame_quiz_attempts', 'mmogametype_quiz').(++$i)]);
-            unset( $rec->id);
-            writer::with_context($context)->export_data( $newpath, $rec);
+            $newpath = array_merge($path,
+                [get_string('privacy:metadata:mmogame_quiz_attempts', 'mmogametype_quiz').(++$i)]
+            );
+            unset($rec->id);
+            writer::with_context($context)->export_data($newpath, $rec);
         }
     }
 

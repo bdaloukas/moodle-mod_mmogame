@@ -74,8 +74,8 @@ class overview_renderable implements renderable {
         $this->export = $export != '' ? $export : null;
 
         // Get data from the database.
-        [$this->where0, $this->params0] = $this->get_where( $rgame->id, null, null, null);
-        [$this->where, $this->params] = $this->get_where( $rgame->id, $numgame, $auserid, $queryid);
+        [$this->where0, $this->params0] = $this->get_where($rgame->id, null, null, null);
+        [$this->where, $this->params] = $this->get_where($rgame->id, $numgame, $auserid, $queryid);
     }
 
     /**
@@ -88,7 +88,9 @@ class overview_renderable implements renderable {
         global $DB;
 
         return $DB->get_records_sql(
-            "SELECT * FROM {mmogame_quiz_attempts} mqa WHERE $this->where ORDER BY id", $this->params);
+            "SELECT * FROM {mmogame_quiz_attempts} mqa WHERE $this->where ORDER BY id",
+            $this->params
+        );
     }
 
     /**
@@ -138,9 +140,9 @@ class overview_renderable implements renderable {
                 WHERE $this->where0
                 AND mqa.auserid = au.id AND au.instanceid = u.id
                 ORDER BY u.lastname, u.firstname, au.id";
-            $recs = $DB->get_records_sql( $sql, $this->params0);
+            $recs = $DB->get_records_sql($sql, $this->params0);
             foreach ($recs as $rec) {
-                $ret[$rec->auserid] = $rec->lastname.' '.$rec->firstname;
+                $ret[$rec->auserid] = $rec->lastname . ' ' . $rec->firstname;
             }
         } else if ($this->rgame->kinduser == 'guid') {
             $sql = "SELECT DISTINCT auserid
@@ -171,7 +173,7 @@ class overview_renderable implements renderable {
                 FROM {mmogame_quiz_attempts} mqa, {question} q
                 WHERE $this->where0 AND mqa.queryid = q.id
                 ORDER BY q.name, mqa.queryid";
-            $recs = $DB->get_records_sql( $sql, $this->params0);
+            $recs = $DB->get_records_sql($sql, $this->params0);
             $ret = [ null => ''];
             foreach ($recs as $rec) {
                 $ret[$rec->queryid] = $rec->name;
@@ -195,7 +197,7 @@ class overview_renderable implements renderable {
                 FROM {mmogame_quiz_attempts} mqa
                 WHERE $this->where0
                 ORDER BY numgame";
-        $recs = $DB->get_records_sql( $sql, $this->params0);
+        $recs = $DB->get_records_sql($sql, $this->params0);
         $ret = [ null => ''];
         foreach ($recs as $rec) {
             $ret[$rec->numgame] = $rec->numgame;
@@ -220,11 +222,11 @@ class overview_renderable implements renderable {
                 return $rec->useranswer;
             } else if ($rec->useranswerid === 0) {
                 return '';
-            } else if (array_key_exists( $rec->useranswerid, $answers)) {
+            } else if (array_key_exists($rec->useranswerid, $answers)) {
                 return $answers[$rec->useranswerid];
             } else {
-                $rec2 = $DB->get_record_select( 'question_answers', 'id=?', [$rec->useranswerid]);
-                $answer = $rec2 === false ? null : strip_tags( $rec2->answer);
+                $rec2 = $DB->get_record_select('question_answers', 'id=?', [$rec->useranswerid]);
+                $answer = $rec2 === false ? null : strip_tags($rec2->answer);
                 $answers[$rec->useranswerid] = $answer;
 
                 return $answer;

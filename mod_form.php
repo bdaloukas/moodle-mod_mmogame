@@ -318,7 +318,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
         $numcategories = 3;
 
         for ($i = 1; $i <= $numcategories; $i++) {
-            $name1 = 'categoryid'.$i;
+            $name1 = 'categoryid' . $i;
             $mform->addElement('select', $name1, get_string('category', 'question') . $i, $this->get_array_question_categories());
             $mform->setType($name1, PARAM_INT);
             $mform->hideIf($name1, 'qbank', 'neq', MMOGAME_QBANK_MOODLEQUESTION);

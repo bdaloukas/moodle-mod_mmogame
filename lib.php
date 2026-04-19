@@ -84,8 +84,8 @@ function mmogame_delete_instance(int $mmogameid): bool {
         return true;
     }
 
-    $function = 'mmogametype_'.$rgame->type.'_delete_instance';
-    require_once($CFG->dirroot.'/mod/mmogame/type/'.$rgame->type.'/lib.php');
+    $function = 'mmogametype_' . $rgame->type . '_delete_instance';
+    require_once($CFG->dirroot . '/mod/mmogame/type/' . $rgame->type . '/lib.php');
     $function($mmogameid);
 
     $DB->delete_records_select('mmogame', 'id=?', [$mmogameid]);
@@ -137,7 +137,7 @@ function mmogame_before_add_or_update_glossary(stdClass $mmogame): void {
         $mmogame->glossarycategoryid = 0;
     }
 
-    $mmogame->qbankparams = $mmogame->glossaryid.','.$mmogame->glossarycategoryid;
+    $mmogame->qbankparams = $mmogame->glossaryid . ',' . $mmogame->glossarycategoryid;
 }
 
 /**
@@ -211,11 +211,11 @@ function mmogame_guidv4(bool $trim = true): string {
     $lbrace = $trim ? "" : chr(123);    // Is "{".
     $rbrace = $trim ? "" : chr(125);    // Is "}".
     return $lbrace.
-              substr($charid,  0,  8).$hyphen.
-              substr($charid,  8,  4).$hyphen.
-              substr($charid, 12,  4).$hyphen.
-              substr($charid, 16,  4).$hyphen.
-              substr($charid, 20, 12).
+              substr($charid,  0,  8) . $hyphen .
+              substr($charid,  8,  4) . $hyphen .
+              substr($charid, 12,  4) . $hyphen .
+              substr($charid, 16,  4) . $hyphen .
+              substr($charid, 20, 12) .
               $rbrace;
 }
 
@@ -225,7 +225,7 @@ function mmogame_guidv4(bool $trim = true): string {
  * @return array of strings
  */
 function mmogame_get_types(): array {
-    $dir = __DIR__.'/type';
+    $dir = __DIR__ . '/type';
     $types = [];
     if (is_dir($dir)) {
         $files = scandir($dir);
@@ -271,12 +271,22 @@ function mmogame_supports(string $feature): ?bool {
  *         (e.g., a report) pass it in here. Default 0 which means no current group.
  * @return string HTML fragment for the link.
  */
-function mmogame_attempt_summary_link_to_reports(stdClass $mmogame, stdClass $cm, stdClass $context,
-                                                 bool $returnzero = false, int $currentgroup = 0): string {
+function mmogame_attempt_summary_link_to_reports(
+    stdClass $mmogame,
+    stdClass $cm,
+    stdClass $context,
+    bool $returnzero = false,
+    int $currentgroup = 0
+): string {
     global $PAGE;
 
     return $PAGE->get_renderer('mod_mmogame')->mmogame_attempt_summary_link_to_reports(
-        $mmogame, $cm, $context, $returnzero, $currentgroup);
+        $mmogame,
+        $cm,
+        $context,
+        $returnzero,
+        $currentgroup
+    );
 }
 
 /**
@@ -316,17 +326,26 @@ function mmogame_extend_settings_navigation(settings_navigation $settings, navig
         require_once($CFG->dirroot . '/mod/mmogame/report/reportlib.php');
         $reportlist = mmogame_report_list($settings->get_page()->cm->context);
 
-        $url = new moodle_url('/mod/mmogame/report.php',
-            ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist)]);
+        $url = new moodle_url(
+            '/mod/mmogame/report.php',
+            ['id' => $settings->get_page()->cm->id, 'mode' => reset($reportlist)]
+        );
         $reportnode = $mmogamenode->add_node(navigation_node::create(get_string('results', 'quiz'), $url,
             navigation_node::TYPE_SETTING,
             null, 'mmogame_report', new pix_icon('i/report', '')));
 
         foreach ($reportlist as $report) {
             $url = new moodle_url('/mod/mmogame/report.php', ['id' => $settings->get_page()->cm->id, 'mode' => $report]);
-            $reportnode->add_node(navigation_node::create(get_string('report_' . $report, 'mmogametype_' . $mode), $url,
-                navigation_node::TYPE_SETTING,
-                null, 'mmogame_report_' . $report, new pix_icon('i/item', '')));
+            $reportnode->add_node(
+                navigation_node::create(
+                    get_string('report_' . $report, 'mmogametype_' . $mode),
+                    $url,
+                    navigation_node::TYPE_SETTING,
+                    null,
+                    'mmogame_report_' . $report,
+                    new pix_icon('i/item', '')
+                )
+            );
         }
     }
 

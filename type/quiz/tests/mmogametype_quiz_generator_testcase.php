@@ -62,9 +62,13 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
         // Create mmoGame.
         $rgame = $this->getDataGenerator()->create_module('mmogame',
-            ['course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
+            [
+                'course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
                 'numgame' => 1, 'type' => 'quiz', 'mode' => 'alone', 'typemode' => 'quiz,alone',
-                'kinduser' => 'guid', 'enabled' => 1]);
+                'kinduser' => 'guid',
+                'enabled' => 1,
+            ]
+        );
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertCount(1, $records);
         $this->assertArrayHasKey($rgame->id, $records);
@@ -80,22 +84,46 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         // Command get_attempt with 1 question.
 
         $answerids = $answertexts = [];
-        $generator->create_multichoice_question($categoryid, '1', '1',
-            ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'], $answerids, $answertexts);
+        $generator->create_multichoice_question(
+            $categoryid,
+            '1',
+            '1',
+            ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'],
+            $answerids,
+            $answertexts
+        );
         $mmogame->update_state(1);
         $result = json_decode($classgetattempt->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
         $this->assertTrue($result->attempt != 0);
 
         // Command set_answer correct.
         $classsetanswer = new mmogametype_quiz\external\set_answer();
-        $result = json_decode($classsetanswer->execute($rgame->id, 'moodle', $USER->id,
-            $result->attempt, $answertexts[0], $answerids[0], ''));
+        $result = json_decode(
+            $classsetanswer->execute(
+                $rgame->id,
+                'moodle',
+                $USER->id,
+                $result->attempt,
+                $answertexts[0],
+                $answerids[0],
+                ''
+            )
+        );
         $this->assertTrue($result->iscorrect == 1);
 
         // Command set_answer error.
         $this->assertTrue($result->attempt != 0);
-        $result = json_decode($classsetanswer->execute($rgame->id, 'moodle', $USER->id,
-            $result->attempt, $answertexts[1], $answerids[1], ''));
+        $result = json_decode(
+            $classsetanswer->execute(
+                $rgame->id,
+                'moodle',
+                $USER->id,
+                $result->attempt,
+                $answertexts[1],
+                $answerids[1],
+                ''
+            )
+        );
         $this->assertTrue($result->iscorrect == 0);
 
         $classgetstate = new get_state();
@@ -162,21 +190,30 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
         // Gives the correct answer.
         $classsetanswer = new mmogametype_quiz\external\set_answer();
-        $result = json_decode($classsetanswer->execute($rgame->id, 'moodle', $USER->id,
-            $result->attempt, $answertexts[0], $answerids[0], ''));
-        $this->assertTrue($result->iscorrect == 1);
-
-        // Gives the wrong answer.
-        $result = json_decode($classgetattempt->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
-        $this->assertTrue($result->attempt != 0);
         $result = json_decode(
             $classsetanswer->execute($rgame->id,
                 'moodle',
                 $USER->id,
                 $result->attempt,
                 $answertexts[0],
-                $answerids[1],
+                $answerids[0],
                 ''
+            )
+        );
+        $this->assertTrue($result->iscorrect == 1);
+
+        // Gives the wrong answer.
+        $result = json_decode($classgetattempt->execute($rgame->id, 'moodle', $USER->id, 'Test', 1, 1));
+        $this->assertTrue($result->attempt != 0);
+        $result = json_decode(
+            $classsetanswer->execute(
+                $rgame->id,
+                'moodle',
+                $USER->id,
+                $result->attempt,
+                $answertexts[0],
+                $answerids[1],
+                '',
             )
         );
         $this->assertTrue($result->iscorrect == 0);

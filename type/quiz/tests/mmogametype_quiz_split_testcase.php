@@ -38,7 +38,6 @@ global $CFG;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogametype_quiz_split_testcase extends advanced_testcase {
-
     /**
      * Test for playing a quiz.
      */
@@ -135,11 +134,15 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
                 $tools[] = 0;
             }
             $classsendanswers = new mmogametype_quiz\external\send_answers_split();
-            $classsendanswers->execute($rgame->id, 'guid', 'testq',
+            $classsendanswers->execute(
+                $rgame->id,
+                'guid',
+                'testq',
                 implode(',', $splits), implode(',', $attempts),
                 implode(',', $iscorrects), implode(',', $answers),
                 implode(',', $timestarts), implode(',', $timeanswers),
-                implode(',', $newsplits), implode(',', $tools));
+                implode(',', $newsplits), implode(',', $tools)
+            );
         }
         $rec = $DB->get_record_sql("SELECT COUNT(*) FROM {mmogame_quiz_attempts}");
     }

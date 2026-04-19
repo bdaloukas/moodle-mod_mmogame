@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 use mod_mmogame\event\course_module_viewed;
 use mod_mmogame\local\mmogame;
@@ -79,7 +79,7 @@ function mmogame_quiz_manage(int $id, mmogame $mmogame, string $url): void {
 
     $mform->display();
 
-    echo '<br>'.get_string('url_for_playing', 'mmogame', ": <a href=\"$url\" target=\"_blank\">$url</a><br>");
+    echo '<br>' . get_string('url_for_playing', 'mmogame', ": <a href=\"$url\" target=\"_blank\">$url</a><br>");
 
     echo $OUTPUT->footer();
 }

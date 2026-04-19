@@ -115,8 +115,6 @@ class restore_mmogame_activity_structure_step extends restore_questions_activity
      * @return void
      */
     protected function process_mmogame_type($data) {
-        global $DB;
-
     }
 
     /**

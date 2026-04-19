@@ -40,7 +40,7 @@ $PAGE->set_context(context_system::instance());
 $id = required_param('id', PARAM_INT);
 $pin = required_param('pin', PARAM_INT);
 
-list ($course, $cm) = get_course_and_cm_from_cmid($id, 'mmogame');
+[$course, $cm] = get_course_and_cm_from_cmid($id, 'mmogame');
 
 $color = $DB->get_record_select('mmogame_aa_colorpalettes', 'id=?', [2]);
 $colors = '[' . $color->color1 . ', ' . $color->color2 . ', ' . $color->color3 . ', ' .
@@ -80,7 +80,7 @@ $classname = "MmoGameType" . ucfirst($rgame->type) . ucfirst($rgame->mode);
 $PAGE->requires->js_call_amd('mmogametype_' . $rgame->type . '/' . strtolower($classname));
 $modeparams = $rgame->modeparams === null || $rgame->modeparams === [] ? 'null' : "'$rgame->modeparams'";
 $PAGE->requires->js_init_code("
-    require(['mmogametype_" . $rgame->type."/" . strtolower($classname) . "'], function(" . $classname . ") {
+    require(['mmogametype_" . $rgame->type . "/" . strtolower($classname) . "'], function(" . $classname . ") {
         const obj = new " . $classname . "();
         console.log($colors);
         obj.setColors(obj.sortColors($colors));

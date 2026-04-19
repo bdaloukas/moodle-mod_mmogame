@@ -23,7 +23,6 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-
 use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
@@ -78,13 +77,19 @@ class send_answers_split extends external_api {
      * @throws required_capability_exception
      * @throws restricted_context_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user,
-                                   ?string $splits = null,
-                                   ?string $attempts = null, ?string $iscorrects = null,
-                                   ?string $answers = null, ?string $timestarts = '',
-                                   string $timeanswers = '', ?string $returnsplits = null,
-                                   ?string $tools = null): array {
-
+    public static function execute(
+        int $mmogameid,
+        string $kinduser,
+        string $user,
+        ?string $splits = null,
+        ?string $attempts = null,
+        ?string $iscorrects = null,
+        ?string $answers = null,
+        ?string $timestarts = '',
+        string $timeanswers = '',
+        ?string $returnsplits = null,
+        ?string $tools = null
+    ): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
@@ -155,7 +160,8 @@ class send_answers_split extends external_api {
                 $answers[$pos],
                 $timestarts[$pos],
                 $timeanswers[$pos],
-                intval($answers[$pos]), $tools[$pos]
+                intval($answers[$pos]),
+                $tools[$pos]
             );
         }
         if ($idea > 0) {
@@ -167,8 +173,14 @@ class send_answers_split extends external_api {
         $mmogame->login_user_log($ids);
 
         $classgetattempt = new get_attempts_split();
-        $result = $classgetattempt->execute($mmogameid, $kinduser, $user,
-            null, $returnsplits, implode(',', $splits));
+        $result = $classgetattempt->execute(
+            $mmogameid,
+            $kinduser,
+            $user,
+            null,
+            $returnsplits,
+            implode(',', $splits)
+        );
         // Attempts that saved to database.
         $result['savedattempts'] = $attempts !== null ? $attempts : [];
         $result['auserids'] = $auserids;
@@ -244,8 +256,7 @@ class send_answers_split extends external_api {
             'queryranks' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'Rank array')
             ),
-        ]
-        );
+        ]);
     }
 
     /**

@@ -33,7 +33,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_mmogametype_quiz_subplugin extends restore_subplugin {
-
     /**
      * Returns array the paths to be handled by the subplugin at mmogame level
      * @return array
