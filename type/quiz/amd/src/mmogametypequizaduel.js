@@ -210,7 +210,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.showScore(json);
 
             this.createDivMessageStart(this.getStringM('js_wait_to_start'));
-            this.sendFastJSON(); // Send fast JSON updates
             if (this.buttonHelp !== undefined) {
                 this.buttonHelp.style.visibility = 'hidden';
             }
@@ -287,7 +286,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         this.createScreen(json, false);
         this.updateDivTimer();
-        this.sendFastJSON();
 
         if (this.buttonHelp !== undefined) {
             this.buttonHelp.style.visibility = 'visible';

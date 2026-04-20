@@ -17,11 +17,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
     return class MmoGameTypeQuiz extends MmoGameUI {
         kinduser;
         user;
-        //url;
         pin;
         labelTimer;
-        timeForSendFastJson = 3000;
-        timefastjson;
         type;
 
         // Colors.
@@ -225,50 +222,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.drawRadio(item, this.colorScore, this.colorBackground2); // Update styling
             });
         }
-        /**
-         * Sends periodic fast JSON updates to the server.
-         */
-        /**
-         * Improved AJAX request using Fetch API instead of XMLHttpRequest
-         */
-        async sendFastJSON() {
-            // Clear any existing timeout before setting a new one
-            if (this.timeoutFastJSON !== undefined) {
-                clearTimeout(this.timeoutFastJSON);
-            }
-
-            this.timeoutFastJSON = setTimeout(async() => {
-                try {
-                    // Create URL-encoded form data
-                    const formData = new URLSearchParams();
-                    formData.append("fastjson", this.fastjson.toString());
-                    formData.append("type", this.type);
-                    // Parse the URL, replace the last path segment with "state.php", and drop all query params
-                    const url = new URL(window.location.href);
-                    url.pathname = url.pathname.replace(/\/[^/]*$/, "/state.php");
-                    url.search = ""; // Remove query parameters.
-                    url.hash = ""; // Remove fragment (if any).
-                    // Send POST request with application/x-www-form-urlencoded format
-                    const response = await fetch(url.toString(), {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                        body: formData.toString(),
-                    });
-
-                    // Check if the response is successful
-                    if (!response.ok) {
-                        throw new Error(`Server responded with status ${response.status}`);
-                    }
-
-                    // Read server response
-                    const data = await response.text();
-                    await this.processFastJson(data);
-                } catch (error) {
-                    this.showError('Error sending Fast JSON:', error);
-                }
-            }, this.timeForSendFastJson);
-        }
-
 
         getStringT(name) {
             return M.util.get_string(name, 'mmogametype_quiz');
@@ -619,36 +572,7 @@ console.log("definitionDiv ",definitionDiv.scrollWidth,definitionDiv.scrollHeigh
             });
         }
 
-        async processFastJson(response) {
-return;
-            if (response === '') {
-                response = await this.callGetState();
-            }
-            let a = response.split('-'); // Are state,timefastjson.
-            let newstate = a.length > 0 ? a[0] : 0;
-            let newTimeFastJSON = a.length > 1 ? parseInt(a[1]) : 0;
-            if (a[0].length > 0) {
-                a[0] = parseInt( a[0]);
-            }
-            if (newstate === '') {
-                newstate = this.state;
-            }
-            if (this.timefastjson === null) {
-                this.timefastjson = 0;
-            }
-            if (newstate !== this.state || newTimeFastJSON !== this.timefastjson) {
-                this.removeMessageDivs();
-                await this.callGetAttempt();
-                return;
-            }
-
-            await this.sendFastJSON();
-        }
-
         processGetAttempt(json) {
-            this.fastjson = parseInt(json.fastjson);
-            this.timefastjson = parseInt(json.timefastjson);
-
             // Calculate time difference and set up the clock
             this.computeDifClock(json.time);
         }

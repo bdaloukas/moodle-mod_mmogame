@@ -173,7 +173,6 @@ console.log("topCreate=",topCreate, "minFontSize=", this.minFontSize);
                 this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
                 this.showScore(json);
                 this.createDivMessageStart(this.getStringM('js_wait_to_start'));
-                this.sendFastJSON(); // Send fast JSON updates
                 return;
             }
 
@@ -219,8 +218,6 @@ console.log("topCreate=",topCreate, "minFontSize=", this.minFontSize);
             if (json.state !== 0) {
                 this.createScreen(json, false);
             }
-
-            this.sendFastJSON(); // Send fast JSON updates
         }
 
         showScore(json) {

@@ -381,28 +381,6 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2024102913)) {
-        // Define field enabled to be added to mmogame.
-        $table = new xmldb_table('mmogame');
-        $field = new xmldb_field('fastjson', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED);
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
-    }
-
-    if ($oldversion < ($ver = 2024102914)) {
-        // Define field enabled to be added to mmogame.
-        $table = new xmldb_table('mmogame');
-        $field = new xmldb_field('timefastjson', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED);
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
-    }
-
     if ($oldversion < ($ver = 2024102915)) {
         // Define field numgame to be added to mmogame.
         $table = new xmldb_table('mmogame');
@@ -1075,5 +1053,39 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         }
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
+
+    if ($oldversion < ($ver = 2026042003)) {
+        $table = new xmldb_table('mmogame');
+        $index = new xmldb_index('fastjson', XMLDB_INDEX_UNIQUE, ['fastjson']);
+
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026042004)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('fastjson');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026042005)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('timefastjson');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }
