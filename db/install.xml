@@ -22,16 +22,11 @@
         <FIELD NAME="pin" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numattempt" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
-        <FIELD NAME="fastjson" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
-        <FIELD NAME="timefastjson" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="striptags" TYPE="int" LENGTH="1" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
-        <INDEXES>
-            <INDEX NAME="fastjson" UNIQUE="true" FIELDS="fastjson"/>
-        </INDEXES>
     </TABLE>
 
     <TABLE NAME="mmogame_aa_users" COMMENT="mmogame_aa_users">
