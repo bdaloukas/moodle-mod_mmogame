@@ -210,7 +210,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
 
                     const btn = this.createDOMElement('img', {
                         parent: parent,
-                        classnames: 'mmogame-button-help',
+                        classnames: 'mmogame-button-avatar',
                         styles: {
                             position: 'absolute',
                             left: `${this.padding + j * (this.iconSize + this.padding)}px`,

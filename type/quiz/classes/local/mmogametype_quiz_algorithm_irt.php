@@ -31,7 +31,7 @@ use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../../lib.php');
+//require_once(dirname(__FILE__) . '/../../lib.php');
 
 /**
  * mmogame_quiz is responsible for managing and facilitating quiz gameplay

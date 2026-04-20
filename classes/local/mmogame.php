@@ -553,11 +553,11 @@ abstract class mmogame {
      */
     public function get_avatars(?int $auserid): array {
         $where = '';
-        $params = [$this->rgame->id, $this->rgame->numgame];
+        $params = [];
         if ($auserid !== null) {
             $where = "id NOT IN (SELECT avatarid
                 FROM {mmogame_aa_grades} WHERE mmogameid=? AND numgame=? AND auserid<>?)";
-            $params[] = $auserid;
+            $params = [$this->rgame->id, $this->rgame->numgame, $auserid];
         }
         $grades = $this->db->get_records_select('mmogame_aa_avatars', $where, $params);
         $ret = [];

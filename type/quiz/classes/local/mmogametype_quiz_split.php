@@ -35,7 +35,7 @@ use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../../lib.php');
+//require_once(dirname(__FILE__) . '/../../lib.php');
 require_once('mmogametype_quiz_algorithm_irt.php');
 
 define('ERRORCODE_NO_QUERIES', 'no_questions');
@@ -822,8 +822,6 @@ class mmogametype_quiz_split extends mmogame {
      * @throws dml_exception
      */
     private function compute_queryranks(array $recs, array &$queryranks): void {
-        global $DB;
-
         $queryids = [];
 
         foreach ($recs as $rec) {
@@ -838,7 +836,7 @@ class mmogametype_quiz_split extends mmogame {
                     AND irt2.difficulty < irt.difficulty) as c
             FROM {mmogame_aa_irt} irt
             WHERE mmogameid=? AND numgame=? AND queryid $insql";
-        $recranks = $DB->get_records_sql(
+        $recranks = $this->db->get_records_sql(
             $sql,
             array_merge([$this->get_id(), $this->get_numgame()], $inparams)
         );

@@ -43,17 +43,6 @@ function mmogame_add_instance(object $mform): int {
     if (!isset($mform->guid)) {
         $mform->guidgame = mmogame_guidv4();
     }
-    if (!isset($mform->fastjson)) {
-        for (;;) {
-            // Generate a random number with 10 digits.
-            $mform->fastjson = random_int(1000000000, 9999999999); // Generates a 10-digit number.
-
-            // Check if the number already exists in the database.
-            if ($DB->get_record_select('mmogame', 'fastjson=?', [$mform->fastjson]) === false) {
-                break;
-            }
-        }
-    }
 
     if (!isset($mform->numgame)) {
         $mform->numgame = 1;

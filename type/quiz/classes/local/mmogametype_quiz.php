@@ -68,12 +68,10 @@ abstract class mmogametype_quiz extends mmogame {
         $ret['avatar'] = $info->avatar;
         $ret['nickname'] = $info->nickname;
         $ret['colors'] = implode(',', $info->colors);
-        $ret['fastjson'] = $this->rgame->fastjson;
         $ret['name'] = $this->rgame->name;
         $ret['state'] = $this->rstate->state;
         $ret['rank'] = $this->get_rank($info->sumscore, 'sumscore');
         $ret['sumscore'] = $info->sumscore;
-        $ret['timefastjson'] = $this->rgame->timefastjson;
         $ret['percent'] = $info->percent;
         $ret['percentrank'] = $this->get_rank($info->percent, 'percent');
 
@@ -122,22 +120,5 @@ abstract class mmogametype_quiz extends mmogame {
      */
     public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void {
         $db->delete_records_select('mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
-    }
-
-    /**
-     * Set the state of the current game.
-     *
-     * @param int $state
-     * @return string
-     */
-    public function set_state(int $state): string {
-        $timefastjson = round(10 * microtime(true));
-
-        $statecontents = $state . "-" . $timefastjson;
-        $filecontents = '';
-
-        $this->save_state($state, $statecontents, $filecontents, $timefastjson);
-
-        return $statecontents;
     }
 }
