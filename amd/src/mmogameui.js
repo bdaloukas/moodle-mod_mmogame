@@ -415,7 +415,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                             avatarids, avatars);
                     }
                 }).fail((error) => {
-                    console.log(error);
                     return error;
                 });
             });
@@ -860,29 +859,5 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         hasHelp() {
             return false;
         }
-
-        /**
-         * Calls the Moodle Web Service 'mmogame_get_state' and returns the response.
-         */
-        async callGetState() {
-            console.log("callGetState");
-            return new Promise((resolve, reject) => {
-                // Calling the service through the Moodle AJAX API
-                require(['core/ajax'], (Ajax) => {
-                    let getState = Ajax.call([{
-                        methodname: 'mod_mmogame_get_state',
-                        args: {mmogameid: this.mmogameid},
-                    }]);
-
-                    getState[0]
-                        .done((response) => resolve(response))
-                        .fail((error) => {
-                            this.createDivMessage('mmogame-error', error.message);
-                            reject(error);
-                        });
-                });
-            });
-        }
-
     };
 });

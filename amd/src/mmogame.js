@@ -691,17 +691,10 @@ define([''], function() {
             if (text === null) {
                 return String(prefix);
             }
-//console.log(text);
             text = String(text);
             prefix = String(prefix);
 
-  /*          console.log('formatText', {
-                type: typeof text,
-                constructor: text.constructor?.name,
-                value: text
-            });*/
-
-            // Remove data-start and data-end attributes from opening <p ...> tags
+            // Remove data-start and data-end attributes from opening <p ...> tags.
             text = text.replace(/<p\b[^>]*>/gi, tag =>
                 tag.replace(/\sdata-(start|end)="[^"]*"/gi, '')
             );

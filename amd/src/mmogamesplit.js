@@ -188,7 +188,6 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                     width: `${this.split.width}px`,
                     height: `${this.split.height}px`,
                     overflow: 'hidden',
-                    //border: '1px solid blue',
                 }
             });
 
@@ -525,10 +524,6 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 this.countY = Math.round(Math.sqrt(this.countAll));
                 this.countX = Math.ceil(this.countAll / this.countY);
 
-                //while (this.body.firstChild) {
-                //    this.body.removeChild(this.body.firstChild);
-                //}
-
                 document.body.innerHTML = '';
                 this.body = document.getElementsByTagName("body")[0];
                 this.area = undefined;
@@ -539,7 +534,6 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
         }
 
         gateSendGetAssets() {
-            console.log("before gateSendGetAssets");
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -566,7 +560,6 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                     };
                     this.gateCreateScreen();
                 }).fail((error) => {
-                    console.log('AJAX fail mod_mmogame_get_assets_split', {params, error});
                     this.showError('gateSendGetAssets', error);
                     return error;
                 });

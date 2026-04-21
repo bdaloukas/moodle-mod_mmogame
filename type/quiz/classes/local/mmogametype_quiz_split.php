@@ -272,7 +272,9 @@ class mmogametype_quiz_split extends mmogame {
         }
 
         $queries = mmogametype_quiz_algorithm_irt::get_queries(
-            $this->get_db(), $this->rgame->id, $this->rgame->numgame,
+            $this->get_db(),
+            $this->rgame->id,
+            $this->rgame->numgame,
             $this->auserid,
             $ids,
             1,

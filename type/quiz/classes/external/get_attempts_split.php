@@ -131,9 +131,9 @@ class get_attempts_split extends external_api {
         $aduelauserids = $onlygroup ? $mmogame->get_auserids_split($kinduser, $user) : [];
 
         for (;;) {
-            $numgame = $aduels = 0;
-            $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips = $answerids = $answertexts = null;
-            $aduelavatars = $aduelcorrects = $queryanswerids0 = null;
+            $numgame = 0;
+            $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips = $answerids = $answertexts = [];
+            $aduelavatars = $aduelcorrects = $queryanswerids0 = $aduels = [];
 
             $countquestions = $countcorrect = 0;
             $islastcorrect = [];
@@ -273,23 +273,22 @@ class get_attempts_split extends external_api {
 
     /**
      * Call get_attempts of mmogame.
-     *
      * @param mmogame $mmogame
      * @param array $auserids
      * @param bool $isaduel
-     * @param ?array $aduelauserids
+     * @param array|null $aduelauserids
      * @param int $numgame
-     * @param $attemptids
-     * @param $attemptqueryids
-     * @param $attemptnums
-     * @param $definitions
-     * @param $tips
-     * @param $answerids
-     * @param $answertexts
-     * @param $aduels
-     * @param $aduelavatars
-     * @param $aduelcorrects
-     * @param $queryanswerids0
+     * @param array $attemptids
+     * @param array $attemptqueryids
+     * @param array $attemptnums
+     * @param array $definitions
+     * @param array $tips
+     * @param array $answerids
+     * @param array $answertexts
+     * @param array $aduels
+     * @param array $aduelavatars
+     * @param array $aduelcorrects
+     * @param array $queryanswerids0
      * @param int $countquestions
      * @param int $countcorrect
      * @param array $islastcorrect
@@ -302,17 +301,17 @@ class get_attempts_split extends external_api {
         bool $isaduel,
         ?array $aduelauserids,
         int &$numgame,
-        &$attemptids,
-        &$attemptqueryids,
-        &$attemptnums,
-        &$definitions,
-        &$tips,
-        &$answerids,
-        &$answertexts,
-        &$aduels,
-        &$aduelavatars,
-        &$aduelcorrects,
-        &$queryanswerids0,
+        array &$attemptids,
+        array &$attemptqueryids,
+        array &$attemptnums,
+        array &$definitions,
+        array &$tips,
+        array &$answerids,
+        array &$answertexts,
+        array &$aduels,
+        array &$aduelavatars,
+        array &$aduelcorrects,
+        array &$queryanswerids0,
         int &$countquestions,
         int &$countcorrect,
         array &$islastcorrect,
@@ -421,7 +420,6 @@ class get_attempts_split extends external_api {
             $answerids[] = implode(',', $a);
             $queryanswerids0[] = implode(',', $queryanswerids);
         }
-error_log("answertexts=".json_encode($answertexts,JSON_PRETTY_PRINT));
         return false;
     }
 }

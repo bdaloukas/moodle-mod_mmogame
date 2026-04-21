@@ -262,11 +262,11 @@ class send_answers_split extends external_api {
     /**
      * Packs as an array the results of idea button.
      *
-     * @param $mmogame
-     * @param $queryids
+     * @param mmogame $mmogame
+     * @param array $queryids
      * @return array
      */
-    protected static function pack_idea($mmogame, $queryids): array {
+    protected static function pack_idea(mmogame $mmogame, array $queryids): array {
         $queries = $mmogame->get_qbank()->load_many($queryids);
         foreach ($queries as $query) {
             $definitions[] = $query->definition;

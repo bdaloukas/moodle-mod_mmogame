@@ -29,8 +29,6 @@ namespace mmogametype_quiz\local;
 use mod_mmogame\local\database\mmogame_database;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 //require_once(dirname(__FILE__) . '/../../lib.php');
 
 /**
@@ -55,8 +53,8 @@ class mmogametype_quiz_algorithm_irt {
      * @param mmogame_database $db
      * @param int $mmogameid
      * @param int $numgame
-     * @param array<int,object> &$questions List of question objects (by reference).
-     * @param array<int,int> $ids Map: queryid => categoryid.
+     * @param array &$questions List of question objects (by reference).
+     * @param array $ids Map: queryid => categoryid.
      */
     protected static function repair_stats(
         mmogame_database $db,
