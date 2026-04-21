@@ -127,7 +127,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.computeSizes(0, this.getMinIconSize(this.info.countquestion));
                     this.createScreen();
                 }).fail((error) => {
-                    console.log(error);
                     return error;
                 });
             });
@@ -422,7 +421,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             // Binary search for the largest font size that still fits
             while ((maxSize - minSize) > precision) {
                 const fontSize = (minSize + maxSize) / 2;
-console.log("fontSize=",fontSize);
                 style.fontSize = fontSize + "px";
 
                 // Check whether the definition overflows

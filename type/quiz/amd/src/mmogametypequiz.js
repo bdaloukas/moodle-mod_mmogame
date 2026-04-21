@@ -402,7 +402,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @returns {Array} The width and height of the definition area.
          */
         createDefinition(left, top, width, height, onlyMetrics, fontSize, definition) {
-            console.log("createDefinition height=",height);
             const definitionDiv = this.createDOMElement(
                 'div',
                 {
@@ -421,7 +420,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.area.appendChild(definitionDiv);
 
                 const size = [definitionDiv.scrollWidth, definitionDiv.scrollHeight];
-console.log("onlyMetrics",fontSize,size);
                 this.area.removeChild(definitionDiv);
                 return size;
             }
@@ -437,7 +435,6 @@ console.log("onlyMetrics",fontSize,size);
             definitionDiv.style.padding = `0 ${this.padding}px`;
 
             this.area.appendChild(definitionDiv);
-console.log("definitionDiv ",definitionDiv.scrollWidth,definitionDiv.scrollHeight);
             return [definitionDiv.scrollWidth, definitionDiv.scrollHeight, definitionDiv];
         }
 
@@ -555,7 +552,6 @@ console.log("definitionDiv ",definitionDiv.scrollWidth,definitionDiv.scrollHeigh
                         }
                     });
                 if (defSize[0] <= definitionWidth && defSize[1] <= maxHeight && ansSize[1] <= maxHeight) {
-                    console.log("break604", defSize, ansSize,"fontSize=",this.fontSize);
                     break;
                 }
             }
