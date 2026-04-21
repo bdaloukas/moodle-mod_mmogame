@@ -421,7 +421,7 @@ class get_attempts_split extends external_api {
             $answerids[] = implode(',', $a);
             $queryanswerids0[] = implode(',', $queryanswerids);
         }
-
+error_log("answertexts=".json_encode($answertexts,JSON_PRETTY_PRINT));
         return false;
     }
 }

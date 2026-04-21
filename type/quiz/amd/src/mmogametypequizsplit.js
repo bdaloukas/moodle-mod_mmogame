@@ -397,62 +397,81 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             }
             return aRandom;
         }
+
         computeFontSize(split, sp) {
-            const ishorizontal = this.split.width >= this.split.height;
+            const ishorizontal = split.width >= split.height;
             let minSize = 10;
             const bodyFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
             let maxSize = Math.min(2 * bodyFontSize, this.iconSize / 2, sp.answersWidth);
-            let fontSize = minSize;
-            let precision = 0.1; // Defines the precision level (0.1px)
+            const precision = 0.1;
+
             const n = sp.aItemLabel.length;
             const div = sp.definition;
             const style = div.style;
-            const maxHeight = ishorizontal ?
-                sp.answersHeight - this.padding - this.iconSize / 2 :
-                sp.answersHeight - this.iconSize - this.padding;
-            style.height = 'auto';
-            // Perform a binary search to find the optimal font size
+
+            const maxHeight = ishorizontal
+                ? sp.answersHeight - this.padding - this.iconSize / 2
+                : sp.answersHeight - this.iconSize - this.padding;
+
+            style.width = sp.definitionWidth + "px";
+            style.height = sp.definitionHeight + "px";
+
+            let bestFit = minSize;
+
+            style.overflow = 'hidden';
+            // Binary search for the largest font size that still fits
             while ((maxSize - minSize) > precision) {
-                fontSize = Math.round(10 * (minSize + maxSize) / 2) / 10; // ComputeAverage
-                style.width = sp.definitionWidth + "px";
+                const fontSize = (minSize + maxSize) / 2;
+console.log("fontSize=",fontSize);
                 style.fontSize = fontSize + "px";
 
-                // Check if the text exceeds the container's boundaries (definition)
-                let isbig = (sp.definition.scrollWidth > sp.definitionWidth || sp.definition.scrollHeight > sp.definitionHeight);
+                // Check whether the definition overflows
+                let isbig = (
+                    div.scrollWidth > div.clientWidth ||
+                    div.scrollHeight > div.clientHeight
+                );
 
                 if (!isbig) {
                     let sum = 0;
                     const maxWidth = Math.round(sp.answersWidth - fontSize - 3 * this.padding);
+
                     for (let i = 0; i < n; i++) {
                         const elem = sp.aItemLabel[i];
                         elem.style.fontSize = `${fontSize}px`;
                         elem.style.width = (maxWidth - 1) + "px";
                         elem.style.height = 'auto';
-                        if (elem.scrollWidth >= maxWidth) {
+
+                        if (elem.scrollWidth > elem.clientWidth) {
                             isbig = true;
                             break;
                         }
-                        sum += parseInt(elem.scrollHeight) + this.padding;
+
+                        sum += elem.scrollHeight + this.padding;
                     }
-                    if (sum >= maxHeight) {
+
+                    if (sum > maxHeight) {
                         isbig = true;
                     }
                 }
+
                 if (isbig) {
-                    maxSize = fontSize - precision;
+                    maxSize = fontSize;
                 } else {
-                    minSize = fontSize + precision / 4;
+                    bestFit = fontSize;
+                    minSize = fontSize;
                 }
             }
-            fontSize = minSize;
+
+            const fontSize = Math.floor(bestFit * 10) / 10;
             sp.fontSize = fontSize;
 
-            // Set the final font size with 1 decimal precision
+            // Apply final font size
             sp.definition.style.fontSize = fontSize + "px";
-            let top = sp.answersTop;
 
+            let top = sp.answersTop;
             const leftLabel = sp.answersLeft + Math.round(fontSize) + this.padding;
             sp.aItemLabelTop = Array(n);
+
             for (let i = 0; i < n; i++) {
                 const elem = sp.aItemLabel[i];
                 elem.style.fontSize = `${fontSize}px`;
@@ -472,18 +491,18 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             }
 
             const space = sp.fontSize;
-            if (top + this.iconSize + this.padding + n * space < this.split.height) {
+            if (top + this.iconSize + this.padding + n * space < split.height) {
                 for (let i = 1; i < n; i++) {
                     const elem = sp.aItemLabel[i];
-                    const top = parseInt(elem.style.top) + i * sp.fontSize;
-                    elem.style.top = `${top}px`;
-                    sp.aItemRadio[i].style.top = `${top}px`;
+                    const newTop = parseInt(elem.style.top) + i * sp.fontSize;
+                    elem.style.top = `${newTop}px`;
+                    sp.aItemRadio[i].style.top = `${newTop}px`;
                 }
                 top += (n - 1) * space;
             }
 
             if (ishorizontal) {
-                // If we can make a vertical space.
+                // If there is enough vertical space, expand the definition block height
                 if (sp.definition.scrollHeight < top - sp.answersTop) {
                     sp.definition.style.height = `${top - sp.answersTop}px`;
                 }
@@ -1014,7 +1033,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
 
             if (this.info.countquestion > 0) {
                 let percent = sp.attempts[0].queryrank / this.info.countquestion;
-                console.log("percent=", percent);
                 this.updateDifficultyRing(sp.ring, percent);
             }
         }
@@ -1678,7 +1696,8 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
         }
 
         getMinIconSize(countquestion) {
-            let size1 = 0, size2 = 0;
+            let size1 = 0;
+            let size2;
             if (countquestion > 0) {
                 const el = document.createElement("div");
                 el.style.position = "absolute";
@@ -1692,12 +1711,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 el.innerHTML = countquestion + " / " + countquestion;
                 this.body.appendChild(el);
 
-                const style = window.getComputedStyle(el);
-                console.log("fontSize=",style.fontSize);
-
-                size1 = Math.round( 1/ 0.8 * Math.max(el.scrollWidth, el.scrollHeight));
-                //this.body.removeChild(tempDiv);
-console.log("tempDiv.innerHTML=",el.innerHTML, "fontSize=", el.style, el.scrollWidth, el.scrollHeight);
+                size1 = Math.round(1 / 0.8 * Math.max(el.scrollWidth, el.scrollHeight));
             }
 
             const tempDiv = document.createElement("div");
@@ -1710,9 +1724,7 @@ console.log("tempDiv.innerHTML=",el.innerHTML, "fontSize=", el.style, el.scrollW
             size2 = Math.max(tempDiv.scrollWidth, tempDiv.scrollHeight);
             this.body.removeChild(tempDiv);
 
-            console.log("size1=",size1,"size2=",size2);
-
-            return Math.round( 1.1 * Math.max(size1, size2));
+            return Math.round(1.1 * Math.max(size1, size2));
         }
     };
 });

@@ -161,6 +161,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
         }
 
         gateCreateScreen() {
+            document.body.style.overflowY = 'hidden';
             this.cIcons = 5;
             this.gateCreateSidebar();
             this.gateShowColorPalettes(this.body, this.countPalettes, this.info.colorpaletteids, this.info.colorpalettes);
@@ -187,7 +188,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                     width: `${this.split.width}px`,
                     height: `${this.split.height}px`,
                     overflow: 'hidden',
-                    border: '1px solid blue',
+                    //border: '1px solid blue',
                 }
             });
 
@@ -524,10 +525,14 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 this.countY = Math.round(Math.sqrt(this.countAll));
                 this.countX = Math.ceil(this.countAll / this.countY);
 
-                while (this.body.firstChild) {
-                    this.body.removeChild(this.body.firstChild);
-                }
+                //while (this.body.firstChild) {
+                //    this.body.removeChild(this.body.firstChild);
+                //}
+
+                document.body.innerHTML = '';
+                this.body = document.getElementsByTagName("body")[0];
                 this.area = undefined;
+
                 this.computeSizes(0);
                 this.gateSendGetAssets();
             });

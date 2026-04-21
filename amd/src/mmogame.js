@@ -687,27 +687,38 @@ define([''], function() {
             };
         }
 
-        formatText(text, prefix) {
+        formatText(text, prefix = '') {
+            if (text === null) {
+                return String(prefix);
+            }
+//console.log(text);
+            text = String(text);
+            prefix = String(prefix);
 
-            // Removes data-start and data-end in <p> </p>
-            text = text.replace(/<p[^>]*>/g, (tag) =>
-                tag.replace(/\sdata-start="[^"]*"/g, "")
-                    .replace(/\sdata-end="[^"]*"/g, "")
+  /*          console.log('formatText', {
+                type: typeof text,
+                constructor: text.constructor?.name,
+                value: text
+            });*/
+
+            // Remove data-start and data-end attributes from opening <p ...> tags
+            text = text.replace(/<p\b[^>]*>/gi, tag =>
+                tag.replace(/\sdata-(start|end)="[^"]*"/gi, '')
             );
 
-            // 1) Check if the whole string is exactly one <p>...</p> block
-            //    If yes, remove the <p> tags completely
-            const match = text.match(/^<p>(.*)<\/p>$/i);
+            // If the whole string is exactly one <p ...>...</p> block,
+            // remove the outer <p> wrapper and prepend the prefix
+            const match = text.match(/^\s*<p\b[^>]*>([\s\S]*?)<\/p>\s*$/i);
             if (match) {
-                return prefix + match[1]; // Return the inner text without <p>.
+                return prefix + match[1];
             }
 
-            // 2) If a <p> exists, insert the prefix only into the first <p>
-            if (text.includes("<p>")) {
-                return text.replace("<p>", `<p>${prefix}`);
+            // If at least one <p ...> exists, insert the prefix into the first one
+            if (/<p\b[^>]*>/i.test(text)) {
+                return text.replace(/<p\b[^>]*>/i, tag => `${tag}${prefix}`);
             }
 
-            // 3) If no <p> exists at all, simply add the prefix at the beginning
+            // If no <p> exists, simply prepend the prefix
             return prefix + text;
         }
     };
