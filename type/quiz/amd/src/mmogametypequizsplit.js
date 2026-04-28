@@ -98,7 +98,8 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 getAttemptsSplit[0].done(({avatars, attempts, attemptqueryids, querydefinitions, querytips,
                                               queryanswerids, numattempts, answertexts, aduels,
                                               aduelavatars, aduelcorrects, auserids, queryanswerids0, grades,
-                                              countquestion, countcorrect, islastcorrect, ranks, queryranks}) => {
+                                              countquestion, countcorrect, islastcorrect, ranks, queryranks,
+                                          hasidea}) => {
                     this.info = {
                         avatars: avatars,
                         attempts: attempts,
@@ -120,6 +121,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         islastcorrect: islastcorrect,
                         ranks: ranks,
                         queryranks: queryranks,
+                        hasidea: hasidea,
                     };
                     if (this.palette !== undefined) {
                         this.setColors(this.palette);
@@ -243,13 +245,14 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 sp.attempts.shift();
                 this.showNextQuestion(sp.position);
             });
-
-            sp.idea = this.createDivIdea(sp, 5 * this.iconSize + this.iconSize / 2 + 6 * this.padding);
-            sp.ideaCallback = () => {
-                this.sendAnswer(split, true, false, false, true);
-                this.askNextQuestions();
-            };
-            sp.idea.addEventListener("click", sp.ideaCallback);
+            if (this.info.hasidea) {
+                sp.idea = this.createDivIdea(sp, 5 * this.iconSize + this.iconSize / 2 + 6 * this.padding);
+                sp.ideaCallback = () => {
+                    this.sendAnswer(split, true, false, false, true);
+                    this.askNextQuestions();
+                };
+                sp.idea.addEventListener("click", sp.ideaCallback);
+            }
 
             // Definition.
             sp.definitionWidth = ishorizontal ?
@@ -522,8 +525,8 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             sp.auserid = info.auserids[splitInfo];
             let attempts = info.attempts[splitInfo].split(",");
             sp.attempts = [];
-            sp.score = info.grades[splitInfo];
-            sp.rank = info.ranks[splitInfo];
+            sp.score = parseInt(info.grades[splitInfo]);
+            sp.rank = parseInt(info.ranks[splitInfo]);
             sp.countcorrect = info.countcorrect[splitInfo];
             for (let i = 0; i < attempts.length; i++) {
                 let item = {attemptid: attempts[i]};

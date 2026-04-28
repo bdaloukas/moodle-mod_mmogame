@@ -29,6 +29,7 @@ $string['algorithm'] = 'Alogorithm for selecting questions';
 $string['algorithm_adaptive'] = 'Adaprive';
 $string['algorithm_random'] = 'Random';
 $string['alone_state1'] = 'Playing the game';
+$string['idea'] = 'Idea';
 $string['js_aduel_cut'] = 'It only shows two answers to choose from.';
 $string['js_aduel_example1'] = 'The player answered incorrectly while his opponent answered correctly.';
 $string['js_aduel_example2'] = 'The player has Rank 1 in the game with 14 points and a correct answer rate of 27%.';

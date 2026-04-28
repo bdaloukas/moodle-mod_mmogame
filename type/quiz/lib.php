@@ -303,3 +303,48 @@ function mmogametype_quiz_irt_read(
     file_put_contents("data.csv", implode("\n", $lines));
     return $mapusers;
 }
+
+/**
+ * Shows controls spesific to each game.
+ *
+ * @param $mform
+ * @return void
+ * @throws coding_exception
+ */
+function mmogametype_quiz_definition($mform): void {
+    // Enabled.
+    $mform->addElement(
+        'advcheckbox',
+        'typequiz_idea',
+        get_string('idea', 'mmogametype_quiz'),
+        get_string('yesno', 'mmogame'),
+        ['group' => 1],
+        [0, 1]
+    );
+    $mform->hideIf('typequiz_idea', 'typemode', 'neq', 'quizsplit');
+}
+
+/**
+ * set_data for mod_form
+ *
+ * @param $defaultvalues
+ * @return void
+ */
+function mmogametype_quiz_set_data($defaultvalues): void {
+    if (!isset($defaultvalues->typeparams)) {
+        return;
+    }
+    $params = $defaultvalues->modeparams;
+    $a = json_decode($params, true);
+    $defaultvalues->idea = isset($a->idea) ? 1 : 0;
+}
+
+/**
+ * data_preprocessing for mod_form
+ *
+ * @param $defaultvalues
+ * @return void
+ */
+function mmogametype_quiz_data_preprocessing(&$defaultvalues): void {
+
+}

@@ -42,6 +42,8 @@ require_once(__DIR__ . '/../../course/moodleform_mod.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_mmogame_mod_form extends moodleform_mod {
+    /** @var array $types: array of types. */
+    protected array $types = [];
     /**
      * Return the id.
      */
@@ -57,6 +59,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
     protected function definition(): void {
         global $CFG;
         $mform = $this->_form;
+        $this->types = mmogame_get_types();
 
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -104,17 +107,15 @@ class mod_mmogame_mod_form extends moodleform_mod {
      * @throws coding_exception
      */
     protected function definition_modes(object $mform): void {
-        $types = mmogame_get_types();
         $dir = __DIR__ . '/type';
         $modes = [];
-        foreach ($types as $type) {
+        foreach ($this->types as $type) {
             require_once($dir . '/' . $type . '/lib.php');
             $function = 'mmogametype_' . $type . '_get_modes';
             $map = $function();
             foreach ($map as $mode => $value) {
                 $modes[$type . '-' . $mode] = $value;
             }
-            echo $function;
         }
 
         $mform->addElement('select', 'typemode', get_string('type', 'mmogame'), $modes);
@@ -143,6 +144,13 @@ class mod_mmogame_mod_form extends moodleform_mod {
             ['group' => 1],
             [0, 1]
         );
+
+        foreach ($this->types as $type) {
+            $function = 'mmogametype_' . $type . '_definition';
+            if (function_exists($function) ) {
+                $function($mform);
+            }
+        }
     }
 
     /**
@@ -154,6 +162,13 @@ class mod_mmogame_mod_form extends moodleform_mod {
         // Completion settings check.
         if (empty($defaultvalues['completionusegrade'])) {
             $defaultvalues['completionpass'] = 0; // Forced unchecked.
+        }
+
+        foreach ($this->types as $type) {
+            $function = 'mmogametype_' . $type . '_data_preprocessing';
+            if (function_exists($function)) {
+                $function($defaultvalues);
+            }
         }
     }
 
@@ -268,6 +283,12 @@ class mod_mmogame_mod_form extends moodleform_mod {
 
         if (isset($defaultvalues->type) && isset($defaultvalues->mode)) {
             $defaultvalues->typemode = $defaultvalues->type . '-' . $defaultvalues->mode;
+            $dir = __DIR__ . '/type';
+            require_once($dir . '/' . $defaultvalues->type . '/lib.php');
+            $function = 'type'.$defaultvalues->type.'_set_data';
+            if (function_exists($function)) {
+                $function($defaultvalues);
+            }
         }
         if (!isset($defaultvalues->pin) || $defaultvalues->pin == 0) {
             $db = new mmogame_database_moodle();

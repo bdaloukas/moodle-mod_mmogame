@@ -181,6 +181,7 @@ class send_answers_split extends external_api {
             $returnsplits,
             implode(',', $splits)
         );
+
         // Attempts that saved to database.
         $result['savedattempts'] = $attempts !== null ? $attempts : [];
         $result['auserids'] = $auserids;
@@ -288,6 +289,6 @@ class send_answers_split extends external_api {
             'aduels' => [], 'aduelavatars' => [], 'aduelcorrects' => [],
             'auserids' => [], 'queryanswerids0' => $queryanswerids0,
             'countquestion' => 0, 'countcorrect' => [], 'islastcorrect' => [],
-            'ranks' => [], 'grades' => [], 'savedattempts' => []];
+            'ranks' => [], 'grades' => [], 'savedattempts' => [], 'queryranks' => []];
     }
 }

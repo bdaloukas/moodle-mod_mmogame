@@ -198,7 +198,7 @@ class get_attempts_split extends external_api {
             'aduels' => $aduels, 'aduelavatars' => $aduelavatars, 'aduelcorrects' => $aduelcorrects,
             'auserids' => $auserids, 'queryanswerids0' => $queryanswerids0, 'grades' => $grades,
             'countquestion' => $countquestions, 'countcorrect' => $countcorrect, 'islastcorrect' => $islastcorrect,
-            'ranks' => $ranks, 'queryranks' => $queryranks];
+            'ranks' => $ranks, 'queryranks' => $queryranks, 'hasidea' => 0];
 
         return $ret;
     }
@@ -268,6 +268,11 @@ class get_attempts_split extends external_api {
             'queryranks' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Rank array')
             ),
+            'hasidea' => new external_value(
+                PARAM_INT,
+                'Has idea'
+            ),
+
         ]);
     }
 

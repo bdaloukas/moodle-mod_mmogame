@@ -82,9 +82,7 @@ $modeparams = $rgame->modeparams === null || $rgame->modeparams === [] ? 'null' 
 $PAGE->requires->js_init_code("
     require(['mmogametype_" . $rgame->type . "/" . strtolower($classname) . "'], function(" . $classname . ") {
         const obj = new " . $classname . "();
-        console.log($colors);
         obj.setColors(obj.sortColors($colors));
-        console.log($rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modeparams);
         obj.gateOpen($rgame->id, $rgame->pin, '$rgame->kinduser', '$user', $modeparams);
     });
 ");
