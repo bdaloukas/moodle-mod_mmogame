@@ -508,6 +508,7 @@ define([''], function() {
             canvas.style.position = "absolute";
             canvas.width = size;
             canvas.height = size;
+console.log("parent=", parent);
             parent.appendChild(canvas);
             if (checked) {
                 canvas.classList.add("checked");

@@ -317,76 +317,76 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
          * @param {object} parent
          * @param {number} split
          * @param {object} sp
-         * @param {boolean} disabled - Whether the answers are disabled.
          * @returns {number} The total height used by the answer options.
          */
-        createAnswerMultichoice(parent, split, sp, disabled) {
+        createAnswerMultichoice(parent, split, sp) {
             const attempt = sp.attempts[0];
             const n = attempt.answers.length;
-            let aItemRadio = Array(n);
-            let aItemLabel = Array(n);
+            sp.aItemRadio = Array(n);
+            sp.aItemLabel = Array(n);
+
             let aRandom = this.computeRandom(n);
+
             // Iterate over each answer
             for (let i = 0; i < n; i++) {
-                const ans = aRandom[i];
-                const label = this.createDOMElement('label', {
-                    parent: sp.parent,
-                    classnames: 'mmogame-quiz-aduelsplit-label' + i,
-                    styles: {
-                        position: 'absolute',
-                        top: `${top}px`,
-                        color: this.getContrastingColor(this.colorBackground),
-                        align: "left",
-                        marginTop: 0,
-                        marginBottom: 0,
-                        overflow: 'visible',
-                        lineHeight: 'normal',
-                    }
-                });
-                // Label.innerHTML = (i + 1) + ". " + attempt.answers[ans];
-                label.innerHTML = this.formatText(attempt.answers[ans], (i + 1) + ". ");
-                label.htmlFor = "mmogame_quiz_aduelsplit-input" + i;
-
-                // Create the checkbox
-                // const checked = achecked.includes(attempt.answerids[ans]);
-                const checked = false;
-                const item = this.createRadiobox(parent, 0, this.colorBackground, this.colorScore,
-                    checked, disabled);
-                item.style.position = "absolute";
-                item.style.left = sp.answersLeft + "px";
-                item.id = "mmogame_quiz_input" + i;
-
-                // Event listeners for interactions
-                item.addEventListener('click', () => {
-                    if (!item.classList.contains("disabled")) {
-                        this.onClickRadio(split, i, this.colorBackground2, this.colorScore);
-                        sp.selectedAnswer = i;
-                        this.selectAnswer(split);
-                        this.updateRanks();
-                    }
-                });
-
-                label.addEventListener('click', () => {
-                    if (this.splits[split].stateShowCorrect !== undefined) {
-                        return; // Disabled.
-                    }
-                    this.onClickRadio(split, i, this.colorBackground2, this.colorScore);
-                    sp.selectedAnswer = i;
-                    this.selectAnswer(split);
-                    this.updateRanks();
-                });
-
-                aItemRadio[i] = item;
-                aItemLabel[i] = label;
+                this.createAnswerMultichoiceItem(split, sp, i, aRandom, attempt);
             }
 
-            sp.aItemRadio = aItemRadio;
-            sp.aItemLabel = aItemLabel;
             sp.selectedAnswer = -1;
             sp.aRandom = aRandom;
             sp.timestart = Math.round(Math.floor(Date.now() / 1000));
 
             return top;
+        }
+
+        createAnswerMultichoiceItem(split, sp, i, aRandom, attempt) {
+            const ans = aRandom[i];
+            const label = this.createDOMElement('label', {
+                parent: sp.parent,
+                classnames: 'mmogame-quiz-aduelsplit-label' + i,
+                styles: {
+                    position: 'absolute',
+                    top: `${top}px`,
+                    color: this.getContrastingColor(this.colorBackground),
+                    align: "left",
+                    marginTop: 0,
+                    marginBottom: 0,
+                    overflow: 'visible',
+                    lineHeight: 'normal',
+                }
+            });
+            label.innerHTML = this.formatText(attempt.answers[ans], (i + 1) + ". ");
+            label.htmlFor = "mmogame_quiz_aduelsplit-input" + i;
+
+            // Create the checkbox
+            const checked = false;
+            const item = this.createRadiobox(sp.parent, 0, this.colorBackground, this.colorScore, checked);
+            item.style.position = "absolute";
+            item.style.left = sp.answersLeft + "px";
+            item.id = "mmogame_quiz_input" + i;
+
+            // Event listeners for interactions
+            item.addEventListener('click', () => {
+                if (!item.classList.contains("disabled")) {
+                    this.onClickRadio(split, i, this.colorBackground2, this.colorScore);
+                    sp.selectedAnswer = i;
+                    this.selectAnswer(split);
+                    this.updateRanks();
+                }
+            });
+
+            label.addEventListener('click', () => {
+                if (this.splits[split].stateShowCorrect !== undefined) {
+                    return; // Disabled.
+                }
+                this.onClickRadio(split, i, this.colorBackground2, this.colorScore);
+                sp.selectedAnswer = i;
+                this.selectAnswer(split);
+                this.updateRanks();
+            });
+
+            sp.aItemRadio[i] = item;
+            sp.aItemLabel[i] = label;
         }
 
         computeRandom(n) {
@@ -665,7 +665,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             let sp = this.splits[split];
 
             if (sp.attempts === undefined || sp.attempts.length === 0) {
-                return; // Wait answer from server, so no attempts available.
+                return false; // Wait answer from server, so no attempts available.
             }
 
           if (sp.selectedAnswer >= 0 && !sp.isWaitingContinue) {
@@ -704,7 +704,10 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.showCorrect(sp, false, addscore, addscoreaduel);
                     this.sendAnswer(split, false, isWizard);
                 }
+
+                return true;
             }
+            return false;
         }
 
         continueAnswer(split) {
@@ -768,7 +771,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
         updateScore(sp) {
             sp.player.lblScore.innerHTML = sp.score;
             sp.player.lblRank.innerHTML = sp.rank !== '' ? '#' + sp.rank : '';
-            this.changeScore = true;
         }
 
         updatePercent(sp) {
@@ -987,8 +989,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             sp.stateShowCorrect = undefined;
 
             this.removeCorrectIcons(sp);
-
-            const n = sp.aItemLabel.length;
+            const n = sp.attempts.length > 0 ? sp.attempts[0].answers.length : 0;
 
             sp.aRandom = this.computeRandom(n);
             for (let i = 0; i < sp.aItemLabel.length; i++) {
@@ -1024,9 +1025,9 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             sp.definition.innerHTML = this.formatText(sp.attempts[0].definition, sp.attempts[0].numattempt + ". ");
             this.autoResizeText(sp.definition, sp.definitionWidth, sp.definitionHeight, true, 0, 0);
             const attempt = sp.attempts[0];
+            this.makeItemLength(split, sp, attempt.answers.length);
             for (let i = 0; i < sp.aItemLabel.length; i++) {
                 const ans = sp.aRandom[i];
-                // Sp.aItemLabel[i].innerHTML = (i + 1) + ": " + attempt.answers[ans];
                 sp.aItemLabel[i].innerHTML = this.formatText(attempt.answers[ans], (i + 1) + ": ");
             }
 
@@ -1035,6 +1036,19 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             if (this.info.countquestion > 0) {
                 let percent = sp.attempts[0].queryrank / this.info.countquestion;
                 this.updateDifficultyRing(sp.ring, percent);
+            }
+        }
+
+        makeItemLength(split, sp, n) {
+            while (n < sp.aItemLabel.length) {
+                sp.parent.removeChild(sp.aItemLabel[n]);
+                sp.parent.removeChild(sp.aItemRadio[n]);
+                sp.aItemLabel.splice(n, 1);
+                sp.aItemRadio.splice(n, 1);
+            }
+
+            while (sp.aItemLabel.length < n) {
+                this.createAnswerMultichoiceItem(split, sp, sp.aItemLabel.length, sp.aRandom, sp.attempts[0]);
             }
         }
 
@@ -1112,7 +1126,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                                          grades, savedattempts, countquestion, countcorrect, islastcorrect, ranks, queryranks}) => {
 
                     if (spidea >= 0) {
-                        this.show_idea(spidea, querydefinitions, queryanswerids0, querytips, answertexts);
+                        this.showIdea(spidea, querydefinitions, queryanswerids0, querytips, answertexts);
                         return;
                     }
 
@@ -1249,7 +1263,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
 
         createAddScore(sp, left, iconSize, addscore) {
             if (addscore === 0) {
-                return;
+                return false;
             }
 
             if (addscore > 0) {
@@ -1583,7 +1597,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             }
         }
 
-        show_idea(spidea, querydefinitions, queryanswerids0, querytips, answertexts) {
+        showIdea(spidea, querydefinitions, queryanswerids0, querytips, answertexts) {
             let sp = this.splits[spidea];
             sp.server = [];
             Array.from(sp.parent.children).forEach(child => {

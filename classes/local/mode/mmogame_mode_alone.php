@@ -53,11 +53,9 @@ class mmogame_mode_alone {
                 ['id' => $rgame->id, 'numgame' => $rgame->numgame]
             );
             $mmogame->update_state($mmogame->get_rstate()->state);
-            $mmogame->set_state($mmogame->get_rstate()->state);
         } else if (isset($data->state)) {
             if ($data->state >= 0 && $data->state <= STATE_LAST) {
                 $mmogame->update_state($data->state);
-                $mmogame->set_state($data->state);
             }
         }
     }

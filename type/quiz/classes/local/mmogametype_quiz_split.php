@@ -785,23 +785,6 @@ class mmogametype_quiz_split extends mmogame {
     }
 
     /**
-     * Set the state of the current game.
-     *
-     * @param int $state
-     * @return string
-     */
-    public function set_state(int $state): string {
-        $timefastjson = round(10 * microtime(true));
-
-        $statecontents = $state . "-" . $timefastjson;
-        $filecontents = '';
-
-        $this->save_state($state, $statecontents, $filecontents, $timefastjson);
-
-        return $statecontents;
-    }
-
-    /**
      * Calls irt idea.
      *
      * @return array

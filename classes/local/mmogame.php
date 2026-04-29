@@ -613,39 +613,6 @@ abstract class mmogame {
     }
 
     /**
-     * Saves state info for fast communication with clients.
-     *
-     * @param int $state
-     * @param string $statecontents
-     * @param string $filecontents
-     * @param int $timefastjson
-     */
-    public function save_state(int $state, string $statecontents, string $filecontents, int $timefastjson): void {
-
-        $newdir = $this->save_state_file($state, $filecontents);
-
-        $file = $this->rgame->fastjson;
-        file_put_contents("$newdir/$file.txt", $statecontents);
-
-        for ($i = 0; $i <= 4; $i++) {
-            if ($i == $state) {
-                continue;
-            }
-            $f = "$newdir/$file-$i.txt";
-            if (file_exists($f)) {
-                unlink($f);
-            }
-        }
-        if ($timefastjson != 0) {
-            $this->rgame->timefastjson = $timefastjson;
-            $this->db->update_record(
-                'mmogame',
-                ['id' => $this->rgame->id, 'timefastjson' => $timefastjson]
-            );
-        }
-    }
-
-    /**
      * Update state in database.
      *
      * @param int $state
