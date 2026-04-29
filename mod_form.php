@@ -147,7 +147,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
 
         foreach ($this->types as $type) {
             $function = 'mmogametype_' . $type . '_definition';
-            if (function_exists($function) ) {
+            if (function_exists($function)) {
                 $function($mform);
             }
         }
@@ -285,7 +285,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
             $defaultvalues->typemode = $defaultvalues->type . '-' . $defaultvalues->mode;
             $dir = __DIR__ . '/type';
             require_once($dir . '/' . $defaultvalues->type . '/lib.php');
-            $function = 'type'.$defaultvalues->type.'_set_data';
+            $function = 'type' . $defaultvalues->type . '_set_data';
             if (function_exists($function)) {
                 $function($defaultvalues);
             }

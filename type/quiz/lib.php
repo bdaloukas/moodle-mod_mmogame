@@ -346,5 +346,4 @@ function mmogametype_quiz_set_data($defaultvalues): void {
  * @return void
  */
 function mmogametype_quiz_data_preprocessing(&$defaultvalues): void {
-
 }
