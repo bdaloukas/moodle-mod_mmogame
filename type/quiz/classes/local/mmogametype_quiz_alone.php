@@ -90,7 +90,6 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                 ['id' => $grade->id, 'countquestions' => $countquestions, 'percent' => $corrects / $countquestions]
             );
         }
-
         $a['numquery'] = $a['numattempt'] = $this->compute_next_numattempt();
         $a['timestart'] = time();
 

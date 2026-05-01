@@ -185,7 +185,6 @@ class send_answers_split extends external_api {
         // Attempts that saved to database.
         $result['savedattempts'] = $attempts !== null ? $attempts : [];
         $result['auserids'] = $auserids;
-error_log("result=".json_encode($result,JSON_PRETTY_PRINT));
         return $result;
     }
 

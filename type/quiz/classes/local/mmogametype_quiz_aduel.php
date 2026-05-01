@@ -82,7 +82,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         if ($this->rstate->state != STATE_PLAY) {
             return null;
         }
-
         $newplayer1 = $newplayer2 = false;
         for ($step = 1; $step <= 2; $step++) {
             $this->aduel = mmogame_mode_aduel::get_aduel($this, $this->maxalone, $newplayer1, $newplayer2, null, false);
@@ -90,7 +89,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                 $this->set_errorcode(ERRORCODE_ADUEL_NO_RIVALS);
                 return null;
             }
-
             if (!$newplayer1 && !$newplayer2) {
                 $rec = mmogame_mode_aduel::get_attempt($this, $this->aduel);
                 if ($rec !== null) {

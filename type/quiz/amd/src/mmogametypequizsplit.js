@@ -61,10 +61,10 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             this.screen = 1;
             this.updateDelay = 500;
             this.computeSizes(0);
-            this.sendGetAttemptsSplit();
+            this.callGetAttemptsSplit();
         }
 
-        sendGetAttemptsSplit() {
+        callGetAttemptsSplit() {
             let avatarids = [];
             const info = this.info;
             this.avatarfiles = [];
@@ -131,7 +131,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     if (this.info.state === 0) {
                         this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                         setTimeout(() => {
-                            this.sendGetAttemptsSplit();
+                            this.callGetAttemptsSplit();
                         }, 10000);
                         return;
                     }
@@ -1173,7 +1173,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     if (this.info.state === 0) {
                         this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                         setTimeout(() => {
-                            this.sendGetAttemptsSplit();
+                            this.callGetAttemptsSplit();
                         }, 10000);
                         return;
                     }
@@ -1515,7 +1515,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
         }
 
         createQuestionTip(sp) {
-            if (sp.questionTip !== undefined || sp.attempts[0].querytip.length == 0) {
+            if (sp.questionTip !== undefined || sp.attempts[0].querytip.length === 0) {
                 return;
             }
 

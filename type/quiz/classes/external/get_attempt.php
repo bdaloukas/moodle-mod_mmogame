@@ -128,7 +128,6 @@ class get_attempt extends external_api {
         }
 
         $mmogame->append_json($ret, $attempt !== false ? $attempt : null, $subcommand);
-
         return json_encode($ret);
     }
 

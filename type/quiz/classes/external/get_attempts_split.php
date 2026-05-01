@@ -128,7 +128,6 @@ class get_attempts_split extends external_api {
                 'state' => (int)$state,
                 'statetime' => (float)$statetime,
             ];
-            error_log("ret2=".json_encode($ret,JSON_PRETTY_PRINT));
             return $ret;
         }
         if ($avatarids !== null) {
@@ -224,7 +223,6 @@ class get_attempts_split extends external_api {
             'auserids' => $auserids, 'queryanswerids0' => $queryanswerids0, 'grades' => $grades,
             'countquestion' => $countquestions, 'countcorrect' => $countcorrect, 'islastcorrect' => $islastcorrect,
             'ranks' => $ranks, 'queryranks' => $queryranks, 'hasidea' => 0, 'state' => $state, 'statetime' => 0];
-        error_log("ret2=".json_encode($ret,JSON_PRETTY_PRINT));
         return $ret;
     }
 

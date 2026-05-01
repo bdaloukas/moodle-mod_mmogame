@@ -193,7 +193,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             window.document.title = json.name;
         }
         this.correct = undefined;
-
         // Update game state
         this.state = parseInt(json.state);
 
@@ -213,11 +212,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
             if (this.buttonHelp !== undefined) {
                 this.buttonHelp.style.visibility = 'hidden';
             }
+            setTimeout(() => {
+                this.callGetAttempt();
+            }, 10000);
             return;
+        } else {
+            this.removeMessageDivs();
         }
-
         this.computeTimeStartClose(json.timestart, json.timeclose);
-
         // Need for a change on colors.
         if (this.savedColors === undefined || this.savedColors !== json.colors) {
             this.savedColors = json.colors;
@@ -231,14 +233,11 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.setColorsString(json.colors);
             this.createIconBar();
         }
-
         if (this.area === undefined) {
             this.createArea(this.areaRect.top, this.areaRect.bottom);
         }
-
         this.updateNicknameAvatar(this.player1, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
         this.updateNicknameAvatar(this.player2, json.aduelAvatar, json.aduelNickname, nicknameWidth, nicknameHeight);
-
         this.updateButtonTool(this.button5050, json.tool1);
         if (json.tool3 !== undefined) {
             json.tool2numattempt = -1;
@@ -247,12 +246,10 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
         this.updateButtonTool(this.buttonSkip, json.tool2);
         this.updateButtonTool(this.buttonWizard, json.tool3);
-
         this.attempt = json.attempt;
         this.aduelPlayer = json.aduelPlayer;
         this.aduelScore = json.aduelScore;
         this.aduelRank = json.aduelRank;
-
         if (json.errorcode !== undefined && json.errorcode === 'aduel_no_rivals' || json.attempt === 0) {
             if (json.param === undefined) {
                 this.showWaitOpponent();
@@ -264,7 +261,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }, this.timeoutWaitOpponent);
             return;
         }
-
         this.isWaitOpponent = false;
 
         this.qtype = json.qtype;

@@ -35,7 +35,6 @@ use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
-//require_once(dirname(__FILE__) . '/../../lib.php');
 require_once('mmogametype_quiz_algorithm_irt.php');
 
 define('ERRORCODE_NO_QUERIES', 'no_questions');
@@ -148,19 +147,6 @@ class mmogametype_quiz_split extends mmogame {
                 if ($ids === null || count($ids) == 0) {
                     return null;
                 }
-
-                // Initializes data.
-                /*$qs = [];
-                foreach ($ids as $id) {
-                    $q = new stdClass();
-                    $q->id = $id;
-                    $q->qpercent = $q->qcountused = $q->ucountused = $q->utimeerror = $q->uscore = $q->upercent = 0;
-
-                    $qs[$id] = $q;
-                }
-                $qs0 = $qs;*/
-            } else {
-                //$qs = $qs0;
             }
 
             if ($newplayer1) {

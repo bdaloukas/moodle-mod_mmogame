@@ -29,8 +29,6 @@ namespace mmogametype_quiz\local;
 use mod_mmogame\local\database\mmogame_database;
 use stdClass;
 
-//require_once(dirname(__FILE__) . '/../../lib.php');
-
 /**
  * mmogame_quiz is responsible for managing and facilitating quiz gameplay
  * within the mmogame system, including handling attempts, scoring,

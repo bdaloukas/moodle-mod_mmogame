@@ -111,7 +111,6 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
             if ($result['state'] == 0 && $step == 1) {
                 continue;   // What is expected (state=0).
             }
-//            print_r( $result);die;
             $splits = [0, 1, 2, 2];
             $iscorrects = [0, 1, 1, 1];
             $attempts = $timestarts = $timeanswers = $answers = [];

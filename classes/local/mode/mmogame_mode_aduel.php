@@ -46,12 +46,10 @@ class mmogame_mode_aduel {
             $game->get_rstate()->state = 0;
             $game->get_db()->update_record('mmogame', ['id' => $game->get_id(), 'numgame' => $data->numgame]);
             $game->update_state($game->get_rstate()->state);
-            $game->set_state($game->get_rstate()->state);
             $game->get_rgame()->numgame = $data->numgame;
         } else if (isset($data->state)) {
             if ($data->state >= 0 && $data->state <= 1) {
                 $game->update_state($data->state);
-                $game->set_state($data->state);
             }
         }
     }
@@ -204,7 +202,6 @@ class mmogame_mode_aduel {
             'numattempt'
         );
         $time = time();
-
         // Select the first that is no started.
         foreach ($recs as $rec) {
             if ($rec->timeclose > $time || $rec->timeclose == 0) {
@@ -221,6 +218,10 @@ class mmogame_mode_aduel {
                 $db->update_record($table, ['id' => $rec->id, 'timestart' => $rec->timestart, 'timeclose' => $rec->timeclose]);
                 return $rec;
             }
+        }
+        foreach ($recs as $rec) {
+            // Returns the first.
+            return $rec;
         }
         return null;
     }
