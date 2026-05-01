@@ -602,35 +602,6 @@ abstract class mmogame {
     }
 
     /**
-     * Writes filecontents in the state file.
-     *
-     * @param int $state
-     * @param string $filecontents
-     * @return string (the directory where the data is saved)
-     */
-    public function save_state_file(int $state, string $filecontents): string {
-        // Creates an upload directory in temp directory.
-        // This directory is used for checking of state without opening database.
-        $file = $this->rgame->fastjson === null ? '00' : $this->rgame->fastjson;
-        $newdir = 'mmogame/states/' . substr($file, -2);
-        $newdir = make_temp_directory($newdir);
-
-        if ($filecontents != '') {
-            $file = "$newdir/$file-$state.txt";
-            if (!file_exists($file) || file_get_contents($file) != $filecontents) {
-                file_put_contents($file, $filecontents);
-            }
-        }
-
-        $file = sprintf("%s/%s.txt", $newdir, $this->rgame->fastjson);
-        if (!file_exists($file)) {
-            file_put_contents($file, $this->rstate->state . '-' . $this->rgame->timefastjson);
-        }
-
-        return $newdir;
-    }
-
-    /**
      * Update state in database.
      *
      * @param int $state
