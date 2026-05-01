@@ -128,7 +128,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     if (this.palette !== undefined) {
                         this.setColors(this.palette);
                     }
-                    console.log("info=",this.info);
                     if (this.info.state === 0) {
                         this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                         setTimeout(() => {
@@ -1171,7 +1170,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         statetime: statetime,
                     };
                     this.removeFromServer(savedattempts);
-                    console.log("info=",this.info);
                     if (this.info.state === 0) {
                         this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                         setTimeout(() => {
@@ -1517,7 +1515,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
         }
 
         createQuestionTip(sp) {
-            if (sp.questionTip !== undefined) {
+            if (sp.questionTip !== undefined || sp.attempts[0].querytip.length == 0) {
                 return;
             }
 
