@@ -172,7 +172,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
                 this.showScore(json);
                 this.createDivMessageStart(this.getStringM('js_wait_to_start'));
+                setTimeout(() => {
+                    this.callGetAttempt();
+                }, 15000);
                 return;
+            } else {
+                this.removeMessageDivs();
             }
 
             if (this.player === undefined) {

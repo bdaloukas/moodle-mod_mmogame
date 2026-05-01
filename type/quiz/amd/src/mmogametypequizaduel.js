@@ -214,7 +214,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
             setTimeout(() => {
                 this.callGetAttempt();
-            }, 10000);
+            }, 15000);
             return;
         } else {
             this.removeMessageDivs();

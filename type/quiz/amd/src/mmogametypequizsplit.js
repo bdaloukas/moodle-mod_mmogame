@@ -1174,7 +1174,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                         setTimeout(() => {
                             this.callGetAttemptsSplit();
-                        }, 10000);
+                        }, 15000);
                         return;
                     }
                     for (let i = 0; i < returnsplits.length; i++) {
