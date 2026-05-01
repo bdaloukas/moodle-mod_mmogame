@@ -586,5 +586,69 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             }
             this.gateSendGetAssets();
         }
+
+        createDivMessageStart(message) {
+            if (this.divMessageHelp !== undefined) {
+                return;
+            }
+            if (this.area !== undefined) {
+                this.area?.remove();
+                this.area = undefined;
+            }
+
+            let left = this.padding;
+            let top = this.areaRect.top;
+            let width = window.innerWidth - 2 * this.padding;
+            let height = window.innerHeight - this.padding - top;
+
+            let height1 = height / 8;
+
+            this.createDivMessageDo('mmogame-message-start', left, top, width, height, message, height1);
+
+            top += (height1 - this.divMessage.scrollHeight) / 2;
+            this.divMessage.style.top = top + "px";
+
+            let div = document.createElement("div");
+            div.style.position = "absolute";
+            div.style.left = left + "px";
+            div.style.textAlign = "left";
+            div.style.width = (width - 2 * this.padding) + "px";
+            div.style.paddingLeft = this.padding + "px";
+            div.style.paddingRight = this.padding + "px";
+
+            div.style.color = this.getContrastingColor(this.colorBackground2);
+            top = this.iconSize + 3 * this.padding + height1;
+            div.style.top = (top + this.padding) + "px";
+            div.style.height = (height - height1) + "px";
+            this.divMessageHelp = div;
+            this.body.appendChild(this.divMessageHelp);
+
+            this.showHelpScreen(div, (width - 2 * this.padding), (height - height1));
+        }
+
+        createDivMessageDo(classnames, left, top, width, height, message, heightmessage) {
+            if (this.divMessageBackground === undefined) {
+                let div = this.createDiv(this.body, classnames, left, top, width, height);
+                div.style.background = this.getColorHex(this.colorBackground2);
+                this.divMessageBackground = div;
+            }
+
+            if (this.divMessage === undefined) {
+                let div = document.createElement("div");
+                div.style.position = "absolute";
+                div.style.left = left + "px";
+                div.style.textAlign = "center";
+                div.style.width = (width - 2 * this.padding) + "px";
+                div.style.paddingLeft = this.padding + "px";
+                div.style.paddingRight = this.padding + "px";
+
+                div.style.background = this.getColorHex(this.colorBackground2);
+                div.style.color = this.getContrastingColor(this.colorBackground2);
+                this.divMessage = div;
+            }
+            this.divMessage.innerHTML = message;
+            this.body.appendChild(this.divMessage);
+            this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
+        }
     };
 });

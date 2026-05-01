@@ -1087,5 +1087,16 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
+    if ($oldversion < ($ver = 2026043000)) {
+        // Define field statetime to be added to mmogame.
+        $table = new xmldb_table('mmogame_aa_states');
+        $field = new xmldb_field('statetime', XMLDB_TYPE_FLOAT, null, null, XMLDB_NOTNULL, null, '0');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }

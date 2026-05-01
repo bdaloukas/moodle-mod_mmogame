@@ -46,6 +46,7 @@ $string['js_help_5050'] = 'Shows only 2 possible answers';
 $string['js_help_skip'] = 'Skip the question';
 $string['js_next_question'] = 'Next question';
 $string['js_percent_opponent'] = "Opponent's percentage of correct answers";
+$string['js_quizsplit_help'] = 'Each player earns 3 points if his answer is correct and loses 1 point for each wrong answer.';
 $string['js_ranking_order'] = 'Ranking order';
 $string['js_wizard'] = 'Revealing the correct answer will cost you 1 mark';
 $string['js_wrong_answer'] = 'Wrong answer';

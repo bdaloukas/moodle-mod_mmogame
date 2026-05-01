@@ -185,7 +185,7 @@ class send_answers_split extends external_api {
         // Attempts that saved to database.
         $result['savedattempts'] = $attempts !== null ? $attempts : [];
         $result['auserids'] = $auserids;
-
+error_log("result=".json_encode($result,JSON_PRETTY_PRINT));
         return $result;
     }
 
@@ -257,6 +257,14 @@ class send_answers_split extends external_api {
             'queryranks' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'Rank array')
             ),
+            'state' => new external_value(
+                PARAM_INT,
+                'Has idea'
+            ),
+            'statetime' => new external_value(
+                PARAM_FLOAT,
+                'Has idea'
+            ),
         ]);
     }
 
@@ -289,6 +297,7 @@ class send_answers_split extends external_api {
             'aduels' => [], 'aduelavatars' => [], 'aduelcorrects' => [],
             'auserids' => [], 'queryanswerids0' => $queryanswerids0,
             'countquestion' => 0, 'countcorrect' => [], 'islastcorrect' => [],
-            'ranks' => [], 'grades' => [], 'savedattempts' => [], 'queryranks' => []];
+            'ranks' => [], 'grades' => [], 'savedattempts' => [], 'queryranks' => [],
+            'state' => $mmogame->get_state(), 'statetime' => $mmogame->get_statetime()];
     }
 }

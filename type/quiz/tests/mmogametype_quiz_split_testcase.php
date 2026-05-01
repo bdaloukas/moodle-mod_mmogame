@@ -94,9 +94,12 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
         $mmogame = mod_mmogame\local\mmogame::create(new mmogame_database_moodle(), $rgame->id);
 
         // Set state to playing.
-        $mmogame->update_state(1);
+        $mmogame->update_state(0);
 
         for ($step = 1; $step <= 100; $step++) {
+            if ($step == 2) {
+                $mmogame->update_state(1);
+            }
             $classgetattempt = new mmogametype_quiz\external\get_attempts_split();
             $result = $classgetattempt->execute(
                 $rgame->id,
@@ -105,6 +108,10 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
                 '1,2,3,4',
                 '0,1,2,3'
             );
+            if ($result['state'] == 0 && $step == 1) {
+                continue;   // What is expected (state=0).
+            }
+//            print_r( $result);die;
             $splits = [0, 1, 2, 2];
             $iscorrects = [0, 1, 1, 1];
             $attempts = $timestarts = $timeanswers = $answers = [];

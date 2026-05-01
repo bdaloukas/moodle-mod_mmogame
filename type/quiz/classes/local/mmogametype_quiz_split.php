@@ -87,7 +87,7 @@ class mmogametype_quiz_split extends mmogame {
      * @param bool $isaduel
      * @param array $adueluserids
      * @param int $countquestions
-     * @param int $corrects
+     * @param array $corrects
      * @param array $islastcorrect
      * @param array $queryranks
      * @return ?array
@@ -99,7 +99,7 @@ class mmogametype_quiz_split extends mmogame {
         bool $isaduel,
         array $adueluserids,
         int &$countquestions,
-        int &$corrects,
+        array &$corrects,
         array &$islastcorrect,
         array &$queryranks
     ): ?array {

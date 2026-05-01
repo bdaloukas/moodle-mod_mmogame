@@ -99,7 +99,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                                               queryanswerids, numattempts, answertexts, aduels,
                                               aduelavatars, aduelcorrects, auserids, queryanswerids0, grades,
                                               countquestion, countcorrect, islastcorrect, ranks, queryranks,
-                                          hasidea}) => {
+                                              hasidea, state, statetime}) => {
                     this.info = {
                         avatars: avatars,
                         attempts: attempts,
@@ -122,9 +122,24 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         ranks: ranks,
                         queryranks: queryranks,
                         hasidea: hasidea,
+                        state: state,
+                        statetime: statetime,
                     };
                     if (this.palette !== undefined) {
                         this.setColors(this.palette);
+                    }
+                    console.log("info=",this.info);
+                    if (this.info.state === 0) {
+                        this.createDivMessageStart(this.getStringM('js_wait_to_start'));
+                        setTimeout(() => {
+                            this.sendGetAttemptsSplit();
+                        }, 10000);
+                        return;
+                    }
+                    if (this.info.statetime !== 0) {
+                        setTimeout(() => {
+                            this.sendGetAttemptsSplit();
+                        }, 1000 * this.info.statetime);
                     }
                     this.computeSizes(0, this.getMinIconSize(this.info.countquestion));
                     this.createScreen();
@@ -1123,7 +1138,8 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 sendAnswers[0].done(({avatars, attempts, attemptqueryids, querydefinitions, querytips,
                                          queryanswerids, numattempts, answertexts, aduels,
                                          aduelavatars, aduelcorrects, auserids, queryanswerids0,
-                                         grades, savedattempts, countquestion, countcorrect, islastcorrect, ranks, queryranks}) => {
+                                         grades, savedattempts, countquestion, countcorrect, islastcorrect, ranks, queryranks,
+                                         state, statetime}) => {
 
                     if (spidea >= 0) {
                         this.showIdea(spidea, querydefinitions, queryanswerids0, querytips, answertexts);
@@ -1151,8 +1167,18 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         islastcorrect: islastcorrect,
                         ranks: ranks,
                         queryranks: queryranks,
+                        state: state,
+                        statetime: statetime,
                     };
                     this.removeFromServer(savedattempts);
+                    console.log("info=",this.info);
+                    if (this.info.state === 0) {
+                        this.createDivMessageStart(this.getStringM('js_wait_to_start'));
+                        setTimeout(() => {
+                            this.sendGetAttemptsSplit();
+                        }, 10000);
+                        return;
+                    }
                     for (let i = 0; i < returnsplits.length; i++) {
                         const split = returnsplits[i];
                         this.copySplitData(i, split);
@@ -1740,6 +1766,24 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             this.body.removeChild(tempDiv);
 
             return Math.round(1.1 * Math.max(size1, size2));
+        }
+
+        showHelpScreen(div) {
+            div.innerHTML = `
+                <br>
+                <div>${this.getStringT('js_alone_help')}</div><br>
+
+                <table class="mmogame-table-help">
+                    <tr>
+                        <td><img height="83" src="type/quiz/assets/aduel/example2.png" alt="" /></td>
+                        <td>${this.getStringT('js_aduel_example2')}</td>
+                    </tr>
+                </table>
+            `;
+        }
+
+        getStringT(name) {
+            return M.util.get_string(name, 'mmogametype_quiz');
         }
     };
 });

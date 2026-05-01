@@ -180,6 +180,24 @@ abstract class mmogame {
     }
 
     /**
+     * Return the variable rstate->statetime. Tells in how many seconds state will go to next state.
+     *
+     * @return float
+     */
+    public function get_statetime(): float {
+        if ($this->rstate === false) {
+            return 0;
+        }
+        $statetime = $this->rstate->statetime;
+        if ($statetime === 0) {
+            return 0;
+        }
+
+        $time = microtime(true);
+        return ($time > $statetime ? $time - $statetime : 0);
+    }
+
+    /**
      * Return the variable rgame->type.
      *
      * @return string

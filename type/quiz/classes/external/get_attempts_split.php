@@ -101,12 +101,35 @@ class get_attempts_split extends external_api {
             }
             $auserids[] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create, $split);
         }
-        if (count($auserids) == 0) {
-            return  ['avatars' => [], 'attempts' => [], 'attemptqueryids' => [],
-                'numattempts' => [], 'querydefinitions' => [],
-                'queryanswerids' => [], 'answertexts' => [],
-                'aduels' => [], 'aduelavatars' => [], 'aduelcorrects' => [],
-                'auserids' => [], 'queryanswerids0' => [], 'grades' => []];
+        $state = $mmogame->get_state();
+        $statetime = $mmogame->get_statetime();
+        if (count($auserids) == 0 || $state == 0 || $statetime == 0) {
+            $ret = [
+                'avatars' => [],
+                'attempts' => [],
+                'attemptqueryids' => [],
+                'numattempts' => [],
+                'querydefinitions' => [],
+                'querytips' => [],
+                'queryanswerids' => [],
+                'answertexts' => [],
+                'aduels' => [],
+                'aduelavatars' => [],
+                'aduelcorrects' => [],
+                'auserids' => [],
+                'queryanswerids0' => [],
+                'grades' => [],
+                'countquestion' => 0,
+                'countcorrect' => [],
+                'islastcorrect' => [],
+                'ranks' => [],
+                'queryranks' => [],
+                'hasidea' => 0,
+                'state' => (int)$state,
+                'statetime' => (float)$statetime,
+            ];
+            error_log("ret2=".json_encode($ret,JSON_PRETTY_PRINT));
+            return $ret;
         }
         if ($avatarids !== null) {
             foreach ($splits as $pos => $split) {
@@ -117,6 +140,7 @@ class get_attempts_split extends external_api {
                 );
             }
         }
+
         $isaduel = $onlygroup = false;
         $modeparams = $mmogame->get_rgame()->modeparams;
         if ($modeparams != '') {
@@ -135,7 +159,8 @@ class get_attempts_split extends external_api {
             $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips = $answerids = $answertexts = [];
             $aduelavatars = $aduelcorrects = $queryanswerids0 = $aduels = [];
 
-            $countquestions = $countcorrect = 0;
+            $countquestions = 0;
+            $countcorrect = [];
             $islastcorrect = [];
             $queryranks = [];
             $retry = self::get_attempts(
@@ -198,8 +223,8 @@ class get_attempts_split extends external_api {
             'aduels' => $aduels, 'aduelavatars' => $aduelavatars, 'aduelcorrects' => $aduelcorrects,
             'auserids' => $auserids, 'queryanswerids0' => $queryanswerids0, 'grades' => $grades,
             'countquestion' => $countquestions, 'countcorrect' => $countcorrect, 'islastcorrect' => $islastcorrect,
-            'ranks' => $ranks, 'queryranks' => $queryranks, 'hasidea' => 0];
-
+            'ranks' => $ranks, 'queryranks' => $queryranks, 'hasidea' => 0, 'state' => $state, 'statetime' => 0];
+        error_log("ret2=".json_encode($ret,JSON_PRETTY_PRINT));
         return $ret;
     }
 
@@ -272,7 +297,14 @@ class get_attempts_split extends external_api {
                 PARAM_INT,
                 'Has idea'
             ),
-
+            'state' => new external_value(
+                PARAM_INT,
+                'Has idea'
+            ),
+            'statetime' => new external_value(
+                PARAM_FLOAT,
+                'Has idea'
+            ),
         ]);
     }
 
@@ -295,7 +327,7 @@ class get_attempts_split extends external_api {
      * @param array $aduelcorrects
      * @param array $queryanswerids0
      * @param int $countquestions
-     * @param int $countcorrect
+     * @param array $countcorrect
      * @param array $islastcorrect
      * @param array $queryranks
      * @return bool
@@ -318,7 +350,7 @@ class get_attempts_split extends external_api {
         array &$aduelcorrects,
         array &$queryanswerids0,
         int &$countquestions,
-        int &$countcorrect,
+        array &$countcorrect,
         array &$islastcorrect,
         array &$queryranks
     ): bool {
