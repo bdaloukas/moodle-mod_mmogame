@@ -289,7 +289,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     onTimeout() {
-        this.divTimer.innerHTML = '';
+        this.divTimer.textContent = '';
         this.disableInput();
 
         this.answer = '';
@@ -307,7 +307,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.createDivMessage('mmomgame-quiz-aduel-wait-opponent',
             this.getStringT('js_aduel_wait_opponent'));
         if (this.labelTimer !== undefined) {
-            this.labelTimer.innerHTML = "";
+            this.labelTimer.textContent = "";
         }
     }
 
@@ -461,7 +461,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
     showScore(json) {
         super.showScore(this.player1, json.sumscore, json.rank, json.percent, json.percentRank, true);
-        this.player1.lblAddScore.innerHTML = json.addscore === undefined ? '' : json.addscore;
+        this.player1.lblAddScore.textContent = json.addscore === undefined ? '' : json.addscore;
         this.autoResizeText(this.player1.lblAddScore, this.player1.cellSize, this.player1.cellSize, true, 0, 0, 1);
 
         if (json.aduelPlayer === 2) {
@@ -662,16 +662,16 @@ define(['mmogametype_quiz/mmogametypequiz'],
             },
         });
 
-        this.divTimer.innerHTML = '23:59';
+        this.divTimer.textContent = '23:59';
         this.autoResizeText(this.divTimer, size, size, false, 0, 0);
-        this.divTimer.innerHTML = '';
+        this.divTimer.textContent = '';
         this.divTimer.title = this.getStringM('js_question_time');
     }
 
     updateDivTimer() {
         if (this.state === 0) {
             if (this.divTimer !== undefined) {
-                this.divTimer.innerHTML = '';
+                this.divTimer.textContent = '';
             }
             return;
         }
@@ -686,7 +686,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         // If no time is remaining, clear the label and handle timeout
         if (remainingTime === 0) {
-            this.divTimer.innerHTML = '';
+            this.divTimer.textContent = '';
             this.onTimeout();
             return;
         }
@@ -694,7 +694,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         // Format the remaining time as mm:ss
         const minutes = Math.floor(remainingTime / 60);
         const seconds = String(Math.floor(remainingTime % 60)).padStart(2, '0');
-        this.divTimer.innerHTML = `${minutes}:${seconds}`;
+        this.divTimer.textContent = `${minutes}:${seconds}`;
 
         // Set a timeout to update the timer every 500ms
         this.timerTimeout = setTimeout(() => this.updateDivTimer(), 500);
@@ -752,7 +752,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.updateNicknameAvatar(this.player2, '', '', 0, 0);
         this.createDivMessage(this.getStringT('js_aduel_wait_opponent'));
         if (this.divTimer !== undefined) {
-            this.divTimer.innerHTML = "";
+            this.divTimer.textContent = "";
         }
     }
 

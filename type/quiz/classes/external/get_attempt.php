@@ -115,6 +115,7 @@ class get_attempt extends external_api {
         $mmogame->login_user($auserid);
 
         if ($nickname !== null && $avatarid !== null && $colorpaletteid != null) {
+            $nickname = mb_substr($nickname, 0, 50);
             $info = $mmogame->get_avatar_info($auserid);
             $mmogame->get_db()->update_record(
                 'mmogame_aa_grades',

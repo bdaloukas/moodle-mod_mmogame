@@ -363,16 +363,16 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }
 
             if (rank !== '') {
-                player.lblRank.innerHTML = `#${rank}`;
+                player.lblRank.textContent = `#${rank}`;
                 this.autoResizeText(player.lblRank, player.cellSize, player.cellSize, false, 0, 0);
             } else {
-                player.lblRank.innerHTML = '';
+                player.lblRank.textContent = '';
             }
 
             let s = boldScore ? `<b>${score}</b>` : score;
             if (player.cacheScore !== s) {
                 player.cacheScore = s;
-                player.lblScore.innerHTML = s;
+                player.lblScore.textContent = s;
                 const width = showPercent ? player.cellSize : 2 * player.cellSize;
                 this.autoResizeText(player.lblScore, width, player.cellSize, false, 0, 0);
             }
@@ -382,7 +382,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 if (player.lblPercent !== undefined) {
                     if (player.cachePercent !== s) {
                         player.cachePercent = s;
-                        player.lblPercent.innerHTML = s;
+                        player.lblPercent.textContent = s;
                         this.autoResizeText(player.lblPercent, player.cellSize - this.padding, player.cellSize, false, 0, 0);
                     }
                 }
@@ -509,7 +509,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     s = filenameWithExt.split('.').slice(0, -1).join('.') || filenameWithExt;
                 }
                 s = this.repairNickname(s);
-                player.nicknameElement.innerHTML = s;
+                player.nicknameElement.textContent = s;
                 player.nicknameElement.style.textAlign = "center";
                 player.nicknameElement.style.color = this.getContrastingColor(this.colorBackground);
                 this.autoResizeText(player.nicknameElement, nicknameWidth, nicknameHeight, true, 0, 0);

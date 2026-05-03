@@ -312,12 +312,10 @@ abstract class mmogame {
      * Returns an array for auserids.
      * @param string $kinduser
      * @param string $user
-     * @return array|null
+     * @return ?array
      */
     public function get_auserids_split(string $kinduser, string $user): ?array {
-        if ($kinduser == 'usercode') {
-            die("Problem");
-        } else if ($kinduser == 'guid') {
+        if ($kinduser == 'guid') {
             $rec = $this->db->get_record_select('mmogame_aa_users_guid', 'guid=?', [$user]);
             if ($rec === null) {
                 return null;
@@ -646,26 +644,33 @@ abstract class mmogame {
         $params = [$rgame->id];
 
         if ($auserid !== null) {
-            $select .= ' AND mmogameid=? AND auserid=?';
+            $select .= ' AND auserid=?';
             $params[] = $auserid;
         }
 
         $db->delete_records_select('mmogame_aa_grades', $select, $params);
         $db->delete_records_select('mmogame_aa_stats', $select, $params);
 
-        $select = 'mmogameid=?' . ($auserid !== null ? ' AND (auserid1=? OR auserid2=?)' : '');
-        $params[] = $rgame->id;
+        $select = 'mmogameid=?';
+        $params = [$rgame->id];
+
         if ($auserid !== null) {
+            $select .= ' AND (auserid1=? OR auserid2=?)';
             $params[] = $auserid;
             $params[] = $auserid;
         }
+
         $db->delete_records_select('mmogame_am_aduel_pairs', $select, $params);
 
-        require_once('type/' . $rgame->type . '/' . $rgame->type . '.php');
-        $class = 'mmogame_' . $rgame->type;
-        $class::delete_auser($db, $rgame, $auserid);
+        $classname = 'mmogametype_' . $rgame->type . '\\local\\mmogametype_' . $rgame->type;
 
-        $db->delete_records_select('mmogame_aa_users', 'id=?', [$auserid]);
+        if (class_exists($classname) && method_exists($classname, 'delete_auser')) {
+            $classname::delete_auser($db, $rgame, $auserid);
+        }
+
+        if ($auserid !== null) {
+            $db->delete_records_select('mmogame_aa_users', 'id=?', [$auserid]);
+        }
     }
 
     /**

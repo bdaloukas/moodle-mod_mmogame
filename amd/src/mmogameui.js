@@ -742,7 +742,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
                     this.processGetAttempt(json);
                 }).fail((error) => {
-                    console.log(error);
                     this.createDivMessage('mmogame-error', "Erorr: " + error.message);
                     return error;
                 });

@@ -1,3 +1,4 @@
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -226,7 +227,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         showScore(json) {
             super.showScore(this.player, json.sumscore, json.rank, json.percent, json.percentRank, true);
-            this.player.lblAddScore.innerHTML = json.addscore === undefined ? '' : json.addscore;
+            this.player.lblAddScore.textContent = json.addscore === undefined ? '' : json.addscore;
             this.autoResizeText(this.player.lblAddScore, this.player.cellSize, this.player.cellSize, true, 0, 0, 1);
         }
 

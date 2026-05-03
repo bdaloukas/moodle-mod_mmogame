@@ -778,17 +778,17 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             if (sp.rank === sp.rankcache) {
                 return;
             }
-            sp.player.lblRank.innerHTML = '#' + sp.rank;
+            sp.player.lblRank.textContent = '#' + sp.rank;
             sp.rankcache = sp.rank;
         }
 
         updateScore(sp) {
-            sp.player.lblScore.innerHTML = sp.score;
-            sp.player.lblRank.innerHTML = sp.rank !== '' ? '#' + sp.rank : '';
+            sp.player.lblScore.textContent = sp.score;
+            sp.player.lblRank.textContent = sp.rank !== '' ? '#' + sp.rank : '';
         }
 
         updatePercent(sp) {
-            sp.percent.lblScore.innerHTML = this.info.countquestion > 0 ? sp.countcorrect + " / " + this.info.countquestion : '';
+            sp.percent.lblScore.textContent = this.info.countquestion > 0 ? sp.countcorrect + " / " + this.info.countquestion : '';
             this.autoResizeText(sp.percent.lblScore, 0.8 * this.iconSize, sp.percent.cellSize,
                 false, 0, 0);
         }
@@ -1035,7 +1035,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             }
 
             // Shows the next question.
-            // sp.definition.innerHTML = sp.attempts[0].numattempt + ". " + sp.attempts[0].definition;
             sp.definition.innerHTML = this.formatText(sp.attempts[0].definition, sp.attempts[0].numattempt + ". ");
             this.autoResizeText(sp.definition, sp.definitionWidth, sp.definitionHeight, true, 0, 0);
             const attempt = sp.attempts[0];
@@ -1195,7 +1194,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
         computeFontScorePercent(sp) {
             if (sp.position === 0) {
                 const player = sp.player;
-                player.lblScore.innerHTML = "99999";
+                player.lblScore.textContent = "99999";
                 this.autoResizeText(player.lblScore, this.iconSize, player.cellSize, false, 0, 0);
                 const fontSize = player.lblScore.style.fontSize;
                 const lineHeight = Math.round(parseFloat(fontSize));
@@ -1204,7 +1203,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     player.lblRank.lineHeight = lineHeight;
                 }
                 player.lblScore.lineHeight = lineHeight;
-                player.lblScore.innerHTML = "";
+                player.lblScore.textContent = "";
             } else {
                 const player = sp.player;
                 let fontSize = this.splits[0].player.lblRank.style.fontSize;
@@ -1317,7 +1316,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 },
             });
 
-            label.innerHTML = addscore;
+            label.textContent = addscore;
 
             return label;
         }
@@ -1747,7 +1746,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 el.style.height = `1em`;
                 el.style.margin = "0";
                 el.style.border = "0";
-                el.innerHTML = countquestion + " / " + countquestion;
+                el.textContent = countquestion + " / " + countquestion;
                 this.body.appendChild(el);
 
                 size1 = Math.round(1 / 0.8 * Math.max(el.scrollWidth, el.scrollHeight));
@@ -1759,7 +1758,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             this.body.appendChild(tempDiv);
             tempDiv.style.width = `1em`;
             tempDiv.style.height = `1em`;
-            tempDiv.innerHTML = '#9999';
+            tempDiv.textContent = '#9999';
             size2 = Math.max(tempDiv.scrollWidth, tempDiv.scrollHeight);
             this.body.removeChild(tempDiv);
 

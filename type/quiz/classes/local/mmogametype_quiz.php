@@ -42,14 +42,16 @@ require_once(dirname(__FILE__) . '/../../lib.php');
  * within the mmogame system, including handling attempts, scoring,
  * and maintaining related user data.
  */
-abstract class mmogametype_quiz extends mmogame {
-    /** @var bool $stopatend: stops at the end of this game. */
+abstract class mmogametype_quiz extends mmogame
+{
+    /** @var bool $stopatend : stops at the end of this game. */
     protected bool $callupdategrades = true;
 
     /**
      * return the name of tabler attempts.
      */
-    public static function get_table_attempts(): string {
+    public static function get_table_attempts(): string
+    {
         return 'mmogame_quiz_attempts';
     }
 
@@ -61,7 +63,8 @@ abstract class mmogametype_quiz extends mmogame {
      * @param string $subcommand
      * @return ?stdClass
      */
-    public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass {
+    public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass
+    {
         $auserid = $this->get_auserid();
 
         $info = $this->get_avatar_info($auserid);
@@ -103,7 +106,8 @@ abstract class mmogametype_quiz extends mmogame {
      * @param stdClass $query
      * @return int
      */
-    protected function get_score_query_negative(bool $iscorrect, stdClass $query): int {
+    protected function get_score_query_negative(bool $iscorrect, stdClass $query): int
+    {
         if (!$this->qbank->is_multichoice($query)) {
             return $iscorrect ? 1 : 0;
         }
@@ -118,7 +122,16 @@ abstract class mmogametype_quiz extends mmogame {
      * @param stdClass $rgame
      * @param ?int $auserid
      */
-    public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void {
-        $db->delete_records_select('mmogame_quiz_attempts', 'mmogameid=? AND auserid=?', [$rgame->id, $auserid]);
+    public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void
+    {
+        $select = 'mmogameid=?';
+        $params = [$rgame->id];
+
+        if ($auserid !== null) {
+            $select .= ' AND auserid=?';
+            $params[] = $auserid;
+        }
+
+        $db->delete_records_select('mmogame_quiz_attempts', $select, $params);
     }
 }
