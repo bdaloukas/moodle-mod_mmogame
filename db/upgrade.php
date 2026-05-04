@@ -1105,16 +1105,16 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
             ['cartoon', '1540767160.svg']
         );
         $sql = "UPDATE {mmogame_aa_avatars} SET filename=? WHERE directory=? AND filename=?";
-        $DB->execute( $sql, ['angel.svg', 'cartoon', 'angel01.svg']);
+        $DB->execute($sql, ['angel.svg', 'cartoon', 'angel01.svg']);
 
         $sql = "UPDATE {mmogame_aa_avatars} SET filename=? WHERE directory=? AND filename=?";
-        $DB->execute( $sql, ['dancer.svg', 'cartoon', 'dancer113.svg']);
+        $DB->execute($sql, ['dancer.svg', 'cartoon', 'dancer113.svg']);
 
         $sql = "UPDATE {mmogame_aa_avatars} SET directory=? WHERE directory=? AND filename=?";
-        $DB->execute( $sql, ['animals', 'cartoon', 'dinosaur.svg']);
+        $DB->execute($sql, ['animals', 'cartoon', 'dinosaur.svg']);
 
         $sql = "UPDATE {mmogame_aa_avatars} SET directory=? WHERE directory=? AND filename=?";
-        $DB->execute( $sql, ['people', 'cartoon', 'doctor.svg']);
+        $DB->execute($sql, ['people', 'cartoon', 'doctor.svg']);
 
         $DB->delete_records_select(
             'mmogame_aa_avatars',
@@ -1123,7 +1123,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         );
 
         $sql = "UPDATE {mmogame_aa_avatars} SET filename=? WHERE directory=? AND filename=?";
-        $DB->execute( $sql, ['perplexed_female.svg', 'cartoon', 'publicdomainq.svg']);
+        $DB->execute($sql, ['perplexed_female.svg', 'cartoon', 'publicdomainq.svg']);
 
         $DB->delete_records_select(
             'mmogame_aa_avatars',
