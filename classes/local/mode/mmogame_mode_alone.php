@@ -27,8 +27,6 @@ namespace mod_mmogame\local\mode;
 use mod_mmogame\local\mmogame;
 use stdClass;
 
-define('STATE_LAST', 2);
-
 /**
  * The class mmogame_mode_alone has the code for mode Alone
  *
@@ -54,7 +52,7 @@ class mmogame_mode_alone {
             );
             $mmogame->update_state($mmogame->get_rstate()->state);
         } else if (isset($data->state)) {
-            if ($data->state >= 0 && $data->state <= STATE_LAST) {
+            if ($data->state >= 0 && $data->state <= 2) {
                 $mmogame->update_state($data->state);
             }
         }

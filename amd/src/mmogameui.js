@@ -69,7 +69,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @returns {string} The file path.
          */
         getSoundFile() {
-            return this.kindSound === 0 ? 'assets/sound-on-flat.png' : 'assets/sound-off-flat.png';
+            return this.kindSound === 0 ? 'assets/sound-on' : 'assets/sound-off.svg';
         }
 
         /**

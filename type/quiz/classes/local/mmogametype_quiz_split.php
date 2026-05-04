@@ -35,7 +35,7 @@ use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once __DIR__ . '/mmogametype_quiz_algorithm_irt.php';
+require_once(__DIR__ . '/mmogametype_quiz_algorithm_irt.php');
 
 define('ERRORCODE_NO_QUERIES', 'no_questions');
 define('ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');

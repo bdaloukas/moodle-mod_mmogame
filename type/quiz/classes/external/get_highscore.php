@@ -71,10 +71,12 @@ class get_highscore extends external_api {
         ]);
 
         // Perform security checks.
-        $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
-        $context = module::instance($cm->id);
-        self::validate_context($context);
-        require_capability('mod/mmogame:play', $context);
+        if ($kinduser == 'moodle') {
+            $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
+            $context = module::instance($cm->id);
+            self::validate_context($context);
+            require_capability('mod/mmogame:play', $context);
+        }
 
         $ret = [];
 

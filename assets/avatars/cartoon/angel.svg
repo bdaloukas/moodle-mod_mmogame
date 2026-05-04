@@ -1,0 +1,144 @@
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="图层_1" xml:space="preserve" viewBox="0 0 595.28 841.89" y="0px" version="1.1" enable-background="new 0 0 595.28 841.89" x="0px">
+<radialGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" cy="600.45" cx="137.72" r="78.823">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#F0ECEB" offset="0"/>
+	<stop stop-color="#F0E7E1" offset=".0703"/>
+	<stop stop-color="#EED5BD" offset=".3459"/>
+	<stop stop-color="#ECC9A3" offset=".6016"/>
+	<stop stop-color="#EBC194" offset=".8276"/>
+	<stop stop-color="#EBBE8E" offset="1"/>
+</radialGradient>
+<path d="m127.78 577.28s-57.45 9.347-85.506 30.718-28.721 19.374 7.351 24.047 169.67 2.005 172.34 2.005l22.043-47.423c0.01-0.01-94.84-37.41-116.22-9.36z" fill="url(#SVGID_1_)"/>
+<radialGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" cy="512.48" cx="275.5" r="205.64">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#EE9AAD" offset="0"/>
+	<stop stop-color="#ED8EA2" offset=".1818"/>
+	<stop stop-color="#E96B85" offset=".526"/>
+	<stop stop-color="#E4225E" offset=".9932"/>
+	<stop stop-color="#E4205D" offset="1"/>
+</radialGradient>
+<path d="m502.53 348.16s26.044 36.745-14.701 60.792l-57.442 55.438s-25.395 28.056 13.354 42.084 76.151 8.016 34.067 57.442-52.104 58.788-106.88 66.805-76.817 16.031-84.168 52.776-62.796-36.071-91.518-96.864-152.3-76.151-154.97-122.24l161.66 3.335s-7.351-50.1 84.833-80.16l131.6-46.087 84.17 6.67z" fill="url(#SVGID_2_)"/>
+<radialGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" cy="560.89" cx="166.15" r="49.598">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#F0ECEB" offset="0"/>
+	<stop stop-color="#F0E7E1" offset=".0703"/>
+	<stop stop-color="#EED5BD" offset=".3459"/>
+	<stop stop-color="#ECC9A3" offset=".6016"/>
+	<stop stop-color="#EBC194" offset=".8276"/>
+	<stop stop-color="#EBBE8E" offset="1"/>
+</radialGradient>
+<path d="m177.88 588.63s-76.151-11.351-76.151-50.1 26.052-13.354 110.22 2.004c0 0.01 59.45 34.08-34.07 48.1z" fill="url(#SVGID_3_)"/>
+<radialGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" cy="415.96" cx="426.04" r="42.562">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#B7D338" offset="0"/>
+	<stop stop-color="#B4D238" offset=".3122"/>
+	<stop stop-color="#ACCD37" offset=".4907"/>
+	<stop stop-color="#9EC337" offset=".6355"/>
+	<stop stop-color="#89B636" offset=".7623"/>
+	<stop stop-color="#6CA636" offset=".8761"/>
+	<stop stop-color="#439538" offset=".9775"/>
+</radialGradient>
+<path d="m479.81 416.96s-56.111-1.996-84.167-28.048l-23.375 2.004 6.678 14.686s28.721 31.398 74.813 37.41l26.06-26.05z" fill="url(#SVGID_4_)"/>
+<radialGradient id="SVGID_5_" gradientUnits="userSpaceOnUse" cy="214.58" cx="279.59" r="219.43">
+	<stop stop-color="#B97372" offset="0"/>
+	<stop stop-color="#540A17" offset="1"/>
+</radialGradient>
+<path d="m447.74 92.647s30.06-26.052 54.107-28.056 72.144 23.046 42.084 169.34l-136.27 110.22-58.115 6.012s-39.077 14.028-54.107 4.008-66.131 24.048-92.184-1.002-60.119-28.056-93.185-12.024-63.125 29.058-92.183-14.028-29.058-33.066 12.024-52.104 73.145 4.008 65.129-57.114c0 0 12.024-48.096 75.149-38.076 0 0 44.087 37.074 107.21 30.06 0 0 37.074-16.032 38.076-38.076l132.27-79.163z" fill="url(#SVGID_5_)"/>
+<radialGradient id="SVGID_6_" gradientUnits="userSpaceOnUse" cy="323.94" cx="413.05" r="159.05">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#F0ECEB" offset="0"/>
+	<stop stop-color="#F0E7E1" offset=".0703"/>
+	<stop stop-color="#EED5BD" offset=".3459"/>
+	<stop stop-color="#ECC9A3" offset=".6016"/>
+	<stop stop-color="#EBC194" offset=".8276"/>
+	<stop stop-color="#EBBE8E" offset="1"/>
+</radialGradient>
+<path d="m403.66 312.08s-87.502 42.083-175.01 129.59-1.339 18.035 64.793 8.016 80.167-32.729 134.94-98.86 15.366 8.016 54.107-3.339 12.697 2.673 22.044 2.673 96.191-54.111 92.849-153.64c0 0-3.335-12.02-50.766 35.407l-75.485 62.123-5.347-14.697-22.044-4.677-30.06 8.016-10.01 29.39z" fill="url(#SVGID_6_)"/>
+<radialGradient id="SVGID_7_" gradientUnits="userSpaceOnUse" cy="218.56" cx="423.51" r="80.972">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#F0ECEB" offset="0"/>
+	<stop stop-color="#F0E9E4" offset=".1684"/>
+	<stop stop-color="#EFE0D2" offset=".4125"/>
+	<stop stop-color="#EDD1B4" offset=".7026"/>
+	<stop stop-color="#EBBE8E" offset="1"/>
+</radialGradient>
+<path d="m351.55 183.83s-0.665 46.091 0 61.454 16.697 44.753 56.111 62.124 62.797-14.697 86.837-80.16 5.339-46.091-6.012-80.159l-74.813-17.367-62.13 54.12z" fill="url(#SVGID_7_)"/>
+<radialGradient id="SVGID_8_" gradientUnits="userSpaceOnUse" cy="127.24" cx="393.98" r="76.2">
+	<stop stop-color="#B97372" offset="0"/>
+	<stop stop-color="#540A17" offset="1"/>
+</radialGradient>
+<path d="m483.82 145.75s-61.121 72.143-163.32 25.05-38.076-44.088 2.004-91.182 58.115-33.065 111.22 11.022c0 0.004 34.06 15.03 50.1 55.11z" fill="url(#SVGID_8_)"/>
+<radialGradient id="SVGID_9_" gradientUnits="userSpaceOnUse" cy="124.03" cx="235.83" r="36.565">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#F0ECEB" offset="0"/>
+	<stop stop-color="#E4D6D0" offset=".0664"/>
+	<stop stop-color="#C59E8E" offset=".2527"/>
+	<stop stop-color="#AE7260" offset=".4326"/>
+	<stop stop-color="#9D5343" offset=".6018"/>
+	<stop stop-color="#923E34" offset=".7575"/>
+	<stop stop-color="#8B312C" offset=".8951"/>
+	<stop stop-color="#892C2A" offset="1"/>
+</radialGradient>
+<polygon points="237.51 88.018 247.54 111.97 272.94 117.29 253.26 134.22 256.06 160.04 233.88 146.55 210.18 157.18 216.16 131.92 198.72 112.68 224.59 110.54" fill="url(#SVGID_9_)"/>
+<radialGradient id="SVGID_10_" gradientUnits="userSpaceOnUse" cy="263.76" cx="159.55" r="44.231">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#EBC3D9" offset="0"/>
+	<stop stop-color="#EAC1D7" offset=".2743"/>
+	<stop stop-color="#E8BAD2" offset=".4312"/>
+	<stop stop-color="#E4AECA" offset=".5584"/>
+	<stop stop-color="#DF9CBD" offset=".6698"/>
+	<stop stop-color="#D885AE" offset=".7708"/>
+	<stop stop-color="#D1679B" offset=".8644"/>
+	<stop stop-color="#C94288" offset=".9504"/>
+	<stop stop-color="#C41F7D" offset="1"/>
+</radialGradient>
+<polygon points="145.12 218.96 168.64 239.72 199.08 232.15 186.58 260.92 203.2 287.52 171.98 284.53 151.78 308.56 145 277.94 115.9 266.18 142.92 250.25" fill="url(#SVGID_10_)"/>
+<radialGradient id="SVGID_11_" gradientUnits="userSpaceOnUse" cy="477.19" cx="533.83" r="54.373">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#EE9AAD" offset="0"/>
+	<stop stop-color="#ED8EA2" offset=".1818"/>
+	<stop stop-color="#E96B85" offset=".526"/>
+	<stop stop-color="#E4225E" offset=".9932"/>
+	<stop stop-color="#E4205D" offset="1"/>
+</radialGradient>
+<polygon points="522.23 421.68 548.67 450.04 587.03 444.36 568.22 478.26 585.49 512.98 547.43 505.56 519.7 532.71 515.01 494.23 480.62 476.28 515.78 459.91" fill="url(#SVGID_11_)"/>
+<radialGradient id="SVGID_12_" gradientUnits="userSpaceOnUse" cy="489.77" cx="259.38" r="28.056">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#FCFBE2" offset="0"/>
+	<stop stop-color="#FCFAE1" offset=".1761"/>
+	<stop stop-color="#FBF4DC" offset=".3123"/>
+	<stop stop-color="#FAE8D4" offset=".4351"/>
+	<stop stop-color="#F8D7C7" offset=".55"/>
+	<stop stop-color="#F5C1B7" offset=".6595"/>
+	<stop stop-color="#F1A2A3" offset=".7648"/>
+	<stop stop-color="#EC7C8A" offset=".8669"/>
+	<stop stop-color="#E84A72" offset=".9639"/>
+	<stop stop-color="#E72E69" offset="1"/>
+</radialGradient>
+<path d="m287.43 489.77c0 15.491-12.564 28.056-28.056 28.056s-28.056-12.564-28.056-28.056c0-15.492 12.564-28.057 28.056-28.057s28.06 12.57 28.06 28.06z" fill="url(#SVGID_12_)"/>
+<radialGradient id="SVGID_13_" gradientUnits="userSpaceOnUse" cy="536.2" cx="309.15" r="17.034">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#FCFBE2" offset="0"/>
+	<stop stop-color="#FCFAE1" offset=".1761"/>
+	<stop stop-color="#FBF4DC" offset=".3123"/>
+	<stop stop-color="#FAE8D4" offset=".4351"/>
+	<stop stop-color="#F8D7C7" offset=".55"/>
+	<stop stop-color="#F5C1B7" offset=".6595"/>
+	<stop stop-color="#F1A2A3" offset=".7648"/>
+	<stop stop-color="#EC7C8A" offset=".8669"/>
+	<stop stop-color="#E84A72" offset=".9639"/>
+	<stop stop-color="#E72E69" offset="1"/>
+</radialGradient>
+<circle cy="536.2" cx="309.15" r="17.034" fill="url(#SVGID_13_)"/>
+<radialGradient id="SVGID_14_" gradientUnits="userSpaceOnUse" cy="241.27" cx="374.26" r="14.696">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#040000" offset="1"/>
+</radialGradient>
+<path d="m388.96 241.28c0 8.114-6.583 14.693-14.701 14.693-8.117 0-14.693-6.579-14.693-14.693 0-8.118 6.576-14.697 14.693-14.697 8.11 0 14.7 6.58 14.7 14.7z" fill="url(#SVGID_14_)"/>
+<radialGradient id="SVGID_15_" gradientUnits="userSpaceOnUse" cy="234.26" cx="463.78" r="14.696">
+	<stop stop-color="#fff" offset="0"/>
+	<stop stop-color="#040000" offset="1"/>
+</radialGradient>
+<path d="m478.48 234.26c0 8.114-6.584 14.693-14.701 14.693-8.118 0-14.693-6.58-14.693-14.693 0-8.118 6.575-14.697 14.693-14.697 8.12 0 14.7 6.58 14.7 14.7z" fill="url(#SVGID_15_)"/>
+<path stroke="#994B4A" d="m444.1 97.082s-13.73 101.44-86.813 53.208-33.129-48.624 25.198-53.208 30.804 2.807 26.138 25.207" fill="none"/>
+<metadata><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/><dc:publisher><cc:Agent rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title>Angel Girl</dc:title><dc:date>2013-07-28T06:09:16</dc:date><dc:description>Free Cute Angel Girl Cartoon</dc:description><dc:source>https://openclipart.org/detail/181223/angel-girl-by-vectorsme-181223</dc:source><dc:creator><cc:Agent><dc:title>vectorsme</dc:title></cc:Agent></dc:creator><dc:subject><rdf:Bag><rdf:li>Angel</rdf:li><rdf:li>Cartoon</rdf:li><rdf:li>Cute</rdf:li><rdf:li>Girl</rdf:li></rdf:Bag></dc:subject></cc:Work><cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/><cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/><cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/></cc:License></rdf:RDF></metadata></svg>

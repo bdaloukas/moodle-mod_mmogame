@@ -1,302 +1,77 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-<svg
-    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:cc="http://creativecommons.org/ns#"
-    xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-    xmlns:svg="http://www.w3.org/2000/svg"
-    xmlns:ns1="http://sozi.baierouge.fr"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    id="svg3289"
-    sodipodi:docname="interviewer.svg"
-    viewBox="0 0 426.95 472.44"
-    version="1.1"
-    inkscape:version="0.47 r22583"
-  >
-  <sodipodi:namedview
-      id="base"
-      bordercolor="#666666"
-      inkscape:pageshadow="2"
-      inkscape:window-y="54"
-      pagecolor="#ffffff"
-      inkscape:window-height="933"
-      inkscape:window-maximized="0"
-      inkscape:zoom="0.98994949"
-      inkscape:window-x="138"
-      showgrid="false"
-      borderopacity="1.0"
-      inkscape:current-layer="layer1"
-      inkscape:cx="226.56632"
-      inkscape:cy="224.73015"
-      inkscape:window-width="940"
-      inkscape:pageopacity="0.0"
-      inkscape:document-units="px"
-  />
-  <g
-      id="layer1"
-      inkscape:label="Layer 1"
-      inkscape:groupmode="layer"
-      transform="translate(-148.43 -296.08)"
-    >
-    <g
-        id="g3434"
-      >
-      <polygon
-          id="polygon4578"
-          style="fill:#565248"
-          points="151.54 284.29 154.04 245.79 138.04 241.04 139.79 270.29 116.54 285.29"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-      />
-      <polygon
-          id="polygon4580"
-          style="fill:#565248"
-          points="194.29 292.29 181.54 270.04 190.29 256.04 178.29 252.04 166.04 269.79 178.29 281.04 153.54 290.04"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-      />
-      <polygon
-          id="polygon4582"
-          style="fill:#fdd89a"
-          points="122.79 166.04 150.29 170.29 136.79 213.79 211.79 224.79 220.54 171.04 227.29 125.04 164.29 106.29 154.29 137.29"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-      />
-      <polygon
-          id="polygon4584"
-          style="fill:#806646"
-          points="211.54 130.04 202.79 167.54 220.54 173.79 242.04 121.04 224.04 106.79 163.29 105.04 160.54 115.54"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-      />
-      <path
-          id="path4586"
-          style="fill:#ffffff"
-          d="m320.76 527.57 15.623-44.784s45.577 0.63076 37.112 30.277c-8.4598 29.646-35.159 18.923-52.734 14.508z"
-      />
-      <polygon
-          id="polygon4588"
-          style="fill:#fb8a00"
-          points="212.79 218.54 138.64 205.04 130.29 244.29 205.7 266.54"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-      />
-      <polygon
-          id="polygon4590"
-          style="fill:#efa512"
-          points="201.29 216.04 165.54 209.79 168.29 232.29"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-      />
-      <polygon
-          id="polygon4592"
-          style="fill:#58595b"
-          points="94.786 239.79 101.79 237.54 96.786 193.29 83.036 196.79"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-      />
-      <ellipse
-          id="ellipse4594"
-          sodipodi:rx="6.125"
-          sodipodi:ry="5.5"
-          d="m 171.536,144.793 c 0,3.03757 -2.74226,5.5 -6.125,5.5 -3.38275,0 -6.125,-2.46243 -6.125,-5.5 0,-3.03757 2.74225,-5.5 6.125,-5.5 3.38274,0 6.125,2.46243 6.125,5.5 z"
-          cx="165.41"
-          cy="144.79"
-          rx="6.125"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-          ry="5.5"
-          sodipodi:cy="144.793"
-          sodipodi:cx="165.411"
-      />
-      <ellipse
-          id="ellipse4596"
-          sodipodi:rx="6.25"
-          sodipodi:ry="5.625"
-          d="m 193.536,150.668 c 0,3.1066 -2.79822,5.625 -6.25,5.625 -3.45178,0 -6.25,-2.5184 -6.25,-5.625 0,-3.1066 2.79822,-5.625 6.25,-5.625 3.45178,0 6.25,2.5184 6.25,5.625 z"
-          cx="187.29"
-          cy="150.67"
-          rx="6.25"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-          ry="5.625"
-          sodipodi:cy="150.668"
-          sodipodi:cx="187.286"
-      />
-      <path
-          id="path4598"
-          style="fill:#808285"
-          d="m179.89 453.14s-40.369 7.5692-29.646 50.461l11.985 32.169 55.507-10.723s20.815-32.169-3.7846-57.4c0 0-12.615-19.554-34.061-14.508z"
-      />
-      <g
-          id="g4600"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-        >
-        <polygon
-            id="polygon4602"
-            points="80.036 172.31 82.036 172.27 82.536 195.77 80.536 195.81"
-        />
-      </g
-      >
-      <g
-          id="g4604"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-        >
-        <polygon
-            id="polygon4606"
-            points="86.788 169.1 88.784 168.99 90.284 195.99 88.288 196.1"
-        />
-      </g
-      >
-      <g
-          id="g4608"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-        >
-        <polygon
-            id="polygon4610"
-            points="93.79 173.38 95.782 173.21 97.532 194.46 95.54 194.62"
-        />
-      </g
-      >
-      <g
-          id="g4612"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-        >
-        <polygon
-            id="polygon4614"
-            points="75.863 189.31 100.11 185.06 100.46 187.03 76.208 191.28"
-        />
-      </g
-      >
-      <g
-          id="g4616"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-        >
-        <polygon
-            id="polygon4618"
-            points="74.339 180.81 99.339 175.81 99.732 177.77 74.732 182.77"
-        />
-      </g
-      >
-      <polygon
-          id="polygon4620"
-          style="fill:#efa512"
-          points="92.786 219.29 101.04 210.04 121.29 221.04 161.04 216.79 158.79 227.54 115.54 233.54"
-          transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"
-      />
-      <path
-          id="path4622"
-          style="stroke:#fdd89a;stroke-width:2.5231;fill:#fdd89a"
-          d="m222.78 562.89-18.923 25.231-24.6-6.3076s-19.554-11.985 3.1538-20.184c0 0-3.7846-16.4 9.4615-11.354 0 0 5.6769-18.292 15.138-5.6769l15.769 18.292z"
-      />
-    </g
-    >
-  </g
-  >
-  <metadata
-    >
-    <rdf:RDF
-      >
-      <cc:Work
-        >
-        <dc:format
-          >image/svg+xml</dc:format
-        >
-        <dc:type
-            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
-        />
-        <cc:license
-            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
-        />
-        <dc:publisher
-          >
-          <cc:Agent
-              rdf:about="http://openclipart.org/"
-            >
-            <dc:title
-              >Openclipart</dc:title
-            >
-          </cc:Agent
-          >
-        </dc:publisher
-        >
-        <dc:title
-          >interviewer</dc:title
-        >
-        <dc:date
-          >2010-08-04T09:16:59</dc:date
-        >
-        <dc:description
-          >part of set of characters submitted separately.</dc:description
-        >
-        <dc:source
-          >https://openclipart.org/detail/77065/interviewer-by-shokunin</dc:source
-        >
-        <dc:creator
-          >
-          <cc:Agent
-            >
-            <dc:title
-              >shokunin</dc:title
-            >
-          </cc:Agent
-          >
-        </dc:creator
-        >
-        <dc:subject
-          >
-          <rdf:Bag
-            >
-            <rdf:li
-              >cartoon</rdf:li
-            >
-            <rdf:li
-              >cartoony</rdf:li
-            >
-            <rdf:li
-              >character design</rdf:li
-            >
-            <rdf:li
-              >characters</rdf:li
-            >
-            <rdf:li
-              >cute</rdf:li
-            >
-            <rdf:li
-              >interview</rdf:li
-            >
-            <rdf:li
-              >interviewer</rdf:li
-            >
-            <rdf:li
-              >jobs</rdf:li
-            >
-            <rdf:li
-              >man</rdf:li
-            >
-            <rdf:li
-              >microphone</rdf:li
-            >
-            <rdf:li
-              >people</rdf:li
-            >
-          </rdf:Bag
-          >
-        </dc:subject
-        >
-      </cc:Work
-      >
-      <cc:License
-          rdf:about="http://creativecommons.org/licenses/publicdomain/"
-        >
-        <cc:permits
-            rdf:resource="http://creativecommons.org/ns#Reproduction"
-        />
-        <cc:permits
-            rdf:resource="http://creativecommons.org/ns#Distribution"
-        />
-        <cc:permits
-            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
-        />
-      </cc:License
-      >
-    </rdf:RDF
-    >
-  </metadata
-  >
-</svg
->
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg3289" viewBox="0 0 426.95 472.44" version="1.1">
+  <g id="layer1" transform="translate(-148.43 -296.08)">
+    <g id="g3434">
+      <polygon id="polygon4578" style="fill:#565248" points="151.54 284.29 154.04 245.79 138.04 241.04 139.79 270.29 116.54 285.29" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"/>
+      <polygon id="polygon4580" style="fill:#565248" points="194.29 292.29 181.54 270.04 190.29 256.04 178.29 252.04 166.04 269.79 178.29 281.04 153.54 290.04" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"/>
+      <polygon id="polygon4582" style="fill:#fdd89a" points="122.79 166.04 150.29 170.29 136.79 213.79 211.79 224.79 220.54 171.04 227.29 125.04 164.29 106.29 154.29 137.29" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"/>
+      <polygon id="polygon4584" style="fill:#806646" points="211.54 130.04 202.79 167.54 220.54 173.79 242.04 121.04 224.04 106.79 163.29 105.04 160.54 115.54" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"/>
+      <path id="path4586" style="fill:#ffffff" d="m320.76 527.57 15.623-44.784s45.577 0.63076 37.112 30.277c-8.4598 29.646-35.159 18.923-52.734 14.508z"/>
+      <polygon id="polygon4588" style="fill:#fb8a00" points="212.79 218.54 138.64 205.04 130.29 244.29 205.7 266.54" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"/>
+      <polygon id="polygon4590" style="fill:#efa512" points="201.29 216.04 165.54 209.79 168.29 232.29" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"/>
+      <polygon id="polygon4592" style="fill:#58595b" points="94.786 239.79 101.79 237.54 96.786 193.29 83.036 196.79" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"/>
+      <ellipse id="ellipse4594" d="m 171.536,144.793 c 0,3.03757 -2.74226,5.5 -6.125,5.5 -3.38275,0 -6.125,-2.46243 -6.125,-5.5 0,-3.03757 2.74225,-5.5 6.125,-5.5 3.38274,0 6.125,2.46243 6.125,5.5 z" cx="165.41" cy="144.79" rx="6.125" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)" ry="5.5"/>
+      <ellipse id="ellipse4596" d="m 193.536,150.668 c 0,3.1066 -2.79822,5.625 -6.25,5.625 -3.45178,0 -6.25,-2.5184 -6.25,-5.625 0,-3.1066 2.79822,-5.625 6.25,-5.625 3.45178,0 6.25,2.5184 6.25,5.625 z" cx="187.29" cy="150.67" rx="6.25" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)" ry="5.625"/>
+      <path id="path4598" style="fill:#808285" d="m179.89 453.14s-40.369 7.5692-29.646 50.461l11.985 32.169 55.507-10.723s20.815-32.169-3.7846-57.4c0 0-12.615-19.554-34.061-14.508z"/>
+      <g id="g4600" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)">
+        <polygon id="polygon4602" points="80.036 172.31 82.036 172.27 82.536 195.77 80.536 195.81"/>
+      </g>
+      <g id="g4604" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)">
+        <polygon id="polygon4606" points="86.788 169.1 88.784 168.99 90.284 195.99 88.288 196.1"/>
+      </g>
+      <g id="g4608" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)">
+        <polygon id="polygon4610" points="93.79 173.38 95.782 173.21 97.532 194.46 95.54 194.62"/>
+      </g>
+      <g id="g4612" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)">
+        <polygon id="polygon4614" points="75.863 189.31 100.11 185.06 100.46 187.03 76.208 191.28"/>
+      </g>
+      <g id="g4616" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)">
+        <polygon id="polygon4618" points="74.339 180.81 99.339 175.81 99.732 177.77 74.732 182.77"/>
+      </g>
+      <polygon id="polygon4620" style="fill:#efa512" points="92.786 219.29 101.04 210.04 121.29 221.04 161.04 216.79 158.79 227.54 115.54 233.54" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"/>
+      <path id="path4622" style="stroke:#fdd89a;stroke-width:2.5231;fill:#fdd89a" d="m222.78 562.89-18.923 25.231-24.6-6.3076s-19.554-11.985 3.1538-20.184c0 0-3.7846-16.4 9.4615-11.354 0 0 5.6769-18.292 15.138-5.6769l15.769 18.292z"/>
+    </g>
+  </g>
+  <metadata>
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
+        <dc:publisher>
+          <cc:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title>interviewer</dc:title>
+        <dc:date>2010-08-04T09:16:59</dc:date>
+        <dc:description>part of set of characters submitted separately.</dc:description>
+        <dc:source>https://openclipart.org/detail/77065/interviewer-by-shokunin</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>shokunin</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>cartoon</rdf:li>
+            <rdf:li>cartoony</rdf:li>
+            <rdf:li>character design</rdf:li>
+            <rdf:li>characters</rdf:li>
+            <rdf:li>cute</rdf:li>
+            <rdf:li>interview</rdf:li>
+            <rdf:li>interviewer</rdf:li>
+            <rdf:li>jobs</rdf:li>
+            <rdf:li>man</rdf:li>
+            <rdf:li>microphone</rdf:li>
+            <rdf:li>people</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>
