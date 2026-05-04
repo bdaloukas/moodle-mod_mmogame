@@ -1101,7 +1101,8 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     if ($oldversion < ($ver = 2026050403)) {
         $DB->delete_records_select(
             'mmogame_aa_avatars',
-            'directory=? AND filename=?', ['cartoon', '1540767160.svg']
+            'directory=? AND filename=?',
+            ['cartoon', '1540767160.svg']
         );
         $sql = "UPDATE {mmogame_aa_avatars} SET filename=? WHERE directory=? AND filename=?";
         $DB->execute( $sql, ['angel.svg', 'cartoon', 'angel01.svg']);
@@ -1117,7 +1118,8 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
         $DB->delete_records_select(
             'mmogame_aa_avatars',
-            'directory=? AND filename=?', ['cartoon', 'online-shopping.svg']
+            'directory=? AND filename=?',
+            ['cartoon', 'online-shopping.svg']
         );
 
         $sql = "UPDATE {mmogame_aa_avatars} SET filename=? WHERE directory=? AND filename=?";
@@ -1125,17 +1127,20 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
         $DB->delete_records_select(
             'mmogame_aa_avatars',
-            'directory=? AND filename=?', ['cartoon', 'ruby-martin74.svg']
+            'directory=? AND filename=?',
+            ['cartoon', 'ruby-martin74.svg']
         );
 
         $DB->delete_records_select(
             'mmogame_aa_avatars',
-            'directory=? AND filename=?', ['people', 'chef.svg']
+            'directory=? AND filename=?',
+            ['people', 'chef.svg']
         );
 
         $DB->delete_records_select(
             'mmogame_aa_avatars',
-            'directory=? AND filename=?', ['people', 'fisherman.svg']
+            'directory=? AND filename=?',
+            ['people', 'fisherman.svg']
         );
 
         upgrade_mod_savepoint(true, $ver, 'mmogame');

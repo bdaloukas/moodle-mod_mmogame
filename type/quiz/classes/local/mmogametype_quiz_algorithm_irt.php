@@ -191,7 +191,8 @@ class mmogametype_quiz_algorithm_irt {
         array &$ranks
     ): array {
         // Get player's skill rating (theta).
-        $rec = $db->get_record_select('mmogame_aa_grades',
+        $rec = $db->get_record_select(
+            'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
             [$mmogameid, $numgame, $auserid]
         );
