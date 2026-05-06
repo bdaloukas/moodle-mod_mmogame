@@ -203,6 +203,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
             this.attempt = json.attempt;
+            this.sessionkey = json.sessionkey;
 
             // Process question type and answers
             this.qtype = json.qtype;

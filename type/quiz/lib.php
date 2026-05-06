@@ -24,8 +24,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_mmogame\local\mmogame;
-
 /**
  * Given an ID of an instance of this module, this function will permanently delete the instance and any data that depends on it.
  *

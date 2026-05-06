@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -34,7 +34,7 @@ use required_capability_exception;
  *
  * @package   mmogametype_quiz
  * @copyright 2024 Vasilis Daloukas
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class send_answers_split extends external_api {
     /**
@@ -46,14 +46,14 @@ class send_answers_split extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
-            'splits' => new external_value(PARAM_RAW, 'The user data'),
-            'attempts' => new external_value(PARAM_RAW, 'The user data'),
-            'iscorrects' => new external_value(PARAM_RAW, 'The user data'),
-            'answers' => new external_value(PARAM_RAW, 'The user data'),
-            'timestarts' => new external_value(PARAM_RAW, 'The user data'),
-            'timeanswers' => new external_value(PARAM_RAW, 'The user data'),
-            'returnsplits' => new external_value(PARAM_RAW, 'The split that wants new questions'),
-            'tools' => new external_value(PARAM_RAW, 'The user data'),
+            'splits' => new external_value(PARAM_TEXT, 'Comma-separated split IDs'),
+            'attempts' => new external_value(PARAM_TEXT, 'Comma-separated attempt IDs'),
+            'sessionkeys' => new external_value(PARAM_TEXT, 'Comma-separated session keys'),
+            'answers' => new external_value(PARAM_TEXT, 'Comma-separated answer IDs'),
+            'timestarts' => new external_value(PARAM_TEXT, 'Comma-separated Unix timestamps'),
+            'timeanswers' => new external_value(PARAM_TEXT, 'Comma-separated Unix timestamps'),
+            'returnsplits' => new external_value(PARAM_TEXT, 'Comma-separated return split IDs'),
+            'tools' => new external_value(PARAM_TEXT, 'Comma-separated tool flags'),
         ]);
     }
 
@@ -65,7 +65,7 @@ class send_answers_split extends external_api {
      * @param string $user
      * @param ?string $splits
      * @param ?string $attempts
-     * @param ?string $iscorrects
+     * @param string|null $sessionkeys
      * @param ?string $answers
      * @param ?string $timestarts
      * @param string $timeanswers
@@ -83,7 +83,7 @@ class send_answers_split extends external_api {
         string $user,
         ?string $splits = null,
         ?string $attempts = null,
-        ?string $iscorrects = null,
+        ?string $sessionkeys = null,
         ?string $answers = null,
         ?string $timestarts = '',
         string $timeanswers = '',
@@ -97,7 +97,7 @@ class send_answers_split extends external_api {
             'user' => $user,
             'splits' => $splits,
             'attempts' => $attempts,
-            'iscorrects' => $iscorrects,
+            'sessionkeys' => $sessionkeys,
             'answers' => $answers,
             'timestarts' => $timestarts,
             'timeanswers' => $timeanswers,
@@ -105,17 +105,35 @@ class send_answers_split extends external_api {
             'tools' => $tools,
         ]);
 
+        // Extracts array.
         $splits = explode(',', $splits);
         $attempts = explode(',', $attempts);
-        $iscorrects = explode(',', $iscorrects);
+        $sessionkeys = explode(',', $sessionkeys);
         $answers = explode(',', $answers);
         $timeanswers = explode(',', $timeanswers);
         $timestarts = explode(',', $timestarts);
         $tools = explode(',', $tools);
+        $returnsplits = explode(',', $returnsplits);
+
+        $user = trim($user);
+
+        if ( $mmogameid <= 0 ) {
+            return self::error('invalid_mmogameid');
+        }
+
+        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user )) {
+            return self::error('invalid_user');
+        }
+
+        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
+
+        if (!in_array($kinduser, $allowedkindusers, true)) {
+            return self::error('invalid_kinduser');
+        }
 
         // Perform security checks.
         $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
-        if ($kinduser == 'moodle') {
+        if ($kinduser === 'moodle') {
             $context = module::instance($cm->id);
             self::validate_context($context);
             require_capability('mod/mmogame:play', $context);
@@ -128,21 +146,15 @@ class send_answers_split extends external_api {
         }
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
 
-        $pos = -1;
         $ret = [];
         $ids = [];
 
-        while (count($attempts)) {
-            if (intval(reset($attempts)) == 0) {
-                array_shift($attempts);
-            } else {
-                break;
-            }
-        }
-
         $idea = 0;
-        foreach ($attempts as $attemptid) {
-            $pos++;
+        foreach ($attempts as $pos => $attemptid) {
+            if ( 0 === (int) $attemptid ) {
+                continue;
+            }
+
             $tool = $tools[$pos];
 
             $mmogame->login_user_nolog($auserids[$pos]);
@@ -157,6 +169,7 @@ class send_answers_split extends external_api {
             $mmogame->set_answer_mode(
                 $ret,
                 $attemptid,
+                $sessionkeys[$pos],
                 $answers[$pos],
                 $timestarts[$pos],
                 $timeanswers[$pos],
@@ -178,12 +191,11 @@ class send_answers_split extends external_api {
             $kinduser,
             $user,
             null,
-            $returnsplits,
-            implode(',', $splits)
+            implode( ',', $returnsplits ),
         );
 
         // Attempts that saved to database.
-        $result['savedattempts'] = $attempts !== null ? $attempts : [];
+        $result['savedattempts'] = $attempts;
         $result['auserids'] = $auserids;
         return $result;
     }
@@ -200,6 +212,9 @@ class send_answers_split extends external_api {
             ),
             'attempts' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Attempts data')
+            ),
+            'sessionkeys' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Session keys')
             ),
             'attemptqueryids' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Query IDs of attempts')
@@ -276,6 +291,9 @@ class send_answers_split extends external_api {
      */
     protected static function pack_idea(mmogame $mmogame, array $queryids): array {
         $queries = $mmogame->get_qbank()->load_many($queryids);
+
+        $definitions = $tips = $answerids = $answertexts = $queryanswerids0 = [];
+
         foreach ($queries as $query) {
             $definitions[] = $query->definition;
             $tips[] = $query->generalfeedback;
@@ -285,6 +303,7 @@ class send_answers_split extends external_api {
             foreach ($query->answerids as $pos => $answerid) {
                 $queryanswerids[$answerid] = $answerid;
                 $answertexts[] = $query->answers[$pos];
+                $a[] = $answerid;
             }
             $answerids[] = implode(',', $a);
             $queryanswerids0[] = implode(',', $queryanswerids);
@@ -298,5 +317,16 @@ class send_answers_split extends external_api {
             'countquestion' => 0, 'countcorrect' => [], 'islastcorrect' => [],
             'ranks' => [], 'grades' => [], 'savedattempts' => [], 'queryranks' => [],
             'state' => $mmogame->get_state(), 'statetime' => $mmogame->get_statetime()];
+    }
+
+    /**
+     * Returns error code
+     *
+     * @param string $error
+     *
+     * @return array
+     */
+    private static function error(string $error): array {
+        return ['errorcode' => $error];
     }
 }

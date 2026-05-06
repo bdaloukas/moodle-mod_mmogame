@@ -27,18 +27,18 @@ namespace mod_mmogame\privacy;
 use coding_exception;
 use context;
 use core\context\module;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\contextlist;
 use core_privacy\local\request\core_userlist_provider;
 use core_privacy\local\request\helper;
-use core_privacy\local\request\writer;
-use core_privacy\local\request\contextlist;
-use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
-use core_privacy\local\request\approved_contextlist;
-use core_privacy\local\metadata\collection;
+use core_privacy\local\request\writer;
 use core_privacy\manager;
 use dml_exception;
+use mmogame;
 use mod_mmogame\local\database\mmogame_database_moodle;
-use mod_mmogame\local\mmogame;
 
 /**
  * Privacy Subsystem implementation for mod_mmogame.

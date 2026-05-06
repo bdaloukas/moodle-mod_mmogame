@@ -24,8 +24,7 @@
 
 namespace mod_mmogame\local\irt;
 
-use dml_exception;
-use dml_transaction_exception;
+use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\mmogame;
 use stdClass;
 
@@ -291,43 +290,37 @@ class mmogame_irt_1pl {
      *
      * @param mmogame $mmogame
      * @param string $filter
+     * @param int $userid
      * @return int
-     * @throws dml_exception
      */
-    public static function keyid(mmogame $mmogame, string &$filter): int {
-        global $DB, $USER;
-
-        $rec = $DB->get_record_select(
+    public static function keyid(mmogame $mmogame, string &$filter, int $userid): int {
+        $rec = $mmogame->get_db()->get_record_select(
             'mmogame_aa_irt_key',
             'mmogameid=? AND numgame=? AND userid=?',
-            [$mmogame->get_id(), $mmogame->get_numgame(), $USER->id]
+            [$mmogame->get_id(), $mmogame->get_numgame(), $userid]
         );
         if ($rec !== false) {
             $filter = $rec->filter;
             return $rec->id;
         }
 
-        $rec = new stdClass();
-        $rec->mmogameid = $mmogame->get_id();
-        $rec->numgame = $mmogame->get_numgame();
-        $rec->userid = $USER->id;
-
-        return $DB->insert_record('mmogame_aa_irt_key', $rec);
+        $a = ['mmogameid' => $mmogame->get_id(), 'numgame' => $mmogame->get_numgame(), 'userid' => $userid];
+        return $mmogame->get_db()->insert_record('mmogame_aa_irt_key', $a);
     }
 
     /**
      * Saves computations on database.
      *
+     * @param mmogame_database $db
      * @param int $keyid
      * @param string $wheresnippet
      * @param array $irtq
      * @param array $irtu
      * @param array $mapqueries
      * @param array $mapusers
-     * @throws dml_exception
-     * @throws dml_transaction_exception
      */
     public static function save(
+        mmogame_database $db,
         int $keyid,
         string $wheresnippet,
         array $irtq,
@@ -335,70 +328,64 @@ class mmogame_irt_1pl {
         array $mapqueries,
         array $mapusers
     ): void {
-        global $DB;
-
         $positionsq = array_keys($mapqueries);
         $positionsu = array_keys($mapusers);
 
-        // Start atomic transaction (ensures delete+bulk insert consistency).
-        $tx = $DB->start_delegated_transaction();
-
         // Clean previous rows for this key.
-        $DB->delete_records_select('mmogame_aa_irt_queries', 'keyid=?', [$keyid]);
-        $DB->delete_records_select('mmogame_aa_irt_ausers', 'keyid=?', [$keyid]);
+        $db->delete_records_select('mmogame_aa_irt_queries', 'keyid=?', [$keyid]);
+        $db->delete_records_select('mmogame_aa_irt_ausers', 'keyid=?', [$keyid]);
 
         $pos = 0;
         foreach ($irtq as $irt) {
             $queryid = $positionsq[$pos++];
             $query = $mapqueries[$queryid];
-            $new = new stdClass();
-            $new->keyid = $keyid;
-            $new->position = $query->position;
-            $new->queryid = $query->queryid;
-            $new->name = mb_substr($query->name, 0, 40);
-            $new->querytext = $query->querytext;
-            $new->b = $irt->b;
-            $new->b_online = $query->b_online;
-            $new->seb = $irt->seb;
-            $new->infit = $irt->infit;
-            $new->std_infit = $irt->stdinfit;
-            $new->outfit = $irt->outfit;
-            $new->std_outfit = $irt->stdoutfit;
-            $new->corrects = $irt->corrects;
-            $new->wrongs = $irt->wrongs;
-            $new->nulls = $irt->nulls;
-            $new->percent = $irt->percent;
-
-            $DB->insert_record('mmogame_aa_irt_queries', $new);
+            $new = [
+                'keyid' => $keyid,
+                'position' => $query->position,
+                'queryid' => $query->queryid,
+                'name' => mb_substr($query->name, 0, 40),
+                'querytext' => $query->querytext,
+                'b' => $irt->b,
+                'b_online' => $query->b_online,
+                'seb' => $irt->seb,
+                'infit' => $irt->infit,
+                'std_infit' => $irt->stdinfit,
+                'outfit' => $irt->outfit,
+                'std_outfit' => $irt->stdoutfit,
+                'corrects' => $irt->corrects,
+                'wrongs' => $irt->wrongs,
+                'nulls' => $irt->nulls,
+                'percent' => $irt->percent,
+            ];
+            $db->insert_record('mmogame_aa_irt_queries', $new);
         }
 
         $pos = 0;
         foreach ($irtu as $irt) {
             $key = $positionsu[$pos++];
             $user = $mapusers[$key];
-            $new = new stdClass();
-            $new->keyid = $keyid;
-            $new->position = $user->position;
-            $new->mmogameid = $user->mmogameid;
-            $new->numgame = $user->numgame;
-            $new->auserid = $user->auserid;
-            $new->theta = $irt->theta;
-            $new->theta_online = $user->theta_online;
-            $new->queries = $user->count;
-            $new->corrects = $user->corrects;
-            $new->wrongs = $user->wrongs;
-            $new->nulls = count($mapqueries) - $user->count;
-            $new->percent = ($user->count != 0 ? 100 * $user->corrects / $user->count : null);
-            $DB->insert_record('mmogame_aa_irt_ausers', $new);
+            $new = [
+                'keyid' => $keyid,
+                'position' => $user->position,
+                'mmogameid' => $user->mmogameid,
+                'numgame' => $user->numgame,
+                'auserid' => $user->auserid,
+                'theta' => $irt->theta,
+                'theta_online' => $user->theta_online,
+                'queries' => $user->count,
+                'corrects' => $user->corrects,
+                'wrongs' => $user->wrongs,
+                'nulls' => count($mapqueries) - $user->count,
+                'percent' => ($user->count != 0 ? 100 * $user->corrects / $user->count : null),
+            ];
+            $db->insert_record('mmogame_aa_irt_ausers', $new);
         }
 
-        $upd = new stdClass();
-        $upd->id = $keyid;
-        $upd->filter = $wheresnippet;
-        $upd->timecomputed = time();
-        $DB->update_record('mmogame_aa_irt_key', $upd);
-
-        // Commit (will auto-rollback on exception).
-        $tx->allow_commit();
+        $upd = [
+            'id' => $keyid,
+            'filter' => $wheresnippet,
+            'timecomputed' => time(),
+        ];
+        $db->update_record('mmogame_aa_irt_key', $upd);
     }
 }

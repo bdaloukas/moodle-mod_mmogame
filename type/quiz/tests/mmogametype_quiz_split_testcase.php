@@ -24,6 +24,7 @@
  */
 
 use mod_mmogame\local\database\mmogame_database_moodle;
+use mod_mmogame\local\mmogame;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -91,7 +92,7 @@ class mmogametype_quiz_split_testcase extends advanced_testcase {
         $rgame = reset($records);
         $this->assertEquals($rgame->qbankparams, $categoryid);
 
-        $mmogame = mod_mmogame\local\mmogame::create(new mmogame_database_moodle(), $rgame->id);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $rgame->id);
 
         // Set state to playing.
         $mmogame->update_state(0);

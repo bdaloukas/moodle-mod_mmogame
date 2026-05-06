@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -32,7 +32,7 @@ use required_capability_exception;
  *
  * @package   mmogametype_quiz
  * @copyright 2024 Vasilis Daloukas
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class set_answer extends external_api {
     /**
@@ -45,7 +45,8 @@ class set_answer extends external_api {
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
             'attempt' => new external_value(PARAM_INT, 'The id of the attempt'),
-            'answer' => new external_value(PARAM_RAW, 'The answer'),
+            'sessionkey' => new external_value(PARAM_ALPHANUM, 'The sessionkey of the attempt'),
+            'answer' => new external_value(PARAM_TEXT, 'The answer', VALUE_DEFAULT, ''),
             'answerid' => new external_value(PARAM_INT, 'The id of the answer'),
             'subcommand' => new external_value(PARAM_ALPHANUM, 'Subcommand'),
         ]);
@@ -58,23 +59,25 @@ class set_answer extends external_api {
      * @param string $kinduser
      * @param string $user
      * @param int $attempt
+     * @param string $sessionkey
      * @param ?string $answer
      * @param int|null $answerid
      * @param string $subcommand
      * @return string
-     * @throws restricted_context_exception
-     * @throws required_capability_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function execute(
         int $mmogameid,
         string $kinduser,
         string $user,
         int $attempt,
+        string $sessionkey,
         ?string $answer,
         ?int $answerid,
-        string $subcommand
+        string $subcommand,
     ): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
@@ -82,13 +85,31 @@ class set_answer extends external_api {
             'kinduser' => $kinduser,
             'user' => $user,
             'attempt' => $attempt,
-            'answer' => $answer != '' ? $answer : null,
+            'sessionkey' => $sessionkey,
+            'answer' => $answer,
             'answerid' => $answerid ?? null,
             'subcommand' => $subcommand,
         ]);
+        $answer = trim((string)$answer);
+
+        if ($mmogameid <= 0) {
+            return self::error('invalid_mmogameid');
+        }
+
+        $user = trim($user );
+
+        if (!preg_match( '/^[A-Za-z0-9_-]{1,100}$/', $user)) {
+            return self::error('invalid_user');
+        }
+
+        $allowedkindusers = [ 'moodle', 'wordpress', 'guid' ];
+
+        if (!in_array( $kinduser, $allowedkindusers, true)) {
+            return self::error('invalid_kinduser');
+        }
 
         // Perform security checks.
-        if ($kinduser == 'moodle') {
+        if ($kinduser === 'moodle') {
             $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
             $context = module::instance($cm->id);
             self::validate_context($context);
@@ -100,12 +121,30 @@ class set_answer extends external_api {
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
         $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
         if ($auserid == null) {
-            return json_encode(['errorcode' => 'no_user']);
+            return self::error('no_user');
+        }
+
+        if ($attempt <= 0) {
+            return self::error('invalid_attempt');
+        }
+
+        if (strlen( $answer ) > 1000) {
+            return self::error('answer_too_long');
+        }
+
+        if ( null !== $answerid && $answerid < 0 ) {
+            return self::error('invalid_answerid');
+        }
+
+        $allowedsubcommands = ['', 'answer', 'tool', 'clear'];
+
+        if (!in_array($subcommand, $allowedsubcommands, true)) {
+            return self::error('bad_subcommand');
         }
 
         $mmogame->login_user($auserid);
 
-        $mmogame->set_answer_mode($ret, $attempt, $answer, $answerid, $subcommand);
+        $mmogame->set_answer_mode($ret, $attempt, $sessionkey, $answer, $answerid, $subcommand, $sessionkey);
 
         return json_encode($ret);
     }
@@ -117,5 +156,16 @@ class set_answer extends external_api {
      */
     public static function execute_returns(): external_value {
         return new external_value(PARAM_RAW, 'A JSON-encoded object with dynamic keys and values');
+    }
+
+    /**
+     * Returns error code
+     *
+     * @param string $error
+     *
+     * @return string
+     */
+    private static function error(string $error): string {
+        return json_encode(['errorcode' => $error]);
     }
 }

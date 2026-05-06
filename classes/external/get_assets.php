@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -34,7 +34,7 @@ use required_capability_exception;
  *
  * @package    mod_mmogame
  * @copyright 2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class get_assets extends external_api {
     /**
@@ -82,11 +82,42 @@ class get_assets extends external_api {
             'colorpalettes' => $colorpalettes ?? 0,
         ]);
         // Perform security checks.
-        if ($kinduser == 'moodle') {
+        if ($kinduser === 'moodle') {
             $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
             $context = module::instance($cm->id);
             self::validate_context($context);
             require_capability('mod/mmogame:play', $context);
+        }
+
+        $user = trim($user );
+
+        if ( $mmogameid <= 0 ) {
+            return self::error('invalid_mmogameid');
+        }
+
+        if ( ! preg_match( '/^[A-Za-z0-9_-]{1,100}$/', $user ) ) {
+            return self::error('invalid_user');
+        }
+
+        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
+
+        if (!in_array($kinduser, $allowedkindusers, true)) {
+            return self::error( 'invalid_kinduser');
+        }
+
+        if ( $avatars < 0) {
+            return self::error( 'invalid_avatars_count');
+        }
+        if ($avatars > 50) {
+            $avatars = 50;
+        }
+
+        if ($colorpalettes > 50) {
+            $colorpalettes = 50;
+        }
+
+        if ( $colorpalettes < 0) {
+            return self::error( 'invalid_colorpalettes_count');
         }
 
         $result = [];
@@ -122,7 +153,7 @@ class get_assets extends external_api {
                 VALUE_OPTIONAL
             ),
             'colorpalettes' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'A color palette'),
+                new external_value(PARAM_TEXT, 'A color palette'),
                 'The list of color palettes',
                 VALUE_OPTIONAL
             ),
@@ -148,10 +179,10 @@ class get_assets extends external_api {
         $a = $mmogame->get_avatars($auserid);
         $avatars = $ids = [];
 
-        if ($info !== null && $info->avatarid != 0 && array_key_exists($info->avatarid, $avatars)) {
-            $avatars[] = $avatars[$info->avatarid];
+        if ($info !== null && $info->avatarid != 0 && array_key_exists($info->avatarid, $a)) {
+            $avatars[] = $a[$info->avatarid];
             $ids[] = $info->avatarid;
-            unset($avatars[$info->avatarid]);
+            unset($a[$info->avatarid]);
             $count--;
         }
         if ($count == 1) {
@@ -193,5 +224,16 @@ class get_assets extends external_api {
 
         $result['colorpaletteids'] = array_keys($pals);
         $result['colorpalettes'] = $colorpalettes;
+    }
+
+    /**
+     * Returns error code
+     *
+     * @param string $error
+     *
+     * @return array
+     */
+    private static function error(string $error): array {
+        return ['errorcode' => $error];
     }
 }

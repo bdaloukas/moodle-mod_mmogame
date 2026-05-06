@@ -30,6 +30,7 @@ use coding_exception;
 use dml_exception;
 use mod_mmogame\local\mode\mmogame_mode_aduel;
 use mod_mmogame\local\database\mmogame_database;
+use Random\RandomException;
 use stdClass;
 
 /** Identifier the state for "play" of mode Aduel */
@@ -77,6 +78,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Tries to find an attempt of open games, otherwise creates a new attempt.
      *
      * @return ?stdClass (a new attempt of false if no attempt)
+     * @throws RandomException
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_attempt(): ?stdClass {
         if ($this->rstate->state != STATE_PLAY) {
@@ -117,6 +121,9 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Creates a new attempt for the first player. Also select which question will be contained in the attempt.
      *
      * @return ?stdClass (a new attempt of false if no attempt)
+     * @throws RandomException
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function get_attempt_new1(): ?stdClass {
         $queries = $this->get_queries_aduel(4);
@@ -137,6 +144,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $a['timeanswer'] = 0;
             $a['timeclose'] = $this->aduel->timelimit != 0 && $ret == 0 ? $a['timestart'] + $this->aduel->timelimit : 0;
             $a['layout'] = $this->qbank->get_layout($query);
+            $a['sessionkey'] = bin2hex(random_bytes(32));
             $id = $this->db->insert_record($this->get_table_attempts(), $a);
             if ($ret == 0) {
                 $ret = $id;
@@ -150,6 +158,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Creates a new attempt for the second player.
      *
      * @return ?stdClass (a new attempt of false if no attempt)
+     * @throws RandomException
      */
     protected function get_attempt_new2(): ?stdClass {
         $table = 'mmogame_quiz_attempts';
@@ -165,7 +174,8 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $a = ['mmogameid' => $this->get_id(),
                 'auserid' => $this->aduel->auserid2, 'queryid' => $rec->queryid, 'numgame' => $rec->numgame,
                 'timestart' => 0, 'numteam' => $rec->numteam,
-                'numattempt' => $rec->numattempt, 'layout' => $rec->layout, 'timeanswer' => 0, ];
+                'numattempt' => $rec->numattempt, 'layout' => $rec->layout, 'timeanswer' => 0,
+                'sessionkey' => bin2hex(random_bytes(32)), ];
             $a['timeclose'] = $ret == 0 ? time() + $this->aduel->timelimit : 0;
             $id = $this->db->insert_record($table, $a);
             if ($ret == 0) {
@@ -249,7 +259,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                         'mmogame_quiz_attempts',
                         ['id' => $attempt->id, 'score' => $attempt->score]
                     );
-                    $this->qbank->update_grades($attempt->auserid, $attempt->score, 0, 0);
+                    $this->qbank->update_grades($attempt->auserid, $attempt->score, 0);
                 }
             } else if ($attempt->iscorrect == 0) {
                 // Check the answer of opposite. If is right duplicate other points.
@@ -258,7 +268,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                         'mmogame_quiz_attempts',
                         ['id' => $opposite->id, 'score' => 2 * $opposite->score]
                     );
-                    $this->qbank->update_grades($opposite->auserid, $opposite->score, 0, 0);
+                    $this->qbank->update_grades($opposite->auserid, $opposite->score, 0);
                 }
             }
         } else if ($this->aduel->tool3numattempt2 == $attempt->numattempt) {
@@ -269,7 +279,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                 'mmogame_quiz_attempts',
                 ['id' => $attempt->id, 'score' => $attempt->score]
             );
-            $this->qbank->update_grades($attempt->auserid, -1, 0, 0);
+            $this->qbank->update_grades($attempt->auserid, -1, 0);
         }
 
         $recs = $this->db->get_record_select(
@@ -444,7 +454,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @throws dml_exception
      */
     public function get_queries_aduel(int $count): ?array {
-        $count = 1;
         // Get the ids of all the queries.
         $ids = $this->qbank->get_queries_ids();
         if ($ids === null || count($ids) == 0) {
@@ -567,6 +576,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      *
      * @param array $ret
      * @param ?int $attemptid
+     * @param string|null $sessionkey
      * @param ?string $answer
      * @param ?int $answerid
      * @param string $subcommand
@@ -575,11 +585,12 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     public function set_answer_mode(
         array &$ret,
         ?int $attemptid,
+        ?string $sessionkey,
         ?string $answer,
         ?int $answerid = null,
         string $subcommand = ''
     ): ?stdClass {
-        $attempt = parent::set_answer_mode($ret, $attemptid, $answer, $answerid, $subcommand);
+        $attempt = parent::set_answer_mode($ret, $attemptid, $sessionkey, $answer, $answerid, $subcommand);
 
         $aduel = $this->aduel;
 

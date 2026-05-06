@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -35,7 +35,7 @@ use function get_coursemodule_from_instance;
  *
  * @package    mod_mmogame
  * @copyright 2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class get_assets_split extends external_api {
     /**
@@ -85,9 +85,42 @@ class get_assets_split extends external_api {
             'countpalettes' => $countpalettes ?? 0,
             'countavatars' => $countavatars ?? 0,
         ]);
+
+        $user = trim($user );
+
+        if ($mmogameid <= 0) {
+            return self::error('invalid_mmogameid');
+        }
+
+        if ( ! preg_match( '/^[A-Za-z0-9_-]{1,100}$/', $user)) {
+            return self::error('invalid_user');
+        }
+
+        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
+
+        if ( ! in_array( $kinduser, $allowedkindusers, true ) ) {
+            return self::error( 'invalid_kinduser');
+        }
+
+        if ( $countsplit <= 0 || $countsplit > 9) {
+            return self::error('invalid_split_count');
+        }
+
+        if ( $countpalettes < 0 || $countpalettes > 50) {
+            return self::error( 'invalid_palette_count');
+        }
+
+        if ($countavatars < 0) {
+            return self::error( 'invalid_avatar_count');
+        }
+
+        if ($countavatars > 50) {
+            $countavatars = 50;
+        }
+
         // Perform security checks.
         $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
-        if ($kinduser == 'moodle') {
+        if ($kinduser === 'moodle') {
             $context = module::instance($cm->id);
             self::validate_context($context);
             require_capability('mod/mmogame:play', $context);
@@ -143,7 +176,7 @@ class get_assets_split extends external_api {
                 VALUE_OPTIONAL
             ),
             'colorpalettes' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'A color palette'),
+                new external_value(PARAM_TEXT, 'A color palette'),
                 'The list of color palettes',
                 VALUE_OPTIONAL
             ),
@@ -154,5 +187,16 @@ class get_assets_split extends external_api {
             ),
             'numavatars' => new external_value(PARAM_INT, 'The number of avatars'),
         ]);
+    }
+
+    /**
+     * Returns error code
+     *
+     * @param string $error
+     *
+     * @return array
+     */
+    private static function error(string $error): array {
+        return ['errorcode' => $error];
     }
 }

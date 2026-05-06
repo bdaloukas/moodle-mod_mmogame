@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -20,10 +20,11 @@
  * @package    mmogametype_quiz
  * @category   test
  * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
 use mod_mmogame\local\database\mmogame_database_moodle;
+use mod_mmogame\local\mmogame;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -72,7 +73,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
         $this->assertCount(1, $records);
         $this->assertArrayHasKey($rgame->id, $records);
-        $mmogame = mod_mmogame\local\mmogame::create(new mmogame_database_moodle(), $rgame->id);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state(1);
 
         // Command get_attempt with empty questionbank.
@@ -104,6 +105,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 'moodle',
                 $USER->id,
                 $result->attempt,
+                $result->sessionkey,
                 $answertexts[0],
                 $answerids[0],
                 ''
@@ -119,6 +121,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 'moodle',
                 $USER->id,
                 $result->attempt,
+                $result->sessionkey,
                 $answertexts[1],
                 $answerids[1],
                 ''
@@ -173,7 +176,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $rgame = reset($records);
         $this->assertEquals($rgame->qbankparams, $categoryid);
 
-        $mmogame = mod_mmogame\local\mmogame::create(new mmogame_database_moodle(), $rgame->id);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $rgame->id);
 
         // Set state to playing.
         $mmogame->update_state(1);
@@ -192,6 +195,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 'moodle',
                 $USER->id,
                 $result->attempt,
+                $result->sessionkey,
                 $answertexts[0],
                 $answerids[0],
                 ''
@@ -208,6 +212,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 'moodle',
                 $USER->id,
                 $result->attempt,
+                $result->sessionkey,
                 $answertexts[0],
                 $answerids[1],
                 '',

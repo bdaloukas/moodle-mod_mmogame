@@ -26,8 +26,8 @@
 
 namespace mmogametype_quiz\local;
 
-use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\mmogame;
+use mod_mmogame\local\database\mmogame_database;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -82,7 +82,7 @@ abstract class mmogametype_quiz extends mmogame {
             $attempt->useranswer = '';
         }
         $ret['attempt'] = $attempt->id;
-
+        $ret['sessionkey'] = $attempt->id !== 0 ? $attempt->sessionkey : '';
         $recquery = null;
         if ($attempt->queryid != 0) {
             $recquery = $this->get_qbank()->load_json($ret, '', $attempt->queryid, $attempt->layout, false);

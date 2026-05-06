@@ -23,7 +23,6 @@
  */
 
 use mod_mmogame\local\database\mmogame_database_moodle;
-use mod_mmogame\local\mmogame;
 
 defined('MOODLE_INTERNAL') || die();
 

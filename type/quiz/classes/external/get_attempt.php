@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -32,7 +32,7 @@ use required_capability_exception;
  *
  * @package   mmogametype_quiz
  * @copyright 2024 Vasilis Daloukas
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class get_attempt extends external_api {
     /**
@@ -44,10 +44,10 @@ class get_attempt extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
-            'nickname' => new external_value(PARAM_RAW, 'The nickname of the user'),
-            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar'),
-            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette'),
-            'subcommand' => new external_value(PARAM_ALPHANUMEXT, 'Subcommands like tool1, tool2, tool3'),
+            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user', VALUE_DEFAULT, ''),
+            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar', VALUE_DEFAULT, 0),
+            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette', VALUE_DEFAULT, 0),
+            'subcommand' => new external_value(PARAM_ALPHANUMEXT, 'Subcommands like tool1, tool2, tool3', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -87,8 +87,37 @@ class get_attempt extends external_api {
             'subcommand' => $subcommand,
         ]);
 
+        $user = trim($user );
+
+        if ( $mmogameid <= 0 ) {
+            return self::error('invalid_mmogameid');
+        }
+
+        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
+            return self::error('invalid_user');
+        }
+
+        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
+        if (!in_array($kinduser, $allowedkindusers, true)) {
+            return self::error('invalid_kinduser');
+        }
+
+        $allowedsubcommands = ['', 'answer', 'tool', 'clear', 'tool1', 'tool2', 'tool3'];
+
+        if (!in_array($subcommand, $allowedsubcommands, true)) {
+            return self::error('bad_subcommand');
+        }
+
+        if ( null !== $avatarid && $avatarid < 0 ) {
+            return self::error('invalid_avatarid');
+        }
+
+        if ( null !== $colorpaletteid && $colorpaletteid < 0 ) {
+            return self::error('invalid_colorpaletteid');
+        }
+
         // Perform security checks.
-        if ($kinduser == 'moodle') {
+        if ($kinduser === 'moodle') {
             $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
             $context = module::instance($cm->id);
             self::validate_context($context);
@@ -98,10 +127,10 @@ class get_attempt extends external_api {
         $ret = [];
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $create = $nickname !== null && $avatarid !== null && $colorpaletteid !== null;
+        $create = $nickname !== '' && $avatarid > 0 && $colorpaletteid > 0;
         $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create, 0);
         if ($auserid === null) {
-            return json_encode(['errorcode' => 'no_user']);
+            return self::error('no_user');
         }
 
         // No selection of avatar and colorpalettes yet.
@@ -111,12 +140,12 @@ class get_attempt extends external_api {
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]
         );
         if (!$create && $grade === null) {
-            return json_encode(['errorcode' => 'no_user']);
+            return self::error('no_user');
         }
 
         $mmogame->login_user($auserid);
 
-        if ($nickname !== null && $avatarid !== null && $colorpaletteid != null) {
+        if ($create) {
             $nickname = mb_substr($nickname, 0, 50);
             $info = $mmogame->get_avatar_info($auserid);
             $mmogame->get_db()->update_record(
@@ -141,5 +170,16 @@ class get_attempt extends external_api {
      */
     public static function execute_returns(): external_value {
         return new external_value(PARAM_RAW, 'A JSON-encoded object with dynamic keys and values');
+    }
+
+    /**
+     * Returns error code
+     *
+     * @param string $error
+     *
+     * @return string
+     */
+    private static function error(string $error): string {
+        return json_encode(['errorcode' => $error]);
     }
 }

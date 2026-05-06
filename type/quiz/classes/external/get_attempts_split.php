@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -34,7 +34,7 @@ use required_capability_exception;
  *
  * @package   mmogametype_quiz
  * @copyright 2024 Vasilis Daloukas
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class get_attempts_split extends external_api {
     /**
@@ -46,8 +46,8 @@ class get_attempts_split extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
-            'avatarids' => new external_value(PARAM_RAW, 'The user data'),
-            'splits' => new external_value(PARAM_RAW, 'The user data'),
+            'avatarids' => new external_value(PARAM_TEXT, 'Comma-separated avatar IDs', VALUE_DEFAULT, ''),
+            'splits' => new external_value(PARAM_TEXT, 'Comma-separated split IDs'),
         ]);
     }
 
@@ -85,11 +85,27 @@ class get_attempts_split extends external_api {
         $avatarids = $avatarids != null ? explode(',', $avatarids) : null;
 
         // Perform security checks.
-        if ($kinduser == 'moodle') {
+        if ($kinduser === 'moodle') {
             $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
             $context = module::instance($cm->id);
             self::validate_context($context);
             require_capability('mod/mmogame:play', $context);
+        }
+
+        $user = trim($user );
+
+        if ($mmogameid <= 0) {
+            return self::error('invalid_mmogameid');
+        }
+
+        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
+            return self::error('invalid_user');
+        }
+
+        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
+
+        if (!in_array( $kinduser, $allowedkindusers, true)) {
+            return self::error('invalid_kinduser');
         }
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
@@ -104,9 +120,10 @@ class get_attempts_split extends external_api {
         $state = $mmogame->get_state();
         $statetime = $mmogame->get_statetime();
         if (count($auserids) == 0 || $state == 0 || $statetime == 0) {
-            $ret = [
+            return [
                 'avatars' => [],
                 'attempts' => [],
+                'sessionkeys' => [],
                 'attemptqueryids' => [],
                 'numattempts' => [],
                 'querydefinitions' => [],
@@ -125,10 +142,9 @@ class get_attempts_split extends external_api {
                 'ranks' => [],
                 'queryranks' => [],
                 'hasidea' => 0,
-                'state' => (int)$state,
-                'statetime' => (float)$statetime,
+                'state' => $state,
+                'statetime' => $statetime,
             ];
-            return $ret;
         }
         if ($avatarids !== null) {
             foreach ($splits as $pos => $split) {
@@ -155,7 +171,7 @@ class get_attempts_split extends external_api {
 
         for (;;) {
             $numgame = 0;
-            $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips = $answerids = $answertexts = [];
+            $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips = $answerids = $answertexts = $sessionkeys = [];
             $aduelavatars = $aduelcorrects = $queryanswerids0 = $aduels = [];
 
             $countquestions = 0;
@@ -169,6 +185,7 @@ class get_attempts_split extends external_api {
                 $aduelauserids,
                 $numgame,
                 $attemptids,
+                $sessionkeys,
                 $attemptqueryids,
                 $attemptnums,
                 $definitions,
@@ -216,7 +233,7 @@ class get_attempts_split extends external_api {
             }
         }
 
-        $ret = ['avatars' => $avatars, 'attempts' => $attemptids, 'attemptqueryids' => $attemptqueryids,
+        $ret = ['avatars' => $avatars, 'attempts' => $attemptids, 'sessionkeys' => $sessionkeys, 'attemptqueryids' => $attemptqueryids,
             'numattempts' => $attemptnums, 'querydefinitions' => $definitions, 'querytips' => $tips,
             'queryanswerids' => $answerids, 'answertexts' => $answertexts,
             'aduels' => $aduels, 'aduelavatars' => $aduelavatars, 'aduelcorrects' => $aduelcorrects,
@@ -238,6 +255,9 @@ class get_attempts_split extends external_api {
             ),
             'attempts' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Attempts data')
+            ),
+            'sessionkeys' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Sessionkeys')
             ),
             'attemptqueryids' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Query IDs of attempts')
@@ -297,11 +317,11 @@ class get_attempts_split extends external_api {
             ),
             'state' => new external_value(
                 PARAM_INT,
-                'Has idea'
+                'State'
             ),
             'statetime' => new external_value(
                 PARAM_FLOAT,
-                'Has idea'
+                'State time'
             ),
         ]);
     }
@@ -314,6 +334,7 @@ class get_attempts_split extends external_api {
      * @param array|null $aduelauserids
      * @param int $numgame
      * @param array $attemptids
+     * @param array $sessionkeys
      * @param array $attemptqueryids
      * @param array $attemptnums
      * @param array $definitions
@@ -337,6 +358,7 @@ class get_attempts_split extends external_api {
         ?array $aduelauserids,
         int &$numgame,
         array &$attemptids,
+        array &$sessionkeys,
         array &$attemptqueryids,
         array &$attemptnums,
         array &$definitions,
@@ -364,13 +386,13 @@ class get_attempts_split extends external_api {
         );
         $queryids = [];  /* Queries that are used */
         $attemptqueryids = []; /* Which query has every attempt */
-        $attemptids = $attemptnums = [];
+        $attemptids = $attemptnums = $sessionkeys = [];
         $querypositions = [];
         $aduelavatars = $aduels = $aduelcorrects = [];
         $querytoatttempt = [];
         $numgame = 0;
         foreach ($recs as $position => $attempts) {
-            $nums = $ids = $newids = [];
+            $nums = $ids = $newids = $sessionkeys1 = [];
             $found = false;
             $isaduel = false;
             $corrects = [];
@@ -398,6 +420,7 @@ class get_attempts_split extends external_api {
                 }
                 $nums[] = $attempt->numattempt;
                 $ids[] = $attempt->id;
+                $sessionkeys1[] = $attempt->sessionkey;
                 $newids[] = $pos;
                 $queryids[$attempt->queryid] = $attempt->queryid;
 
@@ -416,6 +439,7 @@ class get_attempts_split extends external_api {
             }
             $attemptnums[] = implode(',', $nums);
             $attemptids[] = implode(',', $ids);
+            $sessionkeys[] = implode(',', $sessionkeys1);
             $attemptqueryids[] = implode(',', $newids);
             $aduelcorrects[] = $isaduel ? implode(',', $corrects) : '';
         }
@@ -456,5 +480,16 @@ class get_attempts_split extends external_api {
             $queryanswerids0[] = implode(',', $queryanswerids);
         }
         return false;
+    }
+
+    /**
+     * Returns error code
+     *
+     * @param string $error
+     *
+     * @return array
+     */
+    private static function error(string $error): array {
+        return ['errorcode' => $error];
     }
 }

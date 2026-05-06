@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -21,12 +21,15 @@
  *
  * @package    mmogametype_quiz
  * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
 namespace mmogametype_quiz\local;
 
+use coding_exception;
+use dml_exception;
 use mod_mmogame\local\database\mmogame_database;
+use Random\RandomException;
 use stdClass;
 
 /**
@@ -51,6 +54,9 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * Tries to find an attempt of open games, otherwise creates a new attempt.
      *
      * @return ?stdClass (a new attempt of false if no attempt)
+     * @throws RandomException
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_attempt(): ?stdClass {
         $attempt = $this->db->get_record_select(
@@ -92,6 +98,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         }
         $a['numquery'] = $a['numattempt'] = $this->compute_next_numattempt();
         $a['timestart'] = time();
+        $a['sessionkey'] = bin2hex(random_bytes(32));
 
         // Insert data to mmogame_quiz_attempts table.
         $id = $this->db->insert_record('mmogame_quiz_attempts', $a);
@@ -173,7 +180,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
                 }
 
                 // Update statistics for the user and the question.
-                $this->qbank->update_grades($attempt->auserid, $attempt->score, 0, 1);
+                $this->qbank->update_grades($attempt->auserid, $attempt->score, 0);
                 $ret['addscore'] = $attempt->score >= 0 ? '+' . $attempt->score : $attempt->score;
 
                 $this->qbank->update_stats(
@@ -346,6 +353,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      *
      * @param array $ret
      * @param ?int $attemptid
+     * @param string|null $sessionkey
      * @param ?string $answer
      * @param ?int $answerid
      * @param string $subcommand
@@ -354,6 +362,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     public function set_answer_mode(
         array &$ret,
         ?int $attemptid,
+        ?string $sessionkey,
         ?string $answer,
         ?int $answerid = null,
         string $subcommand = ''
@@ -364,8 +373,8 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
 
         $attempt = $this->db->get_record_select(
             'mmogame_quiz_attempts',
-            'mmogameid=? AND auserid=? AND id=?',
-            [$this->get_id(), $this->auserid, $attemptid]
+            'mmogameid=? AND auserid=? AND id=? AND sessionkey=?',
+            [$this->get_id(), $this->auserid, $attemptid, $sessionkey]
         );
         if ($attempt === null) {
             return null;
@@ -390,6 +399,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         $ret['iscorrect'] = $attempt->iscorrect ? 1 : 0;
         $ret['correct'] = $query->concept;
         $ret['attempt'] = $attempt->id;
+        $ret['sessionkey'] = $attempt->sessionkey;
 
         $info = $this->get_avatar_info($this->auserid);
         $ret['sumscore'] = $info->sumscore;
@@ -405,7 +415,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * Returns question types that uses (multichoice).
      * @return string[]
      */
-    public function get_qtypes() {
+    public function get_qtypes(): array {
         return ['multichoice'];
     }
 }

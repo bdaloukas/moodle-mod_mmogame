@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -32,7 +32,7 @@ use required_capability_exception;
  *
  * @package   mmogametype_quiz
  * @copyright 2024 Vasilis Daloukas
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class get_highscore extends external_api {
     /**
@@ -43,7 +43,7 @@ class get_highscore extends external_api {
         return new external_function_parameters([
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
+            'user' => new external_value(PARAM_TEXT, 'User identifier'),
             'count' => new external_value(PARAM_INT, 'How many users'),
         ]);
     }
@@ -70,8 +70,18 @@ class get_highscore extends external_api {
             'count' => $count,
         ]);
 
+        $user = trim($user);
+
+        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user ) ) {
+            return self::error('invalid_user');
+        }
+
+        if ( $count <= 0 || $count > 50 ) {
+            return self::error('invalid_count');
+        }
+
         // Perform security checks.
-        if ($kinduser == 'moodle') {
+        if ($kinduser === 'moodle') {
             $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
             $context = module::instance($cm->id);
             self::validate_context($context);
@@ -80,8 +90,19 @@ class get_highscore extends external_api {
 
         $ret = [];
 
+        if ($mmogameid <= 0) {
+            return self::error('invalid_mmogameid');
+        }
+        $allowed = ['moodle', 'wordpress', 'guid'];
+        if (!in_array($kinduser, $allowed, true)) {
+            return self::error('invalid_kinduser');
+        }
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
         $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
+
+        if ( null === $auserid ) {
+            return self::error('no_user');
+        }
 
         $mmogame->login_user($auserid);
 
@@ -97,5 +118,16 @@ class get_highscore extends external_api {
      */
     public static function execute_returns(): external_value {
         return new external_value(PARAM_RAW, 'A JSON-encoded object with dynamic keys and values');
+    }
+
+    /**
+     * Returns error code
+     *
+     * @param string $error
+     *
+     * @return string
+     */
+    private static function error(string $error): string {
+        return json_encode(['errorcode' => $error]);
     }
 }

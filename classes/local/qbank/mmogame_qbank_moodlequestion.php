@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -19,12 +19,15 @@
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
 namespace mod_mmogame\local\qbank;
 
+use coding_exception;
+use dml_exception;
 use mod_mmogame\local\mmogame;
+use Random\RandomException;
 use stdClass;
 
 /**
@@ -32,7 +35,7 @@ use stdClass;
  *
  * @package    mmogame_qbank_moodlequestion
  * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**
@@ -404,6 +407,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @param stdClass $query
      * @return ?string
+     * @throws RandomException
      */
     public function get_layout(stdClass $query): ?string {
         if ($query->qtype != 'multichoice') {
@@ -450,8 +454,8 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * Return the id of all questions
      *
      * @return ?array
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_queries_ids(): ?array {
         global $DB;

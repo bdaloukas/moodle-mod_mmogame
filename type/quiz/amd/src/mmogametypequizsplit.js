@@ -95,7 +95,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 }]);
 
                 // Handling the response
-                getAttemptsSplit[0].done(({avatars, attempts, attemptqueryids, querydefinitions, querytips,
+                getAttemptsSplit[0].done(({avatars, attempts, sessionkeys, attemptqueryids, querydefinitions, querytips,
                                               queryanswerids, numattempts, answertexts, aduels,
                                               aduelavatars, aduelcorrects, auserids, queryanswerids0, grades,
                                               countquestion, countcorrect, islastcorrect, ranks, queryranks,
@@ -103,6 +103,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.info = {
                         avatars: avatars,
                         attempts: attempts,
+                        sessionkeys: sessionkeys,
                         paletteid: this.paletteid,
                         attemptqueryids: attemptqueryids,
                         numattempts: numattempts,
@@ -538,12 +539,15 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             const numattempts = info.numattempts[splitInfo].split(",");
             sp.auserid = info.auserids[splitInfo];
             let attempts = info.attempts[splitInfo].split(",");
+console.log(info);
+            let sessionkeys = info.sessionkeys[splitInfo].split(",");
             sp.attempts = [];
             sp.score = parseInt(info.grades[splitInfo]);
             sp.rank = parseInt(info.ranks[splitInfo]);
             sp.countcorrect = info.countcorrect[splitInfo];
             for (let i = 0; i < attempts.length; i++) {
                 let item = {attemptid: attempts[i]};
+                item.sessionkey = sessionkeys[i];
                 item.queryid = queryids[i];
                 item.islastcorrect = info.islastcorrect[item.queryid];
                 item.definition = info.querydefinitions[item.queryid];
@@ -810,6 +814,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             const info = {
                 split: split,
                 attemptid: attempt.attemptid,
+                sessionkey: attempt.sessionkey,
                 iscorrect: iscorrect,
                 answer: attempt.answerids0[pos],
                 tools: tools,
@@ -1074,6 +1079,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             }
             let splits = [];
             let attempts = [];
+            let sessionkeys = [];
             let iscorrects = [];
             let answers = [];
             let timestarts = [];
@@ -1091,6 +1097,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     const temp = sp2.server[j];
                     splits.push(temp.split);
                     attempts.push(temp.attemptid);
+                    sessionkeys.push(temp.sessionkey);
                     iscorrects.push(temp.iscorrect ? 1 : 0);
                     answers.push(temp.answer);
                     timestarts.push(temp.timestart);
@@ -1120,6 +1127,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     user: this.user,
                     splits: splits.join(','),
                     attempts: attempts.join(','),
+                    sessionkeys: sessionkeys.join(','),
                     iscorrects: iscorrects.join(','),
                     answers: answers.join(','),
                     timestarts: timestarts.join(','),
@@ -1133,7 +1141,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     args: params
                 }]);
                 // Handling the response
-                sendAnswers[0].done(({avatars, attempts, attemptqueryids, querydefinitions, querytips,
+                sendAnswers[0].done(({avatars, attempts, sessionkeys, attemptqueryids, querydefinitions, querytips,
                                          queryanswerids, numattempts, answertexts, aduels,
                                          aduelavatars, aduelcorrects, auserids, queryanswerids0,
                                          grades, savedattempts, countquestion, countcorrect, islastcorrect, ranks, queryranks,
@@ -1147,6 +1155,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.info = {
                         avatars: avatars,
                         attempts: attempts,
+                        sessionkeys: sessionkeys,
                         paletteid: this.paletteid,
                         attemptqueryids: attemptqueryids,
                         numattempts: numattempts,

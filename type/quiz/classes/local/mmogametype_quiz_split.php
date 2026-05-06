@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -21,7 +21,7 @@
  *
  * @package    mmogametype_quiz
  * @copyright  2025 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 
 namespace mmogametype_quiz\local;
@@ -210,7 +210,8 @@ class mmogametype_quiz_split extends mmogame {
             $a = ['mmogameid' => $this->get_id(),
                 'auserid' => $aduel->auserid2, 'queryid' => $rec->queryid, 'numgame' => $rec->numgame,
                 'timestart' => 0, 'numteam' => $rec->numteam, 'numquery' => $numquery++,
-                'numattempt' => $rec->numattempt, 'layout' => $rec->layout, 'timeanswer' => 0, ];
+                'numattempt' => $rec->numattempt, 'layout' => $rec->layout, 'timeanswer' => 0,
+                'sessionkey' => bin2hex(random_bytes(32)), ];
             $a['timeclose'] = 0;
             $id = $this->db->insert_record('mmogame_quiz_attempts', $a);
             $ids[] = $id;
@@ -288,6 +289,7 @@ class mmogametype_quiz_split extends mmogame {
             $a['timeanswer'] = 0;
             $a['timeclose'] = 0;
             $a['numquery'] = $numquery++;
+            $a['sessionkey'] = bin2hex(random_bytes(32));
             $ids[] = $this->db->insert_record('mmogame_quiz_attempts', $a);
 
             $ignore[$queryid] = $queryid;
@@ -441,21 +443,23 @@ class mmogametype_quiz_split extends mmogame {
      *
      * @param array $ret
      * @param int|null $attemptid
+     * @param string|null $sessionkey
      * @param string|null $answer
      * @param int $timestart
      * @param int $timeanswer
      * @param ?int $answerid
-     * @param ?int $tools
+     * @param ?string $subcommand
      * @return ?stdClass
      */
     public function set_answer_mode(
         array &$ret,
         ?int $attemptid,
+        ?string $sessionkey,
         ?string $answer,
         int $timestart,
         int $timeanswer,
         ?int $answerid = null,
-        ?int $tools = 0
+        ?string $subcommand = '',
     ): ?stdClass {
         if ($attemptid === null) {
             return null;
@@ -463,8 +467,8 @@ class mmogametype_quiz_split extends mmogame {
 
         $attempt = $this->db->get_record_select(
             'mmogame_quiz_attempts',
-            'mmogameid=? AND auserid=? AND id=?',
-            [$this->get_id(), $this->auserid, $attemptid]
+            'mmogameid=? AND auserid=? AND id=? AND sessionkey=?',
+            [$this->get_id(), $this->auserid, $attemptid, $sessionkey]
         );
         if ($attempt === null) {
             return null;

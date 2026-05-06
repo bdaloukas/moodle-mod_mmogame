@@ -46,7 +46,6 @@ require_once($CFG->libdir . '/tablelib.php');
 use core\notification;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\irt\mmogame_irt_1pl;
-use mod_mmogame\local\mmogame;
 
 $mmogame = mmogame::create(new mmogame_database_moodle(), $cm->instance);
 
