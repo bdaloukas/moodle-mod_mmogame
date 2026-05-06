@@ -539,7 +539,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             const numattempts = info.numattempts[splitInfo].split(",");
             sp.auserid = info.auserids[splitInfo];
             let attempts = info.attempts[splitInfo].split(",");
-console.log(info);
             let sessionkeys = info.sessionkeys[splitInfo].split(",");
             sp.attempts = [];
             sp.score = parseInt(info.grades[splitInfo]);
@@ -1128,7 +1127,6 @@ console.log(info);
                     splits: splits.join(','),
                     attempts: attempts.join(','),
                     sessionkeys: sessionkeys.join(','),
-                    iscorrects: iscorrects.join(','),
                     answers: answers.join(','),
                     timestarts: timestarts.join(','),
                     timeanswers: timeanswers.join(','),

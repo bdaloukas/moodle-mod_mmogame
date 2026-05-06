@@ -3,7 +3,7 @@
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 2 of the License, or
+// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
@@ -21,7 +21,7 @@
  *
  * @package    mmogametype_quiz
  * @copyright  2025 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mmogametype_quiz\local;
@@ -31,6 +31,7 @@ use dml_exception;
 use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\mmogame;
 use mod_mmogame\local\mode\mmogame_mode_aduel;
+use Random\RandomException;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -90,6 +91,7 @@ class mmogametype_quiz_split extends mmogame {
      * @param array $islastcorrect
      * @param array $queryranks
      * @return ?array
+     * @throws RandomException
      * @throws coding_exception
      * @throws dml_exception
      */
@@ -181,6 +183,7 @@ class mmogametype_quiz_split extends mmogame {
      *
      * @param stdClass $aduel
      * @return array (a new attempt of false if no attempt)
+     * @throws RandomException
      */
     protected function get_attempts_new2(stdClass $aduel): array {
         $recs = $this->db->get_records_select(
@@ -232,6 +235,7 @@ class mmogametype_quiz_split extends mmogame {
      * @param array $islastcorrect
      * @param array $queryranks
      * @return ?array (a new attempt of false if no attempt)
+     * @throws RandomException
      */
     protected function get_attempts_new1(
         array $ids,
@@ -273,7 +277,7 @@ class mmogametype_quiz_split extends mmogame {
             $islastcorrect,
             $queryranks
         );
-        if ($queries === null) {
+        if (count($queries) === 0) {
             return null;
         }
         $num = 0;
@@ -459,7 +463,7 @@ class mmogametype_quiz_split extends mmogame {
         int $timestart,
         int $timeanswer,
         ?int $answerid = null,
-        ?string $subcommand = '',
+        ?string $subcommand = ''
     ): ?stdClass {
         if ($attemptid === null) {
             return null;
@@ -742,7 +746,7 @@ class mmogametype_quiz_split extends mmogame {
             0,
             1
         );
-        if ($recs === null || count($recs) == 0) {
+        if (count($recs) == 0) {
             // We finished.
             $this->db->update_record('mmogame_am_aduel_pairs', ['id' => $aduel->id, 'isclosed2' => 1]);
         }
@@ -794,7 +798,6 @@ class mmogametype_quiz_split extends mmogame {
      * @param array $recs
      * @param array $queryranks
      * @return void
-     * @throws dml_exception
      */
     private function compute_queryranks(array $recs, array &$queryranks): void {
         $queryids = [];
