@@ -117,11 +117,11 @@ class send_answers_split extends external_api {
 
         $user = trim($user);
 
-        if ( $mmogameid <= 0 ) {
+        if ($mmogameid <= 0) {
             return self::error('invalid_mmogameid');
         }
 
-        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user )) {
+        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
             return self::error('invalid_user');
         }
 
@@ -151,7 +151,7 @@ class send_answers_split extends external_api {
 
         $idea = 0;
         foreach ($attempts as $pos => $attemptid) {
-            if ( 0 === (int) $attemptid ) {
+            if (0 === (int) $attemptid) {
                 continue;
             }
 
@@ -191,7 +191,7 @@ class send_answers_split extends external_api {
             $kinduser,
             $user,
             null,
-            implode( ',', $returnsplits ),
+            implode(',', $returnsplits),
         );
 
         // Attempts that saved to database.

@@ -96,15 +96,15 @@ class set_answer extends external_api {
             return self::error('invalid_mmogameid');
         }
 
-        $user = trim($user );
+        $user = trim($user);
 
-        if (!preg_match( '/^[A-Za-z0-9_-]{1,100}$/', $user)) {
+        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
             return self::error('invalid_user');
         }
 
-        $allowedkindusers = [ 'moodle', 'wordpress', 'guid' ];
+        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
 
-        if (!in_array( $kinduser, $allowedkindusers, true)) {
+        if (!in_array($kinduser, $allowedkindusers, true)) {
             return self::error('invalid_kinduser');
         }
 
@@ -128,11 +128,11 @@ class set_answer extends external_api {
             return self::error('invalid_attempt');
         }
 
-        if (strlen( $answer ) > 1000) {
+        if (strlen($answer ) > 1000) {
             return self::error('answer_too_long');
         }
 
-        if ( null !== $answerid && $answerid < 0 ) {
+        if (null !== $answerid && $answerid < 0) {
             return self::error('invalid_answerid');
         }
 

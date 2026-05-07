@@ -30,8 +30,6 @@ use mod_mmogame\local\mmogame;
 use mod_mmogame\local\database\mmogame_database;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 define('ERRORCODE_NO_QUERIES', 'no_questions');
 define('ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');
 

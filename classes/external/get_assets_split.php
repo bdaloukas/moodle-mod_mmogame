@@ -86,32 +86,36 @@ class get_assets_split extends external_api {
             'countavatars' => $countavatars ?? 0,
         ]);
 
-        $user = trim($user );
+        $user = trim($user);
 
         if ($mmogameid <= 0) {
             return self::error('invalid_mmogameid');
         }
 
-        if ( ! preg_match( '/^[A-Za-z0-9_-]{1,100}$/', $user)) {
+        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
             return self::error('invalid_user');
         }
 
         $allowedkindusers = ['moodle', 'wordpress', 'guid'];
 
-        if ( ! in_array( $kinduser, $allowedkindusers, true ) ) {
-            return self::error( 'invalid_kinduser');
+        if (!in_array($kinduser, $allowedkindusers, true)) {
+            return self::error('invalid_kinduser');
         }
 
         if ( $countsplit <= 0 || $countsplit > 9) {
             return self::error('invalid_split_count');
         }
 
-        if ( $countpalettes < 0 || $countpalettes > 50) {
-            return self::error( 'invalid_palette_count');
+        if ($countpalettes < 0) {
+            return self::error('invalid_palette_count');
+        }
+
+        if ($countpalettes > 64) {
+            $countpalettes = 64;
         }
 
         if ($countavatars < 0) {
-            return self::error( 'invalid_avatar_count');
+            return self::error('invalid_avatar_count');
         }
 
         if ($countavatars > 50) {

@@ -92,7 +92,7 @@ class get_attempts_split extends external_api {
             require_capability('mod/mmogame:play', $context);
         }
 
-        $user = trim($user );
+        $user = trim($user);
 
         if ($mmogameid <= 0) {
             return self::error('invalid_mmogameid');
@@ -104,7 +104,7 @@ class get_attempts_split extends external_api {
 
         $allowedkindusers = ['moodle', 'wordpress', 'guid'];
 
-        if (!in_array( $kinduser, $allowedkindusers, true)) {
+        if (!in_array($kinduser, $allowedkindusers, true)) {
             return self::error('invalid_kinduser');
         }
 

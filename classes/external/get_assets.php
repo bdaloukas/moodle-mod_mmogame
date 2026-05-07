@@ -89,35 +89,35 @@ class get_assets extends external_api {
             require_capability('mod/mmogame:play', $context);
         }
 
-        $user = trim($user );
+        $user = trim($user);
 
-        if ( $mmogameid <= 0 ) {
+        if ($mmogameid <= 0) {
             return self::error('invalid_mmogameid');
         }
 
-        if ( ! preg_match( '/^[A-Za-z0-9_-]{1,100}$/', $user ) ) {
+        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
             return self::error('invalid_user');
         }
 
         $allowedkindusers = ['moodle', 'wordpress', 'guid'];
 
         if (!in_array($kinduser, $allowedkindusers, true)) {
-            return self::error( 'invalid_kinduser');
+            return self::error('invalid_kinduser');
         }
 
-        if ( $avatars < 0) {
-            return self::error( 'invalid_avatars_count');
+        if ($avatars < 0) {
+            return self::error('invalid_avatars_count');
         }
-        if ($avatars > 50) {
-            $avatars = 50;
+        if ($avatars > 64) {
+            $avatars = 64;
         }
 
         if ($colorpalettes > 50) {
             $colorpalettes = 50;
         }
 
-        if ( $colorpalettes < 0) {
-            return self::error( 'invalid_colorpalettes_count');
+        if ($colorpalettes < 0) {
+            return self::error('invalid_colorpalettes_count');
         }
 
         $result = [];

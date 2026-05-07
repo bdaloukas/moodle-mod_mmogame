@@ -72,11 +72,11 @@ class get_highscore extends external_api {
 
         $user = trim($user);
 
-        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user ) ) {
+        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
             return self::error('invalid_user');
         }
 
-        if ( $count <= 0 || $count > 50 ) {
+        if ($count <= 0 || $count > 50) {
             return self::error('invalid_count');
         }
 
@@ -93,14 +93,14 @@ class get_highscore extends external_api {
         if ($mmogameid <= 0) {
             return self::error('invalid_mmogameid');
         }
-        $allowed = ['moodle', 'wordpress', 'guid'];
-        if (!in_array($kinduser, $allowed, true)) {
+        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
+        if (!in_array($kinduser, $allowedkindusers, true)) {
             return self::error('invalid_kinduser');
         }
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
         $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
 
-        if ( null === $auserid ) {
+        if (null === $auserid) {
             return self::error('no_user');
         }
 

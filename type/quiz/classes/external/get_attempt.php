@@ -87,9 +87,9 @@ class get_attempt extends external_api {
             'subcommand' => $subcommand,
         ]);
 
-        $user = trim($user );
+        $user = trim($user);
 
-        if ( $mmogameid <= 0 ) {
+        if ($mmogameid <= 0) {
             return self::error('invalid_mmogameid');
         }
 
@@ -108,11 +108,11 @@ class get_attempt extends external_api {
             return self::error('bad_subcommand');
         }
 
-        if ( null !== $avatarid && $avatarid < 0 ) {
+        if (null !== $avatarid && $avatarid < 0) {
             return self::error('invalid_avatarid');
         }
 
-        if ( null !== $colorpaletteid && $colorpaletteid < 0 ) {
+        if (null !== $colorpaletteid && $colorpaletteid < 0) {
             return self::error('invalid_colorpaletteid');
         }
 
