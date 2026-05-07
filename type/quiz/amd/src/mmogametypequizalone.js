@@ -54,7 +54,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.player.cacheAvatar = '';
             this.player.cacheNickname = '';
             this.player.lblScore.title = this.getStringM('js_grade');
-            this.player.lblRank.title = this.getStringM('js_ranking_grade');
+            this.player.lblRank.title = this.getStringM('js_ranking_order');
 
             this.createButtonSound(fragment, this.padding + (i++) * step,
                 this.padding + nicknameHeight, this.iconSize);

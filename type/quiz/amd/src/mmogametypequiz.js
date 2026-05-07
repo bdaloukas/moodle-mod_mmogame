@@ -300,7 +300,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     color: colorText,
                 },
                 attributes: {
-                    title: this.getStringM('js_ranking'),
+                    title: this.getStringM('js_ranking_order'),
                 },
             });
 

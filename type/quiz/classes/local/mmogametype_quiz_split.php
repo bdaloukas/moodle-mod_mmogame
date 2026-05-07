@@ -38,9 +38,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/mmogametype_quiz_algorithm_irt.php');
 
-define('ERRORCODE_NO_QUERIES', 'no_questions');
-define('ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');
-
 /**
  * mmogametype_quiz_split is responsible for managing and facilitating quiz gameplay
  * within the mmogame system, including handling attempts, scoring,

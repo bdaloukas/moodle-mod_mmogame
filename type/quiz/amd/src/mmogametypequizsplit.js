@@ -1319,7 +1319,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     fontSize: sp.aItemLabel[0].style.fontSize,
                 },
                 attributes: {
-                    title: this.getStringM('js_addscore'),
+                    title: this.getStringM('js_add_score'),
                 },
             });
 

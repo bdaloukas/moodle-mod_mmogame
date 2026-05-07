@@ -70,7 +70,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.player1.cacheAvatar = '';
         this.player1.cacheNickname = '';
         this.player1.lblScore.title = this.getStringM('js_grade');
-        this.player1.lblRank.title = this.getStringM('js_position_grade');
+        this.player1.lblRank.title = this.getStringM('js_ranking_order');
 
         [nickname, avatar] = this.createNicknameAvatar(fragment, 'mmogame-quiz-alone',
             Math.round(this.padding + (i++) * step),
@@ -88,7 +88,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.player2.cacheAvatar = '';
         this.player2.cacheNickname = '';
         this.player2.lblScore.title = this.getStringM('js_percent_opponent');
-        this.player2.lblRank.title = this.getStringM('js_position_percent');
+        this.player2.lblRank.title = this.getStringM('js_position_opponent');
 
         this.createArea(2 * this.padding + this.iconSize + nicknameHeight, this.isVertical ? this.iconSize : 0);
 

@@ -353,7 +353,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                         color: colorText,
                     },
                     attributes: {
-                        title: this.getStringM('js_ranking'),
+                        title: this.getStringM('js_ranking_order'),
                     },
                 });
             }

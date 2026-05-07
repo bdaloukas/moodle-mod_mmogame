@@ -30,9 +30,6 @@ use mod_mmogame\local\mmogame;
 use mod_mmogame\local\database\mmogame_database;
 use stdClass;
 
-define('ERRORCODE_NO_QUERIES', 'no_questions');
-define('ERRORCODE_ADUEL_NO_RIVALS', 'aduel_no_rivals');
-
 /**
  * mmogame_quiz is responsible for managing and facilitating quiz gameplay
  * within the mmogame system, including handling attempts, scoring,
