@@ -102,7 +102,7 @@ class get_assets_split extends external_api {
             return self::error('invalid_kinduser');
         }
 
-        if ( $countsplit <= 0 || $countsplit > 9) {
+        if ($countsplit <= 0 || $countsplit > 9) {
             return self::error('invalid_split_count');
         }
 

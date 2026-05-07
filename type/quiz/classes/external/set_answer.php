@@ -128,7 +128,7 @@ class set_answer extends external_api {
             return self::error('invalid_attempt');
         }
 
-        if (strlen($answer ) > 1000) {
+        if (strlen($answer) > 1000) {
             return self::error('answer_too_long');
         }
 
