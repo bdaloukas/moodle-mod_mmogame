@@ -24,6 +24,7 @@
 
 namespace mod_mmogame\local;
 
+use coding_exception;
 use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\qbank\mmogame_qbank;
 use stdClass;
@@ -93,8 +94,8 @@ abstract class mmogame {
      * Sets the variable code.
     @param string $code
      */
-    public function set_errorcode($code): void {
-        $this->error = $code;
+    public function set_errorcode($errorcode): void {
+        $this->error = $errorcode;
     }
 
     /**
@@ -355,12 +356,12 @@ abstract class mmogame {
      * @param array $ids
      */
     public function login_user_log(array $ids): void {
-        if (count($ids) == 0) {
-            return;
+        foreach ($ids as $id) {
+            $this->db->update_record(
+                'mmogame_aa_users',
+                ['id' => $id, 'lastlogin' => time(), 'lastip' => self::get_ip()]
+            );
         }
-        [$insql, $inparams] = $this->db->get_in_or_equal($ids);
-        $sql = "UPDATE {mmogame_aa_users} SET lastlogin=?, lastip=? WHERE id $insql";
-        $this->db->execute($sql, array_merge([time(), self::get_ip()], $inparams));
     }
 
     /**
@@ -606,29 +607,6 @@ abstract class mmogame {
     public function update_state(int $state): void {
         $this->rstate->state = $state;
         $this->db->update_record('mmogame_aa_states', ['id' => $this->rstate->id, 'state' => $state]);
-    }
-
-    /**
-     * Returns a new unique pin of mmogame with id=$mmogameid
-     *
-     * @param int $mmogameid
-     * @param mmogame_database $db
-     * @param int $digits (number of digits for new pin)
-     * @return int (the new pin)
-     */
-    public static function get_newpin(int $mmogameid, mmogame_database $db, int $digits): int {
-        $min = pow(10, $digits - 1) + 1;
-        $max = pow(10, $digits) - 1;
-        for (;;) {
-            $pin = mt_rand($min, $max);
-            if ($mmogameid == 0) {
-                return $pin;
-            }
-            $rec = $db->get_record_select('mmogame', 'pin=?', [$pin]);
-            if ($rec === false) {
-                return $pin;
-            }
-        }
     }
 
     /**

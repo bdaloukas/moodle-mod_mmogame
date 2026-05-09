@@ -26,7 +26,6 @@ namespace mod_mmogame\local\database;
 
 use coding_exception;
 use dml_exception;
-use Exception;
 use stdClass;
 
 /**
@@ -84,20 +83,6 @@ class mmogame_database_moodle extends mmogame_database {
     }
 
     /**
-     * If you need to perform a complex update using arbitrary SQL, you can use the low level "execute" method.
-     * Only use this when no specialized method exists.
-     *
-     * @param string $sql
-     * @param ?array $params
-     * @throws dml_exception
-     */
-    public function execute(string $sql, ?array $params = null): void {
-        global $DB;
-
-        $DB->execute($sql, $params);
-    }
-
-    /**
      * Return a single database record as an object where the given conditions are used in the WHERE clause.
      *
      * @param string $table The name of the database table.
@@ -110,12 +95,8 @@ class mmogame_database_moodle extends mmogame_database {
     public function get_record_select(string $table, string $select, ?array $params = null, string $fields = '*'): ?stdClass {
         global $DB;
 
-        try {
-            $rec = $DB->get_record_select($table, $select, $params ?? [], $fields);
-            return $rec !== false ? $rec : null;
-        } catch (Exception $e) {
-            return null;
-        }
+        $rec = $DB->get_record_select($table, $select, $params ?? [], $fields);
+        return $rec !== false ? $rec : null;
     }
 
     /**
@@ -235,7 +216,7 @@ class mmogame_database_moodle extends mmogame_database {
      * Return the query fragment to check if a value is IN the given list of items
      * (with a fallback to plain equal comparison if there is just one item)
      *
-     * @param mixed $items
+     * @param array $items
      * @param int $type
      * @param string $prefix
      * @param bool $equal
@@ -245,7 +226,7 @@ class mmogame_database_moodle extends mmogame_database {
      * @throws dml_exception
      */
     public function get_in_or_equal(
-        $items,
+        array $items,
         int $type = SQL_PARAMS_QM,
         string $prefix = 'param',
         bool $equal = true,

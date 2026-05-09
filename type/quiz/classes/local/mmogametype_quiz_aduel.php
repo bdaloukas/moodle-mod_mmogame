@@ -90,7 +90,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         for ($step = 1; $step <= 2; $step++) {
             $this->aduel = mmogame_mode_aduel::get_aduel($this, $this->maxalone, $newplayer1, $newplayer2, null, false);
             if ($this->aduel === null) {
-                $this->set_errorcode(ERRORCODE_ADUEL_NO_RIVALS);
+                $this->set_errorcode("no_rivals");
                 return null;
             }
             if (!$newplayer1 && !$newplayer2) {
@@ -104,6 +104,13 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                         );
                     }
                     return $rec;
+                } else {
+                    // Have to close this.
+                    $this->db->update_record(
+                        'mmogame_am_aduel_pairs',
+                        ['id' => $this->aduel->id, 'isclosed1' => 1, 'isclosed2' => 1, 'timeclose' => time()]
+                    );
+                    return $this->get_attempt_new1();
                 }
                 continue;
             }
@@ -113,7 +120,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                 return $this->get_attempt_new2();
             }
         }
-
         return null;
     }
 
@@ -547,7 +553,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         }
         // Remove items so to remain $count.
         while (count($map2) > $count) {
-            $key = array_rand($map2);
+            $key = array_keys($map2)[rand(0, count($map2 ) - 1)];
             unset($map2[$key]);
         }
 

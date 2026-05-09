@@ -383,12 +383,16 @@ class mmogametype_quiz_algorithm_irt {
 
         // Saves new values.
         if ($recg !== null) {
-            $sql = "UPDATE {mmogame_aa_grades} SET theta=?,timemodified=? WHERE id=?";
-            $db->execute($sql, [$theta, time(), $recg->id]);
+            $db->update_record(
+                'mmogame_aa_grades',
+                ['id' => $recg->id, 'theta' => $theta, 'timemodified' => time()]
+            );
         }
         if ($reci !== null) {
-            $sql = "UPDATE {mmogame_aa_irt} SET difficulty=?, timemodified=? WHERE id=?";
-            $db->execute($sql, [$difficulty, time(), $reci->id]);
+            $db->update_record(
+                'mmogame_aa_irt',
+                ['id' => $recg->id, 'difficulty' => $difficulty, 'timemodified' => time()]
+            );
         }
     }
 

@@ -166,6 +166,7 @@ class send_answers_split extends external_api {
             }
 
             $ids[] = $auserids[$pos];
+            // Checks also than sessionkey is valid for this attempt.
             $mmogame->set_answer_mode(
                 $ret,
                 $attemptid,

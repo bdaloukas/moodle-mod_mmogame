@@ -42,7 +42,6 @@ $string['js_aduel_wait_opponent'] = 'Waiting to find an opponent.';
 $string['js_aduel_wizard'] = 'It shows the correct answer but the player will earn 1 point less.';
 $string['js_alone_help'] = 'Each player earns 3 points if his answer is correct and loses 1 point for each wrong answer.';
 $string['js_correct_answer'] = 'Correct answer';
-$string['js_grade'] = 'Grade';
 $string['js_help_5050'] = 'Shows only 2 possible answers';
 $string['js_help_skip'] = 'Skip the question';
 $string['js_next_question'] = 'Next question';

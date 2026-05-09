@@ -371,12 +371,15 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             return null;
         }
 
+        // The session key is part of the lookup condition so answers can only be
+        // saved for attempts owned by the current anonymous/user session.
         $attempt = $this->db->get_record_select(
             'mmogame_quiz_attempts',
             'mmogameid=? AND auserid=? AND id=? AND sessionkey=?',
             [$this->get_id(), $this->auserid, $attemptid, $sessionkey]
         );
         if ($attempt === null) {
+            // Invalid or expired game session.
             return null;
         }
 

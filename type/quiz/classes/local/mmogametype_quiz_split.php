@@ -111,7 +111,7 @@ class mmogametype_quiz_split extends mmogame {
 
             $aduel = mmogame_mode_aduel::get_aduel($this, $this->maxalone, $newplayer1, $newplayer2, $adueluserids, $isaduel);
             if ($aduel === null) {
-                $this->set_errorcode(ERRORCODE_ADUEL_NO_RIVALS);
+                $this->set_errorcode('no_rivals');
                 return null;
             }
             if (!$newplayer1 && !$newplayer2) {
@@ -298,13 +298,7 @@ class mmogametype_quiz_split extends mmogame {
 
         [$insql, $inparams] = $this->db->get_in_or_equal($ids);
         $sql = "SELECT * FROM {mmogame_quiz_attempts} WHERE id $insql ORDER BY id";
-        $ret = $this->db->get_records_sql($sql, $inparams);
-
-        $sql = 'UPDATE {mmogame_aa_grades} SET countalone=countalone + 1 WHERE
-                mmogameid=? AND numgame=? AND auserid=?';
-        $this->db->execute($sql, [$this->rgame->id, $this->rgame->numgame, $this->auserid]);
-
-        return $ret;
+        return $this->db->get_records_sql($sql, $inparams);
     }
 
     /**
@@ -466,12 +460,15 @@ class mmogametype_quiz_split extends mmogame {
             return null;
         }
 
+        // The session key is part of the lookup condition so answers can only be
+        // saved for attempts owned by the current anonymous/user session.
         $attempt = $this->db->get_record_select(
             'mmogame_quiz_attempts',
             'mmogameid=? AND auserid=? AND id=? AND sessionkey=?',
             [$this->get_id(), $this->auserid, $attemptid, $sessionkey]
         );
         if ($attempt === null) {
+            // Invalid or expired game session.
             return null;
         }
 
@@ -497,7 +494,7 @@ class mmogametype_quiz_split extends mmogame {
             $timestart,
             $timeanswer,
             $answerid,
-            $tools !== null ? $tools : 0,
+            0,
             $autograde,
             $ret,
             $aduel
@@ -682,8 +679,8 @@ class mmogametype_quiz_split extends mmogame {
                     'mmogameid=? AND numgame=? AND auserid=?',
                     [$attempt->mmogameid, $attempt->numgame, $this->auserid]
                 );
-                $score = $grade !== null ? $grade->theta : 0;
-                mmogame_mode_aduel::close_user1($this, $aduel->id, $score);
+                $theta = $grade !== null ? $grade->theta : 0;
+                mmogame_mode_aduel::close_user1($this, $aduel->id, $theta);
             }
 
             return;

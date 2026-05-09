@@ -72,6 +72,9 @@ class get_attempts_split extends external_api {
         ?string $avatarids = null,
         ?string $splits = null
     ): array {
+        if ($avatarids === null) {
+            $avatarids = '';
+        }
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,

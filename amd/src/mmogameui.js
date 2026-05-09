@@ -174,6 +174,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     };
                     this.gateCreateScreen();
                 }).fail((error) => {
+                    this.showError('gateSendGetAssets', error);
                     return error;
                 });
             });
@@ -415,6 +416,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                             avatarids, avatars);
                     }
                 }).fail((error) => {
+                    this.showError('mmogameui.gateEndGetColorsAvatars', error);
                     return error;
                 });
             });
@@ -605,6 +607,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         createDivMessage(classnames, message) {
+            console.log("createDivMessag", classnames, message);
             if (this.area !== undefined) {
                 this.body.removeChild(this.area);
                 this.area = undefined;
@@ -619,7 +622,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             let top = this.areaRect !== undefined ? this.areaRect.top : 0;
             let width = window.innerWidth - 2 * this.padding;
             let height = window.innerHeight - this.padding - top;
-
             this.createDivMessageDo(classnames, left, top, width, height, message, height);
 
             this.divMessage.style.top = (height - this.divMessage.scrollHeight) / 2 + "px";
@@ -741,10 +743,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     }
 
                     this.processGetAttempt(json);
-                }).fail((error) => {
-                    this.createDivMessage('mmogame-error', "Erorr: " + error.message);
+                })  /*.fail((error) => {
+                    this.showError('mmogameui.callGetAttempt', error);
                     return error;
-                });
+                });*/
             });
         }
 
@@ -768,6 +770,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 div.style.color = this.getContrastingColor(this.colorBackground2);
                 this.divMessage = div;
             }
+console.log("createDivMessageDo", message);
             this.divMessage.innerHTML = message;
             this.body.appendChild(this.divMessage);
             this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
@@ -799,6 +802,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {Error} [error] - The error object to display.
          */
         showError(name, error) {
+            console.log("showError", name);
+            console.log(error);
             const message = error?.message || 'An unknown error occurred.';
             this.createDivMessage('mmogame-error', message);
         }

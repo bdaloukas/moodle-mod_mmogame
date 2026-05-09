@@ -209,7 +209,6 @@ abstract class mmogame_qbank {
             $a = ['id' => $rec->id];
             if ($countscore > 0) {
                 $a['countscore'] = $rec->countscore + $countscore;
-                $a['score'] = max(0, $rec->sumscore + $score) / ($rec->countscore + $countscore);
             }
             if ($score != 0) {
                 $a['sumscore'] = max(0, $rec->sumscore + $score);
@@ -222,7 +221,6 @@ abstract class mmogame_qbank {
                 'mmogame_aa_grades',
                 ['mmogameid' => $rgame->id, 'numgame' => $rgame->numgame, 'auserid' => $auserid, 'sumscore' => max(0, $score),
                     'countscore' => $countscore,
-                    'score' => max(0, $score),
                     'timemodified' => time(),
                     ]
             );

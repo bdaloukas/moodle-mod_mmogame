@@ -44,10 +44,10 @@ class get_attempt extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
-            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user', VALUE_DEFAULT, ''),
-            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar', VALUE_DEFAULT, 0),
-            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette', VALUE_DEFAULT, 0),
-            'subcommand' => new external_value(PARAM_ALPHANUMEXT, 'Subcommands like tool1, tool2, tool3', VALUE_DEFAULT, ''),
+            'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user', VALUE_DEFAULT, '', true),
+            'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar', VALUE_DEFAULT, 0, true),
+            'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette', VALUE_DEFAULT, 0, true),
+            'subcommand' => new external_value(PARAM_ALPHANUMEXT, 'Subcommands like tool1, tool2, tool3', VALUE_DEFAULT, '', false),
         ]);
     }
 
@@ -76,6 +76,11 @@ class get_attempt extends external_api {
         ?int $colorpaletteid = null,
         string $subcommand = ''
     ): string {
+        $nickname = $nickname ?? '';
+        $avatarid = $avatarid ?? 0;
+        $colorpaletteid = $colorpaletteid ?? 0;
+        $subcommand = $subcommand ?? '';
+
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,

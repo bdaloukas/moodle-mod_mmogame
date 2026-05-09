@@ -47,7 +47,6 @@ class set_answer extends external_api {
             'attempt' => new external_value(PARAM_INT, 'The id of the attempt'),
             'sessionkey' => new external_value(PARAM_ALPHANUM, 'The sessionkey of the attempt'),
             'answer' => new external_value(PARAM_TEXT, 'The answer', VALUE_DEFAULT, ''),
-            'answerid' => new external_value(PARAM_INT, 'The id of the answer'),
             'subcommand' => new external_value(PARAM_ALPHANUM, 'Subcommand'),
         ]);
     }
@@ -61,7 +60,6 @@ class set_answer extends external_api {
      * @param int $attempt
      * @param string $sessionkey
      * @param ?string $answer
-     * @param int|null $answerid
      * @param string $subcommand
      * @return string
      * @throws coding_exception
@@ -76,7 +74,6 @@ class set_answer extends external_api {
         int $attempt,
         string $sessionkey,
         ?string $answer,
-        ?int $answerid,
         string $subcommand
     ): string {
         // Validate the parameters.
@@ -87,7 +84,6 @@ class set_answer extends external_api {
             'attempt' => $attempt,
             'sessionkey' => $sessionkey,
             'answer' => $answer,
-            'answerid' => $answerid ?? null,
             'subcommand' => $subcommand,
         ]);
         $answer = trim((string)$answer);
@@ -132,7 +128,8 @@ class set_answer extends external_api {
             return self::error('answer_too_long');
         }
 
-        if (null !== $answerid && $answerid < 0) {
+        $answerid = intval($answer);
+        if ($answerid < 0) {
             return self::error('invalid_answerid');
         }
 
@@ -144,6 +141,7 @@ class set_answer extends external_api {
 
         $mmogame->login_user($auserid);
 
+        // Checks also than sessionkey is valid for this attempt.
         $mmogame->set_answer_mode($ret, $attempt, $sessionkey, $answer, $answerid, $subcommand, $sessionkey);
 
         return json_encode($ret);

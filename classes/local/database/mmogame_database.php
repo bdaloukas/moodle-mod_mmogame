@@ -47,14 +47,7 @@ abstract class mmogame_database {
      * @return ?int if the insertions are ok, otherwise false.
      */
     abstract public function insert_record_raw(string $table, array $a, int $returnid, bool $customsequence): ?int;
-    /**
-     * If you need to perform a complex update using arbitrary SQL, you can use the low level "execute" method.
-     * Only use this when no specialized method exists.
-     *
-     * @param string $sql
-     * @param ?array $params
-     */
-    abstract public function execute(string $sql, ?array $params = null): void;
+
     /**
      * Return a single database record as an object where the given conditions are used in the WHERE clause.
      *
@@ -152,7 +145,7 @@ abstract class mmogame_database {
      * @return array
      */
     abstract public function get_in_or_equal(
-        $items,
+        array $items,
         int $type = SQL_PARAMS_QM,
         string $prefix = 'param',
         bool $equal = true,

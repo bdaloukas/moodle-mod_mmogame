@@ -862,7 +862,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2025052502)) {
-        // Define field nextquery to be added to mmogame_aa_grades.
+        // Used when computed from scratch theta.
         $table = new xmldb_table('mmogame_aa_grades');
         $field = new xmldb_field('thetafull', XMLDB_TYPE_FLOAT, null, null, XMLDB_NOTNULL, null, '0');
 
@@ -1143,6 +1143,16 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
             ['people', 'fisherman.svg']
         );
 
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026050901)) {
+        // Maybe percent or theta (IRT).
+        $table = new xmldb_table('mmogame_am_aduel_pairs');
+        $field = new xmldb_field('percent', XMLDB_TYPE_FLOAT);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'score');
+        }
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 

@@ -188,14 +188,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
         if (this.buttonHighScore !== undefined) {
             this.buttonHighScore.style.visibility = 'hidden';
         }
-
         if (json.name !== undefined) {
             window.document.title = json.name;
         }
         this.correct = undefined;
         // Update game state
         this.state = parseInt(json.state);
-
         const nicknameWidth = 2 * this.iconSize + this.padding;
         const nicknameHeight = Math.round(this.iconSize / 3);
         if (this.state === 0) {
@@ -244,12 +242,16 @@ define(['mmogametype_quiz/mmogametypequiz'],
         } else {
             json.tool3numattempt = -1;
         }
+
         this.updateButtonTool(this.buttonSkip, json.tool2);
         this.updateButtonTool(this.buttonWizard, json.tool3);
+
         this.attempt = json.attempt;
+        this.sessionkey = json.sessionkey;
         this.aduelPlayer = json.aduelPlayer;
         this.aduelScore = json.aduelScore;
         this.aduelRank = json.aduelRank;
+
         if (json.errorcode !== undefined && json.errorcode === 'aduel_no_rivals' || json.attempt === 0) {
             if (json.param === undefined) {
                 this.showWaitOpponent();
@@ -262,7 +264,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
             return;
         }
         this.isWaitOpponent = false;
-
         this.qtype = json.qtype;
         if (json.qtype === 'multichoice') {
             this.answers = [];
@@ -279,10 +280,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
         this.single = json.single;
         this.errorcode = json.errorcode;
-
         this.createScreen(json, false);
         this.updateDivTimer();
-
         if (this.buttonHelp !== undefined) {
             this.buttonHelp.style.visibility = 'visible';
         }
@@ -501,6 +500,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             getHighScore[0].done((response) => {
                 this.createScreenHighScore(JSON.parse(response));
             }).fail((error) => {
+                this.showError("mmogametypequizsplit.getHighScore", error);
                 return error;
             });
         });
@@ -750,7 +750,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
             return;
         }
         this.updateNicknameAvatar(this.player2, '', '', 0, 0);
-        this.createDivMessage(this.getStringT('js_aduel_wait_opponent'));
+
+        this.createDivMessage('mmogame-error', this.getStringT('js_aduel_wait_opponent'));
+
         if (this.divTimer !== undefined) {
             this.divTimer.textContent = "";
         }

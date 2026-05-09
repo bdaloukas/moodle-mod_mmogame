@@ -260,7 +260,7 @@ class mmogame_mode_aduel {
      *
      * @param mmogame $mmogame
      * @param int $aduelid
-     * @param float $score
+     * @param float $score  (Ussaly is theta of IRT of player1)
      */
     public static function close_user1(mmogame $mmogame, int $aduelid, float $score): void {
         $params = ['id' => $aduelid, 'isclosed1' => 1, 'score' => $score];

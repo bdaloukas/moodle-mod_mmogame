@@ -144,6 +144,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.computeSizes(0, this.getMinIconSize(this.info.countquestion));
                     this.createScreen();
                 }).fail((error) => {
+                    this.showError("mmogametypequizsplit.getattemptssplit");
                     return error;
                 });
             });
@@ -1192,6 +1193,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     }
                     this.showCursor(sp, false);
                 }).fail((error) => {
+                    this.showError("mmogametypequizsplit.asknextquestion");
                     this.showCursor(sp, false);
                     return error;
                 });

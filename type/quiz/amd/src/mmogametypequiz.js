@@ -457,18 +457,17 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     user: this.user,
                     attempt: this.attempt,
                     sessionkey: this.sessionkey,
-                    answer: this.answer || null,
-                    answerid: this.answerid || null,
+                    answer: this.answerid || '',
                     subcommand: subcommand,
                 };
-
+console.log("params=", params);
                 Ajax.call([{
                     methodname: 'mmogametype_quiz_set_answer', // API endpoint
                     args: params,
                 }])[0].done((response) => {
                     this.processSetAnswer(JSON.parse(response)); // Process the server's response
                 }).fail((error) => {
-                    this.showError(error); // Handle errors
+                    this.showError("mmogametypequizsplit.setanswer", error);
                 });
             });
         }
