@@ -1156,5 +1156,14 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
+    if ($oldversion < ($ver = 2026051000)) {
+        $table = new xmldb_table('mmogame_aa_irt_log');
+
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }

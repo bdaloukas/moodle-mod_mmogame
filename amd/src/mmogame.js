@@ -175,22 +175,6 @@ define([''], function() {
             });
         }
 
-        // For check
-        createButton(parent, classnames, left, top, width, height, src, alt, role = 'button') {
-            return this.createDOMElement('img', {
-                parent,
-                classnames,
-                styles: {
-                    position: 'absolute',
-                    left: `${left}px`,
-                    top: `${top}px`,
-                    width: `${width}px`,
-                    height: `${height}px`,
-                },
-                attributes: {src, alt, role},
-            });
-        }
-
         // Game logic and utility methods
 
         /**
@@ -298,7 +282,7 @@ define([''], function() {
                 tempDiv.style.fontSize = `${fontSize}px`;
                 tempDiv.style.width = `${width}px`;
                 tempDiv.style.height = `0`;
-                tempDiv.innerHTML = text;
+                tempDiv.innerHTML = this.sanitizeFormattingHtml(text);
 
                 newHeight = tempDiv.scrollHeight;
                 newWidth = tempDiv.scrollWidth - 1;
@@ -388,19 +372,6 @@ define([''], function() {
             }
 
             return low;
-        }
-
-        disableButtons(buttons, disabled) {
-            for (let i = 0; i < buttons.length; i++) {
-                let btn = buttons[i];
-                if (btn !== undefined) {
-                    if (disabled) {
-                        btn.classList.add("mmogame_imgbutton_disabled");
-                    } else {
-                        btn.classList.remove("mmogame_imgbutton_disabled");
-                    }
-                }
-            }
         }
 
         repairNickname(nickname) {
@@ -714,6 +685,43 @@ define([''], function() {
 
             // If no <p> exists, simply prepend the prefix
             return prefix + text;
+        }
+
+        sanitizeFormattingHtml(html) {
+            const template = document.createElement('template');
+            template.innerHTML = String(html || '');
+
+            const allowedTags = new Set([
+                'B', 'STRONG', 'I', 'EM', 'U', 'BR',
+                'P', 'DIV', 'SPAN',
+                'SUB', 'SUP',
+                'UL', 'OL', 'LI',
+                'TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TH', 'TD'
+            ]);
+
+            /**
+             * Clean node
+             * @param node
+             */
+            function cleanNode(node) {
+                [...node.childNodes].forEach((child) => {
+                    if (child.nodeType === Node.ELEMENT_NODE) {
+                        if (!allowedTags.has(child.tagName)) {
+                            child.replaceWith(...child.childNodes);
+                            return;
+                        }
+
+                        [...child.attributes].forEach((attr) => {
+                            child.removeAttribute(attr.name);
+                        });
+
+                        cleanNode(child);
+                    }
+                });
+            }
+
+            cleanNode(template.content);
+            return template.innerHTML;
         }
     };
 });

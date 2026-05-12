@@ -254,7 +254,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 },
             });
             if (this.countX * this.countY > 1) {
-                labelAvatar.innerHTML = (iX + this.countX * iY + 1);
+                labelAvatar.textContent = (iX + this.countX * iY + 1);
             }
 
             this.splits.push(
@@ -330,7 +330,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 },
                 attributes: {
                     disabled: true,
-                    innerHTML: '',
+                    textContent: '',
                 },
             });
 
@@ -524,7 +524,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 this.countY = Math.round(Math.sqrt(this.countAll));
                 this.countX = Math.ceil(this.countAll / this.countY);
 
-                document.body.innerHTML = '';
+                document.body.textContent = '';
                 this.body = document.getElementsByTagName("body")[0];
                 this.area = undefined;
 
@@ -646,7 +646,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 div.style.color = this.getContrastingColor(this.colorBackground2);
                 this.divMessage = div;
             }
-            this.divMessage.innerHTML = message;
+            this.divMessage.innerHTML = this.sanitizeFormattingHtml(message);
             this.body.appendChild(this.divMessage);
             this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
         }

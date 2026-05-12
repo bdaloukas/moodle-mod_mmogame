@@ -286,27 +286,6 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
     }
 
     /**
-     * Reads all records with id in $ids from databases.
-     *
-     * @param string $ids
-     * @param bool $loadextra
-     * @param string $fields
-     * @return array
-     */
-    protected function loads(string $ids, bool $loadextra = true, string $fields = 'id,qtype,questiontext as definition'): array {
-        [$insql, $inparams] = $this->mmogame->get_db()->get_in_or_equal(explode(',', $ids));
-        $recs = $this->mmogame->get_db()->get_records_select('question', $insql, $inparams, '', $fields);
-
-        if ($loadextra) {
-            foreach ($recs as $rec) {
-                $this->load2($rec);
-            }
-        }
-
-        return $recs;
-    }
-
-    /**
      * Check if $useranswer is the correct answer
      *
      * @param stdClass $query

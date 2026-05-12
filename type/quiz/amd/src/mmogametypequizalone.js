@@ -233,7 +233,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         showHelpScreen(div) {
-            div.innerHTML = `
+            div.innerHTML = this.sanitizeFormattingHtml(`
                 <br>
                 <div>${this.getStringT('js_alone_help')}</div><br>
 
@@ -243,7 +243,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                         <td>${this.getStringT('js_aduel_example2')}</td>
                     </tr>
                 </table>
-            `;
+            `);
         }
 
         onServerAnswerMultichoice(json) {
@@ -298,7 +298,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         onServerAnswerMultichoiceShowCorrect(i, iscorrect1, iscorrect) {
             if (iscorrect) {
-                this.aItemLabel[i].innerHTML = '<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>';
+                this.aItemLabel[i].innerHTML = this.sanitizeFormattingHtml('<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>');
             }
 
             if (iscorrect1 !== undefined) {

@@ -37,16 +37,6 @@ abstract class mmogame_database {
      * @return ?int if the insertions are ok, otherwise false.
      */
     abstract public function insert_record(string $table, array $a): ?int;
-    /**
-     * For rare cases when you also need to specify the ID of the record to be inserted.
-     *
-     * @param string $table
-     * @param array $a
-     * @param int $returnid
-     * @param bool $customsequence
-     * @return ?int if the insertions are ok, otherwise false.
-     */
-    abstract public function insert_record_raw(string $table, array $a, int $returnid, bool $customsequence): ?int;
 
     /**
      * Return a single database record as an object where the given conditions are used in the WHERE clause.

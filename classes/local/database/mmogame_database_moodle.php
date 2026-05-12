@@ -63,26 +63,6 @@ class mmogame_database_moodle extends mmogame_database {
     }
 
     /**
-     * For rare cases when you also need to specify the ID of the record to be inserted.
-     *
-     * @param string $table
-     * @param array $a
-     * @param int $returnid
-     * @param bool $customsequence
-     * @return ?int if the insertions are ok, otherwise false.
-     * @throws dml_exception
-     */
-    public function insert_record_raw(string $table, array $a, int $returnid, bool $customsequence): ?int {
-        global $DB;
-
-        $rec = new StdClass();
-        foreach ($a as $name => $value) {
-            $rec->$name = $value;
-        }
-        return $DB->insert_record_raw($table, $rec, $returnid, false, $customsequence);
-    }
-
-    /**
      * Return a single database record as an object where the given conditions are used in the WHERE clause.
      *
      * @param string $table The name of the database table.

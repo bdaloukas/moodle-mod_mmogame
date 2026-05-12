@@ -293,7 +293,9 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     padding: `${this.padding}px`,
                 }
             });
-            sp.definition.innerHTML = this.formatText(sp.attempts[0].definition, sp.attempts[0].numattempt + ". ");
+            sp.definition.innerHTML = this.sanitizeFormattingHtml(
+                this.formatText(sp.attempts[0].definition, sp.attempts[0].numattempt + ". ")
+            );
 
             sp.definition.addEventListener('click', () => {
                 this.continueAnswer(split);
@@ -371,7 +373,9 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     lineHeight: 'normal',
                 }
             });
-            label.innerHTML = this.formatText(attempt.answers[ans], (i + 1) + ". ");
+            label.innerHTML = this.sanitizeFormattingHtml(
+                this.formatText(attempt.answers[ans], (i + 1) + ". ")
+            );
             label.htmlFor = "mmogame_quiz_aduelsplit-input" + i;
 
             // Create the checkbox
@@ -1029,9 +1033,9 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             }
 
             if (sp.attempts.length === 0) {
-                sp.definition.innerHTML = '';
+                sp.definition.textContent = '';
                 for (let i = 0; i < sp.aItemLabel.length; i++) {
-                    sp.aItemLabel[i].innerHTML = '';
+                    sp.aItemLabel[i].textContent = '';
                 }
                 this.hideQuestion(sp);
 
@@ -1040,13 +1044,17 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             }
 
             // Shows the next question.
-            sp.definition.innerHTML = this.formatText(sp.attempts[0].definition, sp.attempts[0].numattempt + ". ");
+            sp.definition.innerHTML = this.sanitizeFormattingHtml(
+                this.formatText(sp.attempts[0].definition, sp.attempts[0].numattempt + ". ")
+            );
             this.autoResizeText(sp.definition, sp.definitionWidth, sp.definitionHeight, true, 0, 0);
             const attempt = sp.attempts[0];
             this.makeItemLength(split, sp, attempt.answers.length);
             for (let i = 0; i < sp.aItemLabel.length; i++) {
                 const ans = sp.aRandom[i];
-                sp.aItemLabel[i].innerHTML = this.formatText(attempt.answers[ans], (i + 1) + ": ");
+                sp.aItemLabel[i].innerHTML = this.sanitizeFormattingHtml(
+                    this.formatText(attempt.answers[ans], (i + 1) + ": ")
+                );
             }
 
             this.computeFontSize(split, sp);
@@ -1546,7 +1554,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     padding: `${this.padding}px`,
                 }
             });
-            sp.questionTip.innerHTML = sp.attempts[0].querytip;
+            sp.questionTip.innerHTML = this.sanitizeFormattingHtml(sp.attempts[0].querytip);
 
             this.autoResizeText(sp.definition, sp.definitionWidth - 2 * this.padding, height, true, 0, sp.fontSize);
             this.autoResizeText(sp.questionTip, sp.definitionWidth - 2 * this.padding, heightTip, true, 0, sp.fontSize);
@@ -1674,7 +1682,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 }
                 s += q + '</ul>';
             });
-            sp.ideadiv.innerHTML = s;
+            sp.ideadiv.innerHTML = this.sanitizeFormattingHtml(s);
 
             sp.idea.removeEventListener('click', sp.ideaCallback);
             const callback = () => {
@@ -1775,7 +1783,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
         }
 
         showHelpScreen(div) {
-            div.innerHTML = `
+            div.innerHTML = this.sanitizeFormattingHtml(`
                 <br>
                 <div>${this.getStringT('js_alone_help')}</div><br>
 
@@ -1785,7 +1793,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         <td>${this.getStringT('js_aduel_example2')}</td>
                     </tr>
                 </table>
-            `;
+            `);
         }
 
         getStringT(name) {

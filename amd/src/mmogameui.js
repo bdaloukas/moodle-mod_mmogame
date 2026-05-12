@@ -69,7 +69,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @returns {string} The file path.
          */
         getSoundFile() {
-            return this.kindSound === 0 ? 'assets/sound-on' : 'assets/sound-off.svg';
+            return this.kindSound === 0 ? 'assets/sound-on.svg' : 'assets/sound-off.svg';
         }
 
         /**
@@ -182,7 +182,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
 
         gateCreateScreen() {
-            document.body.innerHTML = '';
+            document.body.textContent = '';
             this.body = document.getElementsByTagName("body")[0];
             this.area = undefined;
 
@@ -266,7 +266,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     color: this.getContrastingColor(this.colorBackground),
                 },
             });
-            lblNickname.innerHTML = this.getStringM('js_name') + ": ";
+            lblNickname.innerHTML = this.sanitizeFormattingHtml(this.getStringM('js_name') + ": ");
 
             if (this.isVertical) {
                 top += lblNickname.scrollHeight + this.padding;
@@ -324,7 +324,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             for (let i = 0; i < aLabel.length; i++) {
                 const label = document.createElement("label");
                 label.style.position = "absolute";
-                label.innerHTML = aLabel[i];
+                label.innerHTML = this.sanitizeFormattingHtml(aLabel[i]);
                 label.style.whiteSpace = "nowrap";
                 label.style.font = "FontAwesome";
                 label.style.fontSize = fontSize + "px";
@@ -549,7 +549,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     left: '0px',
                 },
             });
-            label.innerHTML = title;
+            label.innerHTML = this.sanitizeFormattingHtml(title);
 
             // Button refresh color palettes
             let button = this.createDOMElement('img', {
@@ -770,8 +770,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 div.style.color = this.getContrastingColor(this.colorBackground2);
                 this.divMessage = div;
             }
-console.log("createDivMessageDo", message);
-            this.divMessage.innerHTML = message;
+            this.divMessage.innerHTML = this.sanitizeFormattingHtml(message);
             this.body.appendChild(this.divMessage);
             this.autoResizeText(this.divMessage, width, heightmessage, false, this.minFontSize, this.maxFontSize, 0.5);
         }

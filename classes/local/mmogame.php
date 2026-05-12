@@ -99,15 +99,6 @@ abstract class mmogame {
     }
 
     /**
-     * Returns the variable error.
-     *
-     * @return string
-     */
-    public function get_errorcode(): string {
-        return $this->error;
-    }
-
-    /**
      * Returns the variable timelimit.
      *
      * @return int
@@ -153,15 +144,6 @@ abstract class mmogame {
     }
 
     /**
-     * Return the variable rgame->mode.
-     *
-     * @return string
-     */
-    public function get_mode(): string {
-        return $this->rgame->mode;
-    }
-
-    /**
      * Return the variable rgame->numgame.
      *
      * @return int
@@ -195,15 +177,6 @@ abstract class mmogame {
 
         $time = microtime(true);
         return ($time > $statetime ? $time - $statetime : 0);
-    }
-
-    /**
-     * Return the variable rgame->type.
-     *
-     * @return string
-     */
-    public function get_type(): string {
-        return $this->rgame->type;
     }
 
     /**

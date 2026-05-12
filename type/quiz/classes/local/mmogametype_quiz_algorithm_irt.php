@@ -397,60 +397,6 @@ class mmogametype_quiz_algorithm_irt {
     }
 
     /**
-     * Saves logs to table mmogame_aa_irt_log
-     *
-     * @param mmogame_database $db
-     * @param int $mmogameid
-     * @param int $numgame
-     * @param int $auserid
-     * @param mixed $theta
-     * @param int $queryid
-     * @param float $difficulty
-     * @param ?int $serialcorrects
-     * @param ?int $nextquery
-     * @param int $step
-     * @param int $numquery
-     * @param float $bestscore
-     * @param string $info
-     * @return void
-     */
-    private static function log(
-        mmogame_database $db,
-        int $mmogameid,
-        int $numgame,
-        int $auserid,
-        mixed $theta,
-        int $queryid,
-        float $difficulty,
-        ?int $serialcorrects,
-        ?int $nextquery,
-        int $step,
-        int $numquery,
-        float $bestscore,
-        string $info
-    ): void {
-        $db->insert_record(
-            'mmogame_aa_irt_log',
-            [
-                'mmogameid' => $mmogameid,
-                'numgame' => $numgame,
-                'auserid' => $auserid,
-                'theta' => $theta,
-                'queryid' => $queryid,
-                'difficulty' => $difficulty,
-                'serialcorrects' => $serialcorrects === null ? 0 : $serialcorrects,
-                'nextquery' => $nextquery === null ? 0 : $nextquery,
-                'step' => $step,
-                'timecreated' => time(),
-                'numquery' => $numquery,
-                'bestscore' => $bestscore,
-                'info' => $info,
-                ]
-        );
-    }
-
-
-    /**
      *
      * Sort questions
      *

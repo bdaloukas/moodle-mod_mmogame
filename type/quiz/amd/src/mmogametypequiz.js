@@ -99,7 +99,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                         color: this.getContrastingColor(this.colorBackground),
                     }
                 });
-                label.innerHTML = this.answers[i];
+                label.innerHTML = this.sanitizeFormattingHtml(this.answers[i]);
 
                 if (onlyMetrics) {
                     this.area.appendChild(label);
@@ -258,7 +258,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 },
                 attributes: {
                     disabled: true,
-                    innerHTML: '',
+                    textContent: '',
                 },
             });
 
@@ -414,7 +414,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     }
                 }
             );
-            definitionDiv.innerHTML = definition;
+            definitionDiv.innerHTML = this.sanitizeFormattingHtml(definition);
 
             if (onlyMetrics) {
                 this.area.appendChild(definitionDiv);

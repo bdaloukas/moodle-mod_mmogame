@@ -228,27 +228,6 @@
         <INDEX NAME="mmogameidqueryid" UNIQUE="false" FIELDS="mmogameid,queryid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="mmogame_aa_irt_log" COMMENT="mmogame_aa_irt">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="auserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="theta" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="queryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="difficulty" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="serialcorrects" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="numquery" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
-        <FIELD NAME="nextquery" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
-        <FIELD NAME="step" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
-        <FIELD NAME="bestscore" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="info" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Info"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
 
       <TABLE NAME="mmogame_aa_irt_key" COMMENT="mmogame_aa_irt_key">
       <FIELDS>

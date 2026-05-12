@@ -404,7 +404,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
     onServerAnswerMultichoiceShowCorrect(i, iscorrect1, iscorrect2, iscorrect) {
         if (iscorrect) {
-            this.aItemLabel[i].innerHTML = '<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>';
+            this.aItemLabel[i].innerHTML = this.sanitizeFormattingHtml('<b><u>' + this.aItemLabel[i].innerHTML + '</b></u>');
         }
 
         if (iscorrect1 !== undefined) {
@@ -412,7 +412,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             let div = this.createDiv(this.area, 'mmogame-quiz-aduel-correct-answer',
                 this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
             div.title = iscorrect1 ? this.getStringT('js_correct_answer') : this.getStringT('js_wrong_answer');
-            div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorScore, this.colorScore);
+            div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorScore, this.colorScore)
         }
 
         if (iscorrect2 !== undefined) {
@@ -453,7 +453,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         if (this.aduelPlayer === 2 && tool2 === undefined) {
             s += this.getSVGcorrect(this.iconSize, iscorrect2 !== 0, this.colorScore2, this.colorScore2);
         }
-        this.strip.innerHTML = s;
+        this.strip.innerHTML = this.sanitizeFormattingHtml(s);
 
         this.strip.style.zIndex = '1';
     }
@@ -602,7 +602,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     showHelpScreen(div) {
-        div.innerHTML = `<div> ${this.getStringT('js_aduel_help')} </div>
+        div.innerHTML = this.sanitizeFormattingHtml(`<div> ${this.getStringT('js_aduel_help')} </div>
 <table class="mmogame-table-help">
     <tr>
         <td class="mmogame-td-help-image">
@@ -634,7 +634,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         <td> ${this.getStringT('js_aduel_example2')} </td>
     </tr>
 </table>
-        `;
+        `);
     }
 
     /**

@@ -165,7 +165,7 @@ function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 
-    if ($oldversion < ($ver = 2025110200)) {
+    if ($oldversion < ($ver = 2026051000)) {
         // Define field numattempt to be added to mmogame.
         $table = new xmldb_table('mmogame_quiz_attempts');
         $field = new xmldb_field('tools', XMLDB_TYPE_INTEGER, 2, null, true, null, 0);
