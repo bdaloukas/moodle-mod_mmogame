@@ -247,7 +247,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.updateButtonTool(this.buttonWizard, json.tool3);
 
         this.attempt = json.attempt;
-        this.sessionkey = json.sessionkey;
+        this.attemptkey = json.attemptkey;
         this.aduelPlayer = json.aduelPlayer;
         this.aduelScore = json.aduelScore;
         this.aduelRank = json.aduelRank;
@@ -486,6 +486,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             mmogameid: this.mmogameid,
             kinduser: this.kinduser,
             user: this.user,
+            sessionkey: this.sessionkey,
             count: 10,
         };
 

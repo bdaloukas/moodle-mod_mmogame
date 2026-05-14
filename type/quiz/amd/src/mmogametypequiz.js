@@ -455,12 +455,14 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     mmogameid: this.mmogameid,
                     kinduser: this.kinduser,
                     user: this.user,
-                    attempt: this.attempt,
                     sessionkey: this.sessionkey,
+                    attempt: this.attempt,
+                    attemptkey: this.attemptkey,
                     answer: this.answerid || '',
                     subcommand: subcommand,
                 };
-console.log("params=", params);
+                console.log(params);
+
                 Ajax.call([{
                     methodname: 'mmogametype_quiz_set_answer', // API endpoint
                     args: params,

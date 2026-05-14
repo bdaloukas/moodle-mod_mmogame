@@ -59,6 +59,7 @@ class mmogame_generator_testcase extends advanced_testcase {
         // Test 1: Call without optional parameter avatars, colorpalettes.
         $class = new get_assets();
         $result = $class->execute($rgame->id, 'moodle', $USER->id);
+
         $this->assertArrayNotHasKey('avatars', $result);
         $this->assertArrayNotHasKey('colorpalettes', $result);
 

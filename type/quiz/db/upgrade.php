@@ -84,6 +84,7 @@ function mmogametype_quiz_repair_queries() {
  * @throws downgrade_exception
  * @throws moodle_exception
  * @throws upgrade_exception
+ * @throws \Random\RandomException
  */
 function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
     global $DB;
@@ -176,15 +177,24 @@ function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 
-    if ($oldversion < ($ver = 2026050601)) {
+    if ($oldversion < ($ver = 2026051406)) {
         // Define field type to be added to mmogame.
         $table = new xmldb_table('mmogame_quiz_attempts');
-        $field = new xmldb_field('sessionkey', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL);
+        $field = new xmldb_field('attemptkey', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL);
 
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
+
+            $recs = $DB->get_records_select('mmogame_quiz_attempts', 'attemptkey=?', ['']);
+            foreach ($recs as $rec) {
+                $upd = new stdClass();
+                $upd->id = $rec->id;
+                $upd->attemptkey = bin2hex(random_bytes(32));
+                $DB->update_record('mmogame_quiz_attempts', $upd);
+            }
+
         }
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 
     return true;

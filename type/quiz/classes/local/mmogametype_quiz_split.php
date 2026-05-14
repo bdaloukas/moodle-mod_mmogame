@@ -211,7 +211,7 @@ class mmogametype_quiz_split extends mmogame {
                 'auserid' => $aduel->auserid2, 'queryid' => $rec->queryid, 'numgame' => $rec->numgame,
                 'timestart' => 0, 'numteam' => $rec->numteam, 'numquery' => $numquery++,
                 'numattempt' => $rec->numattempt, 'layout' => $rec->layout, 'timeanswer' => 0,
-                'sessionkey' => bin2hex(random_bytes(32)), ];
+                'attemptkey' => bin2hex(random_bytes(32)), ];
             $a['timeclose'] = 0;
             $id = $this->db->insert_record('mmogame_quiz_attempts', $a);
             $ids[] = $id;
@@ -290,7 +290,7 @@ class mmogametype_quiz_split extends mmogame {
             $a['timeanswer'] = 0;
             $a['timeclose'] = 0;
             $a['numquery'] = $numquery++;
-            $a['sessionkey'] = bin2hex(random_bytes(32));
+            $a['attemptkey'] = bin2hex(random_bytes(32));
             $ids[] = $this->db->insert_record('mmogame_quiz_attempts', $a);
 
             $ignore[$queryid] = $queryid;
@@ -438,8 +438,8 @@ class mmogametype_quiz_split extends mmogame {
      *
      * @param array $ret
      * @param int|null $attemptid
-     * @param string|null $sessionkey
-     * @param string|null $answer
+     * @param ?string $attemptkey
+     * @param ?string $answer
      * @param int $timestart
      * @param int $timeanswer
      * @param ?int $answerid
@@ -449,7 +449,7 @@ class mmogametype_quiz_split extends mmogame {
     public function set_answer_mode(
         array &$ret,
         ?int $attemptid,
-        ?string $sessionkey,
+        ?string $attemptkey,
         ?string $answer,
         int $timestart,
         int $timeanswer,
@@ -464,8 +464,8 @@ class mmogametype_quiz_split extends mmogame {
         // saved for attempts owned by the current anonymous/user session.
         $attempt = $this->db->get_record_select(
             'mmogame_quiz_attempts',
-            'mmogameid=? AND auserid=? AND id=? AND sessionkey=?',
-            [$this->get_id(), $this->auserid, $attemptid, $sessionkey]
+            'mmogameid=? AND auserid=? AND id=? AND attemptkey=?',
+            [$this->get_id(), $this->auserid, $attemptid, $attemptkey]
         );
         if ($attempt === null) {
             // Invalid or expired game session.

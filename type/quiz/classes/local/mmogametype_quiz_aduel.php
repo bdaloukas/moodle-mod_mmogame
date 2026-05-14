@@ -150,7 +150,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $a['timeanswer'] = 0;
             $a['timeclose'] = $this->aduel->timelimit != 0 && $ret == 0 ? $a['timestart'] + $this->aduel->timelimit : 0;
             $a['layout'] = $this->qbank->get_layout($query);
-            $a['sessionkey'] = bin2hex(random_bytes(32));
+            $a['attemptkey'] = bin2hex(random_bytes(32));
             $id = $this->db->insert_record($this->get_table_attempts(), $a);
             if ($ret == 0) {
                 $ret = $id;
@@ -181,7 +181,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                 'auserid' => $this->aduel->auserid2, 'queryid' => $rec->queryid, 'numgame' => $rec->numgame,
                 'timestart' => 0, 'numteam' => $rec->numteam,
                 'numattempt' => $rec->numattempt, 'layout' => $rec->layout, 'timeanswer' => 0,
-                'sessionkey' => bin2hex(random_bytes(32)), ];
+                'attemptkey' => bin2hex(random_bytes(32)), ];
             $a['timeclose'] = $ret == 0 ? time() + $this->aduel->timelimit : 0;
             $id = $this->db->insert_record($table, $a);
             if ($ret == 0) {
@@ -582,7 +582,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      *
      * @param array $ret
      * @param ?int $attemptid
-     * @param string|null $sessionkey
+     * @param ?string $attemptkey
      * @param ?string $answer
      * @param ?int $answerid
      * @param string $subcommand
@@ -591,12 +591,12 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     public function set_answer_mode(
         array &$ret,
         ?int $attemptid,
-        ?string $sessionkey,
+        ?string $attemptkey,
         ?string $answer,
         ?int $answerid = null,
         string $subcommand = ''
     ): ?stdClass {
-        $attempt = parent::set_answer_mode($ret, $attemptid, $sessionkey, $answer, $answerid, $subcommand);
+        $attempt = parent::set_answer_mode($ret, $attemptid, $attemptkey, $answer, $answerid, $subcommand);
 
         $aduel = $this->aduel;
 

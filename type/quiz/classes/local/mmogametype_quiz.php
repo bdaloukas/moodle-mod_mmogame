@@ -77,7 +77,7 @@ abstract class mmogametype_quiz extends mmogame {
             $attempt->useranswer = '';
         }
         $ret['attempt'] = $attempt->id;
-        $ret['sessionkey'] = $attempt->id !== 0 ? $attempt->sessionkey : '';
+        $ret['attemptkey'] = $attempt->id !== 0 ? $attempt->attemptkey : '';
         $recquery = null;
         if ($attempt->queryid != 0) {
             $recquery = $this->get_qbank()->load_json($ret, '', $attempt->queryid, $attempt->layout, false);

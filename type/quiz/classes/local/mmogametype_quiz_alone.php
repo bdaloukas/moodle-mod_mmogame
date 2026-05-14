@@ -79,7 +79,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         $countquestions = $corrects = 0;
         $a = $this->qbank->get_attempt_new(1, true, $countquestions, $corrects);
         if ($a === null) {
-            $this->set_errorcode(ERRORCODE_NO_QUERIES);
+            $this->set_errorcode('no_queries');
             return null;
         }
         unset($a['queries']);
@@ -98,7 +98,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         }
         $a['numquery'] = $a['numattempt'] = $this->compute_next_numattempt();
         $a['timestart'] = time();
-        $a['sessionkey'] = bin2hex(random_bytes(32));
+        $a['attemptkey'] = bin2hex(random_bytes(32));
 
         // Insert data to mmogame_quiz_attempts table.
         $id = $this->db->insert_record('mmogame_quiz_attempts', $a);
@@ -353,7 +353,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      *
      * @param array $ret
      * @param ?int $attemptid
-     * @param string|null $sessionkey
+     * @param ?string $attemptkey
      * @param ?string $answer
      * @param ?int $answerid
      * @param string $subcommand
@@ -362,7 +362,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     public function set_answer_mode(
         array &$ret,
         ?int $attemptid,
-        ?string $sessionkey,
+        ?string $attemptkey,
         ?string $answer,
         ?int $answerid = null,
         string $subcommand = ''
@@ -375,11 +375,11 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         // saved for attempts owned by the current anonymous/user session.
         $attempt = $this->db->get_record_select(
             'mmogame_quiz_attempts',
-            'mmogameid=? AND auserid=? AND id=? AND sessionkey=?',
-            [$this->get_id(), $this->auserid, $attemptid, $sessionkey]
+            'mmogameid=? AND auserid=? AND id=? AND attemptkey=?',
+            [$this->get_id(), $this->auserid, $attemptid, $attemptkey]
         );
         if ($attempt === null) {
-            // Invalid or expired game session.
+            // Invalid or expired attempt session.
             return null;
         }
 
@@ -402,7 +402,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         $ret['iscorrect'] = $attempt->iscorrect ? 1 : 0;
         $ret['correct'] = $query->concept;
         $ret['attempt'] = $attempt->id;
-        $ret['sessionkey'] = $attempt->sessionkey;
+        $ret['atemptkey'] = $attempt->attemptkey;
 
         $info = $this->get_avatar_info($this->auserid);
         $ret['sumscore'] = $info->sumscore;

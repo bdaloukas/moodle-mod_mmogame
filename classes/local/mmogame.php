@@ -27,6 +27,7 @@ namespace mod_mmogame\local;
 use coding_exception;
 use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\qbank\mmogame_qbank;
+use Random\RandomException;
 use stdClass;
 
 /**
@@ -208,15 +209,19 @@ abstract class mmogame {
      * @param string $guid
      * @param bool $create
      * @param int $split
-     * @return ?int
+     * @return array
+     * @throws RandomException
      */
-    public static function get_auserid_from_guid(mmogame_database $db, string $guid, bool $create, int $split): ?int {
+    public static function get_auserid_from_guid(mmogame_database $db, string $guid, bool $create, int $split): array {
         $rec = $db->get_record_select('mmogame_aa_users_guid', 'guid=?', [$guid]);
         if ($rec === null) {
             if (!$create) {
-                return null;
+                return [null, null];
             }
-            $userid = $db->insert_record('mmogame_aa_users_guid', ['guid' => $guid, 'lastlogin' => time()]);
+            $userid = $db->insert_record(
+                'mmogame_aa_users_guid',
+                ['guid' => $guid, 'lastlogin' => time()]
+            );
         } else {
             $userid = $rec->id;
         }
@@ -228,12 +233,13 @@ abstract class mmogame {
      * @param mmogame_database $db
      * @param string $code
      * @param int $split
-     * @return ?int
+     * @return array
+     * @throws RandomException
      */
-    public static function get_auserid_from_usercode(mmogame_database $db, string $code, int $split): ?int {
+    public static function get_auserid_from_usercode(mmogame_database $db, string $code, int $split): array {
         $rec = $db->get_record_select('mmogame_aa_users_code', 'code=?', [$code]);
         if ($rec === false) {
-            return false;
+            return [false, null];
         }
 
         return self::get_auserid_from_db($db, 'usercode', $rec->id, true, $split);
@@ -246,20 +252,27 @@ abstract class mmogame {
      * @param int $userid
      * @param bool $create
      * @param int $split
-     * @return ?int
+     * @return array
+     * @throws RandomException
      */
-    public static function get_auserid_from_db(mmogame_database $db, string $kind, int $userid, bool $create, int $split): ?int {
+    public static function get_auserid_from_db(mmogame_database $db, string $kind, int $userid, bool $create, int $split): array {
         $rec = $db->get_record_select('mmogame_aa_users', 'kind = ? AND instanceid=? AND splitnum=?', [$kind, $userid, $split]);
         if ($rec !== null) {
-            return $rec->id;
+            return [$rec->id, $rec->sessionkey];
         }
         if (!$create) {
-            return null;
+            return [null, null];
         }
-        return $db->insert_record(
+        $sessionkey = bin2hex(random_bytes(32));
+        $id = $db->insert_record(
             'mmogame_aa_users',
-            ['kind' => $kind, 'instanceid' => $userid, 'splitnum' => $split, 'lastlogin' => time(), 'lastip' => self::get_ip()]
+            [
+                'kind' => $kind, 'instanceid' => $userid, 'splitnum' => $split, 'lastlogin' => time(),
+                'sessionkey' => $sessionkey, 'sessionexpires' => time() + 86400,
+            ]
         );
+
+        return [$id, $sessionkey];
     }
 
     /**
@@ -269,9 +282,10 @@ abstract class mmogame {
      * @param string $user
      * @param bool $create
      * @param int $split
-     * @return ?int (the id of table mmogame_aa_users)
+     * @return array (the id of table mmogame_aa_users and a sessionkey)
+     * @throws RandomException
      */
-    public static function get_asuerid(mmogame_database $db, string $kinduser, string $user, bool $create, int $split): ?int {
+    public static function get_asuerid(mmogame_database $db, string $kinduser, string $user, bool $create, int $split): array {
         if ($kinduser == 'usercode') {
             return self::get_auserid_from_usercode($db, $user, $split);
         } else if ($kinduser == 'guid') {
@@ -318,7 +332,12 @@ abstract class mmogame {
     public function login_user(int $auserid): void {
         $this->db->update_record(
             'mmogame_aa_users',
-            ['id' => $auserid, 'lastlogin' => time(), 'lastip' => self::get_ip()]
+            [
+                'id' => $auserid,
+                'lastlogin' => time(),
+                'lastip' => self::get_ip(),
+                'sessionexpires' => time() + 86400,
+            ],
         );
 
         $this->auserid = $auserid;
@@ -629,16 +648,19 @@ abstract class mmogame {
      * @param int $countsplit
      * @param int $countpalettes
      * @param int $countavatars
+     * @param array $sessionkeys
      * @param array $retpalettes
      * @param array $retavatars
      * @param int $maxavatars
      * @param string $kinduser
      * @param string $user
+     * @throws RandomException
      */
     public function get_assets_split(
         int $countsplit,
         int $countpalettes,
         int $countavatars,
+        array &$sessionkeys,
         array &$retpalettes,
         array &$retavatars,
         int &$maxavatars,
@@ -668,7 +690,7 @@ abstract class mmogame {
 
         $currentids = $currentfiles = [];
         for ($i = 0; $i < $countsplit; ++$i) {
-            $auserid = self::get_asuerid($this->db, $kinduser, $user, false, $i);
+            [$auserid, $sessionkeys[$i]] = self::get_asuerid($this->db, $kinduser, $user, true, $i);
             if ($auserid !== null) {
                 $info = $this->get_avatar_info($auserid, false);
                 $avatarid = $info->avatarid;
@@ -715,6 +737,25 @@ abstract class mmogame {
             }
             $retavatars[] = $set;
         }
+    }
+
+    /**
+     * Return the variable rgame->type.
+     *
+     * @return string
+     */
+    public function get_type(): string {
+        return $this->rgame->type;
+    }
+
+
+    /**
+     * Return the variable rgame->mode.
+     *
+     * @return string
+     */
+    public function get_mode(): string {
+        return $this->rgame->mode;
     }
 
     /**

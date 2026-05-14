@@ -29,7 +29,7 @@
         <FIELD NAME="theta" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="difficulty" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="tools" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
-        <FIELD NAME="sessionkey" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="attemptkey" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

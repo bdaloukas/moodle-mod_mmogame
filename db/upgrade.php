@@ -1165,5 +1165,35 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
+    if ($oldversion < ($ver = 2026051407)) {
+        // Define field type to be added to mmogame.
+        $table = new xmldb_table('mmogame_aa_users');
+        $field = new xmldb_field('sessionkey', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026051408)) {
+        $table = new xmldb_table('mmogame_aa_users');
+        $field = new xmldb_field('sessionexpires', XMLDB_TYPE_INTEGER, 10, true, XMLDB_NOTNULL, null, '0');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            $recs = $DB->get_records_select('mmogame_aa_users', 'sessionkey=?', ['']);
+            foreach ($recs as $rec) {
+                $upd = new stdClass();
+                $upd->id = $rec->id;
+                $upd->sessionkey = bin2hex(random_bytes(32));
+                $upd->sessionexpires = time() + 86400;
+                $DB->update_record('mmogame_aa_users', $upd);
+            }
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }

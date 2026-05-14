@@ -85,9 +85,11 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     mmogameid: this.mmogameid,
                     kinduser: this.kinduser,
                     user: this.user,
+                    sessionkeys: this.sessionkeys.join(','),
                     splits: splits,
                     avatarids: avatarids.join(','),
                 };
+                console.log("callGetAttemptsSplit", params);
                 // Calling the service through the Moodle AJAX API
                 let getAttemptsSplit = Ajax.call([{
                     methodname: 'mmogametype_quiz_get_attempts_split',
@@ -95,7 +97,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 }]);
 
                 // Handling the response
-                getAttemptsSplit[0].done(({avatars, attempts, sessionkeys, attemptqueryids, querydefinitions, querytips,
+                getAttemptsSplit[0].done(({avatars, attempts, attemptkeys, attemptqueryids, querydefinitions, querytips,
                                               queryanswerids, numattempts, answertexts, aduels,
                                               aduelavatars, aduelcorrects, auserids, queryanswerids0, grades,
                                               countquestion, countcorrect, islastcorrect, ranks, queryranks,
@@ -103,7 +105,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.info = {
                         avatars: avatars,
                         attempts: attempts,
-                        sessionkeys: sessionkeys,
+                        attemptkeys: attemptkeys,
                         paletteid: this.paletteid,
                         attemptqueryids: attemptqueryids,
                         numattempts: numattempts,
@@ -126,6 +128,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         state: state,
                         statetime: statetime,
                     };
+                    console.log("callGetAttemptsSplit", this.info);
                     if (this.palette !== undefined) {
                         this.setColors(this.palette);
                     }
@@ -539,19 +542,19 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             const info = this.info;
             // Copy attempt ids.
             let queryids = info.attemptqueryids[splitInfo].split(",");
-
+console.log("info=", info);
             const aduelcorrects = info.aduelcorrects[splitInfo].split(',');
             const numattempts = info.numattempts[splitInfo].split(",");
             sp.auserid = info.auserids[splitInfo];
             let attempts = info.attempts[splitInfo].split(",");
-            let sessionkeys = info.sessionkeys[splitInfo].split(",");
+            let attemptkeys = info.attemptkeys[splitInfo].split(",");
             sp.attempts = [];
             sp.score = parseInt(info.grades[splitInfo]);
             sp.rank = parseInt(info.ranks[splitInfo]);
             sp.countcorrect = info.countcorrect[splitInfo];
             for (let i = 0; i < attempts.length; i++) {
                 let item = {attemptid: attempts[i]};
-                item.sessionkey = sessionkeys[i];
+                item.attemptkey = attemptkeys[i];
                 item.queryid = queryids[i];
                 item.islastcorrect = info.islastcorrect[item.queryid];
                 item.definition = info.querydefinitions[item.queryid];
@@ -570,6 +573,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             }
             sp.aduel = this.info.aduels[splitInfo];
             sp.aduelavatar = this.info.aduelavatars[splitInfo];
+            console.log("sp.attempts=",sp.attempts);
         }
 
         moveX(timestamp, split, num, direction, steps) {
@@ -818,7 +822,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             const info = {
                 split: split,
                 attemptid: attempt.attemptid,
-                sessionkey: attempt.sessionkey,
+                attemptkey: attempt.attemptkey,
                 iscorrect: iscorrect,
                 answer: attempt.answerids0[pos],
                 tools: tools,
@@ -1088,7 +1092,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             let splits = [];
             let attempts = [];
             let sessionkeys = [];
-            let iscorrects = [];
+            let attemptkeys = [];
             let answers = [];
             let timestarts = [];
             let timeanswers = [];
@@ -1105,8 +1109,8 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     const temp = sp2.server[j];
                     splits.push(temp.split);
                     attempts.push(temp.attemptid);
-                    sessionkeys.push(temp.sessionkey);
-                    iscorrects.push(temp.iscorrect ? 1 : 0);
+                    sessionkeys.push(this.sessionkeys[j]);
+                    attemptkeys.push(temp.attemptkey);
                     answers.push(temp.answer);
                     timestarts.push(temp.timestart);
                     timeanswers.push(temp.timeanswer);
@@ -1133,22 +1137,24 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     mmogameid: this.mmogameid,
                     kinduser: this.kinduser,
                     user: this.user,
+                    sessionkeys: sessionkeys.join(','),
                     splits: splits.join(','),
                     attempts: attempts.join(','),
-                    sessionkeys: sessionkeys.join(','),
+                    attemptkeys: attemptkeys.join(','),
                     answers: answers.join(','),
                     timestarts: timestarts.join(','),
                     timeanswers: timeanswers.join(','),
                     returnsplits: returnsplits.join(','),
                     tools: tools.join(','),
                 };
+                console.log("sendAnswers", params);
                 // Calling the service through the Moodle AJAX API
                 let sendAnswers = Ajax.call([{
                     methodname: 'mmogametype_quiz_send_answers_split',
                     args: params
                 }]);
                 // Handling the response
-                sendAnswers[0].done(({avatars, attempts, sessionkeys, attemptqueryids, querydefinitions, querytips,
+                sendAnswers[0].done(({avatars, attempts, attemptkeys, attemptqueryids, querydefinitions, querytips,
                                          queryanswerids, numattempts, answertexts, aduels,
                                          aduelavatars, aduelcorrects, auserids, queryanswerids0,
                                          grades, savedattempts, countquestion, countcorrect, islastcorrect, ranks, queryranks,
@@ -1162,7 +1168,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.info = {
                         avatars: avatars,
                         attempts: attempts,
-                        sessionkeys: sessionkeys,
+                        attemptkeys: attemptkeys,
                         paletteid: this.paletteid,
                         attemptqueryids: attemptqueryids,
                         numattempts: numattempts,

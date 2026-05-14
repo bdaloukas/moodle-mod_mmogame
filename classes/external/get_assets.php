@@ -27,6 +27,7 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception as invalid_parameter_exceptionAlias;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -60,11 +61,11 @@ class get_assets extends external_api {
      * @param int $avatars
      * @param int $colorpalettes
      * @return array
-     * @throws restricted_context_exception
-     * @throws required_capability_exception
+     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exceptionAlias
-     * @throws coding_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function execute(
         int $mmogameid,
@@ -123,7 +124,8 @@ class get_assets extends external_api {
         $result = [];
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
+        [$auserid, $result['sessionkey']] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, true, 0);
+
         // Generate avatars array if avatars > 0.
         if ($avatars > 0) {
             self::compute_avatars($mmogame, $auserid, $avatars, $result);
@@ -132,6 +134,7 @@ class get_assets extends external_api {
         if ($colorpalettes > 0) {
             self::compute_colorpalettes($mmogame, $colorpalettes, $result);
         }
+
         return $result;
     }
 
@@ -160,6 +163,11 @@ class get_assets extends external_api {
             'colorpaletteids' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'A color palette ID'),
                 'The list of color palette IDs',
+                VALUE_OPTIONAL
+            ),
+            'sessionkey' => new external_value(
+                PARAM_ALPHANUM,
+                'Session key',
                 VALUE_OPTIONAL
             ),
         ]);

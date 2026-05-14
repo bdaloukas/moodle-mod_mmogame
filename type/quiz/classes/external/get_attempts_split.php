@@ -27,6 +27,7 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -46,6 +47,7 @@ class get_attempts_split extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
+            'sessionkeys' => new external_value(PARAM_TEXT, 'Comma-separated session keys'),
             'avatarids' => new external_value(PARAM_TEXT, 'Comma-separated avatar IDs', VALUE_DEFAULT, ''),
             'splits' => new external_value(PARAM_TEXT, 'Comma-separated split IDs'),
         ]);
@@ -57,9 +59,11 @@ class get_attempts_split extends external_api {
      * @param int $mmogameid
      * @param string $kinduser
      * @param string $user
+     * @param string $sessionkeys
      * @param ?string $avatarids
      * @param ?string $splits
      * @return array
+     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
@@ -69,6 +73,7 @@ class get_attempts_split extends external_api {
         int $mmogameid,
         string $kinduser,
         string $user,
+        string $sessionkeys,
         ?string $avatarids = null,
         ?string $splits = null
     ): array {
@@ -80,11 +85,13 @@ class get_attempts_split extends external_api {
             'mmogameid' => $mmogameid,
             'kinduser' => $kinduser,
             'user' => $user,
+            'sessionkeys' => $sessionkeys,
             'avatarids' => $avatarids,
             'splits' => $splits,
         ]);
 
         $splits = explode(',', $splits);
+        $sessionkeys = explode(',', $sessionkeys);
         $avatarids = $avatarids != null ? explode(',', $avatarids) : null;
 
         // Perform security checks.
@@ -118,7 +125,8 @@ class get_attempts_split extends external_api {
             if ($split == '') {
                 continue;
             }
-            $auserids[] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create, $split);
+            [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create, $split);
+            $auserids[] = $auserid;
         }
         $state = $mmogame->get_state();
         $statetime = $mmogame->get_statetime();
@@ -126,7 +134,7 @@ class get_attempts_split extends external_api {
             return [
                 'avatars' => [],
                 'attempts' => [],
-                'sessionkeys' => [],
+                'attemptkeys' => [],
                 'attemptqueryids' => [],
                 'numattempts' => [],
                 'querydefinitions' => [],
@@ -174,7 +182,7 @@ class get_attempts_split extends external_api {
 
         for (;;) {
             $numgame = 0;
-            $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips = $answerids = $answertexts = $sessionkeys = [];
+            $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips = $answerids = $answertexts = $attemptkeys = [];
             $aduelavatars = $aduelcorrects = $queryanswerids0 = $aduels = [];
 
             $countquestions = 0;
@@ -188,7 +196,7 @@ class get_attempts_split extends external_api {
                 $aduelauserids,
                 $numgame,
                 $attemptids,
-                $sessionkeys,
+                $attemptkeys,
                 $attemptqueryids,
                 $attemptnums,
                 $definitions,
@@ -236,14 +244,13 @@ class get_attempts_split extends external_api {
             }
         }
 
-        $ret = ['avatars' => $avatars, 'attempts' => $attemptids, 'sessionkeys' => $sessionkeys,
+        return ['avatars' => $avatars, 'attempts' => $attemptids, 'attemptkeys' => $attemptkeys,
             'attemptqueryids' => $attemptqueryids, 'numattempts' => $attemptnums, 'querydefinitions' => $definitions,
             'querytips' => $tips, 'queryanswerids' => $answerids, 'answertexts' => $answertexts,
             'aduels' => $aduels, 'aduelavatars' => $aduelavatars, 'aduelcorrects' => $aduelcorrects,
             'auserids' => $auserids, 'queryanswerids0' => $queryanswerids0, 'grades' => $grades,
             'countquestion' => $countquestions, 'countcorrect' => $countcorrect, 'islastcorrect' => $islastcorrect,
             'ranks' => $ranks, 'queryranks' => $queryranks, 'hasidea' => 0, 'state' => $state, 'statetime' => 0];
-        return $ret;
     }
 
     /**
@@ -259,8 +266,8 @@ class get_attempts_split extends external_api {
             'attempts' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Attempts data')
             ),
-            'sessionkeys' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Sessionkeys')
+            'attemptkeys' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'attemptkeys')
             ),
             'attemptqueryids' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Query IDs of attempts')
@@ -337,7 +344,7 @@ class get_attempts_split extends external_api {
      * @param array|null $aduelauserids
      * @param int $numgame
      * @param array $attemptids
-     * @param array $sessionkeys
+     * @param array $attemptkeys
      * @param array $attemptqueryids
      * @param array $attemptnums
      * @param array $definitions
@@ -361,7 +368,7 @@ class get_attempts_split extends external_api {
         ?array $aduelauserids,
         int &$numgame,
         array &$attemptids,
-        array &$sessionkeys,
+        array &$attemptkeys,
         array &$attemptqueryids,
         array &$attemptnums,
         array &$definitions,
@@ -389,13 +396,13 @@ class get_attempts_split extends external_api {
         );
         $queryids = [];  /* Queries that are used */
         $attemptqueryids = []; /* Which query has every attempt */
-        $attemptids = $attemptnums = $sessionkeys = [];
+        $attemptids = $attemptnums = $attemptkeys = [];
         $querypositions = [];
         $aduelavatars = $aduels = $aduelcorrects = [];
         $querytoatttempt = [];
         $numgame = 0;
         foreach ($recs as $position => $attempts) {
-            $nums = $ids = $newids = $sessionkeys1 = [];
+            $nums = $ids = $newids = $attemptkeys1 = [];
             $found = false;
             $isaduel = false;
             $corrects = [];
@@ -423,7 +430,7 @@ class get_attempts_split extends external_api {
                 }
                 $nums[] = $attempt->numattempt;
                 $ids[] = $attempt->id;
-                $sessionkeys1[] = $attempt->sessionkey;
+                $attemptkeys1[] = $attempt->attemptkey;
                 $newids[] = $pos;
                 $queryids[$attempt->queryid] = $attempt->queryid;
 
@@ -442,7 +449,7 @@ class get_attempts_split extends external_api {
             }
             $attemptnums[] = implode(',', $nums);
             $attemptids[] = implode(',', $ids);
-            $sessionkeys[] = implode(',', $sessionkeys1);
+            $attemptkeys[] = implode(',', $attemptkeys1);
             $attemptqueryids[] = implode(',', $newids);
             $aduelcorrects[] = $isaduel ? implode(',', $corrects) : '';
         }

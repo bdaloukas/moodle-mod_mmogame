@@ -550,7 +550,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                     args: params
                 }]);
                 // Handling the response
-                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars}) => {
+                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars, sessionkeys}) => {
                     this.info = {
                         avatarids: avatarids,
                         avatars: avatars,
@@ -558,6 +558,8 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                         colorpalettes: colorpalettes,
                         numavatars: numavatars,
                     };
+                    this.sessionkeys = sessionkeys;
+                    console.log(this.info);
                     this.gateCreateScreen();
                 }).fail((error) => {
                     this.showError('gateSendGetAssets', error);

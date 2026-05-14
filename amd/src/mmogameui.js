@@ -164,13 +164,14 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     args: params
                 }]);
                 // Handling the response
-                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars}) => {
+                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars, sessionkeys}) => {
                     this.info = {
                         avatarids: avatarids,
                         avatars: avatars,
                         colorpaletteids: colorpaletteids,
                         colorpalettes: colorpalettes,
                         numavatars: numavatars,
+                        sessionkeys: sessionkeys
                     };
                     this.gateCreateScreen();
                 }).fail((error) => {
@@ -406,7 +407,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }]);
 
                 // Handling the response
-                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes}) => {
+                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, sessionkey}) => {
+                    this.sessionkey = sessionkey;
                     if (updatePalette) {
                         this.gateShowColorPalettes(this.area, leftPalette, topPalette, countXpalette, countYpalette,
                             colorpaletteids, colorpalettes);
@@ -607,7 +609,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         createDivMessage(classnames, message) {
-            console.log("createDivMessag", classnames, message);
             if (this.area !== undefined) {
                 this.body.removeChild(this.area);
                 this.area = undefined;
@@ -713,11 +714,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     mmogameid: this.mmogameid,
                     kinduser: this.kinduser,
                     user: this.user,
+                    sessionkey: this.sessionkey,
                     nickname: null,
                     colorpaletteid: null,
                     avatarid: null,
                     subcommand: '',
                 };
+                console.log("callGetAttempt", params);
                 if (extraparams !== undefined) {
                     params = {...params, ...extraparams};
                 }
@@ -743,10 +746,10 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     }
 
                     this.processGetAttempt(json);
-                })  /*.fail((error) => {
+                }).fail((error) => {
                     this.showError('mmogameui.callGetAttempt', error);
                     return error;
-                });*/
+                });
             });
         }
 
@@ -801,8 +804,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {Error} [error] - The error object to display.
          */
         showError(name, error) {
-            console.log("showError", name);
-            console.log(error);
             const message = error?.message || 'An unknown error occurred.';
             this.createDivMessage('mmogame-error', message);
         }

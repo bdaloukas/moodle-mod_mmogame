@@ -25,6 +25,7 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -44,6 +45,7 @@ class get_attempt extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
+            'sessionkey' => new external_value(PARAM_ALPHANUMEXT, 'The session of the user'),
             'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user', VALUE_DEFAULT, '', true),
             'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar', VALUE_DEFAULT, 0, true),
             'colorpaletteid' => new external_value(PARAM_INT, 'The ID of the color palette', VALUE_DEFAULT, 0, true),
@@ -57,20 +59,23 @@ class get_attempt extends external_api {
      * @param int $mmogameid
      * @param string $kinduser
      * @param string $user
+     * @param string $sessionkey
      * @param string|null $nickname
      * @param int|null $avatarid
      * @param int|null $colorpaletteid
      * @param string $subcommand
      * @return string
-     * @throws restricted_context_exception
-     * @throws required_capability_exception
+     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function execute(
         int $mmogameid,
         string $kinduser,
         string $user,
+        string $sessionkey,
         ?string $nickname = null,
         ?int $avatarid = null,
         ?int $colorpaletteid = null,
@@ -86,6 +91,7 @@ class get_attempt extends external_api {
             'mmogameid' => $mmogameid,
             'kinduser' => $kinduser,
             'user' => $user,
+            'sessionkey' => $sessionkey,
             'nickname' => $nickname,
             'avatarid' => $avatarid,
             'colorpaletteid' => $colorpaletteid,
@@ -132,8 +138,7 @@ class get_attempt extends external_api {
         $ret = [];
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $create = $nickname !== '' && $avatarid > 0 && $colorpaletteid > 0;
-        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create, 0);
+        [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
         if ($auserid === null) {
             return self::error('no_user');
         }
@@ -144,13 +149,13 @@ class get_attempt extends external_api {
             'mmogameid=? AND numgame=? AND auserid=?',
             [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]
         );
-        if (!$create && $grade === null) {
+        if ($grade === null) {
             return self::error('no_user');
         }
 
         $mmogame->login_user($auserid);
 
-        if ($create) {
+        if ($nickname !== '' && $avatarid > 0 && $colorpaletteid > 0) {
             $nickname = mb_substr($nickname, 0, 50);
             $info = $mmogame->get_avatar_info($auserid);
             $mmogame->get_db()->update_record(

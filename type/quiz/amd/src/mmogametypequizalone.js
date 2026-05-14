@@ -203,8 +203,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
             this.attempt = json.attempt;
-            this.sessionkey = json.sessionkey;
-
+            this.attemptkey = json.attemptkey;
+console.log("processGetAttempt", json);
             // Process question type and answers
             this.qtype = json.qtype;
             if (this.qtype === 'multichoice') {

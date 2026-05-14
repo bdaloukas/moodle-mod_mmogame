@@ -25,6 +25,7 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -44,6 +45,7 @@ class get_highscore extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_TEXT, 'User identifier'),
+            'sessionkey' => new external_value(PARAM_ALPHANUM, 'Session key'),
             'count' => new external_value(PARAM_INT, 'How many users'),
         ]);
     }
@@ -54,19 +56,22 @@ class get_highscore extends external_api {
      * @param int $mmogameid
      * @param string $kinduser
      * @param string $user
+     * @param string $sessionkey
      * @param int $count
      * @return string
-     * @throws restricted_context_exception
-     * @throws required_capability_exception
+     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user, int $count): string {
+    public static function execute(int $mmogameid, string $kinduser, string $user, string $sessionkey, int $count): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
             'mmogameid' => $mmogameid,
             'kinduser' => $kinduser,
             'user' => $user,
+            'sessionkey' => $sessionkey,
             'count' => $count,
         ]);
 
@@ -98,7 +103,7 @@ class get_highscore extends external_api {
             return self::error('invalid_kinduser');
         }
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
+        [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0, null);
 
         if (null === $auserid) {
             return self::error('no_user');

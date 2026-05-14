@@ -25,6 +25,7 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -44,8 +45,9 @@ class set_answer extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
-            'attempt' => new external_value(PARAM_INT, 'The id of the attempt'),
             'sessionkey' => new external_value(PARAM_ALPHANUM, 'The sessionkey of the attempt'),
+            'attempt' => new external_value(PARAM_INT, 'The id of the attempt'),
+            'attemptkey' => new external_value(PARAM_ALPHANUM, 'The attemptkey of the attempt'),
             'answer' => new external_value(PARAM_TEXT, 'The answer', VALUE_DEFAULT, ''),
             'subcommand' => new external_value(PARAM_ALPHANUM, 'Subcommand'),
         ]);
@@ -57,8 +59,9 @@ class set_answer extends external_api {
      * @param int $mmogameid
      * @param string $kinduser
      * @param string $user
-     * @param int $attempt
      * @param string $sessionkey
+     * @param int $attempt
+     * @param string $attemptkey
      * @param ?string $answer
      * @param string $subcommand
      * @return string
@@ -66,13 +69,15 @@ class set_answer extends external_api {
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
      * @throws restricted_context_exception
+     * @throws RandomException
      */
     public static function execute(
         int $mmogameid,
         string $kinduser,
         string $user,
-        int $attempt,
         string $sessionkey,
+        int $attempt,
+        string $attemptkey,
         ?string $answer,
         string $subcommand
     ): string {
@@ -81,6 +86,7 @@ class set_answer extends external_api {
             'mmogameid' => $mmogameid,
             'kinduser' => $kinduser,
             'user' => $user,
+            'attemptkey' => $attemptkey,
             'attempt' => $attempt,
             'sessionkey' => $sessionkey,
             'answer' => $answer,
@@ -115,7 +121,7 @@ class set_answer extends external_api {
         $ret = [];
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $auserid = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
+        [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
         if ($auserid == null) {
             return self::error('no_user');
         }
@@ -142,7 +148,7 @@ class set_answer extends external_api {
         $mmogame->login_user($auserid);
 
         // Checks also than sessionkey is valid for this attempt.
-        $mmogame->set_answer_mode($ret, $attempt, $sessionkey, $answer, $answerid, $subcommand, $sessionkey);
+        $mmogame->set_answer_mode($ret, $attempt, $attemptkey, $answer, $answerid, $subcommand, $sessionkey);
 
         return json_encode($ret);
     }

@@ -27,6 +27,7 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -46,9 +47,10 @@ class send_answers_split extends external_api {
             'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
             'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
             'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
+            'sessionkeys' => new external_value(PARAM_TEXT, 'Comma-separated session keys'),
             'splits' => new external_value(PARAM_TEXT, 'Comma-separated split IDs'),
             'attempts' => new external_value(PARAM_TEXT, 'Comma-separated attempt IDs'),
-            'sessionkeys' => new external_value(PARAM_TEXT, 'Comma-separated session keys'),
+            'attemptkeys' => new external_value(PARAM_TEXT, 'Comma-separated attempt keys'),
             'answers' => new external_value(PARAM_TEXT, 'Comma-separated answer IDs'),
             'timestarts' => new external_value(PARAM_TEXT, 'Comma-separated Unix timestamps'),
             'timeanswers' => new external_value(PARAM_TEXT, 'Comma-separated Unix timestamps'),
@@ -63,15 +65,17 @@ class send_answers_split extends external_api {
      * @param int $mmogameid
      * @param string $kinduser
      * @param string $user
+     * @param string $sessionkeys
      * @param ?string $splits
      * @param ?string $attempts
-     * @param string|null $sessionkeys
+     * @param string|null $attemptkeys
      * @param ?string $answers
      * @param ?string $timestarts
      * @param string $timeanswers
      * @param ?string $returnsplits
      * @param ?string $tools
      * @return array
+     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
@@ -81,9 +85,10 @@ class send_answers_split extends external_api {
         int $mmogameid,
         string $kinduser,
         string $user,
+        string $sessionkeys,
         ?string $splits = null,
         ?string $attempts = null,
-        ?string $sessionkeys = null,
+        ?string $attemptkeys = null,
         ?string $answers = null,
         ?string $timestarts = '',
         string $timeanswers = '',
@@ -95,9 +100,10 @@ class send_answers_split extends external_api {
             'mmogameid' => $mmogameid,
             'kinduser' => $kinduser,
             'user' => $user,
+            'sessionkeys' => $sessionkeys,
             'splits' => $splits,
             'attempts' => $attempts,
-            'sessionkeys' => $sessionkeys,
+            'attemptkeys' => $attemptkeys,
             'answers' => $answers,
             'timestarts' => $timestarts,
             'timeanswers' => $timeanswers,
@@ -108,7 +114,7 @@ class send_answers_split extends external_api {
         // Extracts array.
         $splits = explode(',', $splits);
         $attempts = explode(',', $attempts);
-        $sessionkeys = explode(',', $sessionkeys);
+        $attemptkeys = explode(',', $attemptkeys);
         $answers = explode(',', $answers);
         $timeanswers = explode(',', $timeanswers);
         $timestarts = explode(',', $timestarts);
@@ -142,7 +148,8 @@ class send_answers_split extends external_api {
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
         $auserids = [];
         foreach ($splits as $split) {
-            $auserids[] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, true, $split);
+            [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, true, $split);
+            $auserids[] = $auserid;
         }
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
 
@@ -170,7 +177,7 @@ class send_answers_split extends external_api {
             $mmogame->set_answer_mode(
                 $ret,
                 $attemptid,
-                $sessionkeys[$pos],
+                $attemptkeys[$pos],
                 $answers[$pos],
                 $timestarts[$pos],
                 $timeanswers[$pos],
@@ -191,6 +198,7 @@ class send_answers_split extends external_api {
             $mmogameid,
             $kinduser,
             $user,
+            $sessionkeys,
             null,
             implode(',', $returnsplits),
         );
@@ -214,8 +222,8 @@ class send_answers_split extends external_api {
             'attempts' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Attempts data')
             ),
-            'sessionkeys' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Session keys')
+            'attemptkeys' => new external_multiple_structure(
+                new external_value(PARAM_RAW, 'Attempt keys')
             ),
             'attemptqueryids' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Query IDs of attempts')

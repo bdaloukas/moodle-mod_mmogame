@@ -27,6 +27,7 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception as invalid_parameter_exceptionAlias;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
+use Random\RandomException;
 use required_capability_exception;
 use function get_coursemodule_from_instance;
 
@@ -63,6 +64,7 @@ class get_assets_split extends external_api {
      * @param int $countpalettes
      * @param int $countavatars
      * @return array
+     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exceptionAlias
      * @throws required_capability_exception
@@ -133,10 +135,12 @@ class get_assets_split extends external_api {
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
         $retpalettes = $retavatars = [];
         $maxavatars = 0;
+        $sessionkeys = [];
         $mmogame->get_assets_split(
             $countsplit,
             $countpalettes,
             $countavatars,
+            $sessionkeys,
             $retpalettes,
             $retavatars,
             $maxavatars,
@@ -159,6 +163,7 @@ class get_assets_split extends external_api {
             'colorpalettes' => $palettes,
             'colorpaletteids' => $paletteids,
             'numavatars' => min($maxavatars, $countavatars),
+            'sessionkeys' => $sessionkeys,
         ];
     }
 
@@ -190,6 +195,11 @@ class get_assets_split extends external_api {
                 VALUE_OPTIONAL
             ),
             'numavatars' => new external_value(PARAM_INT, 'The number of avatars'),
+            'sessionkeys' => new external_multiple_structure(
+                new external_value(PARAM_ALPHANUM, 'A session key'),
+                'The list of session keys',
+                VALUE_OPTIONAL
+            ),
         ]);
     }
 
