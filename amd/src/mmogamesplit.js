@@ -529,11 +529,11 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 this.area = undefined;
 
                 this.computeSizes(0);
-                this.gateSendGetAssets();
+                this.gateSendStartSessions();
             });
         }
 
-        gateSendGetAssets() {
+        gateSendStartSessions() {
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -546,7 +546,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 };
                 // Calling the service through the Moodle AJAX API
                 let getAssets = Ajax.call([{
-                    methodname: 'mod_mmogame_get_assets_split',
+                    methodname: 'mod_mmogame_start_sessions',
                     args: params
                 }]);
                 // Handling the response
@@ -559,10 +559,9 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                         numavatars: numavatars,
                     };
                     this.sessionkeys = sessionkeys;
-                    console.log(this.info);
                     this.gateCreateScreen();
                 }).fail((error) => {
-                    this.showError('gateSendGetAssets', error);
+                    this.showError('gateSendStartSessions', error);
                     return error;
                 });
             });
@@ -586,7 +585,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             } else {
                 this.kinduser = user;
             }
-            this.gateSendGetAssets();
+            this.gateSendStartSessions();
         }
 
         createDivMessageStart(message) {

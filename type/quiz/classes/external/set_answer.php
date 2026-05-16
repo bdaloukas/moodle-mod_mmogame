@@ -17,7 +17,6 @@
 namespace mmogametype_quiz\external;
 
 use coding_exception;
-use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -42,11 +41,7 @@ class set_answer extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
-            'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
             'sessionkey' => new external_value(PARAM_ALPHANUM, 'The sessionkey of the attempt'),
-            'attempt' => new external_value(PARAM_INT, 'The id of the attempt'),
             'attemptkey' => new external_value(PARAM_ALPHANUM, 'The attemptkey of the attempt'),
             'answer' => new external_value(PARAM_TEXT, 'The answer', VALUE_DEFAULT, ''),
             'subcommand' => new external_value(PARAM_ALPHANUM, 'Subcommand'),
@@ -56,99 +51,53 @@ class set_answer extends external_api {
     /**
      * Implements the service logic.
      *
-     * @param int $mmogameid
-     * @param string $kinduser
-     * @param string $user
      * @param string $sessionkey
-     * @param int $attempt
      * @param string $attemptkey
      * @param ?string $answer
      * @param string $subcommand
      * @return string
+     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
      * @throws restricted_context_exception
-     * @throws RandomException
      */
     public static function execute(
-        int $mmogameid,
-        string $kinduser,
-        string $user,
         string $sessionkey,
-        int $attempt,
         string $attemptkey,
         ?string $answer,
         string $subcommand
     ): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
-            'mmogameid' => $mmogameid,
-            'kinduser' => $kinduser,
-            'user' => $user,
-            'attemptkey' => $attemptkey,
-            'attempt' => $attempt,
             'sessionkey' => $sessionkey,
+            'attemptkey' => $attemptkey,
             'answer' => $answer,
             'subcommand' => $subcommand,
         ]);
         $answer = trim((string)$answer);
 
-        if ($mmogameid <= 0) {
-            return self::error('invalid_mmogameid');
+        if ($sessionkey === '') {
+            return self::error('invalid_sessionkey');
         }
 
-        $user = trim($user);
-
-        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
-            return self::error('invalid_user');
-        }
-
-        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
-
-        if (!in_array($kinduser, $allowedkindusers, true)) {
-            return self::error('invalid_kinduser');
-        }
-
-        // Perform security checks.
-        if ($kinduser === 'moodle') {
-            $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
-            $context = module::instance($cm->id);
-            self::validate_context($context);
-            require_capability('mod/mmogame:play', $context);
-        }
-
-        $ret = [];
-
-        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
-        if ($auserid == null) {
+        $db = new mmogame_database_moodle();
+        $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
+        if ($auser === null) {
             return self::error('no_user');
         }
+        $ret = [];
 
-        if ($attempt <= 0) {
-            return self::error('invalid_attempt');
-        }
+        $mmogame = mmogame::create($db, $auser->mmogameid);
 
         if (strlen($answer) > 1000) {
             return self::error('answer_too_long');
         }
 
-        $answerid = intval($answer);
-        if ($answerid < 0) {
-            return self::error('invalid_answerid');
-        }
-
-        $allowedsubcommands = ['', 'answer', 'tool', 'clear'];
-
-        if (!in_array($subcommand, $allowedsubcommands, true)) {
-            return self::error('bad_subcommand');
-        }
-
-        $mmogame->login_user($auserid);
+        $mmogame->login_user($auser->id);
 
         // Checks also than sessionkey is valid for this attempt.
-        $mmogame->set_answer_mode($ret, $attempt, $attemptkey, $answer, $answerid, $subcommand, $sessionkey);
+        $mmogame->set_answer_mode($ret, $attemptkey, $answer, $subcommand, $sessionkey);
 
         return json_encode($ret);
     }

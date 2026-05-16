@@ -68,25 +68,16 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             let avatarids = [];
             const info = this.info;
             this.avatarfiles = [];
-            let splits = '';
             for (let i = 0; i < this.splits.length; i++) {
                 const sp = this.splits[i];
                 avatarids.push(sp.avatarid);
                 this.avatarfiles.push(info.avatars[this.gategetavatar(i, sp.avatarpos)]);
-                if (i > 0) {
-                    splits += ",";
-                }
-                splits += i;
             }
 
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
-                    mmogameid: this.mmogameid,
-                    kinduser: this.kinduser,
-                    user: this.user,
                     sessionkeys: this.sessionkeys.join(','),
-                    splits: splits,
                     avatarids: avatarids.join(','),
                 };
                 console.log("callGetAttemptsSplit", params);
@@ -97,14 +88,13 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 }]);
 
                 // Handling the response
-                getAttemptsSplit[0].done(({avatars, attempts, attemptkeys, attemptqueryids, querydefinitions, querytips,
+                getAttemptsSplit[0].done(({avatars, attemptkeys, attemptqueryids, querydefinitions, querytips,
                                               queryanswerids, numattempts, answertexts, aduels,
-                                              aduelavatars, aduelcorrects, auserids, queryanswerids0, grades,
+                                              aduelavatars, aduelcorrects, queryanswerids0, grades,
                                               countquestion, countcorrect, islastcorrect, ranks, queryranks,
                                               hasidea, state, statetime}) => {
                     this.info = {
                         avatars: avatars,
-                        attempts: attempts,
                         attemptkeys: attemptkeys,
                         paletteid: this.paletteid,
                         attemptqueryids: attemptqueryids,
@@ -116,7 +106,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         aduels: aduels,
                         aduelavatars: aduelavatars,
                         aduelcorrects: aduelcorrects,
-                        auserids: auserids,
                         queryanswerids0: queryanswerids0,
                         grades: grades,
                         countquestion: countquestion,
@@ -545,16 +534,13 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
 console.log("info=", info);
             const aduelcorrects = info.aduelcorrects[splitInfo].split(',');
             const numattempts = info.numattempts[splitInfo].split(",");
-            sp.auserid = info.auserids[splitInfo];
-            let attempts = info.attempts[splitInfo].split(",");
             let attemptkeys = info.attemptkeys[splitInfo].split(",");
             sp.attempts = [];
             sp.score = parseInt(info.grades[splitInfo]);
             sp.rank = parseInt(info.ranks[splitInfo]);
             sp.countcorrect = info.countcorrect[splitInfo];
-            for (let i = 0; i < attempts.length; i++) {
-                let item = {attemptid: attempts[i]};
-                item.attemptkey = attemptkeys[i];
+            for (let i = 0; i < attemptkeys.length; i++) {
+                let item = {attemptkey: attemptkeys[i]};
                 item.queryid = queryids[i];
                 item.islastcorrect = info.islastcorrect[item.queryid];
                 item.definition = info.querydefinitions[item.queryid];
@@ -821,7 +807,6 @@ console.log("info=", info);
             const pos = sp.aRandom[sp.selectedAnswer];
             const info = {
                 split: split,
-                attemptid: attempt.attemptid,
                 attemptkey: attempt.attemptkey,
                 iscorrect: iscorrect,
                 answer: attempt.answerids0[pos],
@@ -1089,8 +1074,6 @@ console.log("info=", info);
                 sp.aduelavatarelement.remove();
                 sp.aduelavatarelement = undefined;
             }
-            let splits = [];
-            let attempts = [];
             let sessionkeys = [];
             let attemptkeys = [];
             let answers = [];
@@ -1102,14 +1085,13 @@ console.log("info=", info);
             let spidea = -1;
             for (let i = 0; i < this.splits.length; i++) {
                 const sp2 = this.splits[i];
+                const sessionkey = this.sessionkeys[i];
                 if (sp2.attempts.length === 0) {
                     returnsplits.push(i);
                 }
                 for (let j = 0; j < sp2.server.length; j++) {
                     const temp = sp2.server[j];
-                    splits.push(temp.split);
-                    attempts.push(temp.attemptid);
-                    sessionkeys.push(this.sessionkeys[j]);
+                    sessionkeys.push(sessionkey);
                     attemptkeys.push(temp.attemptkey);
                     answers.push(temp.answer);
                     timestarts.push(temp.timestart);
@@ -1120,26 +1102,11 @@ console.log("info=", info);
                     }
                 }
             }
-            if (splits.length === 0) {
-                // Autorepair.
-                for (let i = 0; i < this.splits.length; i++) {
-                    if (this.splits[i].attempts.length === 0) {
-                        splits.push(i);
-                    }
-                }
-                if (splits.length === 0) {
-                    splits.push(0);
-                }
-            }
+
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
-                    mmogameid: this.mmogameid,
-                    kinduser: this.kinduser,
-                    user: this.user,
                     sessionkeys: sessionkeys.join(','),
-                    splits: splits.join(','),
-                    attempts: attempts.join(','),
                     attemptkeys: attemptkeys.join(','),
                     answers: answers.join(','),
                     timestarts: timestarts.join(','),
@@ -1154,12 +1121,13 @@ console.log("info=", info);
                     args: params
                 }]);
                 // Handling the response
-                sendAnswers[0].done(({avatars, attempts, attemptkeys, attemptqueryids, querydefinitions, querytips,
-                                         queryanswerids, numattempts, answertexts, aduels,
-                                         aduelavatars, aduelcorrects, auserids, queryanswerids0,
-                                         grades, savedattempts, countquestion, countcorrect, islastcorrect, ranks, queryranks,
+                sendAnswers[0].done(({avatars, attemptkeys, attemptqueryids,numattempts,
+                                         querydefinitions, querytips,
+                                         queryanswerids, answertexts, aduels,
+                                         aduelavatars, aduelcorrects, queryanswerids0,
+                                         grades, countquestion, countcorrect, islastcorrect, ranks, queryranks,
                                          state, statetime}) => {
-
+console.log("sendAnswers done");
                     if (spidea >= 0) {
                         this.showIdea(spidea, querydefinitions, queryanswerids0, querytips, answertexts);
                         return;
@@ -1167,7 +1135,6 @@ console.log("info=", info);
 
                     this.info = {
                         avatars: avatars,
-                        attempts: attempts,
                         attemptkeys: attemptkeys,
                         paletteid: this.paletteid,
                         attemptqueryids: attemptqueryids,
@@ -1179,7 +1146,6 @@ console.log("info=", info);
                         aduels: aduels,
                         aduelavatars: aduelavatars,
                         aduelcorrects: aduelcorrects,
-                        auserids: auserids,
                         queryanswerids0: queryanswerids0,
                         grades: grades,
                         countquestion: countquestion,
@@ -1190,7 +1156,7 @@ console.log("info=", info);
                         state: state,
                         statetime: statetime,
                     };
-                    this.removeFromServer(savedattempts);
+                    this.removeFromServer(attemptkeys);
                     if (this.info.state === 0) {
                         this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                         setTimeout(() => {
@@ -1207,6 +1173,7 @@ console.log("info=", info);
                     }
                     this.showCursor(sp, false);
                 }).fail((error) => {
+                    console.log("sendAnswers fail", error);
                     this.showError("mmogametypequizsplit.asknextquestion");
                     this.showCursor(sp, false);
                     return error;
@@ -1468,16 +1435,16 @@ console.log("info=", info);
             });
         }
 
-        removeFromServer(savedattempts) {
+        removeFromServer(attemptkeys) {
             for (let i = 0; i < this.splits.length; i++) {
                 const sp = this.splits[i];
                 let j = 0;
                 while (j < sp.server.length) {
                     const server = sp.server[j];
-                    const index = savedattempts.indexOf(parseInt(server.attemptid));
+                    const index = attemptkeys.indexOf(server.attemptkey);
                     if (index !== -1) {
                         sp.server.splice(j, 1);
-                        savedattempts.splice(index, 1);
+                        attemptkeys.splice(index, 1);
                     } else {
                         j++;
                     }

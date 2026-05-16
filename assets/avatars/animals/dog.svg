@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg3198" viewBox="0 0 380.09 287.01" version="1.0">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg3198" viewBox="0 0 380.09 287.01" version="1.0">
+<desc>Asset licensing information. Title: Perro Amarillo. Creator: egonpin. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs3200">
     <filter id="filter3161" y="-.32618" width="1.598" x="-.299" height="1.6524">
       <feGaussianBlur id="feGaussianBlur3163" stdDeviation="1.8152504"/>
@@ -55,49 +57,4 @@
       <path id="path3155" opacity=".9" filter="url(#filter3161)" d="m31.57 493.22c0.001 3.69-3.261 6.68-7.286 6.68-4.024 0-7.286-2.99-7.285-6.68-0.001-3.69 3.261-6.68 7.285-6.68 4.025 0 7.287 2.99 7.286 6.68z" fill="#fff"/>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Perro Amarillo</dc:title>
-        <dc:date>2007-08-27T14:06:15</dc:date>
-        <dc:description>animal, animal, caricature, caricature, cartoon, cartoon, clip art, clipart, dog, dog, how i did it, image, media, png, public domain, svg, yellow, yellow, </dc:description>
-        <dc:source>http://openclipart.org/detail/5016/perro-amarillo-by-egonpin-5016</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>egonpin</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>animal</rdf:li>
-            <rdf:li>caricature</rdf:li>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>clip art</rdf:li>
-            <rdf:li>clipart</rdf:li>
-            <rdf:li>dog</rdf:li>
-            <rdf:li>how i did it</rdf:li>
-            <rdf:li>image</rdf:li>
-            <rdf:li>media</rdf:li>
-            <rdf:li>png</rdf:li>
-            <rdf:li>public domain</rdf:li>
-            <rdf:li>svg</rdf:li>
-            <rdf:li>yellow</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

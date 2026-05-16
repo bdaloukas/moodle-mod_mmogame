@@ -42,9 +42,6 @@ class get_highscore extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
-            'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_TEXT, 'User identifier'),
             'sessionkey' => new external_value(PARAM_ALPHANUM, 'Session key'),
             'count' => new external_value(PARAM_INT, 'How many users'),
         ]);
@@ -53,9 +50,6 @@ class get_highscore extends external_api {
     /**
      * Implements the service logic.
      *
-     * @param int $mmogameid
-     * @param string $kinduser
-     * @param string $user
      * @param string $sessionkey
      * @param int $count
      * @return string
@@ -65,29 +59,26 @@ class get_highscore extends external_api {
      * @throws required_capability_exception
      * @throws restricted_context_exception
      */
-    public static function execute(int $mmogameid, string $kinduser, string $user, string $sessionkey, int $count): string {
+    public static function execute(string $sessionkey, int $count): string {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
-            'mmogameid' => $mmogameid,
-            'kinduser' => $kinduser,
-            'user' => $user,
             'sessionkey' => $sessionkey,
             'count' => $count,
         ]);
-
-        $user = trim($user);
-
-        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
-            return self::error('invalid_user');
-        }
 
         if ($count <= 0 || $count > 50) {
             return self::error('invalid_count');
         }
 
-        // Perform security checks.
-        if ($kinduser === 'moodle') {
-            $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
+        $db = new mmogame_database_moodle();
+        $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
+        if ($auser === null) {
+            return self::error('no_user');
+        }
+
+        if ($auser->kind === 'moodle') {
+            // Perform security checks.
+            $cm = get_coursemodule_from_instance('mmogame', $auser->mmogameid);
             $context = module::instance($cm->id);
             self::validate_context($context);
             require_capability('mod/mmogame:play', $context);
@@ -95,21 +86,9 @@ class get_highscore extends external_api {
 
         $ret = [];
 
-        if ($mmogameid <= 0) {
-            return self::error('invalid_mmogameid');
-        }
-        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
-        if (!in_array($kinduser, $allowedkindusers, true)) {
-            return self::error('invalid_kinduser');
-        }
-        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0, null);
+        $mmogame = mmogame::create($db, $auser->mmogameid);
 
-        if (null === $auserid) {
-            return self::error('no_user');
-        }
-
-        $mmogame->login_user($auserid);
+        $mmogame->login_user($auser->id);
 
         $mmogame->get_highscore($count, $ret);
 

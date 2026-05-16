@@ -23,7 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_mmogame\external\get_assets;
+use mod_mmogame\external\start_session;
+use mod_mmogame\external\start_sessions;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -57,20 +58,24 @@ class mmogame_generator_testcase extends advanced_testcase {
                 'kinduser' => 'guid', 'enabled' => 1]
         );
         // Test 1: Call without optional parameter avatars, colorpalettes.
-        $class = new get_assets();
-        $result = $class->execute($rgame->id, 'moodle', $USER->id);
+        $startsession = new start_session();
+        $result = $startsession->execute($rgame->id, 'moodle', $USER->id);
 
         $this->assertArrayNotHasKey('avatars', $result);
         $this->assertArrayNotHasKey('colorpalettes', $result);
 
         // Test 2: Call with only 1 optional parameter avatars, colorpalettes.
-        $result = $class->execute($rgame->id, 'moodle', $USER->id, 1, 1);
+        $result = $startsession->execute($rgame->id, 'moodle', $USER->id, 1, 1);
         $this->assertArrayHasKey('avatars', $result);
         $this->assertArrayHasKey('colorpalettes', $result);
 
         // Test 3: Call with 10 optional parameter avatars, colorpalettes.
-        $result = $class->execute($rgame->id, 'moodle', $USER->id, 10, 10);
+        $result = $startsession->execute($rgame->id, 'moodle', $USER->id, 10, 10);
         $this->assertArrayHasKey('avatars', $result);
         $this->assertArrayHasKey('colorpalettes', $result);
+
+        // Test 4: Test startsessions.
+        $startsession = new start_sessions();
+        $startsession->execute($rgame->id, 'moodle', $USER->id, 8, 10, 10);
     }
 }

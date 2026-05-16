@@ -290,17 +290,16 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @param stdClass $query
      * @param ?string $useranswer
-     * @param ?int $useranswerid
      * @param mmogame $mmogame
      * @param float $fraction
      *
      * @return true or false
      */
-    public function is_correct(stdClass $query, ?string $useranswer, ?int $useranswerid, mmogame $mmogame, float &$fraction): bool {
+    public function is_correct(stdClass $query, ?string $useranswer, mmogame $mmogame, float &$fraction): bool {
         if ($query->qtype == 'shortanswer') {
             return $this->is_correct_shortanswer($query, $useranswer, $mmogame);
         } else {
-            return $this->is_correct_multichoice($query, $useranswer, $useranswerid, $fraction);
+            return $this->is_correct_multichoice($query, $useranswer, $fraction);
         }
     }
 
@@ -326,14 +325,13 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @param stdClass $query
      * @param string|null $useranswer
-     * @param ?int $useranswerid
      * @param float $fraction
      *
      * @return true or false
      */
-    protected function is_correct_multichoice(stdClass $query, ?string $useranswer, ?int $useranswerid, float &$fraction): bool {
+    protected function is_correct_multichoice(stdClass $query, ?string $useranswer, float &$fraction): bool {
         if ($query->multichoice->single) {
-            return $this->is_correct_multichoice_single1($query, $useranswerid, $fraction);
+            return $this->is_correct_multichoice_single1($query, intval($useranswer), $fraction);
         } else {
             return $this->is_correct_multichoice_single0($query, $useranswer, $fraction);
         }

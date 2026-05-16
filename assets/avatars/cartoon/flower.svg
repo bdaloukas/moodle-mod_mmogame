@@ -1,5 +1,6 @@
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" width="300" height="300" id="svg3005" version="1.1" viewBox="0 0 300 300">
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" id="svg3005" version="1.1" viewBox="0 0 300 300">
+<desc>Asset licensing information. Title: Flower. Creator: jpenrici. License: CC0 1.0 Universal / Public Domain Dedication.</desc>
+
   <title id="title3530">Flower</title>
   <defs id="defs3007">
     <filter style="color-interpolation-filters:sRGB" id="filter4272" x="-0.012062776" width="1.0241256" y="-0.011937874" height="1.0238757">
@@ -33,42 +34,6 @@
       <feGaussianBlur stdDeviation="0.34853157" id="feGaussianBlur5175"/>
     </filter>
   </defs>
-  <metadata id="metadata3010">
-    <rdf:RDF>
-      <cc:Work rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <dc:title>Flower</dc:title>
-        <dc:date>Abril 2015</dc:date>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>jpenrici</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:publisher>
-          <cc:Agent>
-            <dc:title>Open Clip Art Library</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <cc:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/"/>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>plant</rdf:li>
-            <rdf:li>flora</rdf:li>
-            <rdf:li>nature</rdf:li>
-            <rdf:li>clip art</rdf:li>
-            <rdf:li>clipart</rdf:li>
-            <rdf:li>svg</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
   <g id="layer1" transform="translate(0,-752.36218)">
     <g id="g5177" transform="matrix(0.99967611,0,0,1.059367,-3.3582616,-70.618844)">
       <g style="fill:#225500;stroke:none;filter:url(#filter5145)" transform="matrix(0.92995538,0,0,0.92995538,188.78229,48.797896)" id="g5054">

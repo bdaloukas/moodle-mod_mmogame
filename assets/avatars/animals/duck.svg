@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" space="preserve" viewBox="0 0 387.721 307.91" enable-background="new 0 0 387.721 307.91" overflow="visible">
+<svg xmlns="http://www.w3.org/2000/svg" space="preserve" viewBox="0 0 387.721 307.91" enable-background="new 0 0 387.721 307.91" overflow="visible">
+<desc>Asset licensing information. Title: Rubber Duck. Creator: Gerald_G. Source: Openclipart. License: Public Domain.</desc>
+
   <g id="Layer_1">
     <g clip-rule="evenodd" fill-rule="evenodd">
       <path d="m193.86 224.97c107.01 0 193.86 18.578 193.86 41.471s-86.85 41.473-193.86 41.473c-107.01 0-193.86-18.58-193.86-41.47s86.849-41.47 193.86-41.47" fill="#80C2FF"/>
@@ -21,48 +23,4 @@
       <path d="m314.57 54.742c-2.809-2.196-12.205-3.672-15.84-2.484-3.637 1.332-5.328 5.832-5.473 9.9-0.217 3.852 1.439 10.728 4.969 13.392 3.527 2.484 12.023 2.592 16.344 1.98 4.211-0.684 8.855-3.276 8.928-5.436-0.072-2.232-7.488-4.572-8.928-7.452-1.59-2.988 2.63-7.812 0-9.9z" fill="#DA4100"/>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Rubber Duck</dc:title>
-        <dc:date>2007-11-22T23:44:11</dc:date>
-        <dc:description>animal, bath, clip art, clipart, duck, image, media, png, public domain, rubber, svg, toy, </dc:description>
-        <dc:source>http://openclipart.org/detail/8881/rubber-duck-by-gerald_g-8881</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>Gerald_G</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>animal</rdf:li>
-            <rdf:li>bath</rdf:li>
-            <rdf:li>clip art</rdf:li>
-            <rdf:li>clipart</rdf:li>
-            <rdf:li>duck</rdf:li>
-            <rdf:li>image</rdf:li>
-            <rdf:li>media</rdf:li>
-            <rdf:li>png</rdf:li>
-            <rdf:li>public domain</rdf:li>
-            <rdf:li>rubber</rdf:li>
-            <rdf:li>svg</rdf:li>
-            <rdf:li>toy</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

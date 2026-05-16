@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_mmogame\external\get_assets;
-use mod_mmogame\external\get_assets_split;
+use mod_mmogame\external\start_session;
+use mod_mmogame\external\start_sessions;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
 
@@ -78,14 +78,14 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $mmogame = mmogame::create(new mmogame_database_moodle(), $rgame->id);
         $mmogame->update_state(1);
 
-        $classgetassets = new get_assets();
-        $result = $classgetassets->execute($rgame->id, 'moodle', $USER->id, 10, 10);
+        $startsession = new start_session();
+        $result = $startsession->execute($rgame->id, 'moodle', $USER->id, 10, 10);
         $sessionkey = $result['sessionkey'];
 
         // Command get_attempt with empty questionbank.
         $mmogame->update_state(1);
-        $classgetattempt = new mmogametype_quiz\external\get_attempt();
-        $result = json_decode($classgetattempt->execute($rgame->id, 'moodle', $USER->id, $sessionkey, 1, 1));
+        $getattempt = new mmogametype_quiz\external\get_attempt();
+        $result = json_decode($getattempt->execute($sessionkey, "test", 1, 1, ''));
         $this->assertTrue($result->attempt === 0);
 
         // Command get_attempt with 1 question.
@@ -100,18 +100,14 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
             $answertexts
         );
         $mmogame->update_state(1);
-        $result = json_decode($classgetattempt->execute($rgame->id, 'moodle', $USER->id, $sessionkey, 'Test', 1, 1));
+        $result = json_decode($getattempt->execute($sessionkey, 'Test', 1, 1));
         $this->assertTrue($result->attempt != 0);
 
         // Command set_answer correct.
-        $classsetanswer = new mmogametype_quiz\external\set_answer();
+        $setanswer = new mmogametype_quiz\external\set_answer();
         $result2 = json_decode(
-            $classsetanswer->execute(
-                $rgame->id,
-                'moodle',
-                $USER->id,
+            $setanswer->execute(
                 $sessionkey,
-                $result->attempt,
                 $result->attemptkey,
                 $answerids[0],
                 ''
@@ -123,12 +119,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         // Command set_answer error.
         $this->assertTrue($result2->attempt != 0);
         $result2 = json_decode(
-            $classsetanswer->execute(
-                $rgame->id,
-                'moodle',
-                $USER->id,
+            $setanswer->execute(
                 $sessionkey,
-                $result->attempt,
                 $result->attemptkey,
                 $answerids[1],
                 ''
@@ -188,24 +180,21 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         // Set state to playing.
         $mmogame->update_state(1);
 
-        $classgetassets = new get_assets();
-        $result = $classgetassets->execute($rgame->id, 'moodle', $USER->id, 10, 10);
+        $startsession = new start_session();
+        $result = $startsession->execute($rgame->id, 'moodle', $USER->id, 10, 10);
         $sessionkey = $result['sessionkey'];
 
         // Gets the first question.
-        $classgetattempt = new mmogametype_quiz\external\get_attempt();
+        $getattempt = new mmogametype_quiz\external\get_attempt();
         global $USER;
-        $result = json_decode($classgetattempt->execute($rgame->id, 'moodle', $USER->id, $sessionkey, 1, 1));
+        $result = json_decode($getattempt->execute($sessionkey, "Test", 1, 1, ''));
         $this->assertTrue($result->attempt != 0);
 
         // Gives the correct answer.
-        $classsetanswer = new mmogametype_quiz\external\set_answer();
+        $setanswer = new mmogametype_quiz\external\set_answer();
         $result = json_decode(
-            $classsetanswer->execute(
-                $rgame->id,
-                'moodle',
-                $USER->id,
-                $result->attempt,
+            $setanswer->execute(
+                $sessionkey,
                 $result->attemptkey,
                 $answerids[0],
                 ''
@@ -214,14 +203,11 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $this->assertTrue($result->iscorrect == 1);
 
         // Gives the wrong answer.
-        $result = json_decode($classgetattempt->execute($rgame->id, 'moodle', $USER->id, $sessionkey, 1, 1));
+        $result = json_decode($getattempt->execute($sessionkey, 'moodle', 1, 1, ''));
         $this->assertTrue($result->attempt != 0);
         $result = json_decode(
-            $classsetanswer->execute(
-                $rgame->id,
-                'moodle',
-                $USER->id,
-                $result->attempt,
+            $setanswer->execute(
+                $sessionkey,
                 $result->attemptkey,
                 $answerids[1],
                 '',
@@ -231,10 +217,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
         // Use tool1 (50x50).
         $result = json_decode(
-            $classgetattempt->execute(
-                $rgame->id,
-                'moodle',
-                $USER->id,
+            $getattempt->execute(
                 $sessionkey,
                 'Test nickname',
                 1,
@@ -244,8 +227,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         );
         $this->assertTrue($result->attempt != 0);
 
-        $classgethighscore = new mmogametype_quiz\external\get_highscore();
-        $result = json_decode($classgethighscore->execute($rgame->id, 'moodle', $USER->id, $sessionkey, 3));
+        $gethighscore = new mmogametype_quiz\external\get_highscore();
+        $result = json_decode($gethighscore->execute($sessionkey, 3));
         $this->assertTrue($result->count == 1);
 
         // Reset data.
@@ -313,8 +296,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         // Set state to playing.
         $mmogame->update_state(1);
 
-        $classgetassets = new get_assets_split();
-        $result = $classgetassets->execute($rgame->id, 'moodle', $USER->id, 8, 10);
+        $startsessions = new start_sessions();
+        $result = $startsessions->execute($rgame->id, 'moodle', $USER->id, 8, 10);
         $sessionkeys = $result['sessionkeys'];
 
         for ($step = 1; $step <= 100; $step++) {
@@ -322,39 +305,28 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 $mmogame->update_state(1);
             }
 
-            $classgetattempt = new mmogametype_quiz\external\get_attempts_split();
-            $result = $classgetattempt->execute(
-                $rgame->id,
-                'guid',
-                'testq',
-                implode( ',', $sessionkeys),
-                '1,2,3,4',
-                '0,1,2,3'
+            $getattempt = new mmogametype_quiz\external\get_attempts_split();
+            $result = $getattempt->execute(
+                implode(',', $sessionkeys),
+                '1,2,3,4,5,6,7,8',
             );
+
+            $this->assertFalse(isset($result['errorcode']) && $result['errorcode'] != '');
             if ($result['state'] == 0 && $step == 1) {
                 continue;   // What is expected (state=0).
             }
-            $splits = [0, 1, 2, 2];
+            $used = [0, 1, 2, 2];
             $iscorrects = [0, 1, 1, 1];
-            $attempts = $timestarts = $timeanswers = $answers = [];
-            $pos = -1;
+            $timestarts = $timeanswers = $answers = [];
             $newsplits = [];
             $tools = [];
-            foreach ($splits as $split) {
-                $pos++;
-                $a = explode(',', $result['attempts'][$split]);
-                $attempts[] = array_shift($a);
-                $result['attempts'][$split] = implode(',', $a);
+            $attemptkeys = $usedsessionkeys = [];
+            foreach ($used as $pos) {
+                $usedsessionkeys[] = $sessionkeys[$pos];
+                $s = $result['attemptkeys'][$pos];
+                $a = explode(',', $s);
+                $attemptkeys[] = $a[0];
 
-                if (count($a) == 0) {
-                    $newsplits[] = $split;
-                }
-
-                $a = explode(',', $result['attemptqueryids'][$split]);
-                $queryid = array_shift($a);
-                $result['attemptqueryids'][$split] = implode(',', $a);
-
-                $answerids = $result['queryanswerids'][$queryid];
                 $iscorrect = $iscorrects[$pos];
                 $answers[] = $iscorrect ? $answerids[0] : $answerids[1];
 
@@ -362,15 +334,10 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 $timeanswers[] = time();
                 $tools[] = 0;
             }
-            $classsendanswers = new mmogametype_quiz\external\send_answers_split();
-            $classsendanswers->execute(
-                $rgame->id,
-                'guid',
-                'testq',
-                implode( ',', $sessionkeys),
-                implode(',', $splits),
-                implode(',', $attempts),
-                implode(',', $result['attemptkeys']),
+            $sendanswers = new mmogametype_quiz\external\send_answers_split();
+            $sendanswers->execute(
+                implode(',', $usedsessionkeys),
+                implode(',', $attemptkeys),
                 implode(',', $answers),
                 implode(',', $timestarts),
                 implode(',', $timeanswers),

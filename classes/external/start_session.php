@@ -37,7 +37,7 @@ use required_capability_exception;
  * @copyright 2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_assets extends external_api {
+class start_session extends external_api {
     /**
      * Returns description of method parameters
      * @return external_function_parameters
@@ -100,6 +100,14 @@ class get_assets extends external_api {
             return self::error('invalid_user');
         }
 
+        if ($kinduser === 'moodle') {
+            // Perform security checks.
+            $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
+            $context = module::instance($cm->id);
+            self::validate_context($context);
+            require_capability('mod/mmogame:play', $context);
+        }
+
         $allowedkindusers = ['moodle', 'wordpress', 'guid'];
 
         if (!in_array($kinduser, $allowedkindusers, true)) {
@@ -124,11 +132,12 @@ class get_assets extends external_api {
         $result = [];
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        [$auserid, $result['sessionkey']] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, true, 0);
+        $user = mmogame::get_asuerid($mmogame->get_db(), $mmogameid, $kinduser, $user, true, 0);
+        $result['sessionkey'] = $user->sessionkey;
 
         // Generate avatars array if avatars > 0.
         if ($avatars > 0) {
-            self::compute_avatars($mmogame, $auserid, $avatars, $result);
+            self::compute_avatars($mmogame, $user->id, $avatars, $result);
         }
         // Generate colorpalettes array if colorpalettes > 0.
         if ($colorpalettes > 0) {

@@ -1195,5 +1195,38 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
+    if ($oldversion < ($ver = 2026051500)) {
+        // Define field mmogameid to be added to mmogame_aa_users.
+        $table = new xmldb_table('mmogame_aa_users');
+        $field = new xmldb_field('mmogameid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'id');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026051501)) {
+        $table = new xmldb_table('mmogame_aa_users');
+        $index = new xmldb_index('usercontext', XMLDB_INDEX_UNIQUE, ['mmogameid', 'kind', 'instanceid', 'splitnum']);
+
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026051502)) {
+        $table = new xmldb_table('mmogame_aa_users');
+        $index = new xmldb_index('sessionkey', XMLDB_INDEX_UNIQUE, ['sessionkey']);
+
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }

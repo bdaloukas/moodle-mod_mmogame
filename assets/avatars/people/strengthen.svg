@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 449.7 718.26" version="1.0">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg2" viewBox="0 0 449.7 718.26" version="1.0">
+<desc>Asset licensing information. Title: Strengthen. Creator: Machovka. Source: Openclipart. License: Public Domain.</desc>
+
   <g id="layer1" transform="translate(-168.2 -175.81)">
     <g id="g4491">
       <g id="g4366" transform="matrix(.99093 .13438 -.13438 .99093 89.449 -50.84)">
@@ -103,46 +105,4 @@
       </g>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Strengthen</dc:title>
-        <dc:date>2006-12-25T17:31:31</dc:date>
-        <dc:description/>
-        <dc:source>https://openclipart.org/detail/2267/strengthen-by-machovka</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>Machovka</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>activity</rdf:li>
-            <rdf:li>athletics</rdf:li>
-            <rdf:li>boy</rdf:li>
-            <rdf:li>child</rdf:li>
-            <rdf:li>exercise</rdf:li>
-            <rdf:li>people</rdf:li>
-            <rdf:li>sport</rdf:li>
-            <rdf:li>strength</rdf:li>
-            <rdf:li>training</rdf:li>
-            <rdf:li>weight</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

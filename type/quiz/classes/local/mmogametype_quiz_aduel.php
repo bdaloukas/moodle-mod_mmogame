@@ -112,7 +112,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
                     );
                     return $this->get_attempt_new1();
                 }
-                continue;
             }
             if ($newplayer1) {
                 return $this->get_attempt_new1();
@@ -202,7 +201,6 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * @param stdClass $attempt The quiz attempt object.
      * @param stdClass $query The query object related to the quiz.
      * @param ?string $useranswer The user's answer as a string.
-     * @param ?int $useranswerid Optional user answer ID.
      * @param bool $autograde Whether autograding is enabled.
      * @param array $ret Output array for additional information.
      */
@@ -210,11 +208,10 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         stdClass $attempt,
         stdClass $query,
         ?string $useranswer,
-        ?int $useranswerid,
         bool $autograde,
         array &$ret
     ): void {
-        parent::set_answer($attempt, $query, $useranswer, $useranswerid, $autograde, $ret);
+        parent::set_answer($attempt, $query, $useranswer, $autograde, $ret);
 
         $ret['iscorrect'] = $attempt->iscorrect;
         if ($this->auserid == $this->aduel->auserid1) {
@@ -590,13 +587,11 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      */
     public function set_answer_mode(
         array &$ret,
-        ?int $attemptid,
         ?string $attemptkey,
         ?string $answer,
-        ?int $answerid = null,
         string $subcommand = ''
     ): ?stdClass {
-        $attempt = parent::set_answer_mode($ret, $attemptid, $attemptkey, $answer, $answerid, $subcommand);
+        $attempt = parent::set_answer_mode($ret, $attemptkey, $answer, $subcommand);
 
         $aduel = $this->aduel;
 

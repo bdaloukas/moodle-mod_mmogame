@@ -42,9 +42,6 @@ class get_attempt extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
-            'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
             'sessionkey' => new external_value(PARAM_ALPHANUMEXT, 'The session of the user'),
             'nickname' => new external_value(PARAM_TEXT, 'The nickname of the user', VALUE_DEFAULT, '', true),
             'avatarid' => new external_value(PARAM_INT, 'The ID of the avatar', VALUE_DEFAULT, 0, true),
@@ -56,9 +53,6 @@ class get_attempt extends external_api {
     /**
      * Implements the service logic.
      *
-     * @param int $mmogameid
-     * @param string $kinduser
-     * @param string $user
      * @param string $sessionkey
      * @param string|null $nickname
      * @param int|null $avatarid
@@ -70,11 +64,9 @@ class get_attempt extends external_api {
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
      * @throws restricted_context_exception
+     * @throws \dml_exception
      */
     public static function execute(
-        int $mmogameid,
-        string $kinduser,
-        string $user,
         string $sessionkey,
         ?string $nickname = null,
         ?int $avatarid = null,
@@ -88,9 +80,6 @@ class get_attempt extends external_api {
 
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
-            'mmogameid' => $mmogameid,
-            'kinduser' => $kinduser,
-            'user' => $user,
             'sessionkey' => $sessionkey,
             'nickname' => $nickname,
             'avatarid' => $avatarid,
@@ -98,19 +87,9 @@ class get_attempt extends external_api {
             'subcommand' => $subcommand,
         ]);
 
-        $user = trim($user);
-
-        if ($mmogameid <= 0) {
-            return self::error('invalid_mmogameid');
-        }
-
-        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
-            return self::error('invalid_user');
-        }
-
-        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
-        if (!in_array($kinduser, $allowedkindusers, true)) {
-            return self::error('invalid_kinduser');
+        $sessionkey = trim($sessionkey);
+        if (!is_string($sessionkey) || $sessionkey === '' || $sessionkey === '') {
+            return self::error('invalid_sessionkey');
         }
 
         $allowedsubcommands = ['', 'answer', 'tool', 'clear', 'tool1', 'tool2', 'tool3'];
@@ -127,37 +106,32 @@ class get_attempt extends external_api {
             return self::error('invalid_colorpaletteid');
         }
 
-        // Perform security checks.
-        if ($kinduser === 'moodle') {
-            $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
-            $context = module::instance($cm->id);
-            self::validate_context($context);
-            require_capability('mod/mmogame:play', $context);
-        }
-
         $ret = [];
 
-        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, false, 0);
-        if ($auserid === null) {
+        $db = new mmogame_database_moodle();
+        $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
+        if ($auser === null) {
             return self::error('no_user');
         }
+        $mmogame = mmogame::create( $db, $auser->mmogameid);
+        $mmogame->login_user($auser->id);
+
+        $rgame = $mmogame->get_rgame();
 
         // No selection of avatar and colorpalettes yet.
-        $grade = $mmogame->get_db()->get_record_select(
+        $grade = $db->get_record_select(
             'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
-            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]
+            [$auser->mmogameid, $rgame->numgame, $auser->id]
         );
+
         if ($grade === null) {
             return self::error('no_user');
         }
 
-        $mmogame->login_user($auserid);
-
         if ($nickname !== '' && $avatarid > 0 && $colorpaletteid > 0) {
             $nickname = mb_substr($nickname, 0, 50);
-            $info = $mmogame->get_avatar_info($auserid);
+            $info = $mmogame->get_avatar_info($auser->id);
             $mmogame->get_db()->update_record(
                 'mmogame_aa_grades',
                 ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid, 'colorpaletteid' => $colorpaletteid]

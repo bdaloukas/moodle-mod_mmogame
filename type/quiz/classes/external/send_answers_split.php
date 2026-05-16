@@ -17,13 +17,12 @@
 namespace mmogametype_quiz\external;
 
 use coding_exception;
-use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use core_external\restricted_context_exception;
+use dml_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
@@ -44,12 +43,7 @@ class send_answers_split extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
-            'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
             'sessionkeys' => new external_value(PARAM_TEXT, 'Comma-separated session keys'),
-            'splits' => new external_value(PARAM_TEXT, 'Comma-separated split IDs'),
-            'attempts' => new external_value(PARAM_TEXT, 'Comma-separated attempt IDs'),
             'attemptkeys' => new external_value(PARAM_TEXT, 'Comma-separated attempt keys'),
             'answers' => new external_value(PARAM_TEXT, 'Comma-separated answer IDs'),
             'timestarts' => new external_value(PARAM_TEXT, 'Comma-separated Unix timestamps'),
@@ -62,12 +56,7 @@ class send_answers_split extends external_api {
     /**
      * Implements the service logic.
      *
-     * @param int $mmogameid
-     * @param string $kinduser
-     * @param string $user
      * @param string $sessionkeys
-     * @param ?string $splits
-     * @param ?string $attempts
      * @param string|null $attemptkeys
      * @param ?string $answers
      * @param ?string $timestarts
@@ -79,16 +68,11 @@ class send_answers_split extends external_api {
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
-     * @throws restricted_context_exception
+     * @throws dml_exception
      */
     public static function execute(
-        int $mmogameid,
-        string $kinduser,
-        string $user,
         string $sessionkeys,
-        ?string $splits = null,
-        ?string $attempts = null,
-        ?string $attemptkeys = null,
+        ?string $attemptkeys,
         ?string $answers = null,
         ?string $timestarts = '',
         string $timeanswers = '',
@@ -97,12 +81,7 @@ class send_answers_split extends external_api {
     ): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
-            'mmogameid' => $mmogameid,
-            'kinduser' => $kinduser,
-            'user' => $user,
             'sessionkeys' => $sessionkeys,
-            'splits' => $splits,
-            'attempts' => $attempts,
             'attemptkeys' => $attemptkeys,
             'answers' => $answers,
             'timestarts' => $timestarts,
@@ -112,59 +91,34 @@ class send_answers_split extends external_api {
         ]);
 
         // Extracts array.
-        $splits = explode(',', $splits);
-        $attempts = explode(',', $attempts);
+        $sessionkeys = explode(',', $sessionkeys);
         $attemptkeys = explode(',', $attemptkeys);
         $answers = explode(',', $answers);
         $timeanswers = explode(',', $timeanswers);
         $timestarts = explode(',', $timestarts);
         $tools = explode(',', $tools);
-        $returnsplits = explode(',', $returnsplits);
 
-        $user = trim($user);
-
-        if ($mmogameid <= 0) {
-            return self::error('invalid_mmogameid');
-        }
-
-        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
-            return self::error('invalid_user');
-        }
-
-        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
-
-        if (!in_array($kinduser, $allowedkindusers, true)) {
-            return self::error('invalid_kinduser');
-        }
-
-        // Perform security checks.
-        $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
-        if ($kinduser === 'moodle') {
-            $context = module::instance($cm->id);
-            self::validate_context($context);
-            require_capability('mod/mmogame:play', $context);
-        }
-
-        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
+        $db = new mmogame_database_moodle();
         $auserids = [];
-        foreach ($splits as $split) {
-            [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, true, $split);
-            $auserids[] = $auserid;
+        $mmogameid = null;
+        foreach ($sessionkeys as $pos => $sessionkey) {
+            $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
+            if ($mmogameid == null) {
+                $mmogameid = $auser->mmogameid;
+            } else if ($mmogameid != $auser->mmogameid) {
+                return self::error('invalid_sessionkey ' . $pos);
+            }
+            $auserids[] = $auser->id;
         }
-        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
+        $mmogame = mmogame::create($db, $mmogameid);
 
         $ret = [];
-        $ids = [];
 
         $idea = 0;
-        foreach ($attempts as $pos => $attemptid) {
-            if (0 === (int) $attemptid) {
-                continue;
-            }
-
+        foreach ($attemptkeys as $pos => $attemptkey) {
             $tool = $tools[$pos];
 
-            $mmogame->login_user_nolog($auserids[$pos]);
+            $mmogame->login_user($auserids[$pos]);
 
             if ($tool & 4) {
                 // Special case (Idea button).
@@ -172,12 +126,15 @@ class send_answers_split extends external_api {
                 continue;
             }
 
-            $ids[] = $auserids[$pos];
+            if ($idea > 0) {
+                $queryids = $mmogame->idea();
+                return self::pack_idea($mmogame, $queryids);
+            }
+
             // Checks also than sessionkey is valid for this attempt.
             $mmogame->set_answer_mode(
                 $ret,
-                $attemptid,
-                $attemptkeys[$pos],
+                $attemptkey,
                 $answers[$pos],
                 $timestarts[$pos],
                 $timeanswers[$pos],
@@ -185,28 +142,9 @@ class send_answers_split extends external_api {
                 $tools[$pos]
             );
         }
-        if ($idea > 0) {
-            $mmogame->login_user_nolog($idea);
-            $queryids = $mmogame->idea();
-            return self::pack_idea($mmogame, $queryids);
-        }
 
-        $mmogame->login_user_log($ids);
-
-        $classgetattempt = new get_attempts_split();
-        $result = $classgetattempt->execute(
-            $mmogameid,
-            $kinduser,
-            $user,
-            $sessionkeys,
-            null,
-            implode(',', $returnsplits),
-        );
-
-        // Attempts that saved to database.
-        $result['savedattempts'] = $attempts;
-        $result['auserids'] = $auserids;
-        return $result;
+        $getattempts = new get_attempts_split();
+        return $getattempts->execute( implode( ',', $sessionkeys));
     }
 
     /**
@@ -218,9 +156,6 @@ class send_answers_split extends external_api {
         return new external_single_structure([
             'avatars' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Avatar IDs')
-            ),
-            'attempts' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Attempts data')
             ),
             'attemptkeys' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Attempt keys')
@@ -252,17 +187,11 @@ class send_answers_split extends external_api {
             'aduelcorrects' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Corrects')
             ),
-            'auserids' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'auserids')
-            ),
             'queryanswerids0' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Answer IDs original')
             ),
             'grades' => new external_multiple_structure(
                 new external_value(PARAM_FLOAT, 'Grades per user')
-            ),
-            'savedattempts' => new external_multiple_structure(
-                new external_value(PARAM_INT, 'attempts')
             ),
             'countquestion' => new external_value(
                 PARAM_INT,
@@ -318,11 +247,11 @@ class send_answers_split extends external_api {
             $queryanswerids0[] = implode(',', $queryanswerids);
         }
 
-        return ['avatars' => [], 'attempts' => [], 'attemptqueryids' => [],
+        return ['avatars' => [], 'attemptqueryids' => [],
             'numattempts' => [], 'querydefinitions' => $definitions, 'querytips' => $tips,
             'queryanswerids' => $answerids, 'answertexts' => $answertexts,
             'aduels' => [], 'aduelavatars' => [], 'aduelcorrects' => [],
-            'auserids' => [], 'queryanswerids0' => $queryanswerids0,
+            'queryanswerids0' => $queryanswerids0,
             'countquestion' => 0, 'countcorrect' => [], 'islastcorrect' => [],
             'ranks' => [], 'grades' => [], 'savedattempts' => [], 'queryranks' => [],
             'state' => $mmogame->get_state(), 'statetime' => $mmogame->get_statetime()];

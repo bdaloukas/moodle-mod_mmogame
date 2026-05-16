@@ -43,16 +43,16 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
-    'mod_mmogame_get_assets' => [
-        'classname'     => 'mod_mmogame\external\get_assets',
-        'description'   => 'Gets the list of avatars and color palettes.',
+    'mod_mmogame_start_session' => [
+        'classname'     => 'mod_mmogame\external\start_session',
+        'description'   => 'Start usersession and gets the list of avatars and color palettes.',
         'type'          => 'read',
         'ajax'          => true,
         'loginrequired' => false,
     ],
-    'mod_mmogame_get_assets_split' => [
-        'classname'     => 'mod_mmogame\external\get_assets_split',
-        'description'   => 'Gets the list of avatars and colorpalettes.',
+    'mod_mmogame_start_sessions' => [
+        'classname'     => 'mod_mmogame\external\start_sessions',
+        'description'   => 'Start usersession for many users and gets the list of avatars and colorpalettes.',
         'type'          => 'read',
         'methodname'    => 'execute',
         'ajax'          => true,

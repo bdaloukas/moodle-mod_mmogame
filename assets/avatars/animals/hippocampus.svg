@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg5672" viewBox="0 0 618.49 1118" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg5672" viewBox="0 0 618.49 1118" version="1.1">
+<desc>Asset licensing information. Title: Seahorse. Creator: Moini. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs5676">
     <radialGradient id="radialGradient6270" gradientUnits="userSpaceOnUse" cy="648.51" cx="344.35" gradientTransform="matrix(.99347 -.30968 .62024 1.9898 -453.86 -605.77)" r="290.47">
       <stop id="stop6264" style="stop-color:#ffffff" offset="0"/>
@@ -107,43 +109,4 @@
     <path id="path6796" style="stroke-linejoin:round;color:#000000;filter:url(#filter6822);stroke:#154e73;stroke-linecap:round;stroke-width:2.9;fill:none" d="m438.62 261.94c28.524 10.844 48.586 6.8794 70.125 5.5"/>
   </g>
   <path id="path6904" style="color:#000000;filter:url(#filter6922);fill:#1e4653" d="m294.53 228.1a14.098 16.529 0 1 1 -0.18621 -0.51117" transform="translate(-53.881 -80.752)"/>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Seahorse</dc:title>
-        <dc:date>2011-05-07T11:53:40</dc:date>
-        <dc:description>Cute little seahorse, forming the letter I or J or L.</dc:description>
-        <dc:source>https://openclipart.org/detail/137083/seahorse-by-moini</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>Moini</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>animal</rdf:li>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>fish</rdf:li>
-            <rdf:li>marine</rdf:li>
-            <rdf:li>ocean</rdf:li>
-            <rdf:li>sea</rdf:li>
-            <rdf:li>seahorse</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

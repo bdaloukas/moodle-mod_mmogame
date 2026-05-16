@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" viewBox="0 0 320 420" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 320 420" version="1.1">
+<desc>Asset licensing information. Title: Sphinx. Creator: Viscious-Speed. Source: Openclipart. License: Public Domain.</desc>
+
   <title id="title6476">Sphinx</title>
   <defs id="defs6">
     <linearGradient id="linearGradient4022">
@@ -329,44 +331,4 @@
       </g>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Sphinx</dc:title>
-        <dc:date>2011-03-13T12:00:50</dc:date>
-        <dc:description/>
-        <dc:source>https://openclipart.org/detail/127093/sphinx-by-viscious-speed</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>Viscious-Speed</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>Blue</rdf:li>
-            <rdf:li>Bust</rdf:li>
-            <rdf:li>Culture</rdf:li>
-            <rdf:li>Face</rdf:li>
-            <rdf:li>Gold</rdf:li>
-            <rdf:li>History</rdf:li>
-            <rdf:li>Icon</rdf:li>
-            <rdf:li>Sphinx</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

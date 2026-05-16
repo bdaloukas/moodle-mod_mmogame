@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 438.34 319.78" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg2" viewBox="0 0 438.34 319.78" version="1.1">
+<desc>Asset licensing information. Title: Chewing cow. Creator: gmad. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs4">
     <filter id="filter5121" height="1.2627" width="1.3873" color-interpolation-filters="sRGB" y="-.13133" x="-.19366">
       <feGaussianBlur id="feGaussianBlur5123" stdDeviation="0.38248253"/>
@@ -140,41 +142,4 @@
       </g>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Chewing cow</dc:title>
-        <dc:date>2010-04-17T07:55:51</dc:date>
-        <dc:description/>
-        <dc:source>https://openclipart.org/detail/48547/chewing-cow-by-gmad</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>gmad</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>animal</rdf:li>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>chewing</rdf:li>
-            <rdf:li>cow</rdf:li>
-            <rdf:li>mammal</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" viewBox="0 0 202.54 392.94" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg2" viewBox="0 0 202.54 392.94" version="1.1">
+<desc>Asset licensing information. Title: thinking caveman. Creator: Fabuio. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs4">
     <linearGradient id="linearGradient3696" y2="407.61" gradientUnits="userSpaceOnUse" x2="398.41" y1="389.87" x1="448.82">
       <stop id="stop3692" style="stop-color:#ffaaaa" offset="0"/>
@@ -174,43 +176,4 @@
       </g>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>thinking caveman</dc:title>
-        <dc:date>2012-08-13T04:38:10</dc:date>
-        <dc:description>A caveman with hand on chin</dc:description>
-        <dc:source>https://openclipart.org/detail/171697/thinking-caveman-by-fabuio-171697</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>Fabuio</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>beard</rdf:li>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>caveman</rdf:li>
-            <rdf:li>club</rdf:li>
-            <rdf:li>man</rdf:li>
-            <rdf:li>primitive</rdf:li>
-            <rdf:li>thinking</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

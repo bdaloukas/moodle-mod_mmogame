@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 417.94 468.97" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg2" viewBox="0 0 417.94 468.97" version="1.1">
+<desc>Asset licensing information. Title: octopus. Creator: evilestmark. Source: Openclipart. License: Public Domain.</desc>
+
   <g id="layer1" transform="translate(-103.1 -229.5)">
     <path id="path2820" style="stroke:#000000;stroke-width:.86031px;fill:#440055" d="m360.78 405.08s5.0681 42.197 44.794 117.32c33.662 63.658 99.201 50.154 97.231-6.6418 66.565 97.42-68.616 126.25-156.5 31.899-6.1612 60.29 31.143 39.229 9.7538 46.192-21.389 6.9625-47.472 26.892-45.219-4.0662 2.2529-30.958-13.468-65.408-13.468-65.408 25.92 156.49-205.56 92.617-144.72 22.814 8.5927 66.308 72.358 33.007 88.47-11.568 15.769-48.654 34.293-79.92 23.537-129.15l96.118-1.3954z"/>
     <path id="path2894" style="fill:#660080" d="m249.29 389.51s65.256 109.73 13.111 159.96c-51.086 49.21-83.157 54.429-86.534-18.356-71.675 60.675-17.232 129.85 55.067 110.13 106.99-57.883 74.135-115.98 107.51-120.62 33.377-4.6405 20.05 89.988 73.423 107.51 59.933 19.678 105.36-27.549 68.178-86.534 0 0 0 39.334-26.222 39.334-84.766-46.137-67.385-99.891-52.445-183.56l-152.09-7.8667z"/>
@@ -36,40 +38,4 @@
     <path id="path2864" style="stroke:#8800aa;fill:#eeaaff" d="m151.52 770.53c0 5.021-8.593 9.0914-19.193 9.0914s-19.193-4.0703-19.193-9.0914c0-5.021 8.593-9.0914 19.193-9.0914s19.193 4.0704 19.193 9.0914z" transform="matrix(.034449 .35884 -.35884 .034449 592.46 518.25)"/>
     <path id="path2866" style="stroke:#8800aa;fill:#eeaaff" d="m151.52 770.53c0 5.021-8.593 9.0914-19.193 9.0914s-19.193-4.0703-19.193-9.0914c0-5.021 8.593-9.0914 19.193-9.0914s19.193 4.0704 19.193 9.0914z" transform="matrix(-.091711 .31988 -.31988 -.091711 572.66 616.05)"/>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>octopus</dc:title>
-        <dc:date>2013-01-24T23:52:47</dc:date>
-        <dc:description>A purple octopus, supposedly a female.</dc:description>
-        <dc:source>https://openclipart.org/detail/174448/octopus-by-evilestmark-174448</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>evilestmark</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>marine animal</rdf:li>
-            <rdf:li>mollusk</rdf:li>
-            <rdf:li>octopus</rdf:li>
-            <rdf:li>tako</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

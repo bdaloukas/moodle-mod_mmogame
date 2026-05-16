@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="Calque_1" enable-background="new 0 0 243 148" xml:space="preserve" viewBox="0 0 243 148" version="1.1" y="0px" x="0px">
+<svg xmlns="http://www.w3.org/2000/svg" id="Calque_1" enable-background="new 0 0 243 148" xml:space="preserve" viewBox="0 0 243 148" version="1.1" y="0px" x="0px">
+<desc>Asset licensing information. Title: clown fish. Creator: presquesage. Source: Openclipart. License: Public Domain.</desc>
+
 <g id="XMLID_2_">
 	<g>
 		<path d="m13.113 75.885c-0.675 14.187 2.57 42.779 14.236 50.917s13.66-0.613 19.246-5.089c1.88-1.511 3.87-3.08 5.269-5.181 0 0-1.57 0.284 0.854-1.509 1.902-4.1 1.536-10.107-4.832-20.425 0 0 2.758-12.137-4.693-17.326-2.21-0.442-2.02-1.122-2.02-1.122s-27.385-14.449-28.06-0.262z" fill="#DF8106"/>
@@ -38,4 +40,4 @@
 		<path stroke-width="2" d="m179.95 101.51s-19.608 6.973-33.397 4.731"/>
 	</g>
 </g>
-<metadata><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/><dc:publisher><cc:Agent rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title>clown fish</dc:title><dc:date>2012-09-11T16:24:24</dc:date><dc:description/><dc:source>https://openclipart.org/detail/172295/clown-fish-by-presquesage-172295</dc:source><dc:creator><cc:Agent><dc:title>presquesage</dc:title></cc:Agent></dc:creator><dc:subject><rdf:Bag><rdf:li>clown fish</rdf:li><rdf:li>poisson clown</rdf:li></rdf:Bag></dc:subject></cc:Work><cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/><cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/><cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/></cc:License></rdf:RDF></metadata></svg>
+</svg>

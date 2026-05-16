@@ -17,18 +17,15 @@
 namespace mmogametype_quiz\external;
 
 use coding_exception;
-use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use core_external\restricted_context_exception;
+use dml_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
-use Random\RandomException;
-use required_capability_exception;
 
 /**
  * External function for starting a new attempt or continuing the last attempt.
@@ -44,89 +41,48 @@ class get_attempts_split extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'mmogameid' => new external_value(PARAM_INT, 'The ID of the mmogame'),
-            'kinduser' => new external_value(PARAM_ALPHA, 'The kind of user'),
-            'user' => new external_value(PARAM_ALPHANUMEXT, 'The user data'),
             'sessionkeys' => new external_value(PARAM_TEXT, 'Comma-separated session keys'),
             'avatarids' => new external_value(PARAM_TEXT, 'Comma-separated avatar IDs', VALUE_DEFAULT, ''),
-            'splits' => new external_value(PARAM_TEXT, 'Comma-separated split IDs'),
         ]);
     }
 
     /**
      * Implements the service logic.
      *
-     * @param int $mmogameid
-     * @param string $kinduser
-     * @param string $user
      * @param string $sessionkeys
      * @param ?string $avatarids
-     * @param ?string $splits
      * @return array
-     * @throws RandomException
+     * @throws dml_exception
      * @throws coding_exception
      * @throws invalid_parameter_exception
-     * @throws required_capability_exception
-     * @throws restricted_context_exception
      */
     public static function execute(
-        int $mmogameid,
-        string $kinduser,
-        string $user,
         string $sessionkeys,
         ?string $avatarids = null,
-        ?string $splits = null
     ): array {
-        if ($avatarids === null) {
-            $avatarids = '';
-        }
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
-            'mmogameid' => $mmogameid,
-            'kinduser' => $kinduser,
-            'user' => $user,
             'sessionkeys' => $sessionkeys,
             'avatarids' => $avatarids,
-            'splits' => $splits,
         ]);
 
-        $splits = explode(',', $splits);
         $sessionkeys = explode(',', $sessionkeys);
         $avatarids = $avatarids != null ? explode(',', $avatarids) : null;
 
-        // Perform security checks.
-        if ($kinduser === 'moodle') {
-            $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
-            $context = module::instance($cm->id);
-            self::validate_context($context);
-            require_capability('mod/mmogame:play', $context);
-        }
-
-        $user = trim($user);
-
-        if ($mmogameid <= 0) {
-            return self::error('invalid_mmogameid');
-        }
-
-        if (!preg_match('/^[A-Za-z0-9_-]{1,100}$/', $user)) {
-            return self::error('invalid_user');
-        }
-
-        $allowedkindusers = ['moodle', 'wordpress', 'guid'];
-
-        if (!in_array($kinduser, $allowedkindusers, true)) {
-            return self::error('invalid_kinduser');
-        }
-
-        $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $create = $avatarids !== null;
+        $db = new mmogame_database_moodle();
+        $auser = null;
+        $mmogame = null;
         $auserids = [];
-        foreach ($splits as $split) {
-            if ($split == '') {
-                continue;
+        foreach ($sessionkeys as $sessionkey) {
+            $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
+            if ($auser === null) {
+                return self::error('no_user');
             }
-            [$auserid] = mmogame::get_asuerid($mmogame->get_db(), $kinduser, $user, $create, $split);
-            $auserids[] = $auserid;
+            if ($mmogame == null) {
+                $mmogame = mmogame::create($db, $auser->mmogameid);
+            }
+
+            $auserids[] = $auser->id;
         }
         $state = $mmogame->get_state();
         $statetime = $mmogame->get_statetime();
@@ -144,7 +100,6 @@ class get_attempts_split extends external_api {
                 'aduels' => [],
                 'aduelavatars' => [],
                 'aduelcorrects' => [],
-                'auserids' => [],
                 'queryanswerids0' => [],
                 'grades' => [],
                 'countquestion' => 0,
@@ -158,9 +113,9 @@ class get_attempts_split extends external_api {
             ];
         }
         if ($avatarids !== null) {
-            foreach ($splits as $pos => $split) {
+            foreach ($sessionkeys as $pos => $sessionkey) {
                 $info = $mmogame->get_avatar_info($auserids[$pos], false);
-                $mmogame->get_db()->update_record(
+                $db->update_record(
                     'mmogame_aa_grades',
                     ['id' => $info->id, 'avatarid' => $avatarids[$pos]]
                 );
@@ -178,7 +133,7 @@ class get_attempts_split extends external_api {
                 $onlygroup = true;
             }
         }
-        $aduelauserids = $onlygroup ? $mmogame->get_auserids_split($kinduser, $user) : [];
+        $aduelauserids = $onlygroup ? $mmogame->get_ausers_split($auser->kinduser, $auser->user) : [];
 
         for (;;) {
             $numgame = 0;
@@ -218,7 +173,7 @@ class get_attempts_split extends external_api {
             }
         }
 
-        [$insql, $inparams] = $mmogame->get_db()->get_in_or_equal($auserids);
+        [$insql, $inparams] = $db->get_in_or_equal($auserids);
         $sql = "SELECT g.auserid, g.sumscore, a.directory, a.filename,
             (SELECT COUNT(*)
                 FROM {mmogame_aa_grades} g2
@@ -228,9 +183,9 @@ class get_attempts_split extends external_api {
             LEFT JOIN {mmogame_aa_avatars} a ON a.id=g.avatarid
             WHERE g.mmogameid=? AND g.numgame=? AND g.auserid $insql";
 
-        $recs = $mmogame->get_db()->get_records_sql(
+        $recs = $db->get_records_sql(
             $sql,
-            array_merge([$mmogameid, $numgame], $inparams)
+            array_merge([$auser->mmogameid, $numgame], $inparams)
         );
         $grades = $avatars = $ranks = [];
         foreach ($auserids as $auserid) {
@@ -244,11 +199,12 @@ class get_attempts_split extends external_api {
             }
         }
 
-        return ['avatars' => $avatars, 'attempts' => $attemptids, 'attemptkeys' => $attemptkeys,
-            'attemptqueryids' => $attemptqueryids, 'numattempts' => $attemptnums, 'querydefinitions' => $definitions,
+        return ['avatars' => $avatars, 'attemptkeys' => $attemptkeys,
+            'attemptqueryids' => $attemptqueryids,
+            'numattempts' => $attemptnums, 'querydefinitions' => $definitions,
             'querytips' => $tips, 'queryanswerids' => $answerids, 'answertexts' => $answertexts,
             'aduels' => $aduels, 'aduelavatars' => $aduelavatars, 'aduelcorrects' => $aduelcorrects,
-            'auserids' => $auserids, 'queryanswerids0' => $queryanswerids0, 'grades' => $grades,
+            'queryanswerids0' => $queryanswerids0, 'grades' => $grades,
             'countquestion' => $countquestions, 'countcorrect' => $countcorrect, 'islastcorrect' => $islastcorrect,
             'ranks' => $ranks, 'queryranks' => $queryranks, 'hasidea' => 0, 'state' => $state, 'statetime' => 0];
     }
@@ -263,14 +219,11 @@ class get_attempts_split extends external_api {
             'avatars' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Avatar IDs')
             ),
-            'attempts' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Attempts data')
-            ),
             'attemptkeys' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'attemptkeys')
             ),
             'attemptqueryids' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Query IDs of attempts')
+                new external_value(PARAM_RAW, 'attemptqueryids')
             ),
             'querydefinitions' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Query definitions')
@@ -295,9 +248,6 @@ class get_attempts_split extends external_api {
             ),
             'aduelcorrects' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Corrects')
-            ),
-            'auserids' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'ausers')
             ),
             'queryanswerids0' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Original queryids')

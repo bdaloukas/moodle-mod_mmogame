@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="图层_1" xml:space="preserve" viewBox="0 0 595.28 841.89" y="0px" version="1.1" enable-background="new 0 0 595.28 841.89" x="0px">
+<svg xmlns="http://www.w3.org/2000/svg" id="图层_1" xml:space="preserve" viewBox="0 0 595.28 841.89" y="0px" version="1.1" enable-background="new 0 0 595.28 841.89" x="0px">
+<desc>Asset licensing information. Title: Angel Girl. Creator: vectorsme. Source: Openclipart. License: Public Domain.</desc>
+
 <radialGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" cy="600.45" cx="137.72" r="78.823">
 	<stop stop-color="#fff" offset="0"/>
 	<stop stop-color="#F0ECEB" offset="0"/>
@@ -141,4 +143,4 @@
 </radialGradient>
 <path d="m478.48 234.26c0 8.114-6.584 14.693-14.701 14.693-8.118 0-14.693-6.58-14.693-14.693 0-8.118 6.575-14.697 14.693-14.697 8.12 0 14.7 6.58 14.7 14.7z" fill="url(#SVGID_15_)"/>
 <path stroke="#994B4A" d="m444.1 97.082s-13.73 101.44-86.813 53.208-33.129-48.624 25.198-53.208 30.804 2.807 26.138 25.207" fill="none"/>
-<metadata><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/><dc:publisher><cc:Agent rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title>Angel Girl</dc:title><dc:date>2013-07-28T06:09:16</dc:date><dc:description>Free Cute Angel Girl Cartoon</dc:description><dc:source>https://openclipart.org/detail/181223/angel-girl-by-vectorsme-181223</dc:source><dc:creator><cc:Agent><dc:title>vectorsme</dc:title></cc:Agent></dc:creator><dc:subject><rdf:Bag><rdf:li>Angel</rdf:li><rdf:li>Cartoon</rdf:li><rdf:li>Cute</rdf:li><rdf:li>Girl</rdf:li></rdf:Bag></dc:subject></cc:Work><cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/><cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/><cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/></cc:License></rdf:RDF></metadata></svg>
+</svg>

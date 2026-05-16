@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" viewBox="0 0 300 300" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg2" viewBox="0 0 300 300" version="1.1">
+<desc>Asset licensing information. Title: Openclipart. Source: Openclipart. License: Public Domain.</desc>
+
   <title id="title3022">smiling face of a child 2</title>
   <g id="layer2" transform="translate(0,-200)">
     <g id="g3033" transform="translate(1.4286 -17.143)">
@@ -35,23 +37,4 @@
       <path id="path3027" style="fill:#fed9a2" d="m135.36 159.64c0 2.0711-4.9568 3.75-11.071 3.75-6.1146 0-11.071-1.6789-11.071-3.75s4.9568-3.75 11.071-3.75c6.1146 0 11.071 1.6789 11.071 3.75z" transform="matrix(.20254 -.12671 .33528 .22676 -9.3682 324.37)"/>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

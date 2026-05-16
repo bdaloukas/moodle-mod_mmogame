@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" viewBox="0 0 419.25 470.55" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 419.25 470.55" version="1.1">
+<desc>Asset licensing information. Title: Blue hair mermaid. Creator: paulliu. Source: Openclipart. License: Public Domain.</desc>
+
   <title id="title4562">Red mermaid with blue hair</title>
   <defs id="defs4">
     <linearGradient id="linearGradient4050">
@@ -162,40 +164,4 @@
       <path id="path4949" style="fill:#ffffff" d="m1291.8 381.61-8.146-6.2852-9.354 4.2852 6.2852-8.146-4.2852-9.354 8.146 6.2852 9.354-4.2852-6.2852 8.146z" transform="matrix(.63658 .034935 -.034141 .62211 542.31 126.95)"/>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Blue hair mermaid</dc:title>
-        <dc:date>2012-10-22T20:41:06</dc:date>
-        <dc:description/>
-        <dc:source>https://openclipart.org/detail/172847/blue-hair-mermaid-by-paulliu-172847</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>paulliu</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>female</rdf:li>
-            <rdf:li>girl</rdf:li>
-            <rdf:li>manga</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

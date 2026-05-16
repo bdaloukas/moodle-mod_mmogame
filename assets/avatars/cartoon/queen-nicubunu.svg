@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" viewBox="0 0 617.46 705.23" version="1.0" y="0" x="0">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 617.46 705.23" version="1.0" y="0" x="0">
+<desc>Asset licensing information. Title: Queen's Head. Creator: gammillian. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs3">
     <linearGradient id="linearGradient6214">
       <stop id="stop6216" style="stop-color:#c10000" offset="0"/>
@@ -49,40 +51,4 @@
     <path id="path1816" style="fill-rule:evenodd;fill:#000000" d="m125.4 493.19c-8.0159 13.026-17.557 25.21-15.894 35.053 1.6628 9.8434 14.596 16.949 22.592 22.624l3.349-4.8374c-7.0319-4.9904-11.657-11.442-13.024-19.536-1.367-8.0934 0.50338-18.144 8.0003-30.327l-5.0234-2.9768z"/>
     <path id="path1822" style="fill:url(#linearGradient2895)" d="m252.74 52.083c0-2.4505-13.868 37.727-25.939 72.754l-14.23-60.104-16.13 67.374-31-76.231-12.34 82.881-35.11-46.504 39.54 159.74c-102.19 36.39-129.69 130.96-129.69 130.96 9.0022 3.159 25.445 5.364 42.704 7.2754-9.9461 26.537-15.816 55.895-15.816 86.989 0 115.53 76.477 209.09 170.81 209.09 39.112 0 74.625-16.865 103.44-43.969-4.7264 13.201-10.794 24.456-19.928 31.316 73.306 25.289 190.65 10.905 239.77-5.0612 0 0-137.86-43.638-120.52-129.69 17.43-150.02-20.96-282.59-159.74-298.61l25.3-146.15-18.66 30.37c-6.92-21.33-22.46-69.248-22.46-72.437zm-57.887 645.93c-2.9974-4.3706 158.19-2.3101 153.42 0h-153.42z"/>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Queen's Head</dc:title>
-        <dc:date>2010-08-02T23:25:33</dc:date>
-        <dc:description/>
-        <dc:source>https://openclipart.org/detail/76513/queens-head-by-gammillian</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>gammillian</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>head</rdf:li>
-            <rdf:li>queen</rdf:li>
-            <rdf:li>woman</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

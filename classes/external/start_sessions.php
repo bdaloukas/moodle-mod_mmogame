@@ -38,7 +38,7 @@ use function get_coursemodule_from_instance;
  * @copyright 2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_assets_split extends external_api {
+class start_sessions extends external_api {
     /**
      * Returns description of method parameters
      * @return external_function_parameters
@@ -136,7 +136,7 @@ class get_assets_split extends external_api {
         $retpalettes = $retavatars = [];
         $maxavatars = 0;
         $sessionkeys = [];
-        $mmogame->get_assets_split(
+        $mmogame->start_sessions(
             $countsplit,
             $countpalettes,
             $countavatars,

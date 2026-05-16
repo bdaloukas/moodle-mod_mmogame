@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg5297" viewBox="0 0 744.09 1052.4" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg5297" viewBox="0 0 744.09 1052.4" version="1.1">
+<desc>Asset licensing information. Title: Cartoon Robot. Creator: wildchief. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs5299">
     <linearGradient id="linearGradient5409" y2="371.65" gradientUnits="userSpaceOnUse" x2="30" y1="396.51" x1="46.941">
       <stop id="stop4212-4-18" style="stop-color:#b7bec8" offset="0"/>
@@ -194,42 +196,4 @@
     <path id="path6898" style="fill:url(#radialGradient6906)" d="m515.18 590.72-1.0102-41.416c15.648 14.674 24.819-21.407 27.274-32.325 0 0-7.0711-9.0914 2.0203-5.0508s20.203 23.234 20.203 23.234 1.0102 25.254-11.112 33.335c-12.122 8.0812-34.345 4.0406-34.345 4.0406 12.901 30.561 30.571 70.797 46.467 108.09l-49.5-89.9z"/>
     <path id="path6908" style="fill:url(#radialGradient6916)" d="m507.1 510.92c-89.441 20.918-179.7 15.637-270.72 11.112 90.51 18.631 184.14 26.172 270.72-11.112z"/>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Cartoon Robot</dc:title>
-        <dc:date>2010-08-27T20:25:03</dc:date>
-        <dc:description>A cartoon robot used in my website but happy to share if others have a use for it</dc:description>
-        <dc:source>https://openclipart.org/detail/82495/cartoon-robot-by-wildchief</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>wildchief</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>computer</rdf:li>
-            <rdf:li>droid</rdf:li>
-            <rdf:li>machine</rdf:li>
-            <rdf:li>robot</rdf:li>
-            <rdf:li>robotics</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

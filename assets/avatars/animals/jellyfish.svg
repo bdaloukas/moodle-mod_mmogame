@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" viewBox="0 0 456.03 524.42" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg2" viewBox="0 0 456.03 524.42" version="1.1">
+<desc>Asset licensing information. Title: Jellyfish. Creator: Moini. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs4">
     <filter id="filter3747" color-interpolation-filters="sRGB">
       <feGaussianBlur id="feGaussianBlur3749" stdDeviation="1.2784743"/>
@@ -30,46 +32,4 @@
       <path id="path2922" style="stroke-linejoin:round;stroke:#154e73;stroke-linecap:round;stroke-width:5.5;fill:none" d="m508.11 471.52c-8.8315 1.6433-18.421 7.3381-14.142 27.274 3.6018 16.781 14.789 28.213 4.0406 43.437-7.0713 10.015-13.985 24.844-11.112 31.315 9.0576 20.397-3.5441 37.039-11.112 55.558m-41.41-171.73c-11.996 10.368-21.75 24.679-14.142 38.386 6.4151 11.558 20.243 19.895 13.132 31.315-5.8536 9.4014-20.676 14.154-14.142 28.284 12.257 26.506 4.9638 38.832-8.0812 44.447m-47.49-152.53c-6.9987 5.3938-18.518 12.591-12.122 27.274 3.5836 8.2264 8.2972 9.3392 16.162 23.234 5.9363 10.487 0.0943 27.144-9.0914 34.345-26.482 20.759-14.853 42.422-22.223 63.64m-32.32-160.61c-31.068 22.934-27.932 33.485-22.223 43.437 11.413 19.896 7.9193 35.419 0 40.406-12.494 7.8672-26.637 40.997-18.183 56.569m-27.27-149.5c1.9175 2.5799 5.293 24.766-3.0305 36.366-7.9012 11.011-24.882 16.274-28.284 34.345-2.651 14.08 9.075 24.183 10.102 34.345 2.0527 20.32-12.969 32.223-22.223 35.355"/>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Jellyfish</dc:title>
-        <dc:date>2011-05-07T11:55:50</dc:date>
-        <dc:description>Jellyfish, can be used as a dot, for example.</dc:description>
-        <dc:source>https://openclipart.org/detail/137089/jellyfish-by-moini</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>Moini</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>animal</rdf:li>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>jellies</rdf:li>
-            <rdf:li>jelly</rdf:li>
-            <rdf:li>jellyfish</rdf:li>
-            <rdf:li>marine</rdf:li>
-            <rdf:li>medusa</rdf:li>
-            <rdf:li>ocean</rdf:li>
-            <rdf:li>sea</rdf:li>
-            <rdf:li>sea jelly</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

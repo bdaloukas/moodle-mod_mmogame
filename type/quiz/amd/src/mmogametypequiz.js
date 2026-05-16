@@ -452,11 +452,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             require(['core/ajax'], (Ajax) => {
                 const params = {
-                    mmogameid: this.mmogameid,
-                    kinduser: this.kinduser,
-                    user: this.user,
                     sessionkey: this.sessionkey,
-                    attempt: this.attempt,
                     attemptkey: this.attemptkey,
                     answer: this.answerid || '',
                     subcommand: subcommand,

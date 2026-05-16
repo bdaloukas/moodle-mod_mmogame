@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg3292" viewBox="0 0 64 64" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg3292" viewBox="0 0 64 64" version="1.1">
+<desc>Asset licensing information. Title: home_icon. Creator: netalloy. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs3294">
     <filter id="filter4438" height="1" width="1" color-interpolation-filters="sRGB" y="0" x="0">
       <feGaussianBlur id="feGaussianBlur4440" result="blur" stdDeviation="2.000000" in="SourceAlpha"/>
@@ -47,38 +49,4 @@
     <path id="path4880" style="filter:url(#filter4424);stroke:#878a96;stroke-linecap:round;stroke-miterlimit:31.2;stroke-width:5;fill:#7288ad" d="m-114.15 487.69s48.924-66.345 82.833-65.66c33.029 0.66748 78.539 67.175 78.539 67.175l14.647-0.50508s-71.816-74.216-88.355-76.379c-20.033-2.6208-97.513 75.117-97.513 75.117l9.849 0.25254z" transform="matrix(.27439 0 0 .27663 38.804 -107.78)"/>
     <rect id="rect5428" style="filter:url(#filter4410);stroke:#d5c4c4;stroke-linecap:round;stroke-width:.87795;fill:url(#linearGradient4165)" transform="matrix(.43594 0 0 .57008 58.374 -271.24)" height="33.082" width="27.779" y="537.02" x="-78.539"/>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>home_icon</dc:title>
-        <dc:date>2010-04-02T20:59:59</dc:date>
-        <dc:description>grey home icon 64x64</dc:description>
-        <dc:source>https://openclipart.org/detail/36235/home_icon-by-netalloy-36235</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>netalloy</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>home</rdf:li>
-            <rdf:li>real estate</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

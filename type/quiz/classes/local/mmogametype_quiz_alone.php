@@ -29,6 +29,7 @@ namespace mmogametype_quiz\local;
 use coding_exception;
 use dml_exception;
 use mod_mmogame\local\database\mmogame_database;
+use mod_mmogame\local\mmogame;
 use Random\RandomException;
 use stdClass;
 
@@ -59,13 +60,13 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @throws dml_exception
      */
     public function get_attempt(): ?stdClass {
-        $attempt = $this->db->get_record_select(
+        $attempts = $this->db->get_records_select(
             'mmogame_quiz_attempts',
             'mmogameid=? AND numgame=? AND auserid=? AND timeanswer=0',
             [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()]
         );
 
-        if ($attempt !== null) {
+        foreach ($attempts as $attempt) {
             if ($attempt->timestart == 0) {
                 $attempt->timestart = time();
                 $this->db->update_record(
@@ -98,7 +99,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         }
         $a['numquery'] = $a['numattempt'] = $this->compute_next_numattempt();
         $a['timestart'] = time();
-        $a['attemptkey'] = bin2hex(random_bytes(32));
+        $a['attemptkey'] = mmogame::createkey();
 
         // Insert data to mmogame_quiz_attempts table.
         $id = $this->db->insert_record('mmogame_quiz_attempts', $a);
@@ -119,14 +120,13 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         stdClass $attempt,
         stdClass $query,
         ?string $useranswer,
-        ?int $useranswerid,
         bool $autograde,
         array &$ret
     ): void {
         // If auto-grading is enabled, check if the answer is correct and set iscorrect.
         if ($autograde) {
             $fraction = 0.0;
-            $attempt->iscorrect = $this->qbank->is_correct($query, $useranswer, $useranswerid, $this, $fraction);
+            $attempt->iscorrect = $this->qbank->is_correct($query, $useranswer, $this, $fraction);
             $attempt->iscorrect = $attempt->iscorrect ? 1 : 0;
         }
 
@@ -138,8 +138,8 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         if (!$istimeout) {
             if ($this->qbank->is_multichoice($query)) {
                 // Handle multiple-choice answers.
-                $a['useranswerid'] = $attempt->useranswerid = $useranswerid;
                 $a['useranswer'] = null;
+                $a['useranswerid'] = $attempt->useranswerid = intval($useranswer);
             } else {
                 // Handle other question types.
                 $a['useranswer'] = $attempt->useranswer = $useranswer;
@@ -352,31 +352,23 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * Updates the database and array $ret about the correctness of user's answer
      *
      * @param array $ret
-     * @param ?int $attemptid
      * @param ?string $attemptkey
      * @param ?string $answer
-     * @param ?int $answerid
      * @param string $subcommand
      * @return ?stdClass: the attempt
      */
     public function set_answer_mode(
         array &$ret,
-        ?int $attemptid,
         ?string $attemptkey,
         ?string $answer,
-        ?int $answerid = null,
         string $subcommand = ''
     ): ?stdClass {
-        if ($attemptid === null) {
-            return null;
-        }
-
         // The session key is part of the lookup condition so answers can only be
         // saved for attempts owned by the current anonymous/user session.
         $attempt = $this->db->get_record_select(
             'mmogame_quiz_attempts',
-            'mmogameid=? AND auserid=? AND id=? AND attemptkey=?',
-            [$this->get_id(), $this->auserid, $attemptid, $attemptkey]
+            'mmogameid=? AND auserid=? AND attemptkey=?',
+            [$this->get_id(), $this->auserid, $attemptkey]
         );
         if ($attempt === null) {
             // Invalid or expired attempt session.
@@ -397,7 +389,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             $autograde = false;
             $ret['tool2'] = 1;
         }
-        $this->set_answer($attempt, $query, $answer, $answerid, $autograde, $ret);
+        $this->set_answer($attempt, $query, $answer, $autograde, $ret);
 
         $ret['iscorrect'] = $attempt->iscorrect ? 1 : 0;
         $ret['correct'] = $query->concept;

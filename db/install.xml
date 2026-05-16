@@ -32,6 +32,7 @@
     <TABLE NAME="mmogame_aa_users" COMMENT="mmogame_aa_users">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="kind" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="splitnum" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
@@ -43,6 +44,10 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="usercontext" UNIQUE="true" FIELDS="mmogameid,kind,instanceid,splitnum"/>
+        <INDEX NAME="sessionkey" UNIQUE="true" FIELDS="sessionkey"/>
+      </INDEXES>
     </TABLE>
 
     <TABLE NAME="mmogame_aa_avatars" COMMENT="mmogame_aa_avatars">

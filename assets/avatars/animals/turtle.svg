@@ -1,5 +1,6 @@
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" viewBox="0 0 529.88 358.46" version="1.0">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 529.88 358.46" version="1.0">
+<desc>Asset licensing information. Title: Turtle. Creator: iammisc. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs4">
     <linearGradient id="linearGradient44176">
       <stop id="stop44178" style="stop-color:#03c503" offset="0"/>
@@ -117,40 +118,4 @@
     <path id="path47137" style="stroke:#000000;stroke-width:2.7;fill:none" d="m156.32 121.25c18.68-25.255 28.28-1.01 28.28-1.01"/>
     <path id="path47139" style="stroke:#000000;stroke-width:2.7;fill:none" d="m215.13 121.25c-18.69-25.255-28.29-1.01-28.29-1.01"/>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Turtle</dc:title>
-        <dc:date>2007-12-21T03:33:44</dc:date>
-        <dc:description>A simple crystal turtle that I made as a logo for one of my long-forgotten sourceforge project.</dc:description>
-        <dc:source>https://openclipart.org/detail/10216/turtle-by-iammisc</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>iammisc</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>amphibian</rdf:li>
-            <rdf:li>animal</rdf:li>
-            <rdf:li>crystal</rdf:li>
-            <rdf:li>turtle</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

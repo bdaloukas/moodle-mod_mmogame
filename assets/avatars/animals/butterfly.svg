@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" viewBox="0 0 336.65 389.16" version="1.0">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 336.65 389.16" version="1.0">
+<desc>Asset licensing information. Title: Monarch Butterfly. Creator: jimmiet. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs4">
     <linearGradient id="linearGradient4182">
       <stop id="stop4190" style="stop-color:#ffffff;stop-opacity:0" offset="0"/>
@@ -232,43 +234,4 @@
       <path id="path4305" style="fill-rule:evenodd;stroke-width:0;fill:url(#radialGradient3011)" d="m152.91 261.55c4.48 2.46 9.78 2.25 14.16 0.25-5.32 4.11-8.82 4.17-14.16-0.25z"/>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Monarch Butterfly</dc:title>
-        <dc:date>2008-09-03T02:45:59</dc:date>
-        <dc:description>A colorful monarch butterfly</dc:description>
-        <dc:source>https://openclipart.org/detail/19002/monarch-butterfly-by-jimmiet-19002</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>jimmiet</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>animal</rdf:li>
-            <rdf:li>butterfly</rdf:li>
-            <rdf:li>color</rdf:li>
-            <rdf:li>insect</rdf:li>
-            <rdf:li>monarch</rdf:li>
-            <rdf:li>nature</rdf:li>
-            <rdf:li>photorealistic</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

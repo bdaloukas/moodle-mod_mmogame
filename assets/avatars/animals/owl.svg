@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg3283" viewBox="0 0 309.3 433.42" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg3283" viewBox="0 0 309.3 433.42" version="1.1">
+<desc>Asset licensing information. Title: Owl. Creator: karthikeyan. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs3285">
     <linearGradient id="linearGradient4323-7" y2="362.28" xlink:href="#linearGradient4098-6-1" gradientUnits="userSpaceOnUse" x2="219.61" gradientTransform="matrix(1.7812 0 0 1.7055 -73.145 422.43)" y1="354.02" x1="219.61"/>
     <linearGradient id="linearGradient4098-6-1">
@@ -64,38 +66,4 @@
       </g>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Owl</dc:title>
-        <dc:date>2011-12-20T13:53:51</dc:date>
-        <dc:description>Owl</dc:description>
-        <dc:source>https://openclipart.org/detail/166364/owl-by-karthikeyan</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>karthikeyan</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>bird</rdf:li>
-            <rdf:li>owl</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

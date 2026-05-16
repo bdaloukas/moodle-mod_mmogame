@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 128 128" version="1.0">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg2" viewBox="0 0 128 128" version="1.0">
+<desc>Asset licensing information. Title: Comic characters: Graduated. Creator: nicubunu. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs4">
     <filter id="filter3443" height="1.6533" width="1.2503" y="-.32663" x="-.12514">
       <feGaussianBlur id="feGaussianBlur3445" stdDeviation="1.9634296"/>
@@ -38,43 +40,4 @@
       <path id="path3913" style="stroke:#675d1b;stroke-width:1.4043px;fill:none" d="m138.25 208.12c1.76-0.87 3.26-1.84 3.37-3.37l2.63 1.25"/>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Comic characters: Graduated</dc:title>
-        <dc:date>2009-03-05T15:41:53</dc:date>
-        <dc:description>Comic characters: a graduated student</dc:description>
-        <dc:source>https://openclipart.org/detail/21909/comic-characters:-graduated-by-nicubunu</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>nicubunu</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>character</rdf:li>
-            <rdf:li>comic</rdf:li>
-            <rdf:li>funny</rdf:li>
-            <rdf:li>guy</rdf:li>
-            <rdf:li>human</rdf:li>
-            <rdf:li>people</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

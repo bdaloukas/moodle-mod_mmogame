@@ -448,7 +448,6 @@ class mmogametype_quiz_split extends mmogame {
      */
     public function set_answer_mode(
         array &$ret,
-        ?int $attemptid,
         ?string $attemptkey,
         ?string $answer,
         int $timestart,
@@ -456,16 +455,13 @@ class mmogametype_quiz_split extends mmogame {
         ?int $answerid = null,
         ?string $subcommand = ''
     ): ?stdClass {
-        if ($attemptid === null) {
-            return null;
-        }
 
         // The session key is part of the lookup condition so answers can only be
         // saved for attempts owned by the current anonymous/user session.
         $attempt = $this->db->get_record_select(
             'mmogame_quiz_attempts',
-            'mmogameid=? AND auserid=? AND id=? AND attemptkey=?',
-            [$this->get_id(), $this->auserid, $attemptid, $attemptkey]
+            'mmogameid=? AND auserid=? AND attemptkey=?',
+            [$this->get_id(), $this->auserid, $attemptkey]
         );
         if ($attempt === null) {
             // Invalid or expired game session.
@@ -532,7 +528,7 @@ class mmogametype_quiz_split extends mmogame {
         // If auto-grading is enabled, check if the answer is correct and set iscorrect.
         if ($autograde) {
             $fraction = 0.0;
-            $attempt->iscorrect = $this->qbank->is_correct($query, $useranswer, $useranswerid, $this, $fraction);
+            $attempt->iscorrect = $this->qbank->is_correct($query, $useranswer, $this, $fraction);
             $attempt->iscorrect = $attempt->iscorrect ? 1 : 0;
         }
         $istimeout = false;

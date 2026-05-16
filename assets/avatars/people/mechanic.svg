@@ -1,4 +1,6 @@
-<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 600 700" version="1.0">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg2" viewBox="0 0 600 700" version="1.0">
+<desc>Asset licensing information. Title: Mechanic. Creator: jonata. Source: Openclipart. License: Public Domain.</desc>
+
   <defs id="defs4">
     <linearGradient id="linearGradient3478">
       <stop id="stop3480" style="stop-color:#000000;stop-opacity:0" offset="0"/>
@@ -403,49 +405,4 @@
       </g>
     </g>
   </g>
-  <metadata id="metadata7560">
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>Mechanic</dc:title>
-        <dc:date>2008-06-23T18:59:16</dc:date>
-        <dc:description/>
-        <dc:source>https://openclipart.org/detail/17436/mechanic-by-jonata</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>jonata</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>blue</rdf:li>
-            <rdf:li>contour</rdf:li>
-            <rdf:li>happy</rdf:li>
-            <rdf:li>job</rdf:li>
-            <rdf:li>man</rdf:li>
-            <rdf:li>mechanic</rdf:li>
-            <rdf:li>outline</rdf:li>
-            <rdf:li>people</rdf:li>
-            <rdf:li>red</rdf:li>
-            <rdf:li>smiling</rdf:li>
-            <rdf:li>work</rdf:li>
-            <rdf:li>worker</rdf:li>
-            <rdf:li>wrench</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

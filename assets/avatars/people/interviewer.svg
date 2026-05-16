@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg3289" viewBox="0 0 426.95 472.44" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg3289" viewBox="0 0 426.95 472.44" version="1.1">
+<desc>Asset licensing information. Title: interviewer. Creator: shokunin. Source: Openclipart. License: Public Domain.</desc>
+
   <g id="layer1" transform="translate(-148.43 -296.08)">
     <g id="g3434">
       <polygon id="polygon4578" style="fill:#565248" points="151.54 284.29 154.04 245.79 138.04 241.04 139.79 270.29 116.54 285.29" transform="matrix(2.5231 0 0 2.5231 -35.29 31.048)"/>
@@ -31,47 +33,4 @@
       <path id="path4622" style="stroke:#fdd89a;stroke-width:2.5231;fill:#fdd89a" d="m222.78 562.89-18.923 25.231-24.6-6.3076s-19.554-11.985 3.1538-20.184c0 0-3.7846-16.4 9.4615-11.354 0 0 5.6769-18.292 15.138-5.6769l15.769 18.292z"/>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>interviewer</dc:title>
-        <dc:date>2010-08-04T09:16:59</dc:date>
-        <dc:description>part of set of characters submitted separately.</dc:description>
-        <dc:source>https://openclipart.org/detail/77065/interviewer-by-shokunin</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>shokunin</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>cartoon</rdf:li>
-            <rdf:li>cartoony</rdf:li>
-            <rdf:li>character design</rdf:li>
-            <rdf:li>characters</rdf:li>
-            <rdf:li>cute</rdf:li>
-            <rdf:li>interview</rdf:li>
-            <rdf:li>interviewer</rdf:li>
-            <rdf:li>jobs</rdf:li>
-            <rdf:li>man</rdf:li>
-            <rdf:li>microphone</rdf:li>
-            <rdf:li>people</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>

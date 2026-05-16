@@ -311,6 +311,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }
             });
             this.btnSubmit.addEventListener("click", () => {
+                console.log("btnSubmit");
                 // This.gatePlayGame(true, this.edtNickname.value, this.paletteid, this.avatarid);
                 this.callGetAttempt(
                     {nickname: this.edtNickname.value, colorpaletteid: this.paletteid, avatarid: this.avatarid},
@@ -401,13 +402,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     colorpalettes: updatePalette ? countXpalette * countYpalette : 0,
                 };
                 // Calling the service through the Moodle AJAX API
-                let getAssets = Ajax.call([{
-                    methodname: 'mod_mmogame_get_assets',
+                let startSession = Ajax.call([{
+                    methodname: 'mod_mmogame_start_session',
                     args: params
                 }]);
 
                 // Handling the response
-                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, sessionkey}) => {
+                startSession[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, sessionkey}) => {
                     this.sessionkey = sessionkey;
                     if (updatePalette) {
                         this.gateShowColorPalettes(this.area, leftPalette, topPalette, countXpalette, countYpalette,
@@ -425,7 +426,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateShowColorPalettes(parent, left, top, countX, countY, colorpaletteids, colorpalettes) {
-            let i = 0; // Counter for color palettes
+            let i = 0; // Counter for color palettes.
             const count = colorpalettes.length;
             this.canvasColor = undefined;
             const canvasSize = this.iconSize - this.padding * 3 / 2;
@@ -450,7 +451,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     canvas.width = canvasSize;
                     canvas.height = canvasSize;
                     canvas.style.cursor = 'pointer';
-                    canvas.classList.add("mmogame_color");
+                    canvas.classList.add("mmogame-color");
 
                     acanvas.push(canvas);
 
@@ -703,7 +704,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
          * @param {Object} extraparams - Additional parameters to override default ones.
          */
         async callGetAttempt(extraparams = undefined) {
-
             if (this.kindSound === undefined) {
                 const option = await this.getOption("kindSound");
                 this.kindSound = option !== null ? option.value : 1;
@@ -711,19 +711,16 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             require(['core/ajax'], (Ajax) => {
                 let params = {
-                    mmogameid: this.mmogameid,
-                    kinduser: this.kinduser,
-                    user: this.user,
                     sessionkey: this.sessionkey,
                     nickname: null,
                     colorpaletteid: null,
                     avatarid: null,
                     subcommand: '',
                 };
-                console.log("callGetAttempt", params);
                 if (extraparams !== undefined) {
                     params = {...params, ...extraparams};
                 }
+                console.log("callGetAttempts", params);
                 // Calling the service through the Moodle AJAX API
                 let getAttempt = Ajax.call([{
                     methodname: 'mmogametype_quiz_get_attempt',

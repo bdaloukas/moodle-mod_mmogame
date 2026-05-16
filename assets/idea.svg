@@ -1,4 +1,6 @@
-<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg4432" viewBox="0 0 671.25 946.86" version="1.0">
+<svg xmlns="http://www.w3.org/2000/svg" id="svg4432" viewBox="0 0 671.25 946.86" version="1.0">
+<desc>Asset licensing information. Title: idea. Creator: yves_guillou. Source: Openclipart. License: Public Domain.</desc>
+
   <g id="layer1" transform="translate(-31.705 -23.216)">
     <g id="g6398" transform="matrix(1.2009 0 0 1.2009 -82.797 -66.116)">
       <g id="g6400" transform="matrix(.89758 0 0 1 36.715 -59.83)">
@@ -14,45 +16,4 @@
       <path id="path6418" transform="matrix(1.6599 0 0 .97991 -165.25 -228.45)" fill="#fff" d="m310.37 548.12a28.045 52.351 0 1 1 0 -0.02"/>
     </g>
   </g>
-  <metadata>
-    <rdf:RDF>
-      <cc:Work>
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
-        <dc:publisher>
-          <cc:Agent rdf:about="http://openclipart.org/">
-            <dc:title>Openclipart</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:title>idea</dc:title>
-        <dc:date>2008-01-03T19:15:16</dc:date>
-        <dc:description>bulb, bulb, clip art, clipart, icon, icon, image, media, png, public domain, svg, </dc:description>
-        <dc:source>http://openclipart.org/detail/10515/idea-by-yves_guillou-10515</dc:source>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>yves_guillou</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>bulb</rdf:li>
-            <rdf:li>clip art</rdf:li>
-            <rdf:li>clipart</rdf:li>
-            <rdf:li>icon</rdf:li>
-            <rdf:li>image</rdf:li>
-            <rdf:li>media</rdf:li>
-            <rdf:li>png</rdf:li>
-            <rdf:li>public domain</rdf:li>
-            <rdf:li>svg</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-      </cc:Work>
-      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
-        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
-      </cc:License>
-    </rdf:RDF>
-  </metadata>
-</svg>
+  </svg>
