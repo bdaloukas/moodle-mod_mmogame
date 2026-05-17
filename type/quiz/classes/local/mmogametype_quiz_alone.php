@@ -112,7 +112,6 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @param stdClass $attempt
      * @param stdClass $query
      * @param ?string $useranswer
-     * @param ?int $useranswerid
      * @param bool $autograde
      * @param array $ret (will contain all information)
      */

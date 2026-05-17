@@ -70,6 +70,12 @@ class get_highscore extends external_api {
             return self::error('invalid_count');
         }
 
+        $sessionkey = trim($sessionkey);
+
+        if (!preg_match('/^[a-f0-9]{64}$/', $sessionkey)) {
+            return self::error('invalid_sessionkey');
+        }
+
         $db = new mmogame_database_moodle();
         $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
         if ($auser === null) {
@@ -86,9 +92,9 @@ class get_highscore extends external_api {
 
         $ret = [];
 
-        $mmogame = mmogame::create($db, $auser->mmogameid);
+        $mmogame = mmogame::create($db, (int)$auser->mmogameid);
 
-        $mmogame->login_user($auser->id);
+        $mmogame->login_user((int)$auser->id);
 
         $mmogame->get_highscore($count, $ret);
 

@@ -77,7 +77,8 @@ class set_answer extends external_api {
         ]);
         $answer = trim((string)$answer);
 
-        if ($sessionkey === '') {
+        $sessionkey = trim($sessionkey);
+        if (!preg_match('/^[a-f0-9]{64}$/', $sessionkey)) {
             return self::error('invalid_sessionkey');
         }
 
@@ -88,16 +89,16 @@ class set_answer extends external_api {
         }
         $ret = [];
 
-        $mmogame = mmogame::create($db, $auser->mmogameid);
+        $mmogame = mmogame::create($db, (int)$auser->mmogameid);
 
         if (strlen($answer) > 1000) {
             return self::error('answer_too_long');
         }
 
-        $mmogame->login_user($auser->id);
+        $mmogame->login_user((int)$auser->id);
 
-        // Checks also than sessionkey is valid for this attempt.
-        $mmogame->set_answer_mode($ret, $attemptkey, $answer, $subcommand, $sessionkey);
+        // Checks also than attemptkey is valid for this mmogameid, auserid.
+        $mmogame->set_answer_mode($ret, $attemptkey, $answer, $subcommand);
 
         return json_encode($ret);
     }

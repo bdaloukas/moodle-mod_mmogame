@@ -535,7 +535,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
 
         gateSendStartSessions() {
             require(['core/ajax'], (Ajax) => {
-                // Defining the parameters to be passed to the service
+                // Defining the parameters to be passed to the service.
                 let params = {
                     mmogameid: this.mmogameid,
                     kinduser: this.kinduser,
@@ -545,12 +545,12 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                     countavatars: this.countXavatars * this.countYavatars,
                 };
                 // Calling the service through the Moodle AJAX API
-                let getAssets = Ajax.call([{
+                let startSessions = Ajax.call([{
                     methodname: 'mod_mmogame_start_sessions',
                     args: params
                 }]);
                 // Handling the response
-                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars, sessionkeys}) => {
+                startSessions[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars, sessionkeys}) => {
                     this.info = {
                         avatarids: avatarids,
                         avatars: avatars,

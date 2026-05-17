@@ -88,7 +88,7 @@ class get_attempt extends external_api {
         ]);
 
         $sessionkey = trim($sessionkey);
-        if (!is_string($sessionkey) || $sessionkey === '' || $sessionkey === '') {
+        if (!preg_match('/^[a-f0-9]{64}$/', $sessionkey)) {
             return self::error('invalid_sessionkey');
         }
 
@@ -113,7 +113,10 @@ class get_attempt extends external_api {
         if ($auser === null) {
             return self::error('no_user');
         }
-        $mmogame = mmogame::create( $db, $auser->mmogameid);
+        $mmogameid = $auser->mmogameid;
+
+        // From this point on, mmogameid/auserid are trusted only from the validated session.
+        $mmogame = mmogame::create( $db, $mmogameid);
         $mmogame->login_user($auser->id);
 
         $rgame = $mmogame->get_rgame();
@@ -122,7 +125,7 @@ class get_attempt extends external_api {
         $grade = $db->get_record_select(
             'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
-            [$auser->mmogameid, $rgame->numgame, $auser->id]
+            [$mmogameid, $rgame->numgame, $auser->id]
         );
 
         if ($grade === null) {

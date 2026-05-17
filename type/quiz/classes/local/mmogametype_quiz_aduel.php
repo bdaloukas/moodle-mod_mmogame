@@ -87,39 +87,37 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             return null;
         }
         $newplayer1 = $newplayer2 = false;
-        for ($step = 1; $step <= 2; $step++) {
-            $this->aduel = mmogame_mode_aduel::get_aduel($this, $this->maxalone, $newplayer1, $newplayer2, null, false);
-            if ($this->aduel === null) {
-                $this->set_errorcode("no_rivals");
-                return null;
-            }
-            if (!$newplayer1 && !$newplayer2) {
-                $rec = mmogame_mode_aduel::get_attempt($this, $this->aduel);
-                if ($rec !== null) {
-                    if ($rec->timestart == 0) {
-                        $rec->timestart = time();
-                        $this->db->update_record(
-                            'mmogame_quiz_attempts',
-                            ['id' => $rec->id, 'timestart' => $rec->timestart]
-                        );
-                    }
-                    return $rec;
-                } else {
-                    // Have to close this.
+
+        $this->aduel = mmogame_mode_aduel::get_aduel($this, $this->maxalone, $newplayer1, $newplayer2, null, false);
+        if ($this->aduel === null) {
+            $this->set_errorcode("no_rivals");
+            return null;
+        }
+        if (!$newplayer1 && !$newplayer2) {
+            $rec = mmogame_mode_aduel::get_attempt($this, $this->aduel);
+            if ($rec !== null) {
+                if ($rec->timestart == 0) {
+                    $rec->timestart = time();
                     $this->db->update_record(
-                        'mmogame_am_aduel_pairs',
-                        ['id' => $this->aduel->id, 'isclosed1' => 1, 'isclosed2' => 1, 'timeclose' => time()]
+                        'mmogame_quiz_attempts',
+                        ['id' => $rec->id, 'timestart' => $rec->timestart]
                     );
-                    return $this->get_attempt_new1();
                 }
-            }
-            if ($newplayer1) {
-                return $this->get_attempt_new1();
+                return $rec;
             } else {
-                return $this->get_attempt_new2();
+                // Have to close this.
+                $this->db->update_record(
+                    'mmogame_am_aduel_pairs',
+                    ['id' => $this->aduel->id, 'isclosed1' => 1, 'isclosed2' => 1, 'timeclose' => time()]
+                );
+                return $this->get_attempt_new1();
             }
         }
-        return null;
+        if ($newplayer1) {
+            return $this->get_attempt_new1();
+        } else {
+            return $this->get_attempt_new2();
+        }
     }
 
     /**
@@ -578,10 +576,8 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
      * Updates the database and array $ret about the correctness of user's answer
      *
      * @param array $ret
-     * @param ?int $attemptid
      * @param ?string $attemptkey
      * @param ?string $answer
-     * @param ?int $answerid
      * @param string $subcommand
      * @return ?stdClass: the attempt
      */

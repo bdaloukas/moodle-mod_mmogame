@@ -67,23 +67,30 @@ class get_attempts_split extends external_api {
         ]);
 
         $sessionkeys = explode(',', $sessionkeys);
-        $avatarids = $avatarids != null ? explode(',', $avatarids) : null;
+        $avatarids = $avatarids !== null && $avatarids !== '' ? explode(',', $avatarids) : null;
+
+        if (null !== $avatarids && count($avatarids) !== count($sessionkeys)) {
+            return self::error('invalid_avatarids');
+        }
 
         $db = new mmogame_database_moodle();
         $auser = null;
-        $mmogame = null;
+        $mmogameid = null;
         $auserids = [];
         foreach ($sessionkeys as $sessionkey) {
             $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
             if ($auser === null) {
                 return self::error('no_user');
             }
-            if ($mmogame == null) {
-                $mmogame = mmogame::create($db, $auser->mmogameid);
+            if ($mmogameid === null) {
+                $mmogameid = (int )$auser->mmogameid;
+            } else if ($mmogameid != (int)$auser->mmogameid) {
+                return self::error('invalid_sessionkey');
             }
 
-            $auserids[] = $auser->id;
+            $auserids[] = (int )$auser->id;
         }
+        $mmogame = mmogame::create($db, $mmogameid);
         $state = $mmogame->get_state();
         $statetime = $mmogame->get_statetime();
         if (count($auserids) == 0 || $state == 0 || $statetime == 0) {
@@ -185,7 +192,7 @@ class get_attempts_split extends external_api {
 
         $recs = $db->get_records_sql(
             $sql,
-            array_merge([$auser->mmogameid, $numgame], $inparams)
+            array_merge([$mmogameid, $numgame], $inparams)
         );
         $grades = $avatars = $ranks = [];
         foreach ($auserids as $auserid) {

@@ -147,7 +147,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.gateCreateScreen();
         }
 
-        gateSendGetAssets() {
+        gateSendStartSessions() {
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -159,12 +159,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     countavatars: this.countXavatars * this.countYavatars,
                 };
                 // Calling the service through the Moodle AJAX API
-                let getAssets = Ajax.call([{
-                    methodname: 'mod_mmogame_get_assets_split',
+                let startSessions = Ajax.call([{
+                    methodname: 'mod_mmogame_start_sessions',
                     args: params
                 }]);
                 // Handling the response
-                getAssets[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars, sessionkeys}) => {
+                startSessions[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars, sessionkeys}) => {
                     this.info = {
                         avatarids: avatarids,
                         avatars: avatars,
@@ -175,7 +175,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     };
                     this.gateCreateScreen();
                 }).fail((error) => {
-                    this.showError('gateSendGetAssets', error);
+                    this.showError('gateSendStartSessions', error);
                     return error;
                 });
             });
@@ -311,7 +311,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 }
             });
             this.btnSubmit.addEventListener("click", () => {
-                console.log("btnSubmit");
                 // This.gatePlayGame(true, this.edtNickname.value, this.paletteid, this.avatarid);
                 this.callGetAttempt(
                     {nickname: this.edtNickname.value, colorpaletteid: this.paletteid, avatarid: this.avatarid},
@@ -402,13 +401,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     colorpalettes: updatePalette ? countXpalette * countYpalette : 0,
                 };
                 // Calling the service through the Moodle AJAX API
-                let startSession = Ajax.call([{
+                let startSessions = Ajax.call([{
                     methodname: 'mod_mmogame_start_session',
                     args: params
                 }]);
 
                 // Handling the response
-                startSession[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, sessionkey}) => {
+                startSessions[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, sessionkey}) => {
                     this.sessionkey = sessionkey;
                     if (updatePalette) {
                         this.gateShowColorPalettes(this.area, leftPalette, topPalette, countXpalette, countYpalette,
@@ -720,7 +719,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 if (extraparams !== undefined) {
                     params = {...params, ...extraparams};
                 }
-                console.log("callGetAttempts", params);
                 // Calling the service through the Moodle AJAX API
                 let getAttempt = Ajax.call([{
                     methodname: 'mmogametype_quiz_get_attempt',

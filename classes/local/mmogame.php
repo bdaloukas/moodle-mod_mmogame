@@ -281,12 +281,12 @@ abstract class mmogame {
         bool $create,
         int $split
     ): ?stdClass {
-        $rec = $db->get_record_select('mmogame_aa_users', 'kind = ? AND instanceid=? AND splitnum=?', [$kind, $userid, $split]);
+        $rec = $db->get_record_select(
+            'mmogame_aa_users',
+            'mmogameid = ? AND kind = ? AND instanceid=? AND splitnum=?',
+            [$mmogameid, $kind, $userid, $split]
+        );
         if ($rec !== null) {
-            if ($rec->mmogameid != $mmogameid) {
-                $db->update_record('mmogame_aa_users', ['id' => $rec->id, 'mmogameid' => $mmogameid]);
-                $rec->mmogameid = $mmogameid;
-            }
             return $rec;
         }
         if (!$create) {

@@ -90,8 +90,10 @@ class send_answers_split extends external_api {
             'tools' => $tools,
         ]);
 
-        // Extracts array.
+        // Extract sessionkeys.
         $sessionkeys = explode(',', $sessionkeys);
+
+        // Extracts array.
         $attemptkeys = explode(',', $attemptkeys);
         $answers = explode(',', $answers);
         $timeanswers = explode(',', $timeanswers);
@@ -103,12 +105,15 @@ class send_answers_split extends external_api {
         $mmogameid = null;
         foreach ($sessionkeys as $pos => $sessionkey) {
             $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
-            if ($mmogameid == null) {
-                $mmogameid = $auser->mmogameid;
-            } else if ($mmogameid != $auser->mmogameid) {
+            if ($auser === null) {
+                return self::error('no_user');
+            }
+            if ($mmogameid === null) {
+                $mmogameid = (int)$auser->mmogameid;
+            } else if ($mmogameid !== (int)$auser->mmogameid) {
                 return self::error('invalid_sessionkey ' . $pos);
             }
-            $auserids[] = $auser->id;
+            $auserids[] = (int)$auser->id;
         }
         $mmogame = mmogame::create($db, $mmogameid);
 
