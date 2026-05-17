@@ -700,8 +700,10 @@ define([''], function() {
             ]);
 
             /**
-             * Clean node
-             * @param node
+             * Clean node.
+             *
+             * @param {Node} node DOM node to sanitize.
+             * @returns {void}
              */
             function cleanNode(node) {
                 [...node.childNodes].forEach((child) => {

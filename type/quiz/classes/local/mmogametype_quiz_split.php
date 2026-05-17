@@ -437,7 +437,6 @@ class mmogametype_quiz_split extends mmogame {
      * Set answer mode.
      *
      * @param array $ret
-     * @param int|null $attemptid
      * @param ?string $attemptkey
      * @param ?string $answer
      * @param int $timestart

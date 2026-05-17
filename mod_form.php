@@ -155,7 +155,7 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * data_preprocessing
      *
-     * @param stdClass $defaultvalues
+     * @param $defaultvalues
      */
     public function data_preprocessing(&$defaultvalues): void {
         // Completion settings check.
@@ -275,9 +275,9 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * Set data
      *
-     * @param object $defaultvalues
+     * @param mixed $defaultvalues
      */
-    public function set_data($defaultvalues): void {
+    public function set_data(mixed $defaultvalues): void {
         $mmogameid = isset($defaultvalues->id) ? intval($defaultvalues->id) : 0;
 
         if (isset($defaultvalues->type) && isset($defaultvalues->mode)) {

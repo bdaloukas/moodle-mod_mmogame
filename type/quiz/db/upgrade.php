@@ -192,7 +192,6 @@ function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
                 $upd->attemptkey = bin2hex(random_bytes(32));
                 $DB->update_record('mmogame_quiz_attempts', $upd);
             }
-
         }
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }

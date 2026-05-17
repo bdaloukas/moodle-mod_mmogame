@@ -116,7 +116,7 @@ class get_attempt extends external_api {
         $mmogameid = $auser->mmogameid;
 
         // From this point on, mmogameid/auserid are trusted only from the validated session.
-        $mmogame = mmogame::create( $db, $mmogameid);
+        $mmogame = mmogame::create($db, $mmogameid);
         $mmogame->login_user($auser->id);
 
         $rgame = $mmogame->get_rgame();

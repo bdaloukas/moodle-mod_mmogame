@@ -548,7 +548,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         }
         // Remove items so to remain $count.
         while (count($map2) > $count) {
-            $key = array_keys($map2)[rand(0, count($map2 ) - 1)];
+            $key = array_keys($map2)[rand(0, count($map2) - 1)];
             unset($map2[$key]);
         }
 

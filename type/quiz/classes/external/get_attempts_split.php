@@ -58,7 +58,7 @@ class get_attempts_split extends external_api {
      */
     public static function execute(
         string $sessionkeys,
-        ?string $avatarids = null,
+        ?string $avatarids = null
     ): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [
@@ -83,12 +83,12 @@ class get_attempts_split extends external_api {
                 return self::error('no_user');
             }
             if ($mmogameid === null) {
-                $mmogameid = (int )$auser->mmogameid;
+                $mmogameid = (int)$auser->mmogameid;
             } else if ($mmogameid != (int)$auser->mmogameid) {
                 return self::error('invalid_sessionkey');
             }
 
-            $auserids[] = (int )$auser->id;
+            $auserids[] = (int)$auser->id;
         }
         $mmogame = mmogame::create($db, $mmogameid);
         $state = $mmogame->get_state();

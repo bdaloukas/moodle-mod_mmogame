@@ -127,7 +127,7 @@ abstract class mmogame_database {
      * Return the query fragment to check if a value is IN the given list of items
      * (with a fallback to plain equal comparison if there is just one item)
      *
-     * @param mixed $items
+     * @param array $items
      * @param int $type
      * @param string $prefix
      * @param bool $equal

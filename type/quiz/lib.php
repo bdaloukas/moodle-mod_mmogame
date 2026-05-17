@@ -305,11 +305,11 @@ function mmogametype_quiz_irt_read(
 /**
  * Shows controls spesific to each game.
  *
- * @param $mform
+ * @param object $mform
  * @return void
  * @throws coding_exception
  */
-function mmogametype_quiz_definition($mform): void {
+function mmogametype_quiz_definition(object $mform): void {
     // Enabled.
     $mform->addElement(
         'advcheckbox',
@@ -325,10 +325,10 @@ function mmogametype_quiz_definition($mform): void {
 /**
  * set_data for mod_form
  *
- * @param $defaultvalues
+ * @param mixed $defaultvalues
  * @return void
  */
-function mmogametype_quiz_set_data($defaultvalues): void {
+function mmogametype_quiz_set_data(mixed $defaultvalues): void {
     if (!isset($defaultvalues->typeparams)) {
         return;
     }
@@ -340,8 +340,8 @@ function mmogametype_quiz_set_data($defaultvalues): void {
 /**
  * data_preprocessing for mod_form
  *
- * @param $defaultvalues
+ * @param mixed $defaultvalues
  * @return void
  */
-function mmogametype_quiz_data_preprocessing(&$defaultvalues): void {
+function mmogametype_quiz_data_preprocessing(mixed &$defaultvalues): void {
 }

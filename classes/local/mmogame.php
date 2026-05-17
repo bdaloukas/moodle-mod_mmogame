@@ -102,7 +102,7 @@ abstract class mmogame {
 
     /**
      * Sets the variable code.
-    @param string $code
+     * @param string $errorcode
      */
     public function set_errorcode($errorcode): void {
         $this->error = $errorcode;

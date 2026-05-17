@@ -149,7 +149,7 @@ class send_answers_split extends external_api {
         }
 
         $getattempts = new get_attempts_split();
-        return $getattempts->execute( implode( ',', $sessionkeys));
+        return $getattempts->execute(implode(',', $sessionkeys));
     }
 
     /**
