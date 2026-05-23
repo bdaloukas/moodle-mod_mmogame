@@ -33,8 +33,6 @@ use mod_mmogame\local\mmogame;
 use mod_mmogame\local\mode\mmogame_mode_aduel;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * mmogametype_quiz_split is responsible for managing and facilitating quiz gameplay
  * within the mmogame system, including handling attempts, scoring,

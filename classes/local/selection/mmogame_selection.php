@@ -39,9 +39,9 @@ abstract class mmogame_selection {
     /**
      * Constructors that saves $mmogame to variable
      *
-     * @param $mmogame
+     * @param stdClass $mmogame
      */
-    public function __construct($mmogame) {
+    public function __construct(stdClass $mmogame) {
         $this->mmogame = $mmogame;
     }
 
@@ -152,7 +152,7 @@ abstract class mmogame_selection {
     protected function check_stats(stdClass $auser, array $ids): void {
         $mmogame = $this->mmogame;
         $db = $this->mmogame->get_db();
-        $hashname = 'h'.implode(',', $ids);
+        $hashname = 'h' . implode(',', $ids);
         if (md5($hashname) !== $auser->hashcompute) {
             $countqueries = $this->repair_stats($ids);
             $db->update_record(
@@ -171,9 +171,9 @@ abstract class mmogame_selection {
     /**
      * Balance selected query IDs across categories.
      *
-     * @param array<int,int> $found Array with queryid as key and categoryid as value.
-     * @param int            $count Number of query IDs to return.
-     * @return int[] Selected query IDs.
+     * @param array $found Array with queryid as key and categoryid as value.
+     * @param int $count Number of query IDs to return.
+     * @return array Selected query IDs.
      */
     protected static function balance_categories(array $found, int $count): array {
         if ($count <= 0 || empty($found)) {

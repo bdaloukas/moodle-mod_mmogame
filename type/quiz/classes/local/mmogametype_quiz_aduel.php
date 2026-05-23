@@ -205,7 +205,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $rec = reset($recs);
             if ($rec === false) {
                 // We finished.
-                $rankvalue1 = $this->get_rankvalue1($attempt->mmogameid, $attempt->numgame, $this->auserid);
+                $rankvalue1 = $this->get_rankvalue1($this->auserid);
                 $this->db->update_record(
                     'mmogame_am_aduel_pairs',
                     ['id' => $this->aduel->id, 'isclosed1' => 1, 'rankvalue1' => $rankvalue1]
@@ -502,12 +502,10 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     /**
      * Return the value used for comparing users to find the nearest one
      *
-     * @param $mmogameid
-     * @param $numgame
      * @param int $auserid
      * @return ?float
      */
-    public function get_rankvalue1($mmogameid, $numgame, int $auserid): ?float {
+    public function get_rankvalue1(int $auserid): ?float {
         $rgrade = $this->get_rgrade($auserid);
 
         $name = $this->get_selection()->get_field_rankvalue1();

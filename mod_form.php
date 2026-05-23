@@ -155,9 +155,9 @@ class mod_mmogame_mod_form extends moodleform_mod {
     /**
      * data_preprocessing
      *
-     * @param $defaultvalues
+     * @param array $defaultvalues
      */
-    public function data_preprocessing(&$defaultvalues): void {
+    public function data_preprocessing(array &$defaultvalues): void {
         // Completion settings check.
         if (empty($defaultvalues['completionusegrade'])) {
             $defaultvalues['completionpass'] = 0; // Forced unchecked.

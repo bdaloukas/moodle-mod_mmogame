@@ -17,9 +17,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mmogametype_quiz_algorithm_irt class
+ * mmogame_selection_irt class
  *
- * @package    mmogametype_quiz
+ * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -50,7 +50,7 @@ class mmogame_selection_irt extends mmogame_selection {
         $mmogameid = $mmogame->get_id();
         $auser = $mmogame->get_auser();
         $numgame = $mmogame->get_numgame();
-        $this->check_stats( $auser, $ids);
+        $this->check_stats($auser, $ids);
 
         $sortnum = 1;
         $sort1 = 'st.serialcorrects,st.counterror DESC,st.countused,ABS(irt.difficulty-?),st.randkey';
@@ -66,7 +66,7 @@ class mmogame_selection_irt extends mmogame_selection {
             FROM {mmogame_as_irt} irt
             LEFT JOIN {mmogame_aa_stats} st ON st.queryid = irt.queryid AND st.mmogameid=? AND st.numgame=? AND st.auserid = ?
             WHERE irt.mmogameid=? AND irt.numgame=?
-            ORDER BY ".($sortnum === 1 ? $sort1 : $sort2);
+            ORDER BY " . ($sortnum === 1 ? $sort1 : $sort2);
         $params = [$theta, $mmogameid, $mmogame->get_numgame(), $auser->id, $mmogameid, $numgame];
         if ($sortnum === 1) {
             $params[] = $theta;
@@ -134,7 +134,7 @@ class mmogame_selection_irt extends mmogame_selection {
         $db = $mmogame->get_db();
 
         // Read parameters from database.
-        $recg = $mmogame->get_rgrade( $mmogame->get_auserid());
+        $recg = $mmogame->get_rgrade($mmogame->get_auserid());
         $theta = $recg !== null ? $recg->theta : 0;
 
         $reci = $db->get_record_select(
@@ -172,7 +172,7 @@ class mmogame_selection_irt extends mmogame_selection {
         $auserid = $mmogame->get_auser();
 
         // Get player's skill rating (theta).
-        $rec = $mmogame->get_rgrade( $auserid);
+        $rec = $mmogame->get_rgrade($auserid);
         $theta = $rec !== null ? $rec->theta : 0;
 
         // Retrieve all questions with player stats.
@@ -213,7 +213,7 @@ class mmogame_selection_irt extends mmogame_selection {
                 'mmogameid=? AND numgame=? AND queryid=?',
                 [$mmogame->get_id(), $mmogame->get_numgame(), $queryid]
             );
-            $rgrade = $mmogame->get_rgrade( $auserid);
+            $rgrade = $mmogame->get_rgrade($auserid);
             if ($rgrade === null || $irt === null) {
                 return 0;
             } else if ($irt->difficulty > $rgrade->theta) {

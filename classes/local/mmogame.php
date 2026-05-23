@@ -219,7 +219,7 @@ abstract class mmogame {
             return $this->auser;
         }
 
-        return $this->db->get_record_select( 'mmogame_aa_users', 'id=?', [$this->auserid]);
+        return $this->db->get_record_select('mmogame_aa_users', 'id=?', [$this->auserid]);
     }
 
     /**
@@ -841,10 +841,10 @@ abstract class mmogame {
     /**
      * Return mmogame_aa_grades record
      *
-     * @param $auserid
-     * @return stdClass|null
+     * @param int $auserid
+     * @return ?stdClass
      */
-    public function get_rgrade($auserid): ?stdClass {
+    public function get_rgrade(int $auserid): ?stdClass {
         return $this->db->get_record_select(
             'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',

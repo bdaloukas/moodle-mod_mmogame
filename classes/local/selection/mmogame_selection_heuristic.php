@@ -19,7 +19,7 @@
 /**
  * mmogametype_quiz_algorithm_irt class
  *
- * @package    mmogametype_quiz
+ * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -81,11 +81,10 @@ class mmogame_selection_heuristic extends mmogame_selection {
     /**
      * Create missing records in mmogame_as_heuristic
      *
-     * @param $queryid
-     * @param $iscorrect
-     * @return void
+     * @param int $queryid
+     * @param bool $iscorrect
      */
-    public function update_stats($queryid, $iscorrect) {
+    public function update_stats(int $queryid, bool $iscorrect) {
         $mmogame = $this->mmogame;
         $db = $mmogame->get_db();
         $rgame = $mmogame->get_rgame();
