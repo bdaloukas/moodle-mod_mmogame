@@ -61,7 +61,6 @@ class mmogame_mode_aduel {
      * @param int $maxalone
      * @param bool $newplayer1
      * @param bool $newplayer2
-     * @param array|null $auserids
      * @param bool $isaduel
      * @return ?stdClass
      */
@@ -70,7 +69,6 @@ class mmogame_mode_aduel {
         int $maxalone,
         bool &$newplayer1,
         bool &$newplayer2,
-        ?array $auserids,
         bool $isaduel
     ): ?stdClass {
         $newplayer1 = $newplayer2 = false;
@@ -81,11 +79,6 @@ class mmogame_mode_aduel {
         $select = 'mmogameid=? AND numgame=? AND ' .
             '(auserid1=? AND timestart1 <> 0 AND isclosed1 = 0 OR auserid2=? AND timestart2 <> 0 AND isclosed2 = 0)';
         $params = [$mmogame->get_id(), $mmogame->get_numgame(), $auserid, $auserid];
-        if ($auserids !== null && count($auserids)) {
-            [$insql, $inparams] = $mmogame->get_db()->get_in_or_equal($auserids);
-            $select .= " AND auserid1 $insql";
-            $params = array_merge($params, $inparams);
-        }
         $recs = $db->get_records_select(
             'mmogame_am_aduel_pairs',
             $select,
@@ -105,21 +98,13 @@ class mmogame_mode_aduel {
         }
 
         // Computes the theta of current user.
-        $grade = $db->get_record_select(
-            'mmogame_aa_grades',
-            'mmogameid=? AND numgame=? AND auserid=?',
-            [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]
-        );
-        $theta = $grade != null ? $grade->theta : 0;
+        $rgrade = $mmogame->get_rgrade($auserid);
+        $name = $mmogame->get_selection()->get_field_rankvalue1();
+        $rankvalue1 = $rgrade !== null ? $rgrade->$name : 0;
 
-        if ($grade->countalone > 0) {
+        if ($rgrade->countalone > 0) {
             $select = 'mmogameid=? AND numgame=? AND auserid1 <> ? AND isclosed1 = 1 AND isclosed2 = 0 AND auserid2 IS NULL';
             $params = [$mmogame->get_id(), $mmogame->get_numgame(), $auserid];
-            if (count($auserids)) {
-                [$insql, $inparams] = $mmogame->get_db()->get_in_or_equal($auserids);
-                $select .= " AND auserid1 $insql";
-                $params = array_merge($params, $inparams);
-            }
             $pairs = $db->get_records_select(
                 'mmogame_am_aduel_pairs',
                 $select,
@@ -148,7 +133,7 @@ class mmogame_mode_aduel {
 
         $map = [];
         foreach ($pairs as $pair) {
-            $key = round(1000000 * abs($pair->score - $theta));
+            $key = round(1000000 * abs($pair->rankvalue1 - $rankvalue1));
             $map[$key] = $pair;
         }
         ksort($map);
@@ -160,7 +145,7 @@ class mmogame_mode_aduel {
         $pair->timestart2 = time();
         $db->update_record('mmogame_am_aduel_pairs', ['id' => $pair->id, 'auserid2' => $auserid, 'timestart2' => time()]);
 
-        $db->update_record('mmogame_aa_grades', ['id' => $grade->id, 'countalone' => $grade->countalone - 1]);
+        $db->update_record('mmogame_aa_grades', ['id' => $rgrade->id, 'countalone' => $rgrade->countalone - 1]);
 
         $newplayer2 = true;
 
@@ -231,16 +216,12 @@ class mmogame_mode_aduel {
      *
      * @param mmogame $mmogame
      * @param stdClass $aduel
-     * @param bool $all
      * @return array (array of attempts record)
      */
-    public static function get_attempts(mmogame $mmogame, stdClass $aduel, bool $all = false): array {
-
-        $table = $mmogame->get_table_attempts();
-
+    public static function get_attempts(mmogame $mmogame, stdClass $aduel): array {
         return $mmogame->get_db()->get_records_select(
-            $table,
-            "auserid=? AND numgame=? AND numteam=? " . ($all ? "" : " AND timeanswer=0"),
+            $mmogame->get_table_attempts(),
+            "auserid=? AND numgame=? AND numteam=? AND timeanswer=0",
             [$mmogame->get_auserid(), $mmogame->get_numgame(), $aduel->id],
             'numattempt'
         );
@@ -260,10 +241,11 @@ class mmogame_mode_aduel {
      *
      * @param mmogame $mmogame
      * @param int $aduelid
-     * @param float $score  (Ussaly is theta of IRT of player1)
+     * @param stdClass $rgrade  (Is used for comparing to other players)
      */
-    public static function close_user1(mmogame $mmogame, int $aduelid, float $score): void {
-        $params = ['id' => $aduelid, 'isclosed1' => 1, 'score' => $score];
+    public static function close_user1(mmogame $mmogame, int $aduelid, stdClass $rgrade): void {
+        $name = $mmogame->get_selection()->get_field_rankvalue1();
+        $params = ['id' => $aduelid, 'isclosed1' => 1, 'rankvalue1' => $rgrade->$name];
 
         $mmogame->get_db()->update_record('mmogame_am_aduel_pairs', $params);
     }

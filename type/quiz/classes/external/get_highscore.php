@@ -25,7 +25,6 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
-use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -53,7 +52,6 @@ class get_highscore extends external_api {
      * @param string $sessionkey
      * @param int $count
      * @return string
-     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
@@ -94,7 +92,7 @@ class get_highscore extends external_api {
 
         $mmogame = mmogame::create($db, (int)$auser->mmogameid);
 
-        $mmogame->login_user((int)$auser->id);
+        $mmogame->login_user($auser);
 
         $mmogame->get_highscore($count, $ret);
 

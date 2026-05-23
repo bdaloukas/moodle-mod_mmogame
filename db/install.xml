@@ -15,6 +15,7 @@
         <FIELD NAME="qbankparams" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="subcategories" TYPE="int" LENGTH="1" NOTNULL="true"  SEQUENCE="false" DEFAULT="0"/>
         <FIELD NAME="modeparams" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="selection" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="type" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="mode" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
@@ -40,6 +41,7 @@
         <FIELD NAME="lastip" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="sessionkey" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="sessionexpires" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="hashcompute" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -105,14 +107,11 @@
         <FIELD NAME="usercode" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="nickname" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="colorpaletteid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="sumscore" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="countscore" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="grade" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="numteam" TYPE="int" LENGTH="10" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="percent" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="countquestions" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="countmastered" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="theta" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="countalone" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="irtrank" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
         <FIELD NAME="thetafull" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -129,23 +128,41 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="queryid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="auserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="queryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="auserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numteam" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="counterror" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timeerror" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="countcorrect" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="countused" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="percent" TYPE="float" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="islastcorrect" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="serialcorrects" TYPE="int" LENGTH="10"  NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="nextquery" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="serialcorrects" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="nextattempt" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="randkey" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="index_unique" UNIQUE="true" FIELDS="mmogameid,numgame,queryid,auserid,numteam"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="mmogame_as_heuristic" COMMENT="mmogame_as_stats_queries">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="queryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="countcorrect" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="countused" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="percent" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mmogameidqueryid" UNIQUE="false" FIELDS="mmogameid,queryid"/>
       </INDEXES>
     </TABLE>
 
@@ -182,6 +199,8 @@
         <FIELD NAME="state" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="statetime" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>        <FIELD NAME="param1" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="info" TYPE="text" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="hashcompute" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="countqueries" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -201,13 +220,9 @@
         <FIELD NAME="timelimit" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The time limit for attempts, in seconds."/>
         <FIELD NAME="isclosed1" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="isclosed2" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="tool1numattempt1" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="tool1numattempt2" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="tool2numattempt1" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="tool2numattempt2" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="tool3numattempt1" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="tool3numattempt2" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="score" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="tools1" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="tools2" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="rankvalue1" TYPE="float" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -217,7 +232,7 @@
         <INDEX NAME="mmogameidnumgameauserid2isclosed2timestart2" UNIQUE="false" FIELDS="mmogameid,numgame,auserid2,isclosed2,timestart2"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="mmogame_aa_irt" COMMENT="mmogame_aa_irt">
+    <TABLE NAME="mmogame_as_irt" COMMENT="mmogame_as_irt">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -236,7 +251,7 @@
       </INDEXES>
     </TABLE>
 
-      <TABLE NAME="mmogame_aa_irt_key" COMMENT="mmogame_aa_irt_key">
+      <TABLE NAME="mmogame_as_irt_key" COMMENT="mmogame_as_irt_key">
       <FIELDS>
          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
           <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -250,7 +265,7 @@
           </KEYS>
       </TABLE>
 
-    <TABLE NAME="mmogame_aa_irt_queries" COMMENT="mmogame_aa_irt_queries">
+    <TABLE NAME="mmogame_as_irt_queries" COMMENT="mmogame_as_irt_queries">
         <FIELDS>
             <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
             <FIELD NAME="keyid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -278,7 +293,7 @@
         </INDEXES>
     </TABLE>
 
-      <TABLE NAME="mmogame_aa_irt_ausers" COMMENT="mmogame_aa_irt_ausers">
+      <TABLE NAME="mmogame_as_irt_ausers" COMMENT="mmogame_as_irt_ausers">
           <FIELDS>
               <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
               <FIELD NAME="keyid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

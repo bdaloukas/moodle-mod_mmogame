@@ -13,7 +13,6 @@
         <FIELD NAME="numgame" TYPE="int" LENGTH="10" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numteam" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="numattempt" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="numquery" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="queryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="useranswerid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="useranswer" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
@@ -22,13 +21,10 @@
         <FIELD NAME="timestart" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timeclose" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timeanswer" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="!=0 means it is finished"/>
-        <FIELD NAME="fraction" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="score" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="score2" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="iscorrect2" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="grade" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="theta" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="difficulty" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="tools" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
+        <FIELD NAME="tools" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="attemptkey" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>

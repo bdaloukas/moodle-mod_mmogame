@@ -30,17 +30,23 @@ use mod_mmogame\local\mmogame;
 use mod_mmogame\local\database\mmogame_database;
 use stdClass;
 
+/** Identifier the state for "play" */
+const MMOGAME_QUIZ_STATE_PLAY = 1;
+/** Identifier the button "skip" */
+const MMOGAME_QUIZ_TOOL_SKIP = 2;
+/** Identifier the button "wizard" */
+const MMOGAME_QUIZ_TOOL_WIZARD = 4;
+/** Identifier the button "cut" */
+const MMOGAME_QUIZ_TOOL_5050 = 8;
+
 /**
  * mmogame_quiz is responsible for managing and facilitating quiz gameplay
  * within the mmogame system, including handling attempts, scoring,
  * and maintaining related user data.
  */
 abstract class mmogametype_quiz extends mmogame {
-    /** @var bool $stopatend : stops at the end of this game. */
-    protected bool $callupdategrades = true;
-
     /**
-     * return the name of tabler attempts.
+     * return the name of table attempts.
      */
     public static function get_table_attempts(): string {
         return 'mmogame_quiz_attempts';
@@ -63,10 +69,10 @@ abstract class mmogametype_quiz extends mmogame {
         $ret['colors'] = implode(',', $info->colors);
         $ret['name'] = $this->rgame->name;
         $ret['state'] = $this->rstate->state;
-        $ret['rank'] = $this->get_rank($info->sumscore, 'sumscore');
-        $ret['sumscore'] = $info->sumscore;
-        $ret['percent'] = $info->percent;
-        $ret['percentrank'] = $this->get_rank($info->percent, 'percent');
+        $ret['rank'] = $this->get_rank($info->grade, 'grade');
+        $ret['grade'] = $info->grade;
+        $ret['countmastered'] = $info->countmastered;
+        $ret['percentmastered'] = $this->get_rank($info->countmastered, 'countmastered');
 
         if ($attempt === null) {
             $attempt = new stdClass();
@@ -76,7 +82,6 @@ abstract class mmogametype_quiz extends mmogame {
             $attempt->queryid = 0;
             $attempt->useranswer = '';
         }
-        $ret['attempt'] = $attempt->id;
         $ret['attemptkey'] = $attempt->id !== 0 ? $attempt->attemptkey : '';
         $recquery = null;
         if ($attempt->queryid != 0) {

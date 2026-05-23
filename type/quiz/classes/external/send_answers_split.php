@@ -26,7 +26,6 @@ use dml_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
-use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -64,7 +63,6 @@ class send_answers_split extends external_api {
      * @param ?string $returnsplits
      * @param ?string $tools
      * @return array
-     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
@@ -101,7 +99,7 @@ class send_answers_split extends external_api {
         $tools = explode(',', $tools);
 
         $db = new mmogame_database_moodle();
-        $auserids = [];
+        $ausers = [];
         $mmogameid = null;
         foreach ($sessionkeys as $pos => $sessionkey) {
             $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
@@ -113,7 +111,7 @@ class send_answers_split extends external_api {
             } else if ($mmogameid !== (int)$auser->mmogameid) {
                 return self::error('invalid_sessionkey ' . $pos);
             }
-            $auserids[] = (int)$auser->id;
+            $ausers[] = $auser;
         }
         $mmogame = mmogame::create($db, $mmogameid);
 
@@ -123,11 +121,11 @@ class send_answers_split extends external_api {
         foreach ($attemptkeys as $pos => $attemptkey) {
             $tool = $tools[$pos];
 
-            $mmogame->login_user($auserids[$pos]);
+            $mmogame->login_user($ausers[$pos]);
 
             if ($tool & 4) {
                 // Special case (Idea button).
-                $idea = $auserids[$pos];
+                $idea = $ausers[$pos]->id;
                 continue;
             }
 

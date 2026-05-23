@@ -17,15 +17,14 @@
 namespace mmogametype_quiz\external;
 
 use coding_exception;
-use core\context\module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
 use core_external\restricted_context_exception;
+use dml_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
-use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -59,12 +58,11 @@ class get_attempt extends external_api {
      * @param int|null $colorpaletteid
      * @param string $subcommand
      * @return string
-     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
      * @throws restricted_context_exception
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     public static function execute(
         string $sessionkey,
@@ -117,7 +115,7 @@ class get_attempt extends external_api {
 
         // From this point on, mmogameid/auserid are trusted only from the validated session.
         $mmogame = mmogame::create($db, $mmogameid);
-        $mmogame->login_user($auser->id);
+        $mmogame->login_user($auser);
 
         $rgame = $mmogame->get_rgame();
 

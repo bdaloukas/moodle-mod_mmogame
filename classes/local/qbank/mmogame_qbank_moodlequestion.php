@@ -27,7 +27,6 @@ namespace mod_mmogame\local\qbank;
 use coding_exception;
 use dml_exception;
 use mod_mmogame\local\mmogame;
-use Random\RandomException;
 use stdClass;
 
 /**
@@ -84,6 +83,9 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      * @return ?stdClass
      */
     public function load_many(array $ids, bool $loadextra = true, string $fields = ''): ?array {
+        if (count($ids) === 0) {
+            return null;
+        }
         if ($fields == '') {
             $fields = 'qbe.id, q.id as questionid,q.qtype,q.name,q.questiontext as definition,q.generalfeedback';
         }
@@ -384,7 +386,6 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
      *
      * @param stdClass $query
      * @return ?string
-     * @throws RandomException
      */
     public function get_layout(stdClass $query): ?string {
         if ($query->qtype != 'multichoice') {
@@ -405,6 +406,20 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             array_splice($items, $pos, 1);
         }
         return $layout;
+    }
+
+    /**
+     * Return the layout (the positions of answer) for the question $queryid
+     *
+     * @param int $queryid
+     * @return string|null
+     */
+    public function get_layout_queryid(int $queryid): ?string {
+        $query = $this->load($queryid);
+        if ($query === null) {
+            return null;
+        }
+        return $this->get_layout($query);
     }
 
     /**
@@ -481,6 +496,7 @@ class mmogame_qbank_moodlequestion extends mmogame_qbank {
             AND q.qtype $insql2";
         $recs = $db->get_records_sql($sql, array_merge($inparams1, $inparams2));
         $map = [];
+
         foreach ($recs as $rec) {
             $map[$rec->id] = $rec->questioncategoryid;
         }

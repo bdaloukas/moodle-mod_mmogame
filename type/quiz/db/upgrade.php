@@ -127,13 +127,6 @@ function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
             $dbman->drop_field($table, $field);
         }
 
-        // Define field numgame to be added to mmogame.
-        $table = new xmldb_table('mmogame_quiz_attempts');
-        $field = new xmldb_field('numquery', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'numattempt');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 
@@ -166,17 +159,6 @@ function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 
-    if ($oldversion < ($ver = 2026051000)) {
-        // Define field numattempt to be added to mmogame.
-        $table = new xmldb_table('mmogame_quiz_attempts');
-        $field = new xmldb_field('tools', XMLDB_TYPE_INTEGER, 2, null, true, null, 0);
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
-    }
-
     if ($oldversion < ($ver = 2026051406)) {
         // Define field type to be added to mmogame.
         $table = new xmldb_table('mmogame_quiz_attempts');
@@ -192,6 +174,70 @@ function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
                 $upd->attemptkey = bin2hex(random_bytes(32));
                 $DB->update_record('mmogame_quiz_attempts', $upd);
             }
+        }
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2026051906)) {
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('numquery');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2026051907)) {
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('fraction');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2026051908)) {
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('score2');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2026051910)) {
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('iscorrect2');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2026052000)) {
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('score', XMLDB_TYPE_FLOAT, null, null, null, null, '0');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'grade');
+        }
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2026052001)) {
+        // Define field numattempt to be added to mmogame.
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $field = new xmldb_field('tools', XMLDB_TYPE_INTEGER, 2, null, true, null, 0);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }

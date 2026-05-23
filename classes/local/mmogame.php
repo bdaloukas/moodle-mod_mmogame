@@ -27,7 +27,7 @@ namespace mod_mmogame\local;
 use coding_exception;
 use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\qbank\mmogame_qbank;
-use Random\RandomException;
+use mod_mmogame\local\selection\mmogame_selection;
 use stdClass;
 
 /**
@@ -44,6 +44,8 @@ abstract class mmogame {
     protected stdClass $rgame;
     /** @var int $auserid: the user (table mmogame_aa_users). */
     protected int $auserid = 0;
+    /** @var ?stdClass $auser: the user (table mmogame_aa_users). */
+    protected ?stdClass $auser;
     /** @var mmogame_qbank $qbank: question bank to be used. */
     protected mmogame_qbank $qbank;
 
@@ -56,6 +58,8 @@ abstract class mmogame {
     /** @var ?stdClass $rstate: the record of table mmogame_aa_states. */
     protected ?stdClass $rstate;
 
+    /** @var mmogame_selection $selection: The algorithm for question selection */
+    protected mmogame_selection $selection;
     /**
      * Constructor.
      *
@@ -89,12 +93,12 @@ abstract class mmogame {
             $classname = 'mod_mmogame\local\qbank\mmogame_qbank_' . $rgame->qbank;
             $this->qbank = new $classname($this);
         }
+
+        $this->set_selection($rgame->selection);
     }
 
     /**
      * Creates a sessionkey or attemptkey.
-     *
-     * @throws RandomException
      */
     public static function createkey(): string {
         return bin2hex(random_bytes(32));
@@ -104,7 +108,7 @@ abstract class mmogame {
      * Sets the variable code.
      * @param string $errorcode
      */
-    public function set_errorcode($errorcode): void {
+    public function set_errorcode(string $errorcode): void {
         $this->error = $errorcode;
     }
 
@@ -201,8 +205,21 @@ abstract class mmogame {
     /**
      * Return the variable auserid.
      */
-    public function get_auserid(): int {
+    public function get_auserid(): ?int {
         return $this->auserid;
+    }
+
+    /**
+     * Returns the member variable $auser.
+     *
+     * @return stdClass
+     */
+    public function get_auser(): stdClass {
+        if ($this->auser === null) {
+            return $this->auser;
+        }
+
+        return $this->db->get_record_select( 'mmogame_aa_users', 'id=?', [$this->auserid]);
     }
 
     /**
@@ -220,7 +237,6 @@ abstract class mmogame {
      * @param bool $create
      * @param int $split
      * @return ?stdClass
-     * @throws RandomException
      */
     public static function get_auser_from_guid(
         mmogame_database $db,
@@ -251,7 +267,6 @@ abstract class mmogame {
      * @param string $code
      * @param int $split
      * @return ?stdClass
-     * @throws RandomException
      */
     public static function get_auser_from_usercode(mmogame_database $db, int $mmogameid, string $code, int $split): ?stdClass {
         $rec = $db->get_record_select('mmogame_aa_users_code', 'code=?', [$code]);
@@ -271,7 +286,6 @@ abstract class mmogame {
      * @param bool $create
      * @param int $split
      * @return ?stdClass
-     * @throws RandomException
      */
     public static function get_auser_from_db(
         mmogame_database $db,
@@ -335,7 +349,6 @@ abstract class mmogame {
      * @param bool $create
      * @param int $split
      * @return ?stdClass (the rec of table mmogame_aa_users)
-     * @throws RandomException
      */
     public static function get_asuerid(
         mmogame_database $db,
@@ -386,28 +399,21 @@ abstract class mmogame {
 
     /**
      * Marks user as loged in.
-     * @param int $auserid
+     * @param stdClass $auser
      */
-    public function login_user(int $auserid): void {
+    public function login_user(stdClass $auser): void {
         $this->db->update_record(
             'mmogame_aa_users',
             [
-                'id' => $auserid,
+                'id' => $auser->id,
                 'lastlogin' => time(),
                 'lastip' => self::get_ip(),
                 'sessionexpires' => time() + 86400,
             ],
         );
 
-        $this->auserid = $auserid;
-    }
-
-    /**
-     * Marks user as loged in.
-     * @param int $auserid
-     */
-    public function login_user_nolog(int $auserid): void {
-        $this->auserid = $auserid;
+        $this->auser = $auser;
+        $this->auserid = $auser->id;
     }
 
     /**
@@ -434,13 +440,15 @@ abstract class mmogame {
     /**
      * Returns the next numattempt of the current game.
      *
+     * @param string $table
+     * @param int $auserid
      * @return int
      */
-    public function compute_next_numattempt(): int {
+    public function compute_next_numattempt(string $table, int $auserid): int {
         $rec = $this->db->get_record_select(
-            $this->get_table_attempts(),
+            $table,
             'mmogameid=? AND numgame=? AND auserid=?',
-            [$this->rgame->id, $this->rgame->numgame, $this->get_auserid()],
+            [$this->rgame->id, $this->rgame->numgame, $auserid],
             'MAX(numattempt) as maxnum'
         );
         return $rec->maxnum + 1;
@@ -700,7 +708,6 @@ abstract class mmogame {
      * @param int $maxavatars
      * @param string $kinduser
      * @param string $user
-     * @throws RandomException
      */
     public function start_sessions(
         int $countsplit,
@@ -814,4 +821,43 @@ abstract class mmogame {
      * @return ?stdClass
      */
     abstract public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass;
+
+    /**
+     * Assigns the selection queries algorithm
+     *
+     * @param ?string $selection
+     * @return void
+     * @throws coding_exception
+     */
+    private function set_selection(?string $selection) {
+        $classname = 'mod_mmogame\local\selection\mmogame_selection_' . ($selection === 'irt' ? 'irt' : 'heuristic');
+
+        if (!class_exists($classname)) {
+            throw new coding_exception("Class $classname does not exist.");
+        }
+        $this->selection = new $classname($this);
+    }
+
+    /**
+     * Return mmogame_aa_grades record
+     *
+     * @param $auserid
+     * @return stdClass|null
+     */
+    public function get_rgrade($auserid): ?stdClass {
+        return $this->db->get_record_select(
+            'mmogame_aa_grades',
+            'mmogameid=? AND numgame=? AND auserid=?',
+            [$this->rgame->id, $this->rgame->numgame, $auserid]
+        );
+    }
+
+    /**
+     * Returns selection queries algorithm.
+     *
+     * @return mmogame_selection
+     */
+    public function get_selection(): mmogame_selection {
+        return $this->selection;
+    }
 }

@@ -24,7 +24,6 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
-use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -56,7 +55,6 @@ class set_answer extends external_api {
      * @param ?string $answer
      * @param string $subcommand
      * @return string
-     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws required_capability_exception
@@ -95,7 +93,7 @@ class set_answer extends external_api {
             return self::error('answer_too_long');
         }
 
-        $mmogame->login_user((int)$auser->id);
+        $mmogame->login_user($auser);
 
         // Checks also than attemptkey is valid for this mmogameid, auserid.
         $mmogame->set_answer_mode($ret, $attemptkey, $answer, $subcommand);

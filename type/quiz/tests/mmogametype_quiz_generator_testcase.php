@@ -85,8 +85,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         // Command get_attempt with empty questionbank.
         $mmogame->update_state(1);
         $getattempt = new mmogametype_quiz\external\get_attempt();
-        $result = json_decode($getattempt->execute($sessionkey, "test", 1, 1, ''));
-        $this->assertTrue($result->attempt === 0);
+        $result = json_decode($getattempt->execute($sessionkey, "test", 1, 1));
+        $this->assertTrue($result->attemptkey === '');
 
         // Command get_attempt with 1 question.
 
@@ -101,7 +101,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         );
         $mmogame->update_state(1);
         $result = json_decode($getattempt->execute($sessionkey, 'Test', 1, 1));
-        $this->assertTrue($result->attempt != 0);
+        $this->assertTrue($result->attemptkey != '');
 
         // Command set_answer correct.
         $setanswer = new mmogametype_quiz\external\set_answer();
@@ -186,9 +186,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
         // Gets the first question.
         $getattempt = new mmogametype_quiz\external\get_attempt();
-        global $USER;
-        $result = json_decode($getattempt->execute($sessionkey, "Test", 1, 1, ''));
-        $this->assertTrue($result->attempt != 0);
+        $result = json_decode($getattempt->execute($sessionkey, "Test", 1, 1));
+        $this->assertTrue($result->attemptkey !== '');
 
         // Gives the correct answer.
         $setanswer = new mmogametype_quiz\external\set_answer();
@@ -203,8 +202,8 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $this->assertTrue($result->iscorrect == 1);
 
         // Gives the wrong answer.
-        $result = json_decode($getattempt->execute($sessionkey, 'moodle', 1, 1, ''));
-        $this->assertTrue($result->attempt != 0);
+        $result = json_decode($getattempt->execute($sessionkey, 'moodle', 1, 1));
+        $this->assertTrue($result->attemptkey !== '');
         $result = json_decode(
             $setanswer->execute(
                 $sessionkey,
@@ -213,7 +212,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 '',
             )
         );
-        $this->assertTrue($result->iscorrect == 0);
+        $this->assertTrue($result->iscorrect === 0);
 
         // Use tool1 (50x50).
         $result = json_decode(
@@ -225,7 +224,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 'tool1'
             )
         );
-        $this->assertTrue($result->attempt != 0);
+        $this->assertTrue($result->attemptkey !== '');
 
         $gethighscore = new mmogametype_quiz\external\get_highscore();
         $result = json_decode($gethighscore->execute($sessionkey, 3));

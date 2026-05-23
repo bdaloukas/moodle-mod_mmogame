@@ -74,9 +74,8 @@ class get_attempts_split extends external_api {
         }
 
         $db = new mmogame_database_moodle();
-        $auser = null;
         $mmogameid = null;
-        $auserids = [];
+        $ausers = [];
         foreach ($sessionkeys as $sessionkey) {
             $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
             if ($auser === null) {
@@ -88,12 +87,12 @@ class get_attempts_split extends external_api {
                 return self::error('invalid_sessionkey');
             }
 
-            $auserids[] = (int)$auser->id;
+            $ausers[] = $auser;
         }
         $mmogame = mmogame::create($db, $mmogameid);
         $state = $mmogame->get_state();
         $statetime = $mmogame->get_statetime();
-        if (count($auserids) == 0 || $state == 0 || $statetime == 0) {
+        if (count($ausers) == 0 || $state == 0 || $statetime == 0) {
             return [
                 'avatars' => [],
                 'attempts' => [],
@@ -121,7 +120,7 @@ class get_attempts_split extends external_api {
         }
         if ($avatarids !== null) {
             foreach ($sessionkeys as $pos => $sessionkey) {
-                $info = $mmogame->get_avatar_info($auserids[$pos], false);
+                $info = $mmogame->get_avatar_info($ausers[$pos]->id, false);
                 $db->update_record(
                     'mmogame_aa_grades',
                     ['id' => $info->id, 'avatarid' => $avatarids[$pos]]
@@ -129,33 +128,18 @@ class get_attempts_split extends external_api {
             }
         }
 
-        $isaduel = $onlygroup = false;
-        $modeparams = $mmogame->get_rgame()->modeparams;
-        if ($modeparams != '') {
-            $data = json_decode($modeparams, true);
-            if (isset($data['isaduel']) && $data['isaduel'] > 0) {
-                $isaduel = true;
-            }
-            if (isset($data['onlygroup']) && $data['onlygroup'] > 0) {
-                $onlygroup = true;
-            }
-        }
-        $aduelauserids = $onlygroup ? $mmogame->get_ausers_split($auser->kinduser, $auser->user) : [];
-
         for (;;) {
             $numgame = 0;
-            $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips = $answerids = $answertexts = $attemptkeys = [];
-            $aduelavatars = $aduelcorrects = $queryanswerids0 = $aduels = [];
+            $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips =
+            $answerids = $answertexts = $attemptkeys = $queryanswerids0 = [];
 
             $countquestions = 0;
-            $countcorrect = [];
+            $countmastered = [];
             $islastcorrect = [];
             $queryranks = [];
             $retry = self::get_attempts(
                 $mmogame,
-                $auserids,
-                $isaduel,
-                $aduelauserids,
+                $ausers,
                 $numgame,
                 $attemptids,
                 $attemptkeys,
@@ -165,12 +149,8 @@ class get_attempts_split extends external_api {
                 $tips,
                 $answerids,
                 $answertexts,
-                $aduels,
-                $aduelavatars,
-                $aduelcorrects,
                 $queryanswerids0,
-                $countquestions,
-                $countcorrect,
+                $countmastered,
                 $islastcorrect,
                 $queryranks
             );
@@ -180,11 +160,15 @@ class get_attempts_split extends external_api {
             }
         }
 
+        $auserids = [];
+        foreach ($ausers as $auser) {
+            $auserids[] = $auser->id;
+        }
         [$insql, $inparams] = $db->get_in_or_equal($auserids);
-        $sql = "SELECT g.auserid, g.sumscore, a.directory, a.filename,
+        $sql = "SELECT g.auserid, g.grade, a.directory, a.filename,
             (SELECT COUNT(*)
                 FROM {mmogame_aa_grades} g2
-                WHERE g2.mmogameid=g.mmogameid AND g2.numgame=g.numgame AND g2.sumscore > g.sumscore
+                WHERE g2.mmogameid=g.mmogameid AND g2.numgame=g.numgame AND g2.grade > g.grade
             ) as numrank
             FROM {mmogame_aa_grades} g
             LEFT JOIN {mmogame_aa_avatars} a ON a.id=g.avatarid
@@ -198,7 +182,7 @@ class get_attempts_split extends external_api {
         foreach ($auserids as $auserid) {
             foreach ($recs as $rec) {
                 if ($rec->auserid == $auserid) {
-                    $grades[] = $rec->sumscore;
+                    $grades[] = $rec->grade;
                     $ranks[] = $rec->numrank + 1;
                     $avatars[] = $rec->directory . '/' . $rec->filename;
                     break;
@@ -210,9 +194,8 @@ class get_attempts_split extends external_api {
             'attemptqueryids' => $attemptqueryids,
             'numattempts' => $attemptnums, 'querydefinitions' => $definitions,
             'querytips' => $tips, 'queryanswerids' => $answerids, 'answertexts' => $answertexts,
-            'aduels' => $aduels, 'aduelavatars' => $aduelavatars, 'aduelcorrects' => $aduelcorrects,
             'queryanswerids0' => $queryanswerids0, 'grades' => $grades,
-            'countquestion' => $countquestions, 'countcorrect' => $countcorrect, 'islastcorrect' => $islastcorrect,
+            'countquestion' => $countquestions, 'countmastered' => $countmastered, 'islastcorrect' => $islastcorrect,
             'ranks' => $ranks, 'queryranks' => $queryranks, 'hasidea' => 0, 'state' => $state, 'statetime' => 0];
     }
 
@@ -296,9 +279,7 @@ class get_attempts_split extends external_api {
     /**
      * Call get_attempts of mmogame.
      * @param mmogame $mmogame
-     * @param array $auserids
-     * @param bool $isaduel
-     * @param array|null $aduelauserids
+     * @param array $ausers
      * @param int $numgame
      * @param array $attemptids
      * @param array $attemptkeys
@@ -308,21 +289,15 @@ class get_attempts_split extends external_api {
      * @param array $tips
      * @param array $answerids
      * @param array $answertexts
-     * @param array $aduels
-     * @param array $aduelavatars
-     * @param array $aduelcorrects
      * @param array $queryanswerids0
-     * @param int $countquestions
-     * @param array $countcorrect
+     * @param array $countmastered
      * @param array $islastcorrect
      * @param array $queryranks
      * @return bool
      */
     private static function get_attempts(
         mmogame $mmogame,
-        array $auserids,
-        bool $isaduel,
-        ?array $aduelauserids,
+        array $ausers,
         int &$numgame,
         array &$attemptids,
         array &$attemptkeys,
@@ -332,52 +307,30 @@ class get_attempts_split extends external_api {
         array &$tips,
         array &$answerids,
         array &$answertexts,
-        array &$aduels,
-        array &$aduelavatars,
-        array &$aduelcorrects,
         array &$queryanswerids0,
-        int &$countquestions,
-        array &$countcorrect,
+        array &$countmastered,
         array &$islastcorrect,
         array &$queryranks
     ): bool {
         $queryranks = [];
-        $recs = $mmogame->get_attempts(
-            $auserids,
-            $isaduel,
-            $aduelauserids,
-            $countquestions,
-            $countcorrect,
-            $islastcorrect,
-            $queryranks
-        );
+        $recs = $mmogame->get_attempts($ausers, $countmastered);
         $queryids = [];  /* Queries that are used */
         $attemptqueryids = []; /* Which query has every attempt */
         $attemptids = $attemptnums = $attemptkeys = [];
         $querypositions = [];
-        $aduelavatars = $aduels = $aduelcorrects = [];
         $querytoatttempt = [];
         $numgame = 0;
-        foreach ($recs as $position => $attempts) {
+        foreach ($recs as $attempts) {
+            if ($attempts === null || count($attempts) === 0) {
+                // No questions.
+                return false;
+            }
             $nums = $ids = $newids = $attemptkeys1 = [];
             $found = false;
-            $isaduel = false;
-            $corrects = [];
             foreach ($attempts as $attempt) {
                 if (!$found) {
                     $found = true;
                     $numgame = $attempt->numgame;
-                    $auserid = intval($auserids[$position]);
-                    $aduel = $mmogame->get_db()->get_record_select('mmogame_am_aduel_pairs', 'id=?', [$attempt->numteam]);
-                    if (intval($aduel->auserid2) == $auserid) {
-                        $aduels[] = count($aduels);
-                        $info = $mmogame->get_avatar_info($aduel->auserid1, false);
-                        $aduelavatars[] = $info->avatar;
-                        $isaduel = true;
-                    } else {
-                        $aduels[] = -1;
-                        $aduelavatars[] = '';
-                    }
                 }
                 if (array_key_exists($attempt->queryid, $querypositions)) {
                     $pos = $querypositions[$attempt->queryid];
@@ -393,22 +346,17 @@ class get_attempts_split extends external_api {
 
                 $querytoatttempt[$attempt->queryid] = $attempt->id;
 
-                if (!$isaduel) {
-                    $corrects[] = '';
-                } else {
-                    $attempt2 = $mmogame->get_db()->get_record_select(
-                        'mmogame_quiz_attempts',
-                        "mmogameid=? AND numgame=? AND numteam=? AND auserid=? AND numattempt=?",
-                        [$attempt->mmogameid, $attempt->numgame, $attempt->numteam, $aduel->auserid1, $attempt->numattempt]
-                    );
-                    $corrects[] = $attempt2->iscorrect;
-                }
+                $stat = $mmogame->get_db()->get_record_select(
+                    'mmogame_aa_stats',
+                    'mmogameid=? AND numgame=? AND auserid=? AND queryid=?',
+                    [$attempt->mmogameid, $attempt->numgame, $attempt->auserid, $attempt->queryid]
+                );
+                $islastcorrect[] = $stat !== null ? ($stat->serialcorrects >= 0 ? 1 : 0) : null;
             }
             $attemptnums[] = implode(',', $nums);
             $attemptids[] = implode(',', $ids);
             $attemptkeys[] = implode(',', $attemptkeys1);
             $attemptqueryids[] = implode(',', $newids);
-            $aduelcorrects[] = $isaduel ? implode(',', $corrects) : '';
         }
 
         $queries = $mmogame->get_qbank()->load_many($queryids);
