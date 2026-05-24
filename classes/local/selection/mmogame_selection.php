@@ -39,9 +39,9 @@ abstract class mmogame_selection {
     /**
      * Constructors that saves $mmogame to variable
      *
-     * @param stdClass $mmogame
+     * @param mmogame $mmogame
      */
-    public function __construct(stdClass $mmogame) {
+    public function __construct(mmogame $mmogame) {
         $this->mmogame = $mmogame;
     }
 
@@ -52,6 +52,43 @@ abstract class mmogame_selection {
      */
     public function get_field_rankvalue1(): string {
         return 'countmastered';
+    }
+
+    /**
+     * Computes the ranking of query $queryid
+     *
+     * @param int $queryid
+     * @return ?int
+     */
+    abstract public function get_rankquery(int $queryid): ?int;
+
+    /**
+     * Computes the ranking based on $field of table $table
+     *
+     * @param string $table
+     * @param string $field
+     * @param int $queryid
+     * @return int|null
+     */
+    public function get_rankquery_table(string $table, string $field, int $queryid): ?int {
+        $mmogame = $this->mmogame;
+        $rec = $mmogame->get_db()->get_record_select(
+            $table,
+            'mmogameid=? AND numgame=? AND queryid=?',
+            [$mmogame->get_id(), $mmogame->get_numgame(), $queryid],
+            $field
+        );
+        if ($rec === null) {
+            return null;
+        }
+        $rec = $mmogame->get_db()->get_record_select(
+            $table,
+            "mmogameid=? AND numgame=? AND $field > ?",
+            [$mmogame->get_id(), $mmogame->get_numgame(), $rec->$field],
+            'COUNT(*) AS c'
+        );
+
+        return 1 + $rec->c;
     }
 
     /**
@@ -99,7 +136,7 @@ abstract class mmogame_selection {
             'mmogameid=? AND numgame=? AND auserid = ?',
             [$mmogame->get_id(), $numgame, $mmogame->get_auserid()],
             '',
-            'id,queryid'
+            'id,queryid,isvalid'
         );
         // 1. Deletes records from mmogame_aa_stats belonging to the invalid queries.
         foreach ($stats as $stat) {
@@ -152,17 +189,25 @@ abstract class mmogame_selection {
     protected function check_stats(stdClass $auser, array $ids): void {
         $mmogame = $this->mmogame;
         $db = $this->mmogame->get_db();
-        $hashname = 'h' . implode(',', $ids);
+        $hashname = $mmogame->get_rgame()->selection . json_encode($ids, JSON_PRETTY_PRINT);
         if (md5($hashname) !== $auser->hashcompute) {
             $countqueries = $this->repair_stats($ids);
             $db->update_record(
                 'mmogame_aa_users',
                 ['id' => $auser->id, 'hashcompute' => md5($hashname)]
             );
-            if ($mmogame->get_rstate()->countqueries != $countqueries) {
+            $rstate = $mmogame->get_rstate();
+            if (md5($hashname) != $rstate->hashcompute) {
+                $rstate->countqueries = $countqueries;
+                $rstate->hashcompute = md5($hashname);
+                $this->before_repair_state($ids);
                 $db->update_record(
                     'mmogame_aa_states',
-                    ['id' => $mmogame->get_rstate()->id, 'countqueries' => $countqueries]
+                    [
+                        'id' => $mmogame->get_rstate()->id,
+                        'countqueries' => $rstate->countqueries,
+                        'hashcompute' => $rstate->hashcompute,
+                    ]
                 );
             }
         }
@@ -230,5 +275,53 @@ abstract class mmogame_selection {
      * @return void
      */
     public function update(int $queryid, bool $iscorrect, ?float &$theta, ?float &$difficulty): void {
+    }
+
+    /**
+     * Computes grades, ranks and avatars for selected users
+     *
+     * @param array $auserids
+     * @return array [$grades, $ranks, $avatars]
+     */
+    public function compute_ranks(array $auserids): array {
+        $mmogame = $this->mmogame;
+        $db = $mmogame->get_db();
+
+        [$insql, $inparams] = $db->get_in_or_equal($auserids);
+        $sql = "SELECT g.auserid, g.grade, a.directory, a.filename,
+            (SELECT COUNT(*)
+                FROM {mmogame_aa_grades} g2
+                WHERE g2.mmogameid=g.mmogameid AND g2.numgame=g.numgame AND g2.grade > g.grade
+            ) as numrank
+            FROM {mmogame_aa_grades} g
+            LEFT JOIN {mmogame_aa_avatars} a ON a.id=g.avatarid
+            WHERE g.mmogameid=? AND g.numgame=? AND g.auserid $insql";
+
+        $recs = $db->get_records_sql(
+            $sql,
+            array_merge([$mmogame->get_id(), $mmogame->get_numgame()], $inparams)
+        );
+        $grades = $avatars = $ranks = [];
+        foreach ($auserids as $auserid) {
+            foreach ($recs as $rec) {
+                if ($rec->auserid == $auserid) {
+                    $grades[] = $rec->grade;
+                    $ranks[] = $rec->numrank + 1;
+                    $avatars[] = $rec->directory . '/' . $rec->filename;
+                    break;
+                }
+            }
+        }
+
+        return [$grades, $ranks, $avatars];
+    }
+
+    /**
+     * Called before updating field countqueries in table mmogame_aa_states
+     *
+     * @param array $ids
+     * @return void
+     */
+    protected function before_repair_state(array $ids) {
     }
 }

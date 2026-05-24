@@ -157,13 +157,13 @@ class mmogametype_quiz_split_admin extends moodleform {
             $subsql = "SELECT COUNT(*)
                 FROM {mmogame_quiz_attempts}
                 WHERE mmogameid=g.mmogameid AND numgame=g.numgame AND auserid=g.auserid";
-            $sql = "SELECT auserid,sumscore,($subsql) as answers
+            $sql = "SELECT auserid,grade,($subsql) as answers
                 FROM {mmogame_aa_grades} g
                 WHERE mmogameid=? AND numgame=? ORDER BY auserid";
             $recs = $DB->get_records_sql($sql, [$rgame->id, $rgame->numgame]);
             $a = [];
             foreach ($recs as $rec) {
-                $a[$rec->auserid] = $rec->auserid . ':' . $rec->sumscore . '-' . $rec->answers;
+                $a[$rec->auserid] = $rec->auserid . ':' . $rec->grade . '-' . $rec->answers;
             }
             $mform->addElement('html', '<td>' . implode(', ', $a) . '</td>');
             $mform->addElement('html', '</tr>');

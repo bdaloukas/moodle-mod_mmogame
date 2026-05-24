@@ -109,7 +109,7 @@ class get_attempt extends external_api {
         $db = new mmogame_database_moodle();
         $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
         if ($auser === null) {
-            return self::error('no_user');
+            return self::error('no_user s='.$sessionkey);
         }
         $mmogameid = $auser->mmogameid;
 
@@ -117,25 +117,22 @@ class get_attempt extends external_api {
         $mmogame = mmogame::create($db, $mmogameid);
         $mmogame->login_user($auser);
 
-        $rgame = $mmogame->get_rgame();
-
         // No selection of avatar and colorpalettes yet.
-        $grade = $db->get_record_select(
-            'mmogame_aa_grades',
-            'mmogameid=? AND numgame=? AND auserid=?',
-            [$mmogameid, $rgame->numgame, $auser->id]
-        );
-
-        if ($grade === null) {
-            return self::error('no_user');
+        $rgrade = $mmogame->get_rgrade($auser->id, true);
+        if ($rgrade === null) {
+            return self::error('no_rgrade');
         }
 
         if ($nickname !== '' && $avatarid > 0 && $colorpaletteid > 0) {
-            $nickname = mb_substr($nickname, 0, 50);
-            $info = $mmogame->get_avatar_info($auser->id);
+            $rgrade->nickname = mb_substr($nickname, 0, 50);
+            $rgrade->avatarid = $avatarid;
+            $rgrade->colorpaletteid = $colorpaletteid;
             $mmogame->get_db()->update_record(
                 'mmogame_aa_grades',
-                ['id' => $info->id, 'nickname' => $nickname, 'avatarid' => $avatarid, 'colorpaletteid' => $colorpaletteid]
+                [
+                    'id' => $rgrade->id, 'nickname' => $rgrade->nickname,
+                    'avatarid' => $rgrade->avatarid, 'colorpaletteid' => $rgrade->colorpaletteid,
+                ]
             );
         }
         if ($mmogame->get_state() != 0) {

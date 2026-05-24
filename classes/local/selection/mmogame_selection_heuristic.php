@@ -99,7 +99,8 @@ class mmogame_selection_heuristic extends mmogame_selection {
             if ($iscorrect) {
                 $a['countcorrect'] = ++$rec->countcorrect;
             }
-            $a['percent'] = $rec->countcorrect / $rec->countused;
+            // Percent of wrong answers.
+            $a['percent'] = ($rec->countused - $rec->countcorrect) / $rec->countused;
             $db->update_record(
                 'mmogame_as_heuristic',
                 $a
@@ -111,7 +112,7 @@ class mmogame_selection_heuristic extends mmogame_selection {
                 'queryid' => $queryid,
                 'countcorrect' => $iscorrect ? 1 : 0,
                 'countused' => 1,
-                'percent' => $iscorrect ? 1 : 0,
+                'percent' => $iscorrect ? 0 : 1,
             ];
             $db->insert_record('mmogame_as_heuristic', $a);
         }
@@ -126,5 +127,68 @@ class mmogame_selection_heuristic extends mmogame_selection {
      */
     public function compute_addnextattempt(int $queryid, int $iscorrect): int {
         return $iscorrect ? 10 : 5;
+    }
+
+    /**
+     * Computes the ranking of query $queryid
+     *
+     * @param int $queryid
+     * @return ?int
+     */
+    public function get_rankquery(int $queryid): ?int {
+        return $this->get_rankquery_table('mmogame_as_heuristic', 'percent', $queryid);
+    }
+
+    /**
+     * Called before updating field countqueries in table mmogame_aa_states
+     *
+     * @param array $ids
+     * @return void
+     */
+    protected function before_repair_state(array $ids) {
+        $mmogame = $this->mmogame;
+        $numgame = $mmogame->get_numgame();
+        $db = $mmogame->get_db();
+
+        $mapids = [];
+        foreach ($ids as $queryid => $categoryid) {
+            $mapids[$queryid] = $queryid;
+        }
+
+        $recs = $db->get_records_select(
+            'mmogame_as_heuristic',
+            'mmogameid=? AND numgame=?',
+            [$mmogame->get_id(), $numgame],
+            '',
+            'id,queryid,isvalid'
+        );
+        // 1. Deletes records from mmogame_aa_stats belonging to the invalid queries.
+        foreach ($recs as $rec) {
+            $queryid = $rec->queryid;
+            if (!array_key_exists($queryid, $mapids)) {
+                if ($rec->isvalid !== 0) {
+                    $db->update_record('mmogame_as_heurisric', ['id' => $rec->id, 'isvalid' => 0]);
+                }
+                continue;
+            }
+
+            unset($mapids[$queryid]);
+            if ($rec->isvalid === 0) {
+                $db->update_record('mmogame_as_heuristic', ['id' => $rec->id, 'isvalid' => 1]);
+            }
+        }
+
+        // 2. Insert new records mmogame_aa_stats.
+        foreach ($mapids as $queryid) {
+            $db->insert_record(
+                'mmogame_as_heuristic',
+                [
+                    'mmogameid' => $mmogame->get_id(),
+                    'numgame' => $numgame,
+                    'queryid' => $queryid,
+                    'isvalid' => 1,
+                ]
+            );
+        }
     }
 }

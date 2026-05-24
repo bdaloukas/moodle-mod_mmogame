@@ -106,7 +106,6 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         // Compute iscorrect.
         $fraction = 0.0;
         $attempt->iscorrect = $this->qbank->is_correct($query, $useranswer, $this, $fraction) ? 1 : 0;
-
         $time = time();
         $istimeout = ($attempt->timeclose > 0 && $time > $attempt->timeclose + 1);
 

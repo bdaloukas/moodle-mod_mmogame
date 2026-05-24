@@ -100,51 +100,30 @@ abstract class mmogame_qbank {
      */
     public function update_grades(int $auserid, int $addgrade, int $addcountmastered, ?array $fields = null): stdClass {
         $db = $this->mmogame->get_db();
-        $rgame = $this->mmogame->get_rgame();
 
-        $rec = $db->get_record_select(
-            'mmogame_aa_grades',
-            'mmogameid=? AND numgame=? AND auserid=?',
-            [$rgame->id, $rgame->numgame, $auserid]
-        );
-        if ($rec === null) {
-            $this->mmogame->get_grade($auserid);
-            $rec = $db->get_record_select(
-                'mmogame_aa_grades',
-                'mmogameid=? AND numgame=? AND auserid=?',
-                [$rgame->id, $rgame->numgame, $auserid]
-            );
-        }
-        $a = [];
+        $rgrade = $this->mmogame->get_rgrade($auserid, true);
+        $a = ['id' => $rgrade->id];
         if ($fields !== null) {
             foreach ($fields as $field => $value) {
                 $a[$field] = $value;
             }
         }
 
-        if ($rec !== null) {
-            $a['id'] = $rec->id;
-            if ($addgrade != 0) {
-                $a['grade'] = max(0, $rec->grade + $addgrade);
-            }
-            $a['countmastered'] = $rec->countmastered + $addcountmastered;
-            if (count($a) > 1) {
-                $db->update_record('mmogame_aa_grades', $a);
-            }
-
-            return $rec;
-        } else {
-            $a['mmogameid'] = $rgame->id;
-            $a['numgame'] = $rgame->numgame;
-            $a['auserid'] = $auserid;
-            $a['grade'] = max(0, $addgrade);
-            $a['timemodified'] = time();
-            $a['countmastered'] = $addcountmastered;
-
-            $id = $db->insert_record('mmogame_aa_grades', $a);
-
-            return $db->get_record_select('mmogame_aa_grades', 'id=?', $id);
+        if ($addgrade != 0) {
+            $rgrade->grade = max(0, $rgrade->grade + $addgrade);
+            $a['grade'] = $rgrade->grade;
         }
+        if ($addcountmastered != 0) {
+            $rgrade->countmastered = max(0, $rgrade->countmastered + $addcountmastered);
+            $a['countmastered'] = $rgrade->countmastered;
+        }
+        $countqueries = $this->mmogame->get_rstate()->countqueries;
+        $rgrade->percent = $countqueries > 0 ? $rgrade->countmastered / $countqueries : 0;
+        if (count($a) > 1) {
+            $db->update_record('mmogame_aa_grades', $a);
+        }
+
+        return $rgrade;
     }
 
     /**

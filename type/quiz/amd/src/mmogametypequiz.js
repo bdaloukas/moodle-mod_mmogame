@@ -22,8 +22,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         type;
 
         // Colors.
-        colorScore;
-        colorScore2;
+        colorGrade;
+        colorGrade2;
 
         /**
          * Base class for Quiz mmmogame
@@ -118,7 +118,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
                 // Create the checkbox
                 const checked = aChecked !== undefined && aChecked !== null && aChecked.includes(this.answersID[i]);
-                const item = this.createRadiobox(this.body, checkboxSize, this.colorBackground2, this.colorScore,
+                const item = this.createRadiobox(this.body, checkboxSize, this.colorBackground2, this.colorGrade,
                     checked, disabled);
                 item.style.position = "absolute";
                 item.style.left = `${left}px`;
@@ -128,12 +128,12 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 // Event listeners for interactions
                 item.addEventListener('click', () => {
                     if (!item.classList.contains("disabled")) {
-                        this.onClickRadio(i, this.colorBackground2, this.colorScore);
+                        this.onClickRadio(i, this.colorBackground2, this.colorGrade);
                     }
                 });
 
                 label.addEventListener('click', () => {
-                    this.onClickRadio(i, this.colorBackground2, this.colorScore);
+                    this.onClickRadio(i, this.colorBackground2, this.colorGrade);
                 });
 
                 fragment.appendChild(item);
@@ -219,7 +219,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.aItemAnswer.forEach(item => {
                 item.classList.add("disabled");
                 item.setAttribute("disabled", "true"); // Ensuring proper disabling
-                this.drawRadio(item, this.colorScore, this.colorBackground2); // Update styling
+                this.drawRadio(item, this.colorGrade, this.colorBackground2); // Update styling
             });
         }
 
@@ -228,17 +228,17 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         }
 
         /**
-         * Creates a percentage-based score display using createDOMElement.
+         * Creates a percentage-based grade display using createDOMElement.
          *
          * @param {any} parent
          * @param {string} prefixclassname
          * @param {number} left - The left position in pixels.
          * @param {number} top - The top position in pixels.
-         * @param {boolean} createAddScore
+         * @param {boolean} createAddGrade
          * @param {number} colorBackground
          * */
-        createDivScorePercent(parent, prefixclassname, left, top,
-                              createAddScore, colorBackground) {
+        createDivGradePercent(parent, prefixclassname, left, top,
+                              createAddGrade, colorBackground) {
             const colorText = this.getContrastingColor(colorBackground);
             // Create the main button container
             const divMain = this.createDOMElement('div', {
@@ -254,7 +254,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     boxShadow: "inset 0 0 0.125em rgba(255, 255, 255, 0.75)",
                     background: this.getColorHex(colorBackground),
                     color: colorText,
-                    borderRadius: createAddScore ? `${this.iconSize / 10}px` : `${this.iconSize}px`,
+                    borderRadius: createAddGrade ? `${this.iconSize / 10}px` : `${this.iconSize}px`,
                 },
                 attributes: {
                     disabled: true,
@@ -264,12 +264,12 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             const cellSize = Math.round(this.iconSize / 2);
 
-            let lblAddScore;
-            if (createAddScore) {
-                // Create the additional score label (line3)
-                lblAddScore = this.createDOMElement('div', {
+            let lblAddGrade;
+            if (createAddGrade) {
+                // Create the additional grade label (line3)
+                lblAddGrade = this.createDOMElement('div', {
                     parent: parent,
-                    classnames: `${prefixclassname}-addscore`,
+                    classnames: `${prefixclassname}-addgrade`,
                     styles: {
                         position: 'absolute',
                         left: `${left}px`,
@@ -281,7 +281,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                         color: colorText,
                     },
                     attributes: {
-                        title: this.getStringM('js_add_score'),
+                        title: this.getStringM('js_add_grade'),
                     },
                 });
             }
@@ -292,8 +292,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 classnames: `${prefixclassname}-rank`,
                 styles: {
                     position: 'absolute',
-                    left: `${createAddScore ? left + cellSize : left}px`,
-                    width: `${createAddScore ? cellSize : 2 * cellSize}px`,
+                    left: `${createAddGrade ? left + cellSize : left}px`,
+                    width: `${createAddGrade ? cellSize : 2 * cellSize}px`,
                     top: `${top}px`,
                     height: `${cellSize}px`,
                     textAlign: 'center',
@@ -304,14 +304,14 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 },
             });
 
-            // Create the main score label (line2)
-            const lblScore = this.createDOMElement('div', {
+            // Create the main grade label (line2)
+            const lblGrade = this.createDOMElement('div', {
                 parent: parent,
-                classnames: `${prefixclassname}-score`,
+                classnames: `${prefixclassname}-grade`,
                 styles: {
                     position: 'absolute',
                     left: `${left}px`,
-                    width: `${createAddScore ? cellSize : 2 * cellSize}px`,
+                    width: `${createAddGrade ? cellSize : 2 * cellSize}px`,
                     top: `${top + cellSize}px`,
                     height: `${cellSize}px`,
                     lineHeight: `${cellSize}px`,
@@ -325,7 +325,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             // Create the percentage label (line2)
             let lblPercent;
-            if (createAddScore) {
+            if (createAddGrade) {
                 lblPercent = this.createDOMElement('div', {
                     parent: parent,
                     classnames: `${prefixclassname}-percent`,
@@ -345,19 +345,19 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 });
             }
 
-            return {divMain: divMain, lblRank: lblRank, lblScore: lblScore, lblPercent: lblPercent,
-                lblAddScore: lblAddScore, cellSize: cellSize};
+            return {divMain: divMain, lblRank: lblRank, lblGrade: lblGrade, lblPercent: lblPercent,
+                lblAddGrade: lblAddGrade, cellSize: cellSize};
         }
 
-        showScore(player, score, rank, percent, rankpercent, showPercent) {
-            let boldScore = false;
+        showGrade(player, grade, rank, percent, rankpercent, showPercent) {
+            let boldGrade = false;
             let boldPercent = false;
             if (rank !== undefined && rankpercent !== undefined) {
                 if (parseInt(rankpercent) < parseInt(rank)) {
-                    boldScore = true;
+                    boldGrade = true;
                     rank = rankpercent;
                 } else if (parseInt(rankpercent) === parseInt(rank)) {
-                    boldScore = true;
+                    boldGrade = true;
                     boldPercent = true;
                 }
             }
@@ -369,20 +369,22 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 player.lblRank.textContent = '';
             }
 
-            let s = boldScore ? `<b>${score}</b>` : score;
-            if (player.cacheScore !== s) {
-                player.cacheScore = s;
-                player.lblScore.textContent = s;
+            let s = boldGrade ? `b${grade}` : grade;
+            if (player.cacheGrade !== s) {
+                player.cacheGrade = s;
+                player.lblGrade.textContent = grade;
+                player.lblGrade.style.fontWeight = boldGrade ? 'bold' : '';
                 const width = showPercent ? player.cellSize : 2 * player.cellSize;
-                this.autoResizeText(player.lblScore, width, player.cellSize, false, 0, 0);
+                this.autoResizeText(player.lblGrade, width, player.cellSize, false, 0, 0);
             }
 
             if (showPercent) {
-                s = percent === '' ? '' : (boldPercent ? `<b>${Math.round(100 * percent)} </b>` : Math.round(100 * percent)) + '%';
+                const perc = Math.round(100 * percent);
+                s = percent === '' ? '' : (boldPercent ? `b${perc}` : perc) + '%';
                 if (player.lblPercent !== undefined) {
                     if (player.cachePercent !== s) {
                         player.cachePercent = s;
-                        player.lblPercent.textContent = s;
+                        player.lblPercent.textContent = perc;
                         this.autoResizeText(player.lblPercent, player.cellSize - this.padding, player.cellSize, false, 0, 0);
                     }
                 }
@@ -479,8 +481,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             super.setColors(colors);
 
             // Assign specific colors to UI elements
-            this.colorScore = colors[2];
-            this.colorScore2 = colors[4];
+            this.colorGrade = colors[2];
+            this.colorGrade2 = colors[4];
         }
 
         updateNicknameAvatar(player, avatarSrc, nickname, nicknameWidth, nicknameHeight) {
@@ -527,7 +529,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         computeBestFontSize(json, maxHeight) {
             let definitionWidth;
 
-            //maxHeight = this.areaRect.height - this.iconSize - 3 * this.padding;
             definitionWidth = this.isVertical ? this.areaRect.width : Math.round((this.areaRect.width - this.padding) / 2);
 
             for (let step = 1; step <= 2; step++) {

@@ -304,13 +304,13 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
         }
 
         /**
-         * Creates a percentage-based score display using createDOMElement.
+         * Creates a percentage-based grade display using createDOMElement.
          *
          * @param {any} parent
          * @param {number} left - The left position in pixels.
          * @param {boolean} showRank - .
          * */
-        createDivScorePercent(parent, left, showRank) {
+        createDivGradePercent(parent, left, showRank) {
             const colorText = this.getContrastingColor(this.colorBackground);
             // Create the main button container
             const divMain = this.createDOMElement('div', {
@@ -358,10 +358,10 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 });
             }
 
-            // Create the main score label (line2)
-            const lblScore = this.createDOMElement('div', {
+            // Create the main grade label (line2)
+            const lblGrade = this.createDOMElement('div', {
                 parent: parent,
-                classnames: `mmogame-score`,
+                classnames: `mmogame-grade`,
                 styles: {
                     position: 'absolute',
                     left: `${left}px`,
@@ -377,7 +377,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 },
             });
 
-            return {divMain: divMain, lblRank: lblRank, lblScore: lblScore, cellSize: cellSize};
+            return {divMain: divMain, lblRank: lblRank, lblGrade: lblGrade, cellSize: cellSize};
         }
 
         moveX(timestamp, split, num, direction, steps) {

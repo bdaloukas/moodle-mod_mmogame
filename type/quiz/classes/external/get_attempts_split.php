@@ -120,7 +120,7 @@ class get_attempts_split extends external_api {
         }
         if ($avatarids !== null) {
             foreach ($sessionkeys as $pos => $sessionkey) {
-                $info = $mmogame->get_avatar_info($ausers[$pos]->id, false);
+                $info = $mmogame->get_avatar_info($ausers[$pos]->id, false, true);
                 $db->update_record(
                     'mmogame_aa_grades',
                     ['id' => $info->id, 'avatarid' => $avatarids[$pos]]
@@ -164,31 +164,8 @@ class get_attempts_split extends external_api {
         foreach ($ausers as $auser) {
             $auserids[] = $auser->id;
         }
-        [$insql, $inparams] = $db->get_in_or_equal($auserids);
-        $sql = "SELECT g.auserid, g.grade, a.directory, a.filename,
-            (SELECT COUNT(*)
-                FROM {mmogame_aa_grades} g2
-                WHERE g2.mmogameid=g.mmogameid AND g2.numgame=g.numgame AND g2.grade > g.grade
-            ) as numrank
-            FROM {mmogame_aa_grades} g
-            LEFT JOIN {mmogame_aa_avatars} a ON a.id=g.avatarid
-            WHERE g.mmogameid=? AND g.numgame=? AND g.auserid $insql";
 
-        $recs = $db->get_records_sql(
-            $sql,
-            array_merge([$mmogameid, $numgame], $inparams)
-        );
-        $grades = $avatars = $ranks = [];
-        foreach ($auserids as $auserid) {
-            foreach ($recs as $rec) {
-                if ($rec->auserid == $auserid) {
-                    $grades[] = $rec->grade;
-                    $ranks[] = $rec->numrank + 1;
-                    $avatars[] = $rec->directory . '/' . $rec->filename;
-                    break;
-                }
-            }
-        }
+        [$grades, $ranks, $avatars] = $mmogame->get_selection()->compute_ranks($auserids);
 
         return ['avatars' => $avatars, 'attemptkeys' => $attemptkeys,
             'attemptqueryids' => $attemptqueryids,
@@ -377,6 +354,7 @@ class get_attempts_split extends external_api {
             $query = $queries[$queryid];
             $definitions[] = $query->definition;
             $tips[] = $query->generalfeedback;
+            $queryranks[] = $mmogame->get_selection()->get_rankquery($queryid);
 
             $a = [];
             $queryanswerids = [];

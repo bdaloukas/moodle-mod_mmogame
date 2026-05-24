@@ -27,7 +27,6 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception as invalid_parameter_exceptionAlias;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
-use Random\RandomException;
 use required_capability_exception;
 use function get_coursemodule_from_instance;
 
@@ -64,7 +63,6 @@ class start_sessions extends external_api {
      * @param int $countpalettes
      * @param int $countavatars
      * @return array
-     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exceptionAlias
      * @throws required_capability_exception

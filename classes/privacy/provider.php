@@ -82,9 +82,8 @@ class provider implements
                 'color4' => 'privacy:metadata:mmogame_grades:color4',
                 'color5' => 'privacy:metadata:mmogame_grades:color5',
                 'usercode' => 'privacy:metadata:mmogame_grades:usercode',
-                'sumscore' => 'privacy:metadata:mmogame_grades:sumscore',
+                'grade' => 'privacy:metadata:mmogame_grades:grade',
                 'score' => 'privacy:metadata:mmogame_grades:score',
-                'sumscore2' => 'privacy:metadata:mmogame_grades:sumscore2',
                 'numteam' => 'privacy:metadata:mmogame_grades:numteam',
                 'timemodified' => 'privacy:metadata:mmogame_grades:timemodified',
             ], 'privacy:metadata:mmogame_aa_grades');
@@ -200,7 +199,7 @@ class provider implements
     ): void {
         global $DB;
 
-        $sql = "SELECT gg.id, gg.numgame, gg.nickname, gg.usercode, gg.sumscore,
+        $sql = "SELECT gg.id, gg.numgame, gg.nickname, gg.usercode, gg.grade,
             gg.numteam, gg.timemodified, CONCAT(a.directory, '/', a.filename) as avatar,
             mc.color1, mc.color2, mc.color3, mc.color4, mc.color5
             FROM {mmogame_aa_grades} gg

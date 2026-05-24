@@ -27,7 +27,6 @@ use core_external\restricted_context_exception;
 use invalid_parameter_exception as invalid_parameter_exceptionAlias;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
-use Random\RandomException;
 use required_capability_exception;
 
 /**
@@ -61,7 +60,6 @@ class start_session extends external_api {
      * @param int $avatars
      * @param int $colorpalettes
      * @return array
-     * @throws RandomException
      * @throws coding_exception
      * @throws invalid_parameter_exceptionAlias
      * @throws required_capability_exception
@@ -100,14 +98,6 @@ class start_session extends external_api {
             return self::error('invalid_user');
         }
 
-        if ($kinduser === 'moodle') {
-            // Perform security checks.
-            $cm = get_coursemodule_from_instance('mmogame', $mmogameid);
-            $context = module::instance($cm->id);
-            self::validate_context($context);
-            require_capability('mod/mmogame:play', $context);
-        }
-
         $allowedkindusers = ['moodle', 'wordpress', 'guid'];
 
         if (!in_array($kinduser, $allowedkindusers, true)) {
@@ -132,12 +122,13 @@ class start_session extends external_api {
         $result = [];
 
         $mmogame = mmogame::create(new mmogame_database_moodle(), $mmogameid);
-        $user = mmogame::get_asuerid($mmogame->get_db(), $mmogameid, $kinduser, $user, true, 0);
-        $result['sessionkey'] = $user->sessionkey;
+        $auser = mmogame::get_auser_from_kinduser($mmogame->get_db(), $mmogameid, $kinduser, $user, true, 0);
+        $mmogame->login_user($auser);
+        $result['sessionkey'] = $auser->sessionkey;
 
         // Generate avatars array if avatars > 0.
         if ($avatars > 0) {
-            self::compute_avatars($mmogame, $user->id, $avatars, $result);
+            self::compute_avatars($mmogame, $auser->id, $avatars, $result);
         }
         // Generate colorpalettes array if colorpalettes > 0.
         if ($colorpalettes > 0) {

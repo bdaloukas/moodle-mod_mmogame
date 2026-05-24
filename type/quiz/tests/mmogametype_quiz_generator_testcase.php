@@ -45,7 +45,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
      * Test for creating a quiz alone.
      */
     public function test_quiz_alone() {
-        global $DB, $USER;
+        global $DB;
 
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -60,35 +60,13 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $new->context = 1;
         $new->info = 'Info';
         $new->stamp = rand();
+
         $categoryid = $DB->insert_record('question_categories', $new);
 
-        // Create mmoGame.
-        $rgame = $this->getDataGenerator()->create_module(
-            'mmogame',
-            [
-                'course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
-                'numgame' => 1, 'type' => 'quiz', 'mode' => 'alone', 'typemode' => 'quiz,alone',
-                'kinduser' => 'guid',
-                'enabled' => 1,
-            ]
-        );
-        $records = $DB->get_records('mmogame', ['course' => $course->id], 'id');
-        $this->assertCount(1, $records);
-        $this->assertArrayHasKey($rgame->id, $records);
-        $mmogame = mmogame::create(new mmogame_database_moodle(), $rgame->id);
-        $mmogame->update_state(1);
-
-        $startsession = new start_session();
-        $result = $startsession->execute($rgame->id, 'moodle', $USER->id, 10, 10);
-        $sessionkey = $result['sessionkey'];
-
-        // Command get_attempt with empty questionbank.
-        $mmogame->update_state(1);
-        $getattempt = new mmogametype_quiz\external\get_attempt();
-        $result = json_decode($getattempt->execute($sessionkey, "test", 1, 1));
-        $this->assertTrue($result->attemptkey === '');
-
-        // Command get_attempt with 1 question.
+        $rec = $DB->get_record_sql("SELECT COUNT(*) AS c FROM {question}");
+        if (  $rec->c === 0) {
+            $this->test_quiz_alone_empty($course, $categoryid);
+        }
 
         $answerids = $answertexts = [];
         $generator->create_multichoice_question(
@@ -99,34 +77,10 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
             $answerids,
             $answertexts
         );
-        $mmogame->update_state(1);
-        $result = json_decode($getattempt->execute($sessionkey, 'Test', 1, 1));
-        $this->assertTrue($result->attemptkey != '');
 
-        // Command set_answer correct.
-        $setanswer = new mmogametype_quiz\external\set_answer();
-        $result2 = json_decode(
-            $setanswer->execute(
-                $sessionkey,
-                $result->attemptkey,
-                $answerids[0],
-                ''
-            )
-        );
-
-        $this->assertTrue($result2->iscorrect == 1);
-
-        // Command set_answer error.
-        $this->assertTrue($result2->attempt != 0);
-        $result2 = json_decode(
-            $setanswer->execute(
-                $sessionkey,
-                $result->attemptkey,
-                $answerids[1],
-                ''
-            )
-        );
-        $this->assertTrue($result2->iscorrect == 0);
+        for ($step = 1; $step <= 2; $step++) {
+            $this->test_quiz_alone_step($step, $course, $categoryid, $answerids);
+        }
     }
 
     /**
@@ -344,5 +298,124 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
                 implode(',', $tools)
             );
         }
+    }
+
+    /**
+     * Run the tests for step $step in game mmogametype_quizalone
+     *
+     * @param int $step
+     * @param stdClass $course
+     * @param int $categoryid
+     * @param array $answerids
+     * @return void
+     * @throws \core_external\restricted_context_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     */
+    private function test_quiz_alone_step(int $step, stdClass $course, int $categoryid, array $answerids) {
+        global $DB, $USER;
+
+        // Create mmoGame.
+        $rgame = $this->getDataGenerator()->create_module(
+            'mmogame',
+            [
+                'course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
+                'numgame' => 1, 'type' => 'quiz', 'mode' => 'alone', 'typemode' => 'quiz,alone',
+                'kinduser' => 'guid', 'selection' => ($step == 1 ? '' : 'irt'),
+                'enabled' => 1,
+            ]
+        );
+        $records = $DB->get_records('mmogame', ['course' => $course->id], 'id DESC', '*', 0, 1);
+        $rgame = reset($records);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $rgame->id);
+        $mmogame->update_state(1);
+
+        $startsession = new start_session();
+        $result = $startsession->execute($rgame->id, 'moodle', $USER->id, 10, 10);
+        $sessionkey = $result['sessionkey'];
+
+        $mmogame->update_state(1);
+
+        $mmogame->update_state(1);
+        $getattempt = new mmogametype_quiz\external\get_attempt();
+        $result = json_decode($getattempt->execute($sessionkey, 'Test', 1, 1));
+        $this->assertTrue($result->attemptkey !== '', json_encode($result, JSON_PRETTY_PRINT));
+
+        // Command set_answer correct.
+        $setanswer = new mmogametype_quiz\external\set_answer();
+        $result2 = json_decode(
+            $setanswer->execute(
+                $sessionkey,
+                $result->attemptkey,
+                $answerids[0],
+                ''
+            )
+        );
+
+        $this->assertTrue(
+            $result2->iscorrect === 1,
+            "attemptkey=".$result->attemptkey . " answer=" . $answerids[0] .
+            json_encode($result2, JSON_PRETTY_PRINT)
+        );
+
+        // Command set_answer error.
+        $this->assertTrue($result2->attempt != 0);
+        $result2 = json_decode(
+            $setanswer->execute(
+                $sessionkey,
+                $result->attemptkey,
+                $answerids[1],
+                ''
+            )
+        );
+        $this->assertTrue($result2->iscorrect == 0);
+    }
+
+    /**
+     * Runs tests on game mmogametype_quizalone with empty questionbank
+     *
+     * @param $course
+     * @param $categoryid
+     * @return void
+     * @throws \core_external\restricted_context_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     */
+    private function test_quiz_alone_empty($course, $categoryid) {
+        global $DB, $USER;
+
+        // Command get_attempt with empty questionbank.
+        $rgame = $this->getDataGenerator()->create_module(
+            'mmogame',
+            [
+                'course' => $course, 'qbank' => 'moodlequestion', 'categoryid1' => $categoryid, 'pin' => rand(),
+                'numgame' => 1, 'type' => 'quiz', 'mode' => 'alone', 'typemode' => 'quiz,alone',
+                'kinduser' => 'guid', 'selection' => '',
+                'enabled' => 1,
+            ]
+        );
+        $records = $DB->get_records('mmogame', ['course' => $course->id], 'id DESC', '*', 0, 1);
+        $rgame = reset($records);
+        $mmogame = mmogame::create(new mmogame_database_moodle(), $rgame->id);
+        $mmogame->update_state(1);
+
+        $startsession = new start_session();
+        $result = $startsession->execute($rgame->id, 'moodle', $USER->id, 10, 10);
+        $sessionkey = $result['sessionkey'];
+
+        $getattempt = new mmogametype_quiz\external\get_attempt();
+        $result = json_decode($getattempt->execute($sessionkey, "test", 1, 1));
+        $this->assertTrue($result->attemptkey === '', "result=" . json_encode($result, JSON_PRETTY_PRINT));
+
+        $mmogame->get_db()->update_record(
+            'mmogame',
+            ['id' => $rgame->id, 'selection' => 'irt']
+        );
+        $result = json_decode($getattempt->execute($sessionkey, "test", 1, 1));
+        $this->assertTrue($result->attemptkey === '', "result=" . json_encode($result, JSON_PRETTY_PRINT));
     }
 }

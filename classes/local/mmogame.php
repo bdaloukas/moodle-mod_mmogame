@@ -49,6 +49,9 @@ abstract class mmogame {
     /** @var mmogame_qbank $qbank: question bank to be used. */
     protected mmogame_qbank $qbank;
 
+    /** @var ?stdClass $rgrade: question bank to be used. */
+    protected ?stdClass $rgrade;
+
     /** @var string $error: saves the error code. */
     protected string $error = '';
 
@@ -350,7 +353,7 @@ abstract class mmogame {
      * @param int $split
      * @return ?stdClass (the rec of table mmogame_aa_users)
      */
-    public static function get_asuerid(
+    public static function get_auser_from_kinduser(
         mmogame_database $db,
         int $mmogameid,
         string $kinduser,
@@ -487,100 +490,43 @@ abstract class mmogame {
     }
 
     /**
-     * Returns the grade for user auserid
-     *
-     * @param int $auserid
-     * @return ?stdClass
-     */
-    public function get_grade(int $auserid): ?stdClass {
-        $db = $this->db;
-
-        $rec = $db->get_record_select(
-            'mmogame_aa_grades',
-            'mmogameid=? AND numgame=? AND auserid=?',
-            [$this->rgame->id, $this->rgame->numgame, $auserid]
-        );
-        if ($rec !== null) {
-            return $rec;
-        }
-
-        $grades = $db->get_records_select(
-            'mmogame_aa_grades',
-            'mmogameid=? AND auserid=? AND numgame < ?',
-            [$this->rgame->id, $auserid, $this->rgame->numgame],
-            'numgame DESC',
-            '*',
-            1
-        );
-        $a = ['mmogameid' => $this->rgame->id, 'numgame' => $this->rgame->numgame, 'auserid' => $auserid,
-            'timemodified' => time(), 'sumscore' => 0,
-        ];
-        if (count($grades) > 0) {
-            $grade = reset($grades);
-            $a['avatarid'] = $grade->avatarid;
-            $a['usercode'] = $grade->usercode;
-            $a['nickname'] = $grade->nickname;
-            $a['colorpaletteid'] = $grade->colorpaletteid;
-        } else {
-            $a['avatarid'] = $this->get_avatar_default();
-            $recs = $this->db->get_records_select('mmogame_aa_colorpalettes', '', [], 'id', 'id', 1);
-            $a['colorpaletteid'] = reset($recs)->id;
-
-            $user = $db->get_record_select('mmogame_aa_users', 'id=?', [$auserid]);
-            if ($user !== null) {
-                if ($user->kind == 'usercode') {
-                    $rec = $db->get_record_select('mmogame_aa_users_code', 'id=?', [$user->instanceid]);
-                    if ($rec !== false && $rec->code != 0) {
-                        $a['usercode'] = $rec->code;
-                    }
-                }
-            }
-        }
-        $id = $db->insert_record('mmogame_aa_grades', $a);
-
-        return $db->get_record_select('mmogame_aa_grades', 'id=?', [$id]);
-    }
-
-    /**
      * Returns info about avatar for the user auserid.
      *
      * @param int $auserid
      * @param bool $computepalette
+     * @param bool $create
      * @return ?stdClass
      */
-    public function get_avatar_info(int $auserid, bool $computepalette = true): ?stdClass {
-        $sql = "SELECT g.*, a.directory, a.filename, a.id as aid";
-        if ($computepalette) {
-            $sql .= ", c.color1, c.color2, c.color3, c.color4, c.color5";
-        }
-        $sql .= " FROM {mmogame_aa_grades} g
-                LEFT JOIN {mmogame_aa_avatars} a ON g.avatarid=a.id";
-        if ($computepalette) {
-            $sql .= " LEFT JOIN {mmogame_aa_colorpalettes} c ON c.id=g.colorpaletteid ";
-        }
-        $sql .= " WHERE g.mmogameid=? AND g.numgame=? AND g.auserid=?";
-        $grades = $this->db->get_records_sql($sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
-        if (count($grades) == 0) {
-            $grade = $this->get_grade($auserid);
-            if ($grade === false) {
-                return null;
+    public function get_avatar_info(int $auserid, bool $computepalette = true, bool $create = false): ?stdClass {
+        for ($step = 1; $step <= 2; $step++) {
+            $sql = "SELECT g.*, a.directory, a.filename, a.id as aid";
+            if ($computepalette) {
+                $sql .= ", c.color1, c.color2, c.color3, c.color4, c.color5";
             }
-            $grades = $this->db->get_records_sql($sql, [$this->rgame->id, $this->rgame->numgame, $auserid], 0, 1);
-        }
-        $grade = reset($grades);
-        if ($grade->aid == null) {
-            $this->db->update_record(
-                'mmogame_aa_grades',
-                ['id' => $grade->id, 'avatarid' => $this->get_avatar_default()]
-            );
-            $grade = $this->db->get_record_sql($sql, [$this->rgame->id, $this->rgame->numgame, $auserid]);
-        }
-        $grade->avatar = $grade->directory . '/' . $grade->filename;
-        if ($computepalette) {
-            $grade->colors = [$grade->color1, $grade->color2, $grade->color3, $grade->color4, $grade->color5];
+            $sql .= " FROM {mmogame_aa_grades} g
+                    LEFT JOIN {mmogame_aa_avatars} a ON g.avatarid=a.id";
+            if ($computepalette) {
+                $sql .= " LEFT JOIN {mmogame_aa_colorpalettes} c ON c.id=g.colorpaletteid ";
+            }
+            $sql .= " WHERE g.mmogameid=? AND g.numgame=? AND g.auserid=?";
+            $rgrade = $this->db->get_record_sql($sql, [$this->rgame->id, $this->rgame->numgame, $auserid]);
+
+            if ($rgrade === null) {
+                if ($create === false) {
+                    return null;
+                }
+                $this->get_rgrade($auserid, true);
+                continue;
+            }
+            $rgrade->avatar = $rgrade->directory . '/' . $rgrade->filename;
+            if ($computepalette) {
+                $rgrade->colors = [$rgrade->color1, $rgrade->color2, $rgrade->color3, $rgrade->color4, $rgrade->color5];
+            }
+
+            return $rgrade;
         }
 
-        return $grade;
+        return null;
     }
 
     /**
@@ -743,10 +689,10 @@ abstract class mmogame {
 
         $currentids = $currentfiles = [];
         for ($i = 0; $i < $countsplit; ++$i) {
-            $rec = self::get_asuerid($this->db, $this->get_id(), $kinduser, $user, true, $i);
+            $rec = self::get_auser_from_kinduser($this->db, $this->get_id(), $kinduser, $user, true, $i);
             if ($rec !== null) {
                 $sessionkeys[$i] = $rec->sessionkey;
-                $info = $this->get_avatar_info($rec->id, false);
+                $info = $this->get_avatar_info($rec->id, false, true);
                 $avatarid = $info->avatarid;
                 if (array_key_exists($avatarid, $avatars)) {
                     $currentids[$i] = $avatarid;
@@ -842,14 +788,67 @@ abstract class mmogame {
      * Return mmogame_aa_grades record
      *
      * @param int $auserid
+     * @param bool $create
      * @return ?stdClass
      */
-    public function get_rgrade(int $auserid): ?stdClass {
-        return $this->db->get_record_select(
+    public function get_rgrade(int $auserid, bool $create = false): ?stdClass {
+        if (isset($this->rgrade->auserid) && $this->rgrade->auserid === $auserid) {
+            return $this->rgrade;
+        }
+
+        $db = $this->db;
+
+        $this->rgrade = $db->get_record_select(
             'mmogame_aa_grades',
             'mmogameid=? AND numgame=? AND auserid=?',
             [$this->rgame->id, $this->rgame->numgame, $auserid]
         );
+        if ($this->rgrade !== null) {
+            return $this->rgrade;
+        }
+
+        if (!$create) {
+            return null;
+        }
+
+        $grades = $db->get_records_select(
+            'mmogame_aa_grades',
+            'mmogameid=? AND auserid=? AND numgame < ?',
+            [$this->rgame->id, $auserid, $this->rgame->numgame],
+            'numgame DESC',
+            '*',
+            1
+        );
+        $a = [
+            'mmogameid' => $this->rgame->id, 'numgame' => $this->rgame->numgame,
+            'auserid' => $auserid, 'timemodified' => time(), 'grade' => 0,
+        ];
+        if (count($grades) > 0) {
+            $rgrade = reset($grades);
+            $a['avatarid'] = $rgrade->avatarid;
+            $a['usercode'] = $rgrade->usercode;
+            $a['nickname'] = $rgrade->nickname;
+            $a['colorpaletteid'] = $rgrade->colorpaletteid;
+        } else {
+            $a['avatarid'] = $this->get_avatar_default();
+            $recs = $db->get_records_select('mmogame_aa_colorpalettes', '', [], 'id', 'id', 1);
+            $a['colorpaletteid'] = reset($recs)->id;
+
+            $user = $db->get_record_select('mmogame_aa_users', 'id=?', [$auserid]);
+            if ($user !== null) {
+                if ($user->kind == 'usercode') {
+                    $rec = $db->get_record_select('mmogame_aa_users_code', 'id=?', [$user->instanceid]);
+                    if ($rec !== false && $rec->code != 0) {
+                        $a['usercode'] = $rec->code;
+                    }
+                }
+            }
+        }
+        $id = $db->insert_record('mmogame_aa_grades', $a);
+
+        $this->rgrade = $db->get_record_select('mmogame_aa_grades', 'id=?', [$id]);
+
+        return $this->rgrade;
     }
 
     /**

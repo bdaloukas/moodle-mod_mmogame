@@ -18,7 +18,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     function(MmoGameTypeQuiz) {
     return class MmoGameTypeQuizAlone extends MmoGameTypeQuiz {
 
-        // Score variables.
+        // Grade variables.
         player;
 
         constructor() {
@@ -43,17 +43,17 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.padding + nicknameHeight,
                 this.iconSize);
 
-            this.player = this.createDivScorePercent(fragment,
+            this.player = this.createDivGradePercent(fragment,
                 'mmogame-quiz-alone',
                 this.padding + (i++) * step,
                 this.padding + nicknameHeight,
                 true,
-                this.colorScore);
+                this.colorGrade);
             this.player.avatarElement = avatar;
             this.player.nicknameElement = nickname;
             this.player.cacheAvatar = '';
             this.player.cacheNickname = '';
-            this.player.lblScore.title = this.getStringM('js_grade');
+            this.player.lblGrade.title = this.getStringM('js_grade');
             this.player.lblRank.title = this.getStringM('js_ranking_order');
 
             this.createButtonSound(fragment, this.padding + (i++) * step,
@@ -88,7 +88,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             this.createNextButton(this.areaRect.width - this.iconSize - this.padding, this.stripTop);
 
-            this.showScore(json);
+            this.showGrade(json);
         }
 
         /**
@@ -99,9 +99,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
          */
         createScreen(json, disabled) {
             if (this.endofgame) {
-                // Display end-of-game message and final score
+                // Display end-of-game message and final grade
                 this.createDivMessage('mmogame-quiz-alone-endofgame', this.getStringM('js_game_over'));
-                this.showScore(json);
+                this.showGrade(json);
                 return;
             }
 
@@ -113,8 +113,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.createScreenHorizontal(json, disabled);
             }
 
-            // Display the current score
-            this.showScore(json);
+            // Display the current grade
+            this.showGrade(json);
         }
 
         /**
@@ -171,7 +171,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                     this.createIconBar();
                 }
                 this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
-                this.showScore(json);
+                this.showGrade(json);
                 this.createDivMessageStart(this.getStringM('js_wait_to_start'));
                 setTimeout(() => {
                     this.callGetAttempt();
@@ -226,10 +226,10 @@ console.log("processGetAttempt", json);
             }
         }
 
-        showScore(json) {
-            super.showScore(this.player, json.sumscore, json.rank, json.percent, json.percentRank, true);
-            this.player.lblAddScore.textContent = json.addscore === undefined ? '' : json.addscore;
-            this.autoResizeText(this.player.lblAddScore, this.player.cellSize, this.player.cellSize, true, 0, 0, 1);
+        showGrade(json) {
+            super.showGrade(this.player, json.grade, json.rank, json.percentmastered, json.percentRank, true);
+            this.player.lblAddGrade.textContent = json.addgrade === undefined ? '' : json.addgrade;
+            this.autoResizeText(this.player.lblAddGrade, this.player.cellSize, this.player.cellSize, true, 0, 0, 1);
         }
 
         showHelpScreen(div) {
@@ -306,7 +306,7 @@ console.log("processGetAttempt", json);
                 let div = this.createDiv(this.area, 'mmogame-quiz-aduel-correct-answer',
                     this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
                 div.title = iscorrect1 ? this.getStringT('js_correct_answer') : this.getStringT('js_wrong_answer');
-                div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorScore, this.colorScore);
+                div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorGrade, this.colorGrade);
             }
         }
 

@@ -72,7 +72,8 @@ abstract class mmogametype_quiz extends mmogame {
         $ret['rank'] = $this->get_rank($info->grade, 'grade');
         $ret['grade'] = $info->grade;
         $ret['countmastered'] = $info->countmastered;
-        $ret['percentmastered'] = $this->get_rank($info->countmastered, 'countmastered');
+        $ret['percentmastered'] = $info->percentmastered;
+        $ret['percentRank'] = $this->get_rank($info->percentmastered, 'percentmastered');
 
         if ($attempt === null) {
             $attempt = new stdClass();
@@ -87,6 +88,7 @@ abstract class mmogametype_quiz extends mmogame {
         if ($attempt->queryid != 0) {
             $recquery = $this->get_qbank()->load_json($ret, '', $attempt->queryid, $attempt->layout, false);
         }
+        $ret['rankquery'] = $attempt->queryid !== null ? $this->get_selection()->get_rankquery($attempt->queryid) : null;
 
         $ret['timestart'] = $attempt->timestart;
         $ret['timeclose'] = $attempt->timeclose;

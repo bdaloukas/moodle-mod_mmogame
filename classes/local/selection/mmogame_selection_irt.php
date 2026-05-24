@@ -26,6 +26,8 @@
 
 namespace mod_mmogame\local\selection;
 
+use stdClass;
+
 /**
  * mmogame_quiz is responsible for managing and facilitating quiz gameplay
  * within the mmogame system, including handling attempts, scoring,
@@ -77,7 +79,6 @@ class mmogame_selection_irt extends mmogame_selection {
             0,
             2 * $count
         );
-
         $found = [];
         foreach ($recs as $rec) {
             $found[$rec->queryid] = $rec->queryid;
@@ -169,10 +170,10 @@ class mmogame_selection_irt extends mmogame_selection {
     public function idea(): array {
         $mmogame = $this->mmogame;
         $db = $mmogame->get_db();
-        $auserid = $mmogame->get_auser();
+        $auser = $mmogame->get_auser();
 
         // Get player's skill rating (theta).
-        $rec = $mmogame->get_rgrade($auserid);
+        $rec = $mmogame->get_rgrade($auser->id);
         $theta = $rec !== null ? $rec->theta : 0;
 
         // Retrieve all questions with player stats.
@@ -183,7 +184,7 @@ class mmogame_selection_irt extends mmogame_selection {
                 ON st.queryid = irt.queryid AND st.mmogameid=irt.mmogameid AND st.numgame=irt.numgame AND st.auserid = ?
             WHERE irt.mmogameid=? AND irt.numgame=?
             ORDER BY st.serialcorrects,st.counterror DESC,ABS(irt.difficulty - ?)";
-        $questions = $db->get_records_sql($sql, [$auserid, $mmogame->get_id(), $mmogame->get_numgame(), $theta], 0, 10);
+        $questions = $db->get_records_sql($sql, [$auser->id, $mmogame->get_id(), $mmogame->get_numgame(), $theta], 0, 10);
 
         $ret = [];
         foreach ($questions as $question) {
@@ -202,7 +203,7 @@ class mmogame_selection_irt extends mmogame_selection {
      */
     public function compute_addnextattempt(int $queryid, int $iscorrect): int {
         $mmogame = $this->mmogame;
-        $auserid = $mmogame->get_auser();
+        $auserid = $mmogame->get_auser()->id;
 
         if ($iscorrect) {
             return 10;
@@ -242,5 +243,92 @@ class mmogame_selection_irt extends mmogame_selection {
      */
     public function get_field_rankvalue1(): string {
         return 'theta';
+    }
+
+    /**
+     * Computes the ranking of query $queryid
+     *
+     * @param int $queryid
+     * @return ?int
+     */
+    public function get_rankquery(int $queryid): ?int {
+        return $this->get_rankquery_table('mmogame_as_irt', 'difficulty', $queryid);
+    }
+
+    /**
+     * Ensure that the in-memory questions list and the mmogame_aa_stats table are in sync with the defined set of query IDs ($ids).
+     *
+     * - Removes questions whose queryid is not present in $ids.
+     * - Inserts missing rows into mmogame_aa_stats for queryids in $ids.
+     *
+     * @param array $ids Map: queryid => categoryid.
+     * @return int
+     */
+    protected function repair_stats(array $ids): int {
+        $ret = parent::repair_stats($ids);
+        $mmogame = $this->mmogame;
+
+        $rstate = $mmogame->get_rstate();
+        $hashname = $mmogame->get_rgame()->selection . json_encode($ids, JSON_PRETTY_PRINT);
+        if (md5($hashname) === $rstate->hashcompute) {
+            return $ret;
+        }
+
+        $numgame = $mmogame->get_numgame();
+        $db = $mmogame->get_db();
+
+        $mapids = [];
+        foreach ($ids as $queryid => $categoryid) {
+            $mapids[$queryid] = $queryid;
+        }
+
+        $irts = $db->get_records_select(
+            'mmogame_as_irt',
+            'mmogameid=? AND numgame=?',
+            [$mmogame->get_id(), $numgame],
+            '',
+            'id,queryid,isvalid'
+        );
+        // 1. Deletes records from mmogame_aa_stats belonging to the invalid queries.
+        foreach ($irts as $irt) {
+            $queryid = $irt->queryid;
+            if (!array_key_exists($queryid, $mapids)) {
+                if ($irt->isvalid !== 0) {
+                    $db->update_record('mmogame_as_irt', ['id' => $irt->id, 'isvalid' => 0]);
+                }
+                continue;
+            }
+
+            unset($mapids[$queryid]);
+            if ($irt->isvalid === 0) {
+                $db->update_record('mmogame_as_irt', ['id' => $irt->id, 'isvalid' => 1]);
+            }
+        }
+
+        // 2. Insert new records mmogame_aa_stats.
+        foreach ($mapids as $queryid) {
+            $db->insert_record(
+                'mmogame_as_irt',
+                [
+                    'mmogameid' => $mmogame->get_id(),
+                    'numgame' => $numgame,
+                    'queryid' => $queryid,
+                    'isvalid' => 1,
+                    'difficulty' => 0,
+                    'timemodified' => time(),
+                ]
+            );
+        }
+
+        $rstate->hashcompute = md5($hashname);
+        $db->update_record(
+            'mmogame_aa_states',
+            [
+                'id' => $rstate->id,
+                'hashcompute' => $rstate->hashcompute,
+            ]
+        );
+
+        return $ret;
     }
 }

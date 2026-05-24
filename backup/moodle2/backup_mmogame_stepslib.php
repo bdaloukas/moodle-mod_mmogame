@@ -27,8 +27,6 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
      * @return backup_nested_element
      */
     protected function define_structure() {
-        global $CFG;
-
         // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
 
@@ -49,7 +47,7 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
             ['id'],
             [
                 'numgame', 'auserid', 'timemodified', 'avatarid', 'usercode', 'nickname', 'colorpaletteid',
-                'sumscore', 'countscore', 'score', 'sumscore2', 'numteam', 'percentcompleted',
+                'grade', 'numteam', 'countmastered', 'theta', 'countalone', 'thetafull',
             ]
         );
 
