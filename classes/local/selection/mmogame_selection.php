@@ -19,7 +19,7 @@
 /**
  * mmogametype_quiz_algorithm_irt class
  *
- * @package    mmogametype_quiz
+ * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

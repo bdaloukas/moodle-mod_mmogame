@@ -109,7 +109,7 @@ class get_attempt extends external_api {
         $db = new mmogame_database_moodle();
         $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
         if ($auser === null) {
-            return self::error('no_user s='.$sessionkey);
+            return self::error('no_user');
         }
         $mmogameid = $auser->mmogameid;
 

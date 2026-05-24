@@ -64,7 +64,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
         $categoryid = $DB->insert_record('question_categories', $new);
 
         $rec = $DB->get_record_sql("SELECT COUNT(*) AS c FROM {question}");
-        if (  $rec->c === 0) {
+        if ($rec->c === 0) {
             $this->test_quiz_alone_empty($course, $categoryid);
         }
 
@@ -356,7 +356,7 @@ class mmogametype_quiz_generator_testcase extends advanced_testcase {
 
         $this->assertTrue(
             $result2->iscorrect === 1,
-            "attemptkey=".$result->attemptkey . " answer=" . $answerids[0] .
+            "attemptkey=" . $result->attemptkey . " answer=" . $answerids[0] .
             json_encode($result2, JSON_PRETTY_PRINT)
         );
 
