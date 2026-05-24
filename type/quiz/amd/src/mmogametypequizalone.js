@@ -204,7 +204,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
             this.attempt = json.attempt;
             this.attemptkey = json.attemptkey;
-console.log("processGetAttempt", json);
+
             // Process question type and answers
             this.qtype = json.qtype;
             if (this.qtype === 'multichoice') {
@@ -227,7 +227,7 @@ console.log("processGetAttempt", json);
         }
 
         showGrade(json) {
-            super.showGrade(this.player, json.grade, json.rank, json.percentmastered, json.percentRank, true);
+            super.showGrade(this.player, json.grade, json.rank, json.countmastered, json.rankmastered, json.countqueries, true);
             this.player.lblAddGrade.textContent = json.addgrade === undefined ? '' : json.addgrade;
             this.autoResizeText(this.player.lblAddGrade, this.player.cellSize, this.player.cellSize, true, 0, 0, 1);
         }

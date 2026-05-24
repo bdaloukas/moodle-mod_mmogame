@@ -1499,17 +1499,6 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2026052402)) {
-        // Define field percent to be added to mmogame_am_aduel_pairs.
-        $table = new xmldb_table('mmogame_aa_grades');
-        $field = new xmldb_field('percentmastered', XMLDB_TYPE_FLOAT, null, null, XMLDB_NOTNULL, null, '0', 'countmastered');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
-    }
-
     if ($oldversion < ($ver = 2026052404)) {
         $table = new xmldb_table('mmogame_as_heuristic');
 

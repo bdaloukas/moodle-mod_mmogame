@@ -72,8 +72,8 @@ abstract class mmogametype_quiz extends mmogame {
         $ret['rank'] = $this->get_rank($info->grade, 'grade');
         $ret['grade'] = $info->grade;
         $ret['countmastered'] = $info->countmastered;
-        $ret['percentmastered'] = $info->percentmastered;
-        $ret['percentRank'] = $this->get_rank($info->percentmastered, 'percentmastered');
+        $ret['rankmastered'] = $this->get_rank($info->countmastered, 'countmastered');
+        $ret['countqueries'] = $this->get_rstate()->countqueries;
 
         if ($attempt === null) {
             $attempt = new stdClass();

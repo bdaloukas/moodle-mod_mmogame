@@ -82,7 +82,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         $a['queryid'] = $queryid;
         $a['layout'] = $this->qbank->get_layout_queryid($queryid);
         $a['timestart'] = time();
-        $a['attemptkey'] = self::createkey();
+        $a['attemptkey'] = $this->createkey();
 
         // Insert data to mmogame_quiz_attempts table.
         $id = $this->db->insert_record('mmogame_quiz_attempts', $a);
@@ -336,6 +336,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
 
         $ret['countmastered'] = $info->countmastered;
         $ret['rankmastered'] = $this->get_rank($info->countmastered, 'countmastered');
+        $ret['countqueries'] = $this->get_rstate()->countqueries;
 
         return $attempt;
     }

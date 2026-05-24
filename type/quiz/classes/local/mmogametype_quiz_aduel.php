@@ -134,6 +134,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
             $a['queryid'] = $queryid;
             $a['numteam'] = $this->aduel->id;
             $a['layout'] = $this->qbank->get_layout_queryid($queryid);
+            $a['attemptkey'] = $this->createkey();
             $id = $this->db->insert_record($this->get_table_attempts(), $a);
             if ($ret === 0) {
                 $ret = $id;

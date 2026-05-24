@@ -412,7 +412,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             let div = this.createDiv(this.area, 'mmogame-quiz-aduel-correct-answer',
                 this.aItemCorrectX[i], t, this.radioSize, this.radioSize);
             div.title = iscorrect1 ? this.getStringT('js_correct_answer') : this.getStringT('js_wrong_answer');
-            div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorGrade, this.colorGrade)
+            div.innerHTML = this.getSVGcorrect(this.radioSize, iscorrect1, this.colorGrade, this.colorGrade);
         }
 
         if (iscorrect2 !== undefined) {
@@ -459,16 +459,17 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     showGrade(json) {
-        super.showGrade(this.player1, json.grade, json.rank, json.percentmastered, json.percentmastered, true);
+        super.showGrade(this.player1, json.grade, json.rank, json.countmastered, json.rankmastered, json.countqueries, true);
         this.player1.lblAddGrade.textContent = json.addgrade === undefined ? '' : json.addgrade;
         this.autoResizeText(this.player1.lblAddGrade, this.player1.cellSize, this.player1.cellSize, true, 0, 0, 1);
 
         if (json.aduelPlayer === 2) {
             this.player2.divMain.style.visibility = 'visible';
-            super.showGrade(this.player2, json.aduelGrade, json.aduelRank, json.aduelPercent, json.aduelPercentRank, true);
+            super.showGrade(this.player2, json.aduelGrade, json.aduelRank,
+                json.aduelCountMastered, json.aduelRankMastered, json.countqueries, true);
         } else {
             this.player2.divMain.style.visibility = 'hidden';
-            super.showGrade(this.player2, '', '', '', '', false);
+            super.showGrade(this.player2, '', '', '', '', 0, false);
         }
     }
 
@@ -717,7 +718,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         // Display the current score
-        this.showScore(json);
+        this.showGrade(json);
     }
 
     createScreenHorizontal(json, disabled) {

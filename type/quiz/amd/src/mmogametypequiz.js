@@ -349,14 +349,15 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 lblAddGrade: lblAddGrade, cellSize: cellSize};
         }
 
-        showGrade(player, grade, rank, percent, rankpercent, showPercent) {
+        showGrade(player, grade, rank, countmastered, rankmastered, countqueries, showPercent) {
             let boldGrade = false;
             let boldPercent = false;
-            if (rank !== undefined && rankpercent !== undefined) {
-                if (parseInt(rankpercent) < parseInt(rank)) {
+
+            if (rank !== undefined && rankmastered !== undefined) {
+                if (parseInt(rankmastered) < parseInt(rank)) {
                     boldGrade = true;
-                    rank = rankpercent;
-                } else if (parseInt(rankpercent) === parseInt(rank)) {
+                    rank = rankmastered;
+                } else if (parseInt(rankmastered) === parseInt(rank)) {
                     boldGrade = true;
                     boldPercent = true;
                 }
@@ -379,12 +380,12 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             }
 
             if (showPercent) {
-                const perc = Math.round(100 * percent);
-                s = percent === '' ? '' : (boldPercent ? `b${perc}` : perc) + '%';
+                let percent = countqueries > 0 ? Math.round(100 * countmastered / countqueries) + '%' : '';
+                s = percent === '' ? '' : (boldPercent ? `b${percent}` : percent) + '%';
                 if (player.lblPercent !== undefined) {
                     if (player.cachePercent !== s) {
                         player.cachePercent = s;
-                        player.lblPercent.textContent = perc;
+                        player.lblPercent.textContent = percent;
                         this.autoResizeText(player.lblPercent, player.cellSize - this.padding, player.cellSize, false, 0, 0);
                     }
                 }
@@ -459,7 +460,6 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                     answer: this.answerid || '',
                     subcommand: subcommand,
                 };
-                console.log(params);
 
                 Ajax.call([{
                     methodname: 'mmogametype_quiz_set_answer', // API endpoint
