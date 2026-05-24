@@ -36,7 +36,7 @@ class backup_mmogame_activity_structure_step extends backup_questions_activity_s
             ['id'],
             [
                 'name', 'intro', 'introformat', 'language', 'qbank', 'qbankparams', 'modelparams', 'numgame',
-                'type', 'model', 'kinduser', 'pin', 'enabled', 'numattempt', 'fastjson', 'timefastjson', 'striptags',
+                'type', 'model', 'kinduser', 'pin', 'enabled', 'numattempt', 'striptags',
             ]
         );
 

@@ -181,26 +181,17 @@ class send_answers_split extends external_api {
             'answertexts' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Answer texts')
             ),
-            'aduels' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Aduels, one per split')
-            ),
-            'aduelavatars' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Aduels, avatars')
-            ),
-            'aduelcorrects' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Corrects')
-            ),
             'queryanswerids0' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Answer IDs original')
             ),
             'grades' => new external_multiple_structure(
                 new external_value(PARAM_FLOAT, 'Grades per user')
             ),
-            'countquestion' => new external_value(
+            'countqueries' => new external_value(
                 PARAM_INT,
                 'Total number of questions'
             ),
-            'countcorrect' => new external_multiple_structure(
+            'countmastered' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'Total number of corrects')
             ),
             'islastcorrect' => new external_multiple_structure(
@@ -253,9 +244,8 @@ class send_answers_split extends external_api {
         return ['avatars' => [], 'attemptqueryids' => [],
             'numattempts' => [], 'querydefinitions' => $definitions, 'querytips' => $tips,
             'queryanswerids' => $answerids, 'answertexts' => $answertexts,
-            'aduels' => [], 'aduelavatars' => [], 'aduelcorrects' => [],
             'queryanswerids0' => $queryanswerids0,
-            'countquestion' => 0, 'countcorrect' => [], 'islastcorrect' => [],
+            'countqueries' => 0, 'countmastered' => [], 'islastcorrect' => [],
             'ranks' => [], 'grades' => [], 'savedattempts' => [], 'queryranks' => [],
             'state' => $mmogame->get_state(), 'statetime' => $mmogame->get_statetime()];
     }

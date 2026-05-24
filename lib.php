@@ -50,9 +50,6 @@ function mmogame_add_instance(object $mform): int {
     if (!isset($mform->numattempt)) {
         $mform->numattempt = 1;
     }
-    if (!isset($mform->timefastjson)) {
-        $mform->timefastjson = 0;
-    }
     $mform->id = $DB->insert_record("mmogame", $mform);
 
     return $mform->id;

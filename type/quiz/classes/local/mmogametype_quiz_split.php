@@ -95,7 +95,7 @@ class mmogametype_quiz_split extends mmogame {
             }
 
             $rgrade = $this->get_rgrade($auser->id);
-            $countmastered[] = $rgrade->countmastered;
+            $countmastered[] = $rgrade->countmastered !== null ? $rgrade->countmastered : 0;
 
             if (!$newplayer1) {
                 // Continue previous attempt.
@@ -157,7 +157,7 @@ class mmogametype_quiz_split extends mmogame {
             $a['numgame'] = $this->rgame->numgame;
             $a['numteam'] = $aduel->id;
             $a['auserid'] = $this->auserid;
-            $a['numattempt'] = $numattempt;
+            $a['numattempt'] = $numattempt++;
             $a['queryid'] = $queryid;
             $a['timestart'] = count($ids) == 0 ? time() : 0;  // Only the first starts.
             $a['timeanswer'] = 0;
@@ -299,7 +299,6 @@ class mmogametype_quiz_split extends mmogame {
             $addcountmastered
         );
 
-        $this->qbank->update_grades($attempt->auserid, $attempt->grade, $addcountmastered);
         $ret['addgrade'] = $attempt->grade >= 0 ? '+' . $attempt->grade : $attempt->grade;
 
         $a['iscorrect'] = $attempt->iscorrect;

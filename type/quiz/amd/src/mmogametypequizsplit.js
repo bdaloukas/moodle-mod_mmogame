@@ -29,7 +29,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
 
             let splitx = 1;
             let splity = 1;
-            let isaduel = 0;
 
             if (modelparams !== null) {
                 const params = JSON.parse(modelparams);
@@ -39,15 +38,11 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 if (params.splity !== undefined && params.splity > 1) {
                     splity = params.splity;
                 }
-                if (params.isaduel !== undefined && params.isaduel > 1) {
-                    isaduel = params.isaduel;
-                }
             }
             this.countX = splitx;
             this.countY = splity;
 
             this.countAll = this.countX * this.countY;
-            this.isaduel = (isaduel !== 0);
             this.computeSizes(0);
 
             super.gateOpen(mmogameid, pin, kinduser, user, splitx, splity);
@@ -80,7 +75,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     sessionkeys: this.sessionkeys.join(','),
                     avatarids: avatarids.join(','),
                 };
-                console.log("callGetAttemptsSplit", params);
+                console.log("callGetAttemptsSplit params=", params);
                 // Calling the service through the Moodle AJAX API
                 let getAttemptsSplit = Ajax.call([{
                     methodname: 'mmogametype_quiz_get_attempts_split',
@@ -89,9 +84,9 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
 
                 // Handling the response
                 getAttemptsSplit[0].done(({avatars, attemptkeys, attemptqueryids, querydefinitions, querytips,
-                                              queryanswerids, numattempts, answertexts, aduels,
-                                              aduelavatars, aduelcorrects, queryanswerids0, grades,
-                                              countquestion, countcorrect, islastcorrect, ranks, queryranks,
+                                              queryanswerids, numattempts, answertexts,
+                                              queryanswerids0, grades,
+                                              countqueries, countmastered, islastcorrect, ranks, queryranks,
                                               hasidea, state, statetime}) => {
                     this.info = {
                         avatars: avatars,
@@ -103,13 +98,10 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         querytips: querytips,
                         queryanswerids: queryanswerids,
                         answertexts: answertexts,
-                        aduels: aduels,
-                        aduelavatars: aduelavatars,
-                        aduelcorrects: aduelcorrects,
                         queryanswerids0: queryanswerids0,
                         grades: grades,
-                        countquestion: countquestion,
-                        countcorrect: countcorrect,
+                        countqueries: countqueries,
+                        countmastered: countmastered,
                         islastcorrect: islastcorrect,
                         ranks: ranks,
                         queryranks: queryranks,
@@ -117,7 +109,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         state: state,
                         statetime: statetime,
                     };
-                    console.log("callGetAttemptsSplit", this.info);
+                    console.log("callGetAttemptsSplit ret=", this.info);
                     if (this.palette !== undefined) {
                         this.setColors(this.palette);
                     }
@@ -133,9 +125,10 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                             this.sendGetAttemptsSplit();
                         }, 1000 * this.info.statetime);
                     }
-                    this.computeSizes(0, this.getMinIconSize(this.info.countquestion));
+                    this.computeSizes(0, this.getMinIconSize(this.info.countqueries));
                     this.createScreen();
                 }).fail((error) => {
+                    console.log("error", error)
                     this.showError("mmogametypequizsplit.getattemptssplit");
                     return error;
                 });
@@ -183,7 +176,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     const sp = this.splits[i];
                     this.updateGrade(sp);
                     this.updatePercent(sp);
-                    this.checkShowAduel(sp);
                     i++;
                 }
             }
@@ -209,15 +201,13 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             });
 
             const ishorizontal = this.split.width >= this.split.height;
-            // Const showRank = this.isaduel || this.countX * this.countY > 1;
-            // const showRank = true;
             sp.player = this.createDivGradePercent(sp.parent, this.iconSize + 2 * this.padding, true);
             sp.percent = this.createDivGradePercent(sp.parent, 2 * this.iconSize + 3 * this.padding, false);
             this.computeFontGradePercent(sp);
 
             sp.ring = this.createDifficultyRing(sp.parent, 2 * this.iconSize + 3 * this.padding, this.padding, this.iconSize);
-            if (this.info.countquestion > 0) {
-                let percent = sp.attempts[0].queryrank / this.info.countquestion;
+            if (this.info.countqueries > 0) {
+                let percent = sp.attempts[0].queryrank / this.info.countqueries;
                 this.updateDifficultyRing(sp.ring, percent);
             }
             // Avatar.
@@ -272,7 +262,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             sp.definitionTop = this.iconSize + 2 * this.padding;
             sp.definition = this.createDOMElement('div', {
                 parent: sp.parent,
-                classnames: 'mmogame-quiz-aduelsplit-definition',
+                classnames: 'mmogame-quiz-split-definition',
                 styles: {
                     position: 'absolute',
                     left: `${this.padding}px`,
@@ -353,7 +343,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             const ans = aRandom[i];
             const label = this.createDOMElement('label', {
                 parent: sp.parent,
-                classnames: 'mmogame-quiz-aduelsplit-label' + i,
+                classnames: 'mmogame-quiz-split-label' + i,
                 styles: {
                     position: 'absolute',
                     top: `${top}px`,
@@ -368,7 +358,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             label.innerHTML = this.sanitizeFormattingHtml(
                 this.formatText(attempt.answers[ans], (i + 1) + ". ")
             );
-            label.htmlFor = "mmogame_quiz_aduelsplit-input" + i;
+            label.htmlFor = "mmogame_quiz_split-input" + i;
 
             // Create the checkbox
             const checked = false;
@@ -532,13 +522,12 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             // Copy attempt ids.
             let queryids = info.attemptqueryids[splitInfo].split(",");
 console.log("info=", info);
-            const aduelcorrects = info.aduelcorrects[splitInfo].split(',');
             const numattempts = info.numattempts[splitInfo].split(",");
             let attemptkeys = info.attemptkeys[splitInfo].split(",");
             sp.attempts = [];
             sp.grade = parseInt(info.grades[splitInfo]);
             sp.rank = parseInt(info.ranks[splitInfo]);
-            sp.countcorrect = info.countcorrect[splitInfo];
+            sp.countmastered = info.countmastered[splitInfo];
             for (let i = 0; i < attemptkeys.length; i++) {
                 let item = {attemptkey: attemptkeys[i]};
                 item.queryid = queryids[i];
@@ -549,7 +538,6 @@ console.log("info=", info);
                 item.answerids0 = info.queryanswerids0[item.queryid].split(",");
                 item.answers = [];
                 item.numattempt = numattempts[i];
-                item.aduelcorrect = (parseInt(aduelcorrects[i]) !== 0);
                 item.queryrank = info.queryranks[item.queryid];
                 for (let j = 0; j < item.answerids.length; j++) {
                     item.answers.push(info.answertexts[item.answerids[j]]);
@@ -557,9 +545,6 @@ console.log("info=", info);
 
                 sp.attempts.push(item);
             }
-            sp.aduel = this.info.aduels[splitInfo];
-            sp.aduelavatar = this.info.aduelavatars[splitInfo];
-            console.log("sp.attempts=",sp.attempts);
         }
 
         moveX(timestamp, split, num, direction, steps) {
@@ -688,13 +673,8 @@ console.log("info=", info);
                     // Correct answer.
                     const addgrade = isWizard ? 1 : sp.aItemRadio.length - 1;
                     sp.grade += addgrade;
-                    if (sp.aduel >= 0) {
-                        if (!sp.attempts[0].aduelcorrect) {
-                            sp.grade += sp.aItemRadio.length - 1;
-                        }
-                    }
                     if (sp.attempts[0].islastcorrect === 0) {
-                        sp.countcorrect++;
+                        sp.countmastered++;
                         this.updatePercent(sp);
                     }
                     this.updateGrade(sp);
@@ -706,14 +686,7 @@ console.log("info=", info);
                     sp.grade += addgrade;
                     this.updateGrade(sp);
 
-                    let addgradeaduel = 0;
-                    if (sp.aduel >= 0) {
-                        if (sp.attempts[0].aduelcorrect) {
-                            addgradeaduel = sp.aItemRadio.length - 1;
-                            this.updateGradeOpponent(sp, addgradeaduel);
-                        }
-                    }
-                    this.showCorrect(sp, false, addgrade, addgradeaduel);
+                    this.showCorrect(sp, false, addgrade);
                     this.sendAnswer(split, false, isWizard);
                 }
 
@@ -786,7 +759,7 @@ console.log("info=", info);
         }
 
         updatePercent(sp) {
-            sp.percent.lblGrade.textContent = this.info.countquestion > 0 ? sp.countcorrect + " / " + this.info.countquestion : '';
+            sp.percent.lblGrade.textContent = this.info.countqueries > 0 ? sp.countmastered + " / " + this.info.countqueries : '';
             this.autoResizeText(sp.percent.lblGrade, 0.8 * this.iconSize, sp.percent.cellSize,
                 false, 0, 0);
         }
@@ -817,7 +790,7 @@ console.log("info=", info);
             sp.server.push(info);
         }
 
-        showCorrect(sp, iscorrect, addgrade, addgradeaduel) {
+        showCorrect(sp, iscorrect, addgrade) {
             const correctPos = sp.aRandom.indexOf(0);
             const topCorrect = sp.aItemLabelTop[0];
             const topIcon = topCorrect + this.padding + sp.aItemLabel[correctPos].offsetHeight;
@@ -881,7 +854,7 @@ console.log("info=", info);
                 }
 
                 this.createQuestionTip(sp);
-                this.showCorrectStrip(sp, topIcon, iscorrect, addgrade, addgradeaduel);
+                this.showCorrectStrip(sp, topIcon, iscorrect, addgrade);
                 this.createNextButton(sp, correctPos, topIncorrect);
 
                 sp.aItemLabel[correctPos].style.opacity = "1";
@@ -894,7 +867,7 @@ console.log("info=", info);
         createCorrectIcon(sp, parent, left, topSource, topDestination, sizeRadio, iscorrect) {
             const div = this.createDiv(
                 parent,
-                'mmogame-quiz-aduelsplit-iscorrect',
+                'mmogame-quiz-split-iscorrect',
                 left,
                 topSource,
                 sizeRadio,
@@ -1048,8 +1021,8 @@ console.log("info=", info);
 
             this.computeFontSize(split, sp);
 
-            if (this.info.countquestion > 0) {
-                let percent = sp.attempts[0].queryrank / this.info.countquestion;
+            if (this.info.countqueries > 0) {
+                let percent = sp.attempts[0].queryrank / this.info.countqueries;
                 this.updateDifficultyRing(sp.ring, percent);
             }
         }
@@ -1070,10 +1043,6 @@ console.log("info=", info);
         askNextQuestions(sp) {
             this.showCursor(sp, true);
 
-            if (sp !== undefined && sp.aduelavatarelement !== undefined) {
-                sp.aduelavatarelement.remove();
-                sp.aduelavatarelement = undefined;
-            }
             let sessionkeys = [];
             let attemptkeys = [];
             let answers = [];
@@ -1123,11 +1092,9 @@ console.log("info=", info);
                 // Handling the response
                 sendAnswers[0].done(({avatars, attemptkeys, attemptqueryids,numattempts,
                                          querydefinitions, querytips,
-                                         queryanswerids, answertexts, aduels,
-                                         aduelavatars, aduelcorrects, queryanswerids0,
-                                         grades, countquestion, countcorrect, islastcorrect, ranks, queryranks,
+                                         queryanswerids, answertexts, queryanswerids0,
+                                         grades, countqueries, countmastered, islastcorrect, ranks, queryranks,
                                          state, statetime}) => {
-console.log("sendAnswers done");
                     if (spidea >= 0) {
                         this.showIdea(spidea, querydefinitions, queryanswerids0, querytips, answertexts);
                         return;
@@ -1143,13 +1110,10 @@ console.log("sendAnswers done");
                         querytips: querytips,
                         queryanswerids: queryanswerids,
                         answertexts: answertexts,
-                        aduels: aduels,
-                        aduelavatars: aduelavatars,
-                        aduelcorrects: aduelcorrects,
                         queryanswerids0: queryanswerids0,
                         grades: grades,
-                        countquestion: countquestion,
-                        countcorrect: countcorrect,
+                        countqueries: countqueries,
+                        countmastered: countmastered,
                         islastcorrect: islastcorrect,
                         ranks: ranks,
                         queryranks: queryranks,
@@ -1167,7 +1131,6 @@ console.log("sendAnswers done");
                     for (let i = 0; i < returnsplits.length; i++) {
                         const split = returnsplits[i];
                         this.copySplitData(i, split);
-                        this.checkShowAduel(this.splits[split]);
                         this.showNextQuestion(split);
                         this.updatePercent(this.splits[split]);
                     }
@@ -1233,46 +1196,6 @@ console.log("sendAnswers done");
             }
         }
 
-        updateGradeOpponent(sp, addgrade) {
-            const avatar = sp.aduelavatar;
-            for (let i = 0; i < this.splits.length; i++) {
-                if (this.splits[i].avatarfile === avatar) {
-                    const newsplit = this.splits[i];
-                    newsplit.grade += addgrade;
-                    this.updateGrade(newsplit);
-                    break;
-                }
-            }
-        }
-
-        checkShowAduel(sp) {
-            if (sp.aduelavatar === '' || sp.aduelavatar === undefined) {
-                if (sp.aduelavatarelement !== undefined) {
-                    sp.aduelavatarelement.remove();
-                    sp.aduelavatarelement = undefined;
-                }
-                return; // Plays alone
-            }
-            let leftAvatar = Math.round(this.padding + this.iconSize / 2);
-            sp.aduelavatarelement = this.createDOMElement('img', {
-                classname: `mmogame-quiz-avatar`,
-                parent: sp.parent,
-                styles: {
-                    position: 'absolute',
-                    left: `${leftAvatar + 2 * this.iconSize + 2 * this.padding}px`,
-                    top: `${this.padding}px`,
-                    height: `${this.iconSize}px`,
-                    maxWidth: `${this.iconSize}px`,
-                    transform: 'translateX(-50%)',
-                },
-                attributes: {
-                    src: 'assets/avatars/' + sp.aduelavatar,
-                    alt: this.getStringM('js_help'),
-                    role: 'button',
-                },
-            });
-        }
-
         createAddGrade(sp, left, iconSize, addgrade) {
             if (addgrade === 0) {
                 return false;
@@ -1310,7 +1233,7 @@ console.log("sendAnswers done");
             return label;
         }
 
-        showCorrectStrip(sp, top, iscorrect, addgrade, addgradeaduel) {
+        showCorrectStrip(sp, top, iscorrect, addgrade) {
             const iconSize = Math.max(1, Math.min(this.iconSize, Math.ceil(sp.answersWidth / 4 - this.padding - this.padding / 4)));
             sp.stripCorrect = this.createDOMElement('div', {
                 parent: sp.parent,
@@ -1344,29 +1267,6 @@ console.log("sendAnswers done");
                 },
             });
             this.createCorrectIcon(sp, sp.stripCorrect, iconSize + this.padding, 0, 0, this.iconSize, iscorrect);
-
-            if (sp.aduelavatar !== '') {
-                let leftAduel = 2 * (iconSize + this.padding);
-                this.createDOMElement('img', {
-                    classname: `mmogame-quiz-avatar`,
-                    parent: sp.stripCorrect,
-                    styles: {
-                        position: 'absolute',
-                        left: `${leftAduel}px`,
-                        top: `0`,
-                        height: `${iconSize}px`,
-                        maxWidth: `${iconSize}px`,
-                    },
-                    attributes: {
-                        src: 'assets/avatars/' + sp.aduelavatar,
-                        alt: this.getStringM('js_help'),
-                        role: 'button',
-                    },
-                });
-                const correctAduel = sp.attempts[0].aduelcorrect;
-                this.createCorrectIcon(sp, sp.stripCorrect, leftAduel, 0, 0, iconSize, correctAduel);
-                this.createAddGrade(sp, leftAduel + iconSize + this.padding, iconSize, addgradeaduel);
-            }
         }
 
         async createNextButton(sp, correctPos, topIncorrect) {
@@ -1513,7 +1413,7 @@ console.log("sendAnswers done");
 
             sp.questionTip = this.createDOMElement('div', {
                 parent: sp.parent,
-                classnames: 'mmogame-quiz-aduelsplit-questiontip',
+                classnames: 'mmogame-quiz-split-questiontip',
                 styles: {
                     position: 'absolute',
                     left: `${this.padding}px`,
@@ -1625,7 +1525,7 @@ console.log("sendAnswers done");
             const height = this.split.height - this.iconSize - 3 * this.padding;
             sp.ideadiv = this.createDOMElement('div', {
                 parent: sp.parent,
-                classnames: 'mmogame-quiz-aduelsplit-idea',
+                classnames: 'mmogame-quiz-split-idea',
                 styles: {
                     position: 'absolute',
                     left: `${this.padding}px`,
@@ -1722,10 +1622,10 @@ console.log("sendAnswers done");
             ring.fg.style.strokeDasharray = `${percent * sweepLen} ${C}`;
         }
 
-        getMinIconSize(countquestion) {
+        getMinIconSize(countqueries) {
             let size1 = 0;
             let size2;
-            if (countquestion > 0) {
+            if (countqueries > 0) {
                 const el = document.createElement("div");
                 el.style.position = "absolute";
                 el.style.left = "100px";
@@ -1735,7 +1635,7 @@ console.log("sendAnswers done");
                 el.style.height = `1em`;
                 el.style.margin = "0";
                 el.style.border = "0";
-                el.textContent = countquestion + " / " + countquestion;
+                el.textContent = countqueries + " / " + countqueries;
                 this.body.appendChild(el);
 
                 size1 = Math.round(1 / 0.8 * Math.max(el.scrollWidth, el.scrollHeight));

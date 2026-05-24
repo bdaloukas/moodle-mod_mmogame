@@ -93,6 +93,7 @@ class get_attempts_split extends external_api {
         $state = $mmogame->get_state();
         $statetime = $mmogame->get_statetime();
         if (count($ausers) == 0 || $state == 0 || $statetime == 0) {
+
             return [
                 'avatars' => [],
                 'attempts' => [],
@@ -103,13 +104,12 @@ class get_attempts_split extends external_api {
                 'querytips' => [],
                 'queryanswerids' => [],
                 'answertexts' => [],
-                'aduels' => [],
                 'aduelavatars' => [],
                 'aduelcorrects' => [],
                 'queryanswerids0' => [],
                 'grades' => [],
-                'countquestion' => 0,
-                'countcorrect' => [],
+                'countqueries' => 0,
+                'countmastered' => [],
                 'islastcorrect' => [],
                 'ranks' => [],
                 'queryranks' => [],
@@ -133,7 +133,6 @@ class get_attempts_split extends external_api {
             $attemptids = $attemptqueryids = $attemptnums = $definitions = $tips =
             $answerids = $answertexts = $attemptkeys = $queryanswerids0 = [];
 
-            $countquestions = 0;
             $countmastered = [];
             $islastcorrect = [];
             $queryranks = [];
@@ -172,7 +171,8 @@ class get_attempts_split extends external_api {
             'numattempts' => $attemptnums, 'querydefinitions' => $definitions,
             'querytips' => $tips, 'queryanswerids' => $answerids, 'answertexts' => $answertexts,
             'queryanswerids0' => $queryanswerids0, 'grades' => $grades,
-            'countquestion' => $countquestions, 'countmastered' => $countmastered, 'islastcorrect' => $islastcorrect,
+            'countqueries' => $mmogame->get_rstate()->countqueries, 'countmastered' => $countmastered,
+            'islastcorrect' => $islastcorrect,
             'ranks' => $ranks, 'queryranks' => $queryranks, 'hasidea' => 0, 'state' => $state, 'statetime' => 0];
     }
 
@@ -207,26 +207,17 @@ class get_attempts_split extends external_api {
             'answertexts' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Answer texts')
             ),
-            'aduels' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Aduels')
-            ),
-            'aduelavatars' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Avatars')
-            ),
-            'aduelcorrects' => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Corrects')
-            ),
             'queryanswerids0' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Original queryids')
             ),
             'grades' => new external_multiple_structure(
                 new external_value(PARAM_FLOAT, 'Grades per user')
             ),
-            'countquestion' => new external_value(
+            'countqueries' => new external_value(
                 PARAM_INT,
                 'Total number of questions'
             ),
-            'countcorrect' => new external_multiple_structure(
+            'countmastered' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'Total number of corrects')
             ),
             'islastcorrect' => new external_multiple_structure(
@@ -291,6 +282,7 @@ class get_attempts_split extends external_api {
     ): bool {
         $queryranks = [];
         $recs = $mmogame->get_attempts($ausers, $countmastered);
+
         $queryids = [];  /* Queries that are used */
         $attemptqueryids = []; /* Which query has every attempt */
         $attemptids = $attemptnums = $attemptkeys = [];
@@ -304,6 +296,7 @@ class get_attempts_split extends external_api {
             }
             $nums = $ids = $newids = $attemptkeys1 = [];
             $found = false;
+            $numattempt = 0;
             foreach ($attempts as $attempt) {
                 if (!$found) {
                     $found = true;
@@ -315,7 +308,7 @@ class get_attempts_split extends external_api {
                     $pos = count($querypositions);
                     $querypositions[$attempt->queryid] = $pos;
                 }
-                $nums[] = $attempt->numattempt;
+                $nums[] = ++$numattempt;
                 $ids[] = $attempt->id;
                 $attemptkeys1[] = $attempt->attemptkey;
                 $newids[] = $pos;

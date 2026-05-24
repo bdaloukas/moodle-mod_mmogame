@@ -100,7 +100,6 @@ abstract class mmogame_qbank {
      */
     public function update_grades(int $auserid, int $addgrade, int $addcountmastered, ?array $fields = null): stdClass {
         $db = $this->mmogame->get_db();
-
         $rgrade = $this->mmogame->get_rgrade($auserid, true);
         $a = ['id' => $rgrade->id];
         if ($fields !== null) {
@@ -114,6 +113,9 @@ abstract class mmogame_qbank {
             $a['grade'] = $rgrade->grade;
         }
         if ($addcountmastered != 0) {
+            if ($rgrade->countmastered === null) {
+                $rgrade->countmastered = 0;
+            }
             $rgrade->countmastered = max(0, $rgrade->countmastered + $addcountmastered);
             $a['countmastered'] = $rgrade->countmastered;
         }
@@ -136,7 +138,7 @@ abstract class mmogame_qbank {
      * @param bool $iscorrect
      * @param bool $iserror
      * @param int $nextattempt
-     * @param int $countmastered
+     * @param int $addcountmastered
      */
     public function update_stats(
         ?int $numteam,
@@ -144,8 +146,9 @@ abstract class mmogame_qbank {
         bool $iscorrect,
         bool $iserror,
         int $nextattempt,
-        int &$countmastered
+        int &$addcountmastered
     ) {
+        $addcountmastered = 0;
         $db = $this->mmogame->get_db();
         $rgame = $this->mmogame->get_rgame();
         $select = 'mmogameid=? AND numgame=? ';
@@ -176,12 +179,12 @@ abstract class mmogame_qbank {
             $a['countused'] = $rec->countused + 1;
             if ($iscorrect && $rec->serialcorrects == 0) {
                 $rec->serialcorrects = 1;
-                $countmastered++;
+                $addcountmastered = 1;
             } else if ($iscorrect && $rec->serialcorrects > 0) {
                 $rec->serialcorrects = $rec->serialcorrects + 1;
             } else if ($iscorrect == 0) {
                 if ($rec->serialcorrects > 0) {
-                    $countmastered--;
+                    $addcountmastered = -1;
                 }
                 $rec->serialcorrects = 0;
             }
@@ -200,7 +203,7 @@ abstract class mmogame_qbank {
             $a['countused'] = 1;
             $a['serialcorrects'] = $iscorrect ? 1 : 0;
             if ($iscorrect) {
-                $countmastered++;
+                $addcountmastered++;
                 $a['countcorrect'] = 1;
             }
         }
