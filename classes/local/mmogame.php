@@ -699,6 +699,7 @@ abstract class mmogame {
                     $currentfiles[$i] = $avatars[$avatarid];
                     unset($avatars[$avatarid]);
                 }
+                $this->login_user($rec);
             }
         }
         $maxavatars = count($avatars);

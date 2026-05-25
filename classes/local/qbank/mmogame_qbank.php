@@ -229,6 +229,20 @@ abstract class mmogame_qbank {
     }
 
     /**
+     * Return the layout (the positions of answer) for the question $queryid
+     *
+     * @param int $queryid
+     * @return string|null
+     */
+    public function get_layout_queryid(int $queryid): ?string {
+        $query = $this->load($queryid);
+        if ($query === null) {
+            return null;
+        }
+        return $this->get_layout($query);
+    }
+
+    /**
      * Loads data for question id.
      *
      * @param int $id

@@ -281,7 +281,7 @@ class get_attempts_split extends external_api {
         array &$queryranks
     ): bool {
         $queryranks = [];
-        $recs = $mmogame->get_attempts($ausers, $countmastered);
+        [$recs, $countmastered] = $mmogame->get_attempts($ausers);
 
         $queryids = [];  /* Queries that are used */
         $attemptqueryids = []; /* Which query has every attempt */
@@ -376,6 +376,6 @@ class get_attempts_split extends external_api {
      * @return array
      */
     private static function error(string $error): array {
-        return ['errorcode' => $error];
+            return ['errorcode' => $error];
     }
 }

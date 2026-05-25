@@ -168,8 +168,7 @@ abstract class mmogame_selection {
                     'timeerror' => 0,
                     'countcorrect' => 0,
                     'countused' => 0,
-                    'islastcorrect' => 0,
-                    'nextquery' => 0,
+                    'serialcorrects' => 0,
                     'nextattempt' => 0,
                     'randkey' => mt_rand(0, PHP_INT_MAX),
                 ]

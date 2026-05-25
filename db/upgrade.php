@@ -817,7 +817,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2025050705)) {
-        // Define field nextquery to be added to mmogame_aa_grades.
+        // Define field irtrank to be added to mmogame_aa_irt.
         $table = new xmldb_table('mmogame_aa_irt');
         $field = new xmldb_field('irtrank', XMLDB_TYPE_INTEGER, 10, true, XMLDB_NOTNULL, null, '0');
 
@@ -828,7 +828,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2025050706)) {
-        // Define field nextquery to be added to mmogame_aa_grades.
+        // Define field irtrank to be added to mmogame_aa_grades.
         $table = new xmldb_table('mmogame_aa_grades');
         $field = new xmldb_field('irtrank', XMLDB_TYPE_INTEGER, 10, true, XMLDB_NOTNULL, null, '0');
 
@@ -850,7 +850,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2025052503)) {
-        // Define field nextquery to be added to mmogame_aa_grades.
+        // Define field difficultyfull to be added to mmogame_aa_irt.
         $table = new xmldb_table('mmogame_aa_irt');
         $field = new xmldb_field('difficultyfull', XMLDB_TYPE_FLOAT, null, null, XMLDB_NOTNULL, null, '0');
 

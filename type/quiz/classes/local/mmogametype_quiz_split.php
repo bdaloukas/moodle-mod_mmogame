@@ -75,15 +75,14 @@ class mmogametype_quiz_split extends mmogame {
      * Returns the attempts.
      *
      * @param array $ausers
-     * @param array $countmastered
-     * @return ?array
+     * @return ?array  [array of attempts, array of countmastered]
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function get_attempts(array $ausers, array &$countmastered): ?array {
+    public function get_attempts(array $ausers): ?array {
         $ids = null;
 
-        $ret = $queryranks = [];
+        $ret = $queryranks = $countmastered = [];
         foreach ($ausers as $auser) {
             $this->login_user($auser);
             $newplayer1 = $newplayer2 = false;
@@ -124,7 +123,7 @@ class mmogametype_quiz_split extends mmogame {
                 $ret[] = $this->get_attempts_new1($ids, $aduel);
             }
         }
-        return $ret;
+        return [$ret, $countmastered];
     }
 
     /**
