@@ -174,17 +174,6 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2024102808)) {
-        // Define field numattempt to be added to mmogame.
-        $table = new xmldb_table('mmogame');
-        $field = new xmldb_field('numattempt', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
-    }
-
     if ($oldversion < ($ver = 2024102820)) {
         $table = new xmldb_table('mmogame_aa_users_code');
         $index = new xmldb_index('ginstanceidcode', XMLDB_INDEX_UNIQUE, ['ginstanceid', 'code']);
@@ -628,17 +617,6 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2025021504)) {
-        // Define field numattempt to be added to mmogame.
-        $table = new xmldb_table('mmogame_aa_grades');
-        $field = new xmldb_field('percent', XMLDB_TYPE_FLOAT, null, null, XMLDB_NOTNULL, null, '0');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
-    }
-
     if ($oldversion < ($ver = 2025021509)) {
         // Define field percent to be added to mmogame_am_aduel_pairs.
         $table = new xmldb_table('mmogame_am_aduel_pairs');
@@ -744,7 +722,7 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
     }
 
     if ($oldversion < ($ver = 2025050601)) {
-        // Define field numattempt to be added to mmogame.
+        // Define field theta to be added to mmogame_aa_grades.
         $table = new xmldb_table('mmogame_aa_grades');
         $field = new xmldb_field('theta', XMLDB_TYPE_FLOAT, null, null, XMLDB_NOTNULL, null, '0');
 
@@ -1295,17 +1273,6 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
-    if ($oldversion < ($ver = 2026051827)) {
-        $table = new xmldb_table('mmogame_aa_grades');
-        $field = new xmldb_field('percent', XMLDB_TYPE_FLOAT);
-
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
-        }
-
-        upgrade_mod_savepoint(true, $ver, 'mmogame');
-    }
-
     if ($oldversion < ($ver = 2026051828)) {
         $table = new xmldb_table('mmogame_aa_states');
         $field = new xmldb_field('hashcompute', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
@@ -1516,6 +1483,26 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
 
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
+        }
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026052501)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('numattempt');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026052202)) {
+        $table = new xmldb_table('mmogame');
+        $field = new xmldb_field('selectionsort', XMLDB_TYPE_CHAR, 20, null, null, null, '', 'selection');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }

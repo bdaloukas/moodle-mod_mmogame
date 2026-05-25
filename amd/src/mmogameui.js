@@ -728,7 +728,6 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 // Handling the response
                 getAttempt[0].done((response) => {
                     const json = JSON.parse(response);
-                    console.log("getAttempt", json);
                     if (json.errorcode === 'no_user') {
                         this.gateCreateScreen();
                         return;

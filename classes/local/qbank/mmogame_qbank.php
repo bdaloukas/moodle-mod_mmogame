@@ -31,7 +31,7 @@ use stdClass;
 /**
  * The class mmogame_qbank is a based class for saved questions (e.g., glossary, question bank)
  *
- * @package    mmogame_qbank_moodlequestion
+ * @package    mmogame_qbank
  * @copyright  2024 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

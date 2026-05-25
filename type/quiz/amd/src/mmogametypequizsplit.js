@@ -60,7 +60,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
         }
 
         callGetAttemptsSplit() {
-            console.log("in callGetAttemptsSplit");
             let avatarids = [];
             const info = this.info;
             this.avatarfiles = [];
@@ -76,7 +75,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     sessionkeys: this.sessionkeys.join(','),
                     avatarids: avatarids.join(','),
                 };
-                console.log("callGetAttemptsSplit params=", params);
                 // Calling the service through the Moodle AJAX API
                 let getAttemptsSplit = Ajax.call([{
                     methodname: 'mmogametype_quiz_get_attempts_split',
@@ -110,7 +108,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         state: state,
                         statetime: statetime,
                     };
-                    console.log("callGetAttemptsSplit ret=", this.info);
                     if (this.palette !== undefined) {
                         this.setColors(this.palette);
                     }
@@ -129,7 +126,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.computeSizes(0, this.getMinIconSize(this.info.countqueries));
                     this.createScreen();
                 }).fail((error) => {
-                    console.log("error", error);
                     this.showError("mmogametypequizsplit.getattemptssplit");
                     return error;
                 });
@@ -522,7 +518,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             const info = this.info;
             // Copy attempt ids.
             let queryids = info.attemptqueryids[splitInfo].split(",");
-console.log("info=", info);
             const numattempts = info.numattempts[splitInfo].split(",");
             let attemptkeys = info.attemptkeys[splitInfo].split(",");
             sp.attempts = [];
@@ -1084,7 +1079,6 @@ console.log("info=", info);
                     returnsplits: returnsplits.join(','),
                     tools: tools.join(','),
                 };
-                console.log("sendAnswers", params);
                 // Calling the service through the Moodle AJAX API
                 let sendAnswers = Ajax.call([{
                     methodname: 'mmogametype_quiz_send_answers_split',
@@ -1137,7 +1131,6 @@ console.log("info=", info);
                     }
                     this.showCursor(sp, false);
                 }).fail((error) => {
-                    console.log("sendAnswers fail", error);
                     this.showError("mmogametypequizsplit.asknextquestion");
                     this.showCursor(sp, false);
                     return error;

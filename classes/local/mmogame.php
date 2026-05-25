@@ -284,7 +284,7 @@ abstract class mmogame {
      * Return the corresponding auserid from a user.
      * @param mmogame_database $db
      * @param int $mmogameid
-     * @param string $kind (the kind of user e.g., Moodle, GUID)
+     * @param string $kind (the kind of user, for example guid
      * @param int $userid
      * @param bool $create
      * @param int $split
