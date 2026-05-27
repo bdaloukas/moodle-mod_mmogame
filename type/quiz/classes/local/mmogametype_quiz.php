@@ -17,7 +17,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mmogamekind_quiz class
+ * Base quiz game type implementation for MMOGame.
  *
  * @package    mmogametype_quiz
  * @copyright  2024 Vasilis Daloukas
@@ -40,9 +40,7 @@ const MMOGAME_QUIZ_TOOL_WIZARD = 4;
 const MMOGAME_QUIZ_TOOL_5050 = 8;
 
 /**
- * mmogame_quiz is responsible for managing and facilitating quiz gameplay
- * within the mmogame system, including handling attempts, scoring,
- * and maintaining related user data.
+ * Provides shared quiz attempt table, scoring and cleanup helpers.
  */
 abstract class mmogametype_quiz extends mmogame {
     /**
@@ -97,7 +95,10 @@ abstract class mmogametype_quiz extends mmogame {
     }
 
     /**
-     * Return the score with negative values. If "n" is the number of answers, if it corrects returns (n-1) else returns (-1)
+     * Returns negative-marking score for a multiple-choice answer.
+     *
+     * Correct answers return number_of_answers - 1.
+     * Incorrect answers return -1.
      *
      * @param bool $iscorrect
      * @param stdClass $query

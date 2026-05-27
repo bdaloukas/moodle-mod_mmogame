@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is the entry point to the game module. All pages are rendered from here
+ * Defines the database abstraction contract used by MMOGame.
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
@@ -26,26 +26,26 @@ namespace mod_mmogame\local\database;
 use stdClass;
 
 /**
- * This is the base class for database access.
+ * Base database abstraction for Moodle-compatible MMOGame data access.
  */
 abstract class mmogame_database {
     /**
-     * This function inserts a record in database.
+     * Inserts a row into a plugin database table.
      *
-     * @param string $table
-     * @param array $a
-     * @return ?int if the insertions are ok, otherwise false.
+     * @param string               $table Unprefixed or prefixed table name.
+     * @param array<string, mixed> $a     Column values to insert.
+     * @return int|null Inserted record ID, or null when the insert fails.
      */
     abstract public function insert_record(string $table, array $a): ?int;
 
     /**
-     * Return a single database record as an object where the given conditions are used in the WHERE clause.
+     * Retrieves a single row using a WHERE fragment.
      *
-     * @param string $table The name of the database table.
-     * @param string $select The SQL condition to use in the WHERE clause.
-     * @param ?array $params Optional parameters for the SQL condition.
-     * @param string $fields Fields to return, defaults to '*'.
-     * @return ?stdClass The database record as an object, or false if not found.
+     * @param string                                             $table  Unprefixed or prefixed table name.
+     * @param string                                             $select WHERE fragment without the WHERE keyword.
+     * @param array<string, mixed>|array<int, mixed>|null         $params Bound SQL parameters.
+     * @param string                                             $fields Comma-separated field list to return.
+     * @return stdClass|null Matching row, or null when no row is found.
      */
     abstract public function get_record_select(
         string $table,
@@ -53,17 +53,18 @@ abstract class mmogame_database {
         ?array $params = null,
         string $fields = '*'
     ): ?stdClass;
+
     /**
-     * Returns a list of records as an array of objects where the specified conditions are used in the WHERE clause.
+     * Retrieves multiple rows using a WHERE fragment.
      *
-     * @param string $table The name of the database table.
-     * @param string $select The SQL condition for the WHERE clause.
-     * @param ?array $params Optional parameters for the SQL condition.
-     * @param string $sort Optional sorting order.
-     * @param string $fields The fields to return, default is '*'.
-     * @param int $limitfrom The starting point of records to return, default is 0.
-     * @param int $limitnum The number of records to return, default is 0 (no limit).
-     * @return array An array of database records as objects.
+     * @param string                                             $table     Unprefixed or prefixed table name.
+     * @param string                                             $select    WHERE fragment without the WHERE keyword.
+     * @param array<string, mixed>|array<int, mixed>|null         $params    Bound SQL parameters.
+     * @param string                                             $sort      ORDER BY fragment without the ORDER BY keyword.
+     * @param string                                             $fields    Comma-separated field list to return.
+     * @param int                                                $limitfrom Offset for limited result sets.
+     * @param int                                                $limitnum  Maximum number of rows to return. Zero means no limit.
+     * @return array<int|string, object> Matching rows.
      */
     abstract public function get_records_select(
         string $table,
@@ -74,14 +75,15 @@ abstract class mmogame_database {
         int $limitfrom = 0,
         int $limitnum = 0
     ): array;
+
     /**
-     * Count the records in a table where the given conditions are used in the WHERE clause.
+     * Counts rows using a WHERE fragment.
      *
-     * @param string $table The name of the table to count records from.
-     * @param string $select The SQL SELECT statement used for counting records.
-     * @param ?array $params Optional parameters for the SELECT statement.
-     * @param string $countitem The COUNT item to be used, defaults to "COUNT('*')".
-     * @return int The number of records that match the given conditions.
+     * @param string                                             $table     Unprefixed or prefixed table name.
+     * @param string                                             $select    WHERE fragment without the WHERE keyword.
+     * @param array<string, mixed>|array<int, mixed>|null         $params    Bound SQL parameters.
+     * @param string                                             $countitem SQL count expression.
+     * @return int Number of matching rows.
      */
     abstract public function count_records_select(
         string $table,
@@ -89,14 +91,16 @@ abstract class mmogame_database {
         ?array $params = null,
         string $countitem = "COUNT('*')"
     ): int;
+
     /**
-     * Returns a single database record as an object using a custom SELECT query.
+     * Retrieves a single row using a raw SELECT query accepted by the implementation.
      *
-     * @param string $sql The custom SQL SELECT query to execute.
-     * @param ?array $params Optional parameters for the SQL query.
-     * @return ?stdClass :mixed The database record as an object, or false if no record is found.
+     * @param string                                             $sql    SELECT query.
+     * @param array<string, mixed>|array<int, mixed>|null         $params Bound SQL parameters.
+     * @return stdClass|null Matching row, or null when no row is found.
      */
     abstract public function get_record_sql(string $sql, ?array $params = null): ?stdClass;
+
     /**
      * Returns a list of records as an array of objects using a custom SELECT query.
      *
@@ -107,32 +111,39 @@ abstract class mmogame_database {
      * @return array An array of database records as objects.
      */
     abstract public function get_records_sql(string $sql, ?array $params = null, int $limitfrom = 0, int $limitnum = 0): array;
+
     /**
-     * Update a record in the table. The data object must have the property "id" set.
+     * Updates a row in a plugin database table.
      *
-     * @param string $table
-     * @param array $a
+     * The values array must contain an id field used as the update condition.
+     *
+     * @param string               $table Unprefixed or prefixed table name.
+     * @param array<string, mixed> $a     Column values to update, including id.
+     * @return void
      */
     abstract public function update_record(string $table, array $a): void;
+
     /**
-     * Deletes records from the specified table where the given conditions are used in the WHERE clause.
+     * Deletes rows using a WHERE fragment.
      *
-     * @param string $table The name of the database table.
-     * @param string $select The SQL condition for the WHERE clause.
-     * @param ?array $params Optional parameters for the SQL condition.
-     * @return bool
+     * @param string                                             $table  Unprefixed or prefixed table name.
+     * @param string                                             $select WHERE fragment without the WHERE keyword.
+     * @param array<string, mixed>|array<int, mixed>|null         $params Bound SQL parameters.
+     * @return bool True when the delete query succeeds.
      */
     abstract public function delete_records_select(string $table, string $select, ?array $params = null): bool;
+
     /**
-     * Return the query fragment to check if a value is IN the given list of items
-     * (with a fallback to plain equal comparison if there is just one item)
+     * Builds an SQL comparison fragment for one or more values.
      *
-     * @param array $items
-     * @param int $type
-     * @param string $prefix
-     * @param bool $equal
-     * @param bool $onemptyitems
-     * @return array
+     * Implementations return an SQL fragment and the matching bound parameters.
+     *
+     * @param array<int, mixed> $items        Values for the comparison.
+     * @param int              $type         Placeholder mode.
+     * @param string           $prefix       Prefix for named placeholders.
+     * @param bool             $equal        True for IN or = comparisons, false for NOT IN or <> comparisons.
+     * @param bool             $onemptyitems Whether empty item lists are allowed.
+     * @return array{0: string, 1: array<int, mixed>|array<string, mixed>} SQL fragment and bound parameters.
      */
     abstract public function get_in_or_equal(
         array $items,

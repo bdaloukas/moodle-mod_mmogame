@@ -1507,5 +1507,64 @@ function xmldb_mmogame_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, $ver, 'mmogame');
     }
 
+    if ($oldversion < ($ver = 2026052503)) {
+        $table = new xmldb_table('mmogame_aa_states');
+        $index = new xmldb_index('mmogameidnumgame', XMLDB_INDEX_UNIQUE, ['mmogameid', 'numgame']);
+
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026052504)) {
+        $table = new xmldb_table('mmogame_aa_stats');
+        $index = new xmldb_index(
+            'mmogamenumgameauseridnextattempt',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['mmogameid', 'numgame', 'auserid', 'nextattempt']
+        );
+
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026052505)) {
+        $table = new xmldb_table('mmogame_as_irt');
+        $index = new xmldb_index('mmogamenumgamequeryid', XMLDB_INDEX_UNIQUE, ['mmogameid', 'numgame', 'queryid']);
+
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026052506)) {
+        $table = new xmldb_table('mmogame_aa_grades');
+        $index = new xmldb_index('mmogamenumgamegrade', XMLDB_INDEX_UNIQUE, ['mmogameid', 'numgame', 'grade']);
+
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
+    if ($oldversion < ($ver = 2026052507)) {
+        $table = new xmldb_table('mmogame_aa_grades');
+        $index = new xmldb_index('mmogamenumgamecountmastered', XMLDB_INDEX_UNIQUE, ['mmogameid', 'numgame', 'countmastered']);
+
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'mmogame');
+    }
+
     return true;
 }

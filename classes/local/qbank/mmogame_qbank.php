@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * lib
+ * Base question bank logic for MMOGame.
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
@@ -29,11 +29,7 @@ use mod_mmogame\local\mmogame;
 use stdClass;
 
 /**
- * The class mmogame_qbank is a based class for saved questions (e.g., glossary, question bank)
- *
- * @package    mmogame_qbank
- * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Provides shared question attempt, grade and statistics helpers.
  */
 abstract class mmogame_qbank {
     /** @var mmogame: the object mmogame that is connected to the question bank. */
@@ -49,11 +45,11 @@ abstract class mmogame_qbank {
     }
 
     /**
-     * The base function for a new attempt.
+     * Creates or retrieves the next question attempt for a gameplay user.
      *
      * @param int $count
      * @param int $numattempt
-     * @return ?array
+     * @return array|null Attempt data for the selected question.
      * @throws coding_exception
      * @throws dml_exception
      */
@@ -90,13 +86,13 @@ abstract class mmogame_qbank {
     }
 
     /**
-     * Updates the grade in database (table mmogame_aa_grades).
+     * Updates grade records after a submitted answer.
      *
-     * @param int $auserid
+     * @param int $auserid Gameplay user ID.
      * @param int $addgrade
      * @param int $addcountmastered
      * @param array|null $fields
-     * @return stdClass (the new grade)
+     * @return void
      */
     public function update_grades(int $auserid, int $addgrade, int $addcountmastered, ?array $fields = null): stdClass {
         $db = $this->mmogame->get_db();
@@ -129,16 +125,15 @@ abstract class mmogame_qbank {
     }
 
     /**
-     * Updates statistics in the database (table mmogame_aa_stats).
+     * Updates question and user statistics after an answer attempt.
      *
-     * The score2 is a temporary score e.g. chat phase of arguegraph.
-     *
-     * @param ?int $numteam
-     * @param ?int $queryid
-     * @param bool $iscorrect
+     * @param int|null $numteam
+     * @param int|null $queryid Question/query ID.
+     * @param bool $iscorrect Whether the submitted answer is correct.
      * @param bool $iserror
      * @param int $nextattempt
      * @param int $addcountmastered
+     * @return void
      */
     public function update_stats(
         ?int $numteam,
@@ -213,7 +208,6 @@ abstract class mmogame_qbank {
         if ($iserror) {
             $a['counterror'] = ++$rec->counterror;
             $a['timeerror'] = time();
-            $a['islastcorrect'] = 0;
             $a['serialcorrects'] = 0;
         }
 
@@ -243,12 +237,12 @@ abstract class mmogame_qbank {
     }
 
     /**
-     * Loads data for question id.
+     * Loads the question bank implementation configured for an MMOGame instance.
      *
      * @param int $id
      * @param bool $loadextra
      * @param string $fields
-     * @return ?stdClass
+     * @return stdClass|null Loaded question bank instance.
      */
     abstract public function load(int $id, bool $loadextra = true, string $fields = ''): ?stdClass;
 }

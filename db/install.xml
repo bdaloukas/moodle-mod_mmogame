@@ -84,7 +84,6 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="code" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="paramsplit" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="grade" TYPE="float" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -119,7 +118,8 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="mmogameidnumgameauserid" UNIQUE="true" FIELDS="mmogameid,numgame,auserid"/>
-        <INDEX NAME="mmogameid" UNIQUE="false" FIELDS="mmogameid"/>
+        <INDEX NAME="mmogameidnumgamegrade" UNIQUE="false" FIELDS="mmogameid,numgame,grade"/>
+        <INDEX NAME="mmogameidnumgamecountmastered" UNIQUE="false" FIELDS="mmogameid,numgame,countmastered"/>
       </INDEXES>
     </TABLE>
 
@@ -146,6 +146,9 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="index_unique" UNIQUE="true" FIELDS="mmogameid,numgame,queryid,auserid,numteam"/>
+        <INDEX NAME="mmogamenumgameauseridnextattempt" UNIQUE="false" FIELDS="mmogameid,numgame,auserid,nextattempt"/>
+        <INDEX NAME="mmogameidnumgameauseridqueryid" UNIQUE="false" FIELDS="mmogameid, numgame, auserid, queryid"/>
+        <INDEX NAME="mmogameidnumgameauseridsort" UNIQUE="false" FIELDS="mmogameid, numgame, auserid, serialcorrects, countused, countcorrect, timeerror, randkey" />
       </INDEXES>
     </TABLE>
 
@@ -164,7 +167,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="mmogameidqueryid" UNIQUE="false" FIELDS="mmogameid,queryid"/>
+        <INDEX NAME="mmogameidnumgamequeryid" UNIQUE="false" FIELDS="mmogameid,numgame,queryid"/>
+        <INDEX NAME="mmogameidnumgamepercent" UNIQUE="false" FIELDS="mmogameid, numgame, percent" />
       </INDEXES>
     </TABLE>
 
@@ -188,9 +192,6 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="categoryname" UNIQUE="false" FIELDS="category,name"/>
-      </INDEXES>
     </TABLE>
 
     <TABLE NAME="mmogame_aa_states" COMMENT="mmogame_aa_states">
@@ -199,7 +200,8 @@
         <FIELD NAME="mmogameid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numgame" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="state" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="statetime" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>        <FIELD NAME="param1" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="statetime" TYPE="float" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="param1" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="info" TYPE="text" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="hashcompute" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="countqueries" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -207,6 +209,9 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="mmogameidnumgame" UNIQUE="true" FIELDS="mmogameid,numgame"/>
+      </INDEXES>
     </TABLE>
 
     <TABLE NAME="mmogame_am_aduel_pairs" COMMENT="mmogame_am_aduel_pairs">
@@ -250,7 +255,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="mmogameidqueryid" UNIQUE="false" FIELDS="mmogameid,queryid"/>
+        <INDEX NAME="mmogameidnumgamequeryid" UNIQUE="false" FIELDS="mmogameid,numgame,queryid"/>
+        <INDEX NAME="mmogameidnumgamedifficulty" UNIQUE="false" FIELDS="mmogameid, numgame, difficulty"/>
       </INDEXES>
     </TABLE>
 
@@ -292,7 +298,7 @@
             <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         </KEYS>
         <INDEXES>
-            <INDEX NAME="keyid" UNIQUE="true" FIELDS="keyid"/>
+            <INDEX NAME="keyid" UNIQUE="false" FIELDS="keyid"/>
         </INDEXES>
     </TABLE>
 

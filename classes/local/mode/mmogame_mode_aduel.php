@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the mode ADuel
+ * Duel mode implementation for MMOGame.
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
@@ -28,11 +28,7 @@ use mod_mmogame\local\mmogame;
 use stdClass;
 
 /**
- * The class mmogame_mode_aduel has the code for mode ADuel
- *
- * @package    mod_mmogame
- * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Handles paired-player duel attempts and state transitions.
  */
 class mmogame_mode_aduel {
     /**

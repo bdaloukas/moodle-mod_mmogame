@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * MMOGame class
+ * Core MMOGame model and gameplay session manager.
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
@@ -31,11 +31,7 @@ use mod_mmogame\local\selection\mmogame_selection;
 use stdClass;
 
 /**
- * The class mmogame is the base class for all games
- *
- * @package    mod_mmogame
- * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * Represents one MMOGame instance and coordinates users, state, selection and question bank access.
  */
 abstract class mmogame {
     /** @var mmogame_database $db: database to be used. */
@@ -63,11 +59,13 @@ abstract class mmogame {
 
     /** @var mmogame_selection $selection: The algorithm for question selection */
     protected mmogame_selection $selection;
+
     /**
-     * Constructor.
+     * Create a game instance.
      *
      * @param mmogame_database $db (the database)
      * @param stdClass $rgame (a record from table mmogame)
+     * @throws coding_exception
      */
     public function __construct(mmogame_database $db, stdClass $rgame) {
         $this->db = $db;
@@ -226,14 +224,16 @@ abstract class mmogame {
     }
 
     /**
-     * Return an empty string. It is overwring.
+     * Returns the attempts table name.
+     *
+     * Base implementation returns an empty string and is overridden by game types.
      */
     public static function get_table_attempts(): string {
         return '';
     }
 
     /**
-     * Return coresponding auserid from guid (login without a password).
+     * Return corresponding auserid from guid (login without a password).
      * @param mmogame_database $db
      * @param int $mmogameid
      * @param string $guid
@@ -264,7 +264,7 @@ abstract class mmogame {
     }
 
     /**
-     * Return coresponding auserid from a users in the table mmogame_aa_users_code.
+     * Return corresponding auserid from a users in the table mmogame_aa_users_code.
      * @param mmogame_database $db
      * @param int $mmogameid
      * @param string $code
@@ -401,7 +401,7 @@ abstract class mmogame {
     }
 
     /**
-     * Marks user as loged in.
+     * Marks user as logged in.
      * @param stdClass $auser
      */
     public function login_user(stdClass $auser): void {
@@ -490,12 +490,12 @@ abstract class mmogame {
     }
 
     /**
-     * Returns info about avatar for the user auserid.
+     * Retrieves avatar and color palette information for the selection UI.
      *
      * @param int $auserid
      * @param bool $computepalette
      * @param bool $create
-     * @return ?stdClass
+     * @return stdClass|null Avatar and color palette data.
      */
     public function get_avatar_info(int $auserid, bool $computepalette = true, bool $create = false): ?stdClass {
         for ($step = 1; $step <= 2; $step++) {
@@ -530,11 +530,11 @@ abstract class mmogame {
     }
 
     /**
-     * Returns the rank for the current user based on $field
+     * Retrieves the ranking data for a game session.
      *
-     * @param float|int $value
+     * @param $value
      * @param string $field
-     * @return int
+     * @return int Ranking rows.
      */
     public function get_rank($value, string $field): int {
         return $this->db->count_records_select(
@@ -554,10 +554,10 @@ abstract class mmogame {
     }
 
     /**
-     * Returns the available avatars for user auserid.
+     * Retrieves the available avatar records.
      *
-     * @param ?int $auserid
-     * @return array
+     * @param int|null $auserid
+     * @return array<int, object> Avatar rows.
      */
     public function get_avatars(?int $auserid): array {
         $where = '';
@@ -643,7 +643,7 @@ abstract class mmogame {
     }
 
     /**
-     * Returns info abouts avatars and palettes.
+     * Starts one or more gameplay sessions for the requested MMOGame instance.
      *
      * @param int $countsplit
      * @param int $countpalettes
@@ -654,6 +654,7 @@ abstract class mmogame {
      * @param int $maxavatars
      * @param string $kinduser
      * @param string $user
+     * @return void
      */
     public function start_sessions(
         int $countsplit,
@@ -760,12 +761,12 @@ abstract class mmogame {
     }
 
     /**
-     * Saves to array $ret information about the $attempt.
+     * Appends one value to a JSON-encoded array field.
      *
-     * @param array $ret (returns info about the current attempt)
-     * @param ?stdClass $attempt
+     * @param array $ret
+     * @param stdClass|null $attempt
      * @param string $subcommand
-     * @return ?stdClass
+     * @return stdClass|null Updated JSON array string.
      */
     abstract public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass;
 

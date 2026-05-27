@@ -17,7 +17,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mmogame_quiz_alone class
+ * Alone quiz game type implementation for MMOGame.
  *
  * @package    mmogametype_quiz
  * @copyright  2024 Vasilis Daloukas
@@ -31,7 +31,7 @@ use dml_exception;
 use stdClass;
 
 /**
- * The class mmogame_quiz_alone play the game Quiz (Alone).
+ * Handles single-player quiz attempts, scoring and high score data.
  */
 class mmogametype_quiz_alone extends mmogametype_quiz {
     /**

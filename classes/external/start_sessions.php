@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Starts split-mode MMOGame play sessions through the REST external API.
+ *
+ * @package    mod_mmogame
+ * @copyright 2024 Vasilis Daloukas
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace mod_mmogame\external;
 
 use coding_exception;
@@ -31,11 +38,7 @@ use required_capability_exception;
 use function get_coursemodule_from_instance;
 
 /**
- * External function to get the list of avatars and color palettes.
- *
- * @package    mod_mmogame
- * @copyright 2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * External API endpoint for creating and returning multiple split sessions.
  */
 class start_sessions extends external_api {
     /**

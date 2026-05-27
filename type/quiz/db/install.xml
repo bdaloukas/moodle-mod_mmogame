@@ -33,6 +33,10 @@
       <INDEXES>
         <INDEX NAME="auserid" UNIQUE="false" FIELDS="auserid"/>
         <INDEX NAME="mmogameidnumattempt" UNIQUE="false" FIELDS="mmogameid,numattempt"/>
+        <INDEX NAME="mmogameidnumgameauseridtimeanswer" UNIQUE="false" FIELDS="mmogameid,numgame,auserid,timeanswer"/>
+        <INDEX NAME="mmogameidauseridattemptkey" UNIQUE="false" FIELDS="mmogameid,auserid,attemptkey"/>
+        <INDEX NAME="mmogameidnumgamenumteamauseridtimeanswernumattempt" UNIQUE="false" FIELDS="mmogameid, numgame, numteam, auserid, timeanswer, numattempt"/>
+        <INDEX NAME="mmogameidnumgamenumteamnumattemptauserid " UNIQUE="false" FIELDS="mmogameid, numgame, numteam, numattempt, auserid"/>
       </INDEXES>
     </TABLE>
 

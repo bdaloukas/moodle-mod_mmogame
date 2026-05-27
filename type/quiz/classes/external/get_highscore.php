@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Returns high score data for MMOGame quiz mode through the REST external API.
+ *
+ * @package   mmogametype_quiz
+ * @copyright 2024 Vasilis Daloukas
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace mmogametype_quiz\external;
 
 use coding_exception;
@@ -28,11 +35,7 @@ use mod_mmogame\local\mmogame;
 use required_capability_exception;
 
 /**
- * External function for starting a new attempt or continuing the last attempt.
- *
- * @package   mmogametype_quiz
- * @copyright 2024 Vasilis Daloukas
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * External API endpoint for retrieving quiz high score data.
  */
 class get_highscore extends external_api {
     /**

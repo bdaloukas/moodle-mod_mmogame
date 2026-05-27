@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Starts a single MMOGame play session through the REST external API.
+ *
+ * @package    mod_mmogame
+ * @copyright 2024 Vasilis Daloukas
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace mod_mmogame\external;
 
 use coding_exception;
@@ -30,11 +37,7 @@ use mod_mmogame\local\mmogame;
 use required_capability_exception;
 
 /**
- * External function to get the list of avatars and color palettes.
- *
- * @package    mod_mmogame
- * @copyright 2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * External API endpoint for creating and returning one game session.
  */
 class start_session extends external_api {
     /**

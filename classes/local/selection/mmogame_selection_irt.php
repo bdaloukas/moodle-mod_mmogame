@@ -17,7 +17,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mmogame_selection_irt class
+ * IRT 1PL question selection implementation for MMOGame.
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
@@ -29,13 +29,7 @@ namespace mod_mmogame\local\selection;
 use stdClass;
 
 /**
- * mmogame_quiz is responsible for managing and facilitating quiz gameplay
- * within the mmogame system, including handling attempts, scoring,
- * and maintaining related user data.
- */
-
-/**
- * The class mmogame_selection_irt computes next qustions with IRT-1PL.
+ * Selects questions and updates parameters using an item response theory model.
  */
 class mmogame_selection_irt extends mmogame_selection {
     /**

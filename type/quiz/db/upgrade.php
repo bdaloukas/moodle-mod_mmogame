@@ -231,14 +231,29 @@ function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 
-    if ($oldversion < ($ver = 2026052001)) {
-        // Define field numattempt to be added to mmogame.
+    if ($oldversion < ($ver = 2026052500)) {
         $table = new xmldb_table('mmogame_quiz_attempts');
-        $field = new xmldb_field('tools', XMLDB_TYPE_INTEGER, 2, null, true, null, 0);
+        $index = new xmldb_index(
+            'mmogamenumgameauseridtimeanswer',
+            XMLDB_INDEX_UNIQUE,
+            ['mmogameid', 'numgame', 'auserid', 'timeanswer']
+        );
 
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
         }
+
+        upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
+    }
+
+    if ($oldversion < ($ver = 2026052501)) {
+        $table = new xmldb_table('mmogame_quiz_attempts');
+        $index = new xmldb_index('mmogameauseridcountmastered', XMLDB_INDEX_UNIQUE, ['mmogameid', 'auserid', 'attemptkey']);
+
+        if (!$DB->get_manager()->index_exists($table, $index)) {
+            $DB->get_manager()->add_index($table, $index);
+        }
+
         upgrade_plugin_savepoint(true, $ver, 'mmogametype', 'quiz');
     }
 

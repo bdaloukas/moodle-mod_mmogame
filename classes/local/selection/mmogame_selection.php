@@ -17,7 +17,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mmogametype_quiz_algorithm_irt class
+ * Base question selection logic for MMOGame.
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
@@ -30,7 +30,7 @@ use mod_mmogame\local\mmogame;
 use stdClass;
 
 /**
- * The class mmogame_selection is an abstract class for selecting questions
+ * Provides shared ranking, statistics and category balancing logic for question selection.
  */
 abstract class mmogame_selection {
     /** @var mmogame $mmogame: mmogame to be used. */

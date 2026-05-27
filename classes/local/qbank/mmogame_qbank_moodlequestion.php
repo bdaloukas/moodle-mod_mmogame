@@ -31,10 +31,6 @@ use stdClass;
 
 /**
  * The class mmogame_qbank_moodlequestion extends mmogame_qbank and has the code for accessing questions of Moodle
- *
- * @package    mmogame_qbank_moodlequestion
- * @copyright  2024 Vasilis Daloukas
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mmogame_qbank_moodlequestion extends mmogame_qbank {
     /**

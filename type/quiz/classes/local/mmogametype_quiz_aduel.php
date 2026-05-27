@@ -17,7 +17,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mmogame_quiz_aduel class
+ * Duel quiz game type implementation for MMOGame.
  *
  * @package    mmogametype_quiz
  * @copyright  2024 Vasilis Daloukas
@@ -34,7 +34,7 @@ use mod_mmogame\local\database\mmogame_database;
 use stdClass;
 
 /**
- * The class mmogame_quiz_aduel play the game Quiz (Aduel).
+ * Handles duel quiz attempts, answer submission and tool visibility.
  */
 class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     /** @var int $numqueries: number of queries that contain one group of queries. */
@@ -42,7 +42,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     /** @var ?stdClass $aduel: ADuel object or false if no object yet. */
     protected ?stdClass $aduel = null;
 
-    /** @var int $maxalone: maximum number of questions that a user can play withoyt an oponent. */
+    /** @var int $maxalone: maximum number of questions that a user can play without an opponent. */
     protected int $maxalone = 200;
 
     /**
@@ -395,7 +395,7 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
     }
 
     /**
-     * Saves to array $ret informations about the $attempt (only for wizard tool).
+     * Adds wizard-tool data to the response array.
      *
      * @param array $ret (returns info about the current attempt)
      * @param object $query

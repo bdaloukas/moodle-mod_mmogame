@@ -17,7 +17,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mmogametype_quiz_algorithm_irt class
+ * Heuristic question selection implementation for MMOGame.
  *
  * @package    mod_mmogame
  * @copyright  2024 Vasilis Daloukas
@@ -27,7 +27,7 @@
 namespace mod_mmogame\local\selection;
 
 /**
- * The class mmogame_selection_heuristic selects queries using heuristic algorithm
+ * Selects questions using rule-based ranking and usage statistics.
  */
 class mmogame_selection_heuristic extends mmogame_selection {
     /**

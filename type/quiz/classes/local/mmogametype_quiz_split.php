@@ -17,7 +17,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mmogametype_quiz_split class
+ * Split quiz game type implementation for MMOGame.
  *
  * @package    mmogametype_quiz
  * @copyright  2025 Vasilis Daloukas
@@ -34,9 +34,7 @@ use mod_mmogame\local\mode\mmogame_mode_aduel;
 use stdClass;
 
 /**
- * mmogametype_quiz_split is responsible for managing and facilitating quiz gameplay
- * within the mmogame system, including handling attempts, scoring,
- * and maintaining related user data.
+ * Handles split-mode quiz attempts, answers, grading and query ranks.
  */
 class mmogametype_quiz_split extends mmogame {
     /** @var int $numqueries: number of queries that contain one group of queries. */

@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Returns split-mode quiz attempts through the REST external API.
+ *
+ * @package   mmogametype_quiz
+ * @copyright 2024 Vasilis Daloukas
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace mmogametype_quiz\external;
 
 use coding_exception;
@@ -28,11 +36,7 @@ use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
 
 /**
- * External function for starting a new attempt or continuing the last attempt.
- *
- * @package   mmogametype_quiz
- * @copyright 2024 Vasilis Daloukas
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * External API endpoint for retrieving split-mode quiz attempts.
  */
 class get_attempts_split extends external_api {
     /**
@@ -376,6 +380,6 @@ class get_attempts_split extends external_api {
      * @return array
      */
     private static function error(string $error): array {
-            return ['errorcode' => $error];
+        return ['errorcode' => $error];
     }
 }
