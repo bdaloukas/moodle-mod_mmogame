@@ -166,18 +166,19 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             this.gateCreateSidebar();
             this.gateShowColorPalettes(this.body, this.countPalettes, this.info.colorpaletteids, this.info.colorpalettes);
             this.splits = [];
+            let split = 0;
             for (let iY = 0; iY < this.countY; iY++) {
                 for (let iX = 0; iX < this.countX; iX++) {
                     if (this.splits.length >= this.countAll) {
                         break;
                     }
-                    this.gateCreateScreenSplit(iX, iY);
+                    this.gateCreateScreenSplit(split++, iX, iY);
                     this.gateCreateScreenSplitSelect();
                 }
             }
         }
 
-        gateCreateScreenSplit(iX, iY) {
+        gateCreateScreenSplit(split, iX, iY) {
             let parent = this.createDOMElement('div', {
                 parent: this.area,
                 classnames: 'mmogame-split',
@@ -197,11 +198,12 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             let top = labelHeight + this.padding + Math.round(restHeight / 2);
             const topLabel = Math.round((top - labelHeight) / 2);
             let avatarbuttons = [];
-            let pos = (iX + this.countX * iY) * this.countYavatars * this.countXavatars;
 
+            let pos = this.gategetavatar(split, 0);
+            let maxpos = pos + this.info.numavatars[split];
             for (let i = 0; i < this.countYavatars; i++) {
                 for (let j = 0; j < this.countXavatars; j++) {
-                    if (pos >= this.info.avatars.length) {
+                    if (pos >= maxpos) {
                         break;
                     }
                     const filepath = this.info.avatars[pos];
@@ -269,7 +271,11 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             );
         }
         gategetavatar(split, i) {
-            return split * this.info.numavatars + i;
+            let num = 0;
+            for (let j = 0; j < split; j++) {
+                num += this.info.numavatars[j];
+            }
+            return num + i;
         }
 
         gateCreateScreenSplitSelect() {

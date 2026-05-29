@@ -725,7 +725,7 @@ abstract class mmogame {
                 foreach ($keys as $key) {
                     $temp[] = $key;
                     $value = $avatars[$key];
-                    $avatars2[$key] = $avatars[$key];
+                    $avatars2[$key] = $value;
                     $set[$key] = $value;
                 }
                 foreach ($temp as $key) {

@@ -511,13 +511,13 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         // First user press tool.
         $this->aduel->$name |= $tool;
         $this->db->update_record(
-                'mmogame_am_aduel_pairs',
-                ['id' => $this->aduel->id, $name => $this->aduel->$name]
-            );
-            $attempt->tools |= $tool;
-            $this->db->update_record(
-                'mmogame_quiz_attempts',
-                ['id' => $attempt->id, 'tools' => $attempt->tools],
-            );
-        }
+            'mmogame_am_aduel_pairs',
+            ['id' => $this->aduel->id, $name => $this->aduel->$name]
+        );
+        $attempt->tools |= $tool;
+        $this->db->update_record(
+            'mmogame_quiz_attempts',
+            ['id' => $attempt->id, 'tools' => $attempt->tools],
+        );
+    }
 }

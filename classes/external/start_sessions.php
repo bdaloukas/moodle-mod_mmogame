@@ -153,17 +153,19 @@ class start_sessions extends external_api {
             $paletteids[] = $key;
             $palettes[] = implode(',', $value);
         }
+        $numavatars = [];
         foreach ($retavatars as $map) {
             foreach ($map as $key => $value) {
                 $avatarids[] = $key;
                 $avatars[] = $value;
             }
+            $numavatars[] = count($map);
         }
         return ['avatars' => $avatars,
             'avatarids' => $avatarids,
             'colorpalettes' => $palettes,
             'colorpaletteids' => $paletteids,
-            'numavatars' => min($maxavatars, $countavatars),
+            'numavatars' => $numavatars,
             'sessionkeys' => $sessionkeys,
         ];
     }
@@ -195,7 +197,11 @@ class start_sessions extends external_api {
                 'The list of color palette IDs',
                 VALUE_OPTIONAL
             ),
-            'numavatars' => new external_value(PARAM_INT, 'The number of avatars'),
+            'numavatars' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'The number of avatars'),
+                'The list of count of avatars',
+                VALUE_OPTIONAL
+            ),
             'sessionkeys' => new external_multiple_structure(
                 new external_value(PARAM_ALPHANUM, 'A session key'),
                 'The list of session keys',
