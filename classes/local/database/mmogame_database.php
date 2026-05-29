@@ -26,7 +26,7 @@ namespace mod_mmogame\local\database;
 use stdClass;
 
 /**
- * Base database abstraction for Moodle-compatible MMOGame data access.
+ * Base database abstraction for MMO Game data access.
  */
 abstract class mmogame_database {
     /**

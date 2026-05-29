@@ -37,6 +37,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
     buttonWizard;
     buttonHelp;
 
+    TOOLS = Object.freeze({
+        t5050: 'tool1',
+        skip: 'tool2',
+        wizard: 'tool3'
+    });
+
     constructor() {
         super('aduel');
 
@@ -129,7 +135,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.sendGetHighScore();
         });
         this.button5050.addEventListener("click", () => {
-            this.callGetAttempt({subcommand: 'tool1'});
+            this.callGetAttempt({subcommand: this.TOOLS.t5050});
         });
         this.button5050.title = this.getStringT('js_help_5050');
 
@@ -146,7 +152,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.iconSize, 'assets/skip.svg');
         }
         this.buttonSkip.addEventListener("click", () => {
-            this.callSetAnswer("tool2");
+            this.callSetAnswer(this.TOOLS.skip);
         });
         this.buttonSkip.title = this.getStringT('js_help_skip');
 
@@ -160,7 +166,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.iconSize, 'assets/wizard.svg');
         }
         this.buttonWizard.addEventListener("click", () => {
-            this.callGetAttempt({'subcommand': 'tool3'});
+            this.callGetAttempt({'subcommand': this.TOOLS.wizard});
         });
         this.buttonWizard.style.visibility = 'hidden';
         this.buttonWizard.title = this.getStringT('js_wizard');
@@ -330,7 +336,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         this.isWaitOpponent = false;
 
-        this.showCorrectAnswer(json);
+        this.showCorrectAnswerAvatars(json);
         this.createNextButton(this.areaRect.width - this.iconSize - this.padding, this.stripTop);
 
         this.showGrade(json);
@@ -424,7 +430,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
     }
 
-    showCorrectAnswer({iscorrect2, iscorrect, tool2}) {
+    showCorrectAnswerAvatars({aduelIscorrect, iscorrect, tool2}) {
         this.timeclose = 0;
         this.updateDivTimer();
 
@@ -432,16 +438,16 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.stripLeft, this.stripTop, 2 * this.iconSize + this.padding, this.iconSize);
 
         if (tool2 === undefined || this.aduelPlayer === 2) {
-                const btn = this.createImage(this.area, 'mmogame-quiz-aduel-player1',
+            const btn = this.createImage(this.area, 'mmogame-quiz-aduel-player1',
                 this.stripLeft + this.iconSize / 2, this.stripTop, this.iconSize,
-            this.iconSize, "assets/avatars/" + this.player1.cacheAvatar);
+            this.iconSize, 'assets/avatars/' + this.player1.cacheAvatar);
             btn.style.transform = 'translateX(-50%)';
         }
 
         if (tool2 === undefined && this.aduelPlayer === 2) {
             const btn = this.createImage(this.area, 'mmogame-quiz-aduel-player2',
                 this.stripLeft + this.iconSize / 2 + this.iconSize, this.stripTop, this.iconSize,
-                this.iconSize, "assets/avatars/" + this.player2.cacheAvatar);
+                this.iconSize, 'assets/avatars/' + this.player2.cacheAvatar);
             btn.style.transform = 'translateX(-50%)';
         }
 
@@ -451,9 +457,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
             s = '';
         }
         if (this.aduelPlayer === 2 && tool2 === undefined) {
-            s += this.getSVGcorrect(this.iconSize, iscorrect2 !== 0, this.colorGrade2, this.colorGrade2);
+            s += this.getSVGcorrect(this.iconSize, aduelIscorrect !== 0, this.colorGrade2, this.colorGrade2);
         }
-        this.strip.innerHTML = this.sanitizeFormattingHtml(s);
+        this.strip.innerHTML = s;
 
         this.strip.style.zIndex = '1';
     }
@@ -484,9 +490,6 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         let params = {
-            mmogameid: this.mmogameid,
-            kinduser: this.kinduser,
-            user: this.user,
             sessionkey: this.sessionkey,
             count: 10,
         };

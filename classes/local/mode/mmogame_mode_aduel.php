@@ -115,13 +115,15 @@ class mmogame_mode_aduel {
         }
         if (count($pairs) == 0) {
             // There are no open aduel. Create a new one.
-            $count = $db->count_records_select(
-                'mmogame_am_aduel_pairs',
-                'mmogameid=? AND numgame=? AND auserid1 = ? AND auserid2 IS NULL',
-                [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]
-            );
-            if ($count > $maxalone) {
-                return null;   // Wait an opponent.
+            if ($maxalone > 0) {
+                $count = $db->count_records_select(
+                    'mmogame_am_aduel_pairs',
+                    'mmogameid=? AND numgame=? AND auserid1 = ? AND auserid2 IS NULL',
+                    [$mmogame->get_id(), $mmogame->get_numgame(), $auserid]
+                );
+                if ($count > $maxalone) {
+                    return null;   // Wait an opponent.
+                }
             }
             $newplayer1 = true;
             return self::get_aduel_new($mmogame);
@@ -160,6 +162,9 @@ class mmogame_mode_aduel {
         $a = ['mmogameid' => $mmogame->get_id(), 'numgame' => $mmogame->get_numgame(), 'auserid1' => $mmogame->get_auserid(),
             'timestart1' => time(), 'timelimit' => $mmogame->get_timelimit(), 'isclosed1' => 0, 'isclosed2' => 0, ];
         $id = $db->insert_record('mmogame_am_aduel_pairs', $a);
+
+        $rgrade = $mmogame->get_rgrade($mmogame->get_auserid());
+        $db->update_record('mmogame_aa_grades', ['id' => $rgrade->id, 'countalone' => ++$rgrade->countalone]);
 
         return $db->get_record_select('mmogame_am_aduel_pairs', 'id=?', [$id]);
     }

@@ -67,9 +67,6 @@ class provider implements
                 'timeclose' => 'privacy:metadata:mmogame_quiz_attempt:timeclose',
                 'timeanswer' => 'privacy:metadata:mmogame_quiz_attempt:timeanswer',
                 'fraction' => 'privacy:metadata:mmogame_quiz_attempt:fraction',
-                'score' => 'privacy:metadata:mmogame_quiz_attempt:score',
-                'score2' => 'privacy:metadata:mmogame_quiz_attempt:score2',
-                'iscorrect2' => 'privacy:metadata:mmogame_quiz_attempt:iscorrect2',
             ], 'privacy:metadata:mmogame_quiz_attempts');
 
         return $collection;

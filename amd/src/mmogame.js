@@ -725,5 +725,62 @@ define([''], function() {
             cleanNode(template.content);
             return template.innerHTML;
         }
+
+        createUuid() {
+            if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+                return window.crypto.randomUUID();
+            }
+
+            const bytes = new Uint8Array(16);
+
+            if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+                window.crypto.getRandomValues(bytes);
+            } else {
+                for (let i = 0; i < bytes.length; i++) {
+                    bytes[i] = Math.floor(Math.random() * 256);
+                }
+            }
+
+            // eslint-disable-next-line no-bitwise
+            bytes[6] = bytes[6] & 0x0f | 0x40;
+            // eslint-disable-next-line no-bitwise
+            bytes[8] = bytes[8] & 0x3f | 0x80;
+
+            const hex = Array.from(bytes, function (byte) {
+                return byte.toString(16).padStart(2, '0');
+            });
+
+            return (
+                hex.slice(0, 4).join('') + '-' +
+                hex.slice(4, 6).join('') + '-' +
+                hex.slice(6, 8).join('') + '-' +
+                hex.slice(8, 10).join('') + '-' +
+                hex.slice(10, 16).join('')
+            );
+        }
+
+        /**
+         * Generates an SVG for a correct or incorrect icon.
+         *
+         * @param {number} size - The size of the SVG.
+         * @param {boolean} iscorrect - Whether the answer is correct.
+         * @param {int} colorCorrect - Color for correct answers.
+         * @param {int} colorError - Color for incorrect answers.
+         * @returns {string} The SVG markup as a string.
+         */
+        getSVGcorrect(size, iscorrect, colorCorrect, colorError) {
+            if (iscorrect) {
+                let c = colorCorrect !== undefined ? this.getColorHex(colorCorrect) : '#398439';
+                return "<svg aria-hidden=\"true\" class=\"svg-icon iconCheckmarkLg\" width=\"" + size + "\" height=\"" + size +
+                    "\" viewBox=\"0 0 36 36\"><path fill=\"" + c + "\" d=\"m6 14 8 8L30 6v8L14 30l-8-8v-8z\"></path></svg>";
+            } else {
+                let c = colorError !== undefined ? this.getColorHex(colorError) : '#398439';
+                return "<svg width=\"" + size + "\" height=\"" + size +
+                    "\" class=\"bi bi-x-lg\" viewBox=\"0 0 18 18\"> <path fill=\"" + c +
+                    `" d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 
+                1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/></svg>`;
+            }
+        }
+
     };
 });

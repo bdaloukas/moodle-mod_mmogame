@@ -930,20 +930,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             animate();
         }
 
-        getSVGcorrect(size, iscorrect, colorCorrect, colorError) {
-            if (iscorrect) {
-                let c = colorCorrect !== undefined ? this.getColorHex(colorCorrect) : '#398439';
-                return "<svg aria-hidden=\"true\" class=\"svg-icon iconCheckmarkLg\" width=\"" + size + "\" height=\"" + size +
-                    "\" viewBox=\"0 0 36 36\"><path fill=\"" + c + "\" d=\"m6 14 8 8L30 6v8L14 30l-8-8v-8z\"></path></svg>";
-            } else {
-                let c = colorError !== undefined ? this.getColorHex(colorError) : '#398439';
-                return "<svg width=\"" + size + "\" height=\"" + size +
-                    "\" class=\"bi bi-x-lg\" viewBox=\"0 0 18 18\"> <path fill=\"" + c +
-                    `" d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 
-                1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/></svg>`;
-            }
-        }
-
         hideQuestion(sp) {
             this.removeCorrectIcons(sp);
 

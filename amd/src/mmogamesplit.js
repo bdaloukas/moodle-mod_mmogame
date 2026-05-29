@@ -577,7 +577,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 let option = await this.getOption('guid' + mmogameid);
 
                 if (option === null) {
-                    this.user = crypto.randomUUID();
+                    this.user = this.createUuid();
                     this.setOption('guid' + mmogameid, {value: this.user});
                 } else {
                     this.user = option.value;

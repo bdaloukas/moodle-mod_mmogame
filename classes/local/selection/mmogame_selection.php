@@ -274,6 +274,7 @@ abstract class mmogame_selection {
      * @return void
      */
     public function update(int $queryid, bool $iscorrect, ?float &$theta, ?float &$difficulty): void {
+
     }
 
     /**

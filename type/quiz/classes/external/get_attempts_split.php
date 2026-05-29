@@ -62,7 +62,7 @@ class get_attempts_split extends external_api {
      */
     public static function execute(
         string $sessionkeys,
-        ?string $avatarids = null
+        string $avatarids = ''
     ): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [

@@ -79,6 +79,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         }
         $queryid = $a['queries'][0];
         unset($a['queries']);
+        $a['numqueryround'] = 1;
         $a['queryid'] = $queryid;
         $a['layout'] = $this->qbank->get_layout_queryid($queryid);
         $a['timestart'] = time();
@@ -109,7 +110,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         $time = time();
         $istimeout = ($attempt->timeclose > 0 && $time > $attempt->timeclose + 1);
 
-        $a = ['id' => $attempt->id];
+        $a = ['id' => $attempt->id, 'iscorrect' => $attempt->iscorrect];
 
         if (!$istimeout) {
             if ($this->qbank->is_multichoice($query)) {

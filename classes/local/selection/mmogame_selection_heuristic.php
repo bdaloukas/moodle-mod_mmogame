@@ -43,16 +43,19 @@ class mmogame_selection_heuristic extends mmogame_selection {
         $db = $this->mmogame->get_db();
         $mmogameid = $mmogame->get_id();
         $auser = $mmogame->get_auser();
+        $numgame = $mmogame->get_numgame();
         $this->check_stats($auser, $ids);
 
+        $sortnum = 1;
         $sort1 = 'serialcorrects, countused, countcorrect, timeerror, randkey';
         $sort2 = 'serialcorrects, countused, countcorrect, timeerror, nextattempt, randkey';
+        $sort = $sortnum == 2 ? $sort2 : $sort1;
         $found = [];
         $recs = $db->get_records_select(
             'mmogame_aa_stats',
             'mmogameid=? AND numgame=? AND auserid=? AND nextattempt <= ?',
-            [$mmogameid, $mmogame->get_numgame(), $auser->id, $numattempt],
-            $sort1,
+            [$mmogameid, $numgame, $auser->id, $numattempt],
+            $sort,
             'id,queryid',
             0,
             2 * $count
@@ -64,8 +67,8 @@ class mmogame_selection_heuristic extends mmogame_selection {
             $recs = $db->get_records_select(
                 'mmogame_aa_stats',
                 'mmogameid=? AND numgame=? AND auserid=?',
-                [$mmogameid, $mmogame->get_numgame(), $auser->id, $numattempt],
-                $sort2,
+                [$mmogameid, $numgame, $auser->id],
+                $sort,
                 'id,queryid',
                 0,
                 $count - count($found)
@@ -167,7 +170,7 @@ class mmogame_selection_heuristic extends mmogame_selection {
             $queryid = $rec->queryid;
             if (!array_key_exists($queryid, $mapids)) {
                 if ($rec->isvalid !== 0) {
-                    $db->update_record('mmogame_as_heurisric', ['id' => $rec->id, 'isvalid' => 0]);
+                    $db->update_record('mmogame_as_heuristic', ['id' => $rec->id, 'isvalid' => 0]);
                 }
                 continue;
             }

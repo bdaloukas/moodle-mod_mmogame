@@ -229,8 +229,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             top += lblPalette.scrollHeight + this.padding;
             const topGridPalette = top;
             let gridHeightPalette = (maxHeight - topGridPalette - lblPalette.scrollHeight) * 2 / 5;
-            const countX = Math.floor((maxWidth - this.padding) / this.iconSize);
-            const countYpalette = Math.floor(gridHeightPalette / this.iconSize);
+            const countX = Math.max( 1, Math.floor((maxWidth - this.padding) / this.iconSize));
+            const countYpalette = Math.max( 1, Math.floor(gridHeightPalette / this.iconSize));
             gridHeightPalette = countYpalette * this.iconSize;
             top += gridHeightPalette + this.padding;
             // Label Avatars
@@ -239,7 +239,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
 
             top += lblAvatars.scrollHeight + this.padding;
 
-            const countYavatars = Math.floor(Math.floor(maxHeight - top - this.padding) / this.iconSize);
+            const countYavatars = Math.max(1, Math.floor(Math.floor(maxHeight - top - this.padding) / this.iconSize));
             const gridHeightAvatars = countYavatars * this.iconSize;
             this.addEventListenerRefresh(btnPalette, topGridPalette, countX, countYpalette,
                 top, countX, countYavatars, true, false);
@@ -248,7 +248,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 top, countX, countYavatars, false, true);
 
             // Horizontal
-            this.gateSendGetColorsAvatars(0, topGridPalette, countX, countYpalette,
+            this.gateSendStartSession(0, topGridPalette, countX, countYpalette,
                 0, top, countX, countYavatars, true, true);
 
             this.gateCreateSubmit(top + gridHeightAvatars + 2 * this.padding, maxWidth);
@@ -388,9 +388,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             this.area.appendChild(fragment);
         }
 
-        gateSendGetColorsAvatars(leftPalette, topPalette, countXpalette, countYpalette,
+        gateSendStartSession(leftPalette, topPalette, countXpalette, countYpalette,
                                  leftAvatars, topAvatars, countXavatars, countYavatars,
-                                 updatePalette = true, updateAvatars = true) {
+                                 updatePalettes = true, updateAvatars = true) {
             require(['core/ajax'], (Ajax) => {
                 // Defining the parameters to be passed to the service
                 let params = {
@@ -398,7 +398,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     kinduser: this.kinduser,
                     user: this.user,
                     avatars: updateAvatars ? countXavatars * countYavatars : 0,
-                    colorpalettes: updatePalette ? countXpalette * countYpalette : 0,
+                    colorpalettes: updatePalettes ? countXpalette * countYpalette : 0,
                 };
                 // Calling the service through the Moodle AJAX API
                 let startSessions = Ajax.call([{
@@ -409,7 +409,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                 // Handling the response
                 startSessions[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, sessionkey}) => {
                     this.sessionkey = sessionkey;
-                    if (updatePalette) {
+                    if (updatePalettes) {
                         this.gateShowColorPalettes(this.area, leftPalette, topPalette, countXpalette, countYpalette,
                             colorpaletteids, colorpalettes);
                     }
@@ -590,10 +590,12 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         addEventListenerRefresh(btn, topPalette, countXpalette, countYpalette, topAvatars,
                                 countXavatars, countYavatars, updateColors, updateAvatars) {
             btn.addEventListener("click", () => {
-                const elements = Array.from(this.area.getElementsByClassName("mmogame-color"));
-                elements.forEach(element => element.remove());
+                if (updateColors) {
+                    const elements = Array.from(this.area.getElementsByClassName("mmogame-color"));
+                    elements.forEach(element => element.remove());
+                }
 
-                this.gateSendGetColorsAvatars(0, topPalette, countXpalette, countYpalette,
+                this.gateSendStartSession(0, topPalette, countXpalette, countYpalette,
                     0, topAvatars, countXavatars, countYavatars,
                     updateColors, updateAvatars);
             });
