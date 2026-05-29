@@ -193,9 +193,9 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             let maxWidth = this.areaRect.width;
             let size;
             const labels = [
-                `${this.getStringM('js_name')}: `,
-                this.getStringM('js_code'),
-                this.getStringM('js_palette')
+                `${wp.i18n.__('js_name', 'mmogame')}: `,
+                wp.i18n.__('js_code', 'mmogame'),
+                wp.i18n.__('js_palette', 'mmogame')
             ];
             this.fontSize = this.findbest(this.minFontSize, this.maxFontSize, (fontSize) => {
                 size = this.gateComputeLabelSize(fontSize, labels);
@@ -204,15 +204,13 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
                     return 1;
                 }
 
-                const heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
-                let n = Math.floor(heightColors / this.iconSize);
-                if (n === 0) {
-                    return 1;
-                }
-                const heightAvatars = (maxHeight - 4 * fontSize + heightColors) * 3 / 5;
-                const computedHeight = 3 * size[1] + 8 * this.padding + heightColors + heightAvatars;
+                let heightColors = (maxHeight - 4 * fontSize) * 2 / 5;
+                const countYpalette = Math.max(1, Math.floor(heightColors / this.iconSize));
+                heightColors = countYpalette * this.iconSize;
 
-                return computedHeight < maxHeight ? -1 : 1;
+                const heightAvatars = maxHeight - 3 * size[1] - heightColors - 8 * this.padding - this.iconSize;
+
+                return Math.sign(heightAvatars - this.iconSize);
             });
 
             this.gateCreateScreenDo(maxWidth, maxHeight);
@@ -229,8 +227,8 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
             top += lblPalette.scrollHeight + this.padding;
             const topGridPalette = top;
             let gridHeightPalette = (maxHeight - topGridPalette - lblPalette.scrollHeight) * 2 / 5;
-            const countX = Math.max( 1, Math.floor((maxWidth - this.padding) / this.iconSize));
-            const countYpalette = Math.max( 1, Math.floor(gridHeightPalette / this.iconSize));
+            const countX = Math.max(1, Math.floor((maxWidth - this.padding) / this.iconSize));
+            const countYpalette = Math.max(1, Math.floor(gridHeightPalette / this.iconSize));
             gridHeightPalette = countYpalette * this.iconSize;
             top += gridHeightPalette + this.padding;
             // Label Avatars
@@ -522,9 +520,7 @@ define(['mod_mmogame/mmogame'], function(MmoGame) {
         }
 
         gateComputeSizes() {
-            this.computeSizes();
-            this.iconSize = Math.round(0.8 * this.iconSize);
-            this.padding = Math.round(0.8 * this.padding);
+            this.computeSizes(0, 0, window.innerWidth > window.innerHeight ? 10 : 5);
         }
 
         /**

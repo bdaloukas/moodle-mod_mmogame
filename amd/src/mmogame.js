@@ -180,17 +180,27 @@ define([''], function() {
         /**
          * Compute sizes for icons and padding based on the screen dimensions.
          * @param {number} minIconSize
+         * @param {number} cIcons
          */
-        computeSizes(minIconSize = 0) {
-            const cIcons = Math.max(this.cIcons || 5, 5);
+        computeSizes(minIconSize = 0, maxIconSize = 0, cIcons = 0) {
+            if (cIcons === 0) {
+                cIcons = this.cIcons;
+            }
+            if (cIcons < 5) {
+                cIcons = 5;
+            }
+            if (maxIconSize === 0) {
+                maxIconSize = 6 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+            }
             const maxIconWidth = window.innerWidth / cIcons;
             const maxIconHeight = window.innerHeight / 5;
-            this.iconSize = Math.max(minIconSize, Math.min(maxIconWidth, maxIconHeight));
+            this.iconSize = Math.min( maxIconSize, Math.max(minIconSize, Math.min(maxIconWidth, maxIconHeight)));
             const adjustment = this.iconSize / 10 / cIcons;
             this.iconSize = Math.round(this.iconSize - adjustment);
             this.padding = Math.round(this.iconSize / 10);
             this.iconSize -= this.padding;
         }
+
 
         /**
          * Creates a centered image button with automatic scaling.
