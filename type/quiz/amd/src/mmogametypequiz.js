@@ -409,12 +409,14 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             definitionDiv.style.color = this.getContrastingColor(this.colorBackground2);
             definitionDiv.style.left = `${left}px`;
             definitionDiv.style.top = `${top}px`;
-            if (height !== 0) {
-                definitionDiv.style.height = `${height}px`;
-            }
             definitionDiv.style.padding = `0 ${this.padding}px`;
 
             this.area.appendChild(definitionDiv);
+
+            if (height !== 0 && definitionDiv.scrollHeight < height) {
+                definitionDiv.style.height = `${height}px`;
+            }
+
             return [definitionDiv.scrollWidth, definitionDiv.scrollHeight, definitionDiv];
         }
 

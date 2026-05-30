@@ -180,6 +180,7 @@ define([''], function() {
         /**
          * Compute sizes for icons and padding based on the screen dimensions.
          * @param {number} minIconSize
+         * @param {number} maxIconSize
          * @param {number} cIcons
          */
         computeSizes(minIconSize = 0, maxIconSize = 0, cIcons = 0) {
@@ -194,7 +195,9 @@ define([''], function() {
             }
             const maxIconWidth = window.innerWidth / cIcons;
             const maxIconHeight = window.innerHeight / 5;
-            this.iconSize = Math.min( maxIconSize, Math.max(minIconSize, Math.min(maxIconWidth, maxIconHeight)));
+            const bodyFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            this.iconSize = Math.min(maxIconSize, Math.max(minIconSize, Math.min(maxIconWidth, maxIconHeight, 4 * bodyFontSize)));
+
             const adjustment = this.iconSize / 10 / cIcons;
             this.iconSize = Math.round(this.iconSize - adjustment);
             this.padding = Math.round(this.iconSize / 10);
@@ -756,7 +759,7 @@ define([''], function() {
             // eslint-disable-next-line no-bitwise
             bytes[8] = bytes[8] & 0x3f | 0x80;
 
-            const hex = Array.from(bytes, function (byte) {
+            const hex = Array.from(bytes, function(byte) {
                 return byte.toString(16).padStart(2, '0');
             });
 

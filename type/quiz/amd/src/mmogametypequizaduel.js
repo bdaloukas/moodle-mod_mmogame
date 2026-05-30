@@ -457,7 +457,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             s = '';
         }
         if (this.aduelPlayer === 2 && tool2 === undefined) {
-            s += this.getSVGcorrect(this.iconSize, aduelIscorrect !== 0, this.colorGrade2, this.colorGrade2);
+            s += this.getSVGcorrect(this.iconSize, aduelIscorrect === 1, this.colorGrade2, this.colorGrade2);
         }
         this.strip.innerHTML = s;
 
@@ -725,7 +725,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     createScreenHorizontal(json, disabled) {
-        const [width] = this.computeBestFontSize(json);
+        const maxHeight = this.areaRect.height - this.iconSize - 2 * this.padding;
+        const [width] = this.computeBestFontSize(json, maxHeight);
 
         this.radioSize = Math.round(this.fontSize);
         this.stripTop = this.createAnswer(width, 0, width - this.padding, false, this.fontSize, disabled);
@@ -738,7 +739,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
     }
 
     createScreenVertical(json, disabled) {
-        this.computeBestFontSize(json);
+        const maxHeight = this.areaRect.height - this.iconSize - 2 * this.padding;
+        this.computeBestFontSize(json, maxHeight);
 
         this.radioSize = Math.round(this.fontSize);
 

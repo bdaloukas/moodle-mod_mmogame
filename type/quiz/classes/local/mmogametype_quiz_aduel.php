@@ -500,6 +500,11 @@ class mmogametype_quiz_aduel extends mmogametype_quiz_alone {
         return $rgrade !== null ? $rgrade->$name : null;
     }
 
+    /**
+     * @param stdClass|null $attempt
+     * @param int $tool
+     * @return void
+     */
     private function update_tool(?stdClass $attempt, int $tool) {
         $player = ($this->auserid == $this->aduel->auserid2) ? 2 : 1;
 

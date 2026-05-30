@@ -142,7 +142,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
         }
 
         createScreenVertical(json, disabled) {
-            this.computeBestFontSize(json);
+            const maxHeight = this.areaRect.height - this.iconSize - 2 * this.padding;
+            this.computeBestFontSize(json, maxHeight);
 
             this.radioSize = Math.round(this.fontSize);
 

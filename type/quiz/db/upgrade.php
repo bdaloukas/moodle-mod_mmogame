@@ -235,7 +235,7 @@ function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
         $table = new xmldb_table('mmogame_quiz_attempts');
         $index = new xmldb_index(
             'mmogamenumgameauseridtimeanswer',
-            XMLDB_INDEX_UNIQUE,
+            XMLDB_INDEX_NOTUNIQUE,
             ['mmogameid', 'numgame', 'auserid', 'timeanswer']
         );
 
@@ -259,7 +259,7 @@ function xmldb_mmogametype_quiz_upgrade(string $oldversion): bool {
 
     if ($oldversion < ($ver = 2026052900)) {
         // Define field numgame to be added to mmogame.
-        $table = new xmldb_table('quizattempts');
+        $table = new xmldb_table('mmogame_quiz_attempts');
         $field = new xmldb_field('numqueryround', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'numattempt');
 
         if (!$dbman->field_exists($table, $field)) {
