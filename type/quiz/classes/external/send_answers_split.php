@@ -33,7 +33,6 @@ use dml_exception;
 use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
-use required_capability_exception;
 
 /**
  * External API endpoint for saving answers from split-mode quiz attempts.
@@ -50,7 +49,7 @@ class send_answers_split extends external_api {
             'answers' => new external_value(PARAM_TEXT, 'Comma-separated answer IDs'),
             'timestarts' => new external_value(PARAM_TEXT, 'Comma-separated Unix timestamps'),
             'timeanswers' => new external_value(PARAM_TEXT, 'Comma-separated Unix timestamps'),
-            'returnsplits' => new external_value(PARAM_TEXT, 'Comma-separated return split IDs'),
+            'returnsessionkey' => new external_value(PARAM_TEXT, 'Return session key'),
             'tools' => new external_value(PARAM_TEXT, 'Comma-separated tool flags'),
         ]);
     }
@@ -63,13 +62,12 @@ class send_answers_split extends external_api {
      * @param ?string $answers
      * @param ?string $timestarts
      * @param string $timeanswers
-     * @param ?string $returnsplits
+     * @param string|null $returnsessionkey
      * @param ?string $tools
      * @return array
      * @throws coding_exception
-     * @throws invalid_parameter_exception
-     * @throws required_capability_exception
      * @throws dml_exception
+     * @throws invalid_parameter_exception
      */
     public static function execute(
         string $sessionkeys,
@@ -77,7 +75,7 @@ class send_answers_split extends external_api {
         ?string $answers = null,
         ?string $timestarts = '',
         string $timeanswers = '',
-        ?string $returnsplits = null,
+        ?string $returnsessionkey = null,
         ?string $tools = null
     ): array {
         // Validate the parameters.
@@ -87,7 +85,7 @@ class send_answers_split extends external_api {
             'answers' => $answers,
             'timestarts' => $timestarts,
             'timeanswers' => $timeanswers,
-            'returnsplits' => $returnsplits,
+            'returnsessionkey' => $returnsessionkey,
             'tools' => $tools,
         ]);
 
@@ -104,15 +102,21 @@ class send_answers_split extends external_api {
         $db = new mmogame_database_moodle();
         $ausers = [];
         $mmogameid = null;
+        $map = [];
         foreach ($sessionkeys as $pos => $sessionkey) {
-            $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
-            if ($auser === null) {
-                return self::error('no_user');
-            }
-            if ($mmogameid === null) {
-                $mmogameid = (int)$auser->mmogameid;
-            } else if ($mmogameid !== (int)$auser->mmogameid) {
-                return self::error('invalid_sessionkey ' . $pos);
+            if (!array_key_exists($sessionkey, $map)) {
+                $auser = mmogame::get_auser_from_sessionkey($db, $sessionkey);
+                $map[$sessionkey] = $auser;
+                if ($auser === null) {
+                    return self::error('no_user');
+                }
+                if ($mmogameid === null) {
+                    $mmogameid = (int)$auser->mmogameid;
+                } else if ($mmogameid !== (int)$auser->mmogameid) {
+                    return self::error('invalid_sessionkey ' . $pos);
+                }
+            } else {
+                $auser = $map[$sessionkey];
             }
             $ausers[] = $auser;
         }
@@ -150,7 +154,11 @@ class send_answers_split extends external_api {
         }
 
         $getattempts = new get_attempts_split();
-        return $getattempts->execute(implode(',', $sessionkeys));
+        $ret = $getattempts->execute( $returnsessionkey);
+
+        error_log( json_encode($ret, JSON_PRETTY_PRINT));
+
+        return $ret;
     }
 
     /**

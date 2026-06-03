@@ -13,6 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// mmogame/type/quiz/js/mmogametypequiz.js
+
+/**
+ * Defines shared quiz game behavior.
+ *
+ * @package
+ */
 define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
     return class MmoGameTypeQuiz extends MmoGameUI {
         kinduser;

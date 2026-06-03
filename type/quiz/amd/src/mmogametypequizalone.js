@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// mmogame/type/quiz/js/mmogametypequizalone.js
+
+/**
+ * Defines Alone mode behavior for quiz games.
+ *
+ * @package
+ */
+
 define(['mmogametype_quiz/mmogametypequiz'],
     function(MmoGameTypeQuiz) {
     return class MmoGameTypeQuizAlone extends MmoGameTypeQuiz {

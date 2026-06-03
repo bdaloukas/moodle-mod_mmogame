@@ -8,6 +8,13 @@
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+/**
+ * Defines split-screen multiplayer game behavior.
+ *
+ * @package
+ */
+
 define(['mod_mmogame/mmogame', ''], function(MmoGame) {
     return class MmoGameTypeSplit extends MmoGame {
         updateDelay = 200;
@@ -161,7 +168,11 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
         }
 
         gateCreateScreen() {
-            document.body.style.overflowY = 'hidden';
+            document.body.textContent = '';
+            this.body = document.getElementsByTagName("body")[0];
+            this.area = undefined;
+            this.createArea(0, 0);
+
             this.cIcons = 5;
             this.gateCreateSidebar();
             this.gateShowColorPalettes(this.body, this.countPalettes, this.info.colorpaletteids, this.info.colorpalettes);

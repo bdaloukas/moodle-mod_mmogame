@@ -27,6 +27,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// mmogame/js/mmogameui.js
+
+/**
+ * Handles shared MMOGame user interface behavior.
+ *
+ * @package
+ */
 define(['mod_mmogame/mmogame'], function(MmoGame) {
     return class MmoGameUI extends MmoGame {
 

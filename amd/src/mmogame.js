@@ -27,6 +27,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// mmogame/js/mmogame.js
+
+/**
+ * Defines the base MMOGame client-side game class.
+ *
+ * @package
+ */
+
 define([''], function() {
     return class MmoGame {
         // Define default properties with appropriate types

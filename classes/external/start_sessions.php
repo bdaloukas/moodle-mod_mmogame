@@ -31,7 +31,7 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 use core_external\restricted_context_exception;
-use invalid_parameter_exception as invalid_parameter_exceptionAlias;
+use invalid_parameter_exception;
 use mod_mmogame\local\database\mmogame_database_moodle;
 use mod_mmogame\local\mmogame;
 use required_capability_exception;
@@ -67,7 +67,7 @@ class start_sessions extends external_api {
      * @param int $countavatars
      * @return array
      * @throws coding_exception
-     * @throws invalid_parameter_exceptionAlias
+     * @throws invalid_parameter_exception
      * @throws required_capability_exception
      * @throws restricted_context_exception
      */

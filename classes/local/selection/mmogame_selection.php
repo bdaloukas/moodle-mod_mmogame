@@ -302,15 +302,22 @@ abstract class mmogame_selection {
             array_merge([$mmogame->get_id(), $mmogame->get_numgame()], $inparams)
         );
         $grades = $avatars = $ranks = [];
-        foreach ($auserids as $auserid) {
-            foreach ($recs as $rec) {
-                if ($rec->auserid == $auserid) {
-                    $grades[] = $rec->grade;
-                    $ranks[] = $rec->numrank + 1;
-                    $avatars[] = $rec->directory . '/' . $rec->filename;
-                    break;
-                }
+        $recs_by_user = [];
+
+        foreach ( $recs as $rec ) {
+            $recs_by_user[ (int) $rec->auserid ] = $rec;
+        }
+
+        foreach ( $auserids as $auserid ) {
+            $rec = $recs_by_user[ (int) $auserid ] ?? null;
+
+            if ( ! $rec ) {
+                continue;
             }
+
+            $grades[]  = $rec->grade;
+            $ranks[]   = $rec->numrank + 1;
+            $avatars[] = $rec->directory . '/' . $rec->filename;
         }
 
         return [$grades, $ranks, $avatars];

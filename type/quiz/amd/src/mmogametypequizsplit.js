@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// mmogame/type/quiz/js/mmogametypequizsplit.js
+
+/**
+ * Defines Split mode behavior for quiz games.
+ *
+ * @package
+ */
+
 define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
     return class MmoGameQuizSplit extends MmoGameSplit {
 
@@ -90,7 +98,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.info = {
                         avatars: avatars,
                         attemptkeys: attemptkeys,
-                        paletteid: this.paletteid,
                         attemptqueryids: attemptqueryids,
                         numattempts: numattempts,
                         querydefinitions: querydefinitions,
@@ -280,8 +287,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 this.continueAnswer(split);
             });
 
-            const disabled = false;
-
             sp.answersLeft = ishorizontal ? sp.definitionWidth + 2 * this.padding : this.padding;
             sp.answersWidth = this.split.width - sp.answersLeft;
             sp.answersTop = ishorizontal ?
@@ -292,8 +297,8 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             this.createAnswerMultichoice(
                 sp.parent,
                 split,
-                sp,
-                disabled);
+                sp
+            );
 
             this.computeFontSize(split, sp);
 
@@ -314,7 +319,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
          * @param {object} parent
          * @param {number} split
          * @param {object} sp
-         * @returns {number} The total height used by the answer options.
+         * @return void
          */
         createAnswerMultichoice(parent, split, sp) {
             const attempt = sp.attempts[0];
@@ -332,8 +337,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             sp.selectedAnswer = -1;
             sp.aRandom = aRandom;
             sp.timestart = Math.round(Math.floor(Date.now() / 1000));
-
-            return top;
         }
 
         createAnswerMultichoiceItem(split, sp, i, aRandom, attempt) {
@@ -343,7 +346,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                 classnames: 'mmogame-quiz-split-label' + i,
                 styles: {
                     position: 'absolute',
-                    top: `${top}px`,
                     color: this.getContrastingColor(this.colorBackground),
                     align: "left",
                     marginTop: 0,
@@ -400,7 +402,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
         }
 
         computeFontSize(split, sp) {
-            const ishorizontal = split.width >= split.height;
+            const ishorizontal = this.split.width >= this.split.height;
             let minSize = 10;
             const bodyFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
             let maxSize = Math.min(2 * bodyFontSize, this.iconSize / 2, sp.answersWidth);
@@ -491,7 +493,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             }
 
             const space = sp.fontSize;
-            if (top + this.iconSize + this.padding + n * space < split.height) {
+            if (top + this.iconSize + this.padding + n * space < this.split.height) {
                 for (let i = 1; i < n; i++) {
                     const elem = sp.aItemLabel[i];
                     const newTop = parseInt(elem.style.top) + i * sp.fontSize;
@@ -1023,6 +1025,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
         }
 
         askNextQuestions(sp) {
+            const split = sp.position;
             this.showCursor(sp, true);
 
             let sessionkeys = [];
@@ -1030,16 +1033,12 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
             let answers = [];
             let timestarts = [];
             let timeanswers = [];
-            let returnsplits = [];
             let tools = [];
 
             let spidea = -1;
             for (let i = 0; i < this.splits.length; i++) {
                 const sp2 = this.splits[i];
                 const sessionkey = this.sessionkeys[i];
-                if (sp2.attempts.length === 0) {
-                    returnsplits.push(i);
-                }
                 for (let j = 0; j < sp2.server.length; j++) {
                     const temp = sp2.server[j];
                     sessionkeys.push(sessionkey);
@@ -1062,7 +1061,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     answers: answers.join(','),
                     timestarts: timestarts.join(','),
                     timeanswers: timeanswers.join(','),
-                    returnsplits: returnsplits.join(','),
+                    returnsessionkey: this.sessionkeys[sp.position],
                     tools: tools.join(','),
                 };
                 // Calling the service through the Moodle AJAX API
@@ -1071,7 +1070,7 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     args: params
                 }]);
                 // Handling the response
-                sendAnswers[0].done(({avatars, attemptkeys, attemptqueryids,numattempts,
+                sendAnswers[0].done(({avatars, attemptkeys, attemptqueryids, numattempts,
                                          querydefinitions, querytips,
                                          queryanswerids, answertexts, queryanswerids0,
                                          grades, countqueries, countmastered, islastcorrect, ranks, queryranks,
@@ -1084,7 +1083,6 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                     this.info = {
                         avatars: avatars,
                         attemptkeys: attemptkeys,
-                        paletteid: this.paletteid,
                         attemptqueryids: attemptqueryids,
                         numattempts: numattempts,
                         querydefinitions: querydefinitions,
@@ -1109,12 +1107,11 @@ define(['mod_mmogame/mmogamesplit'], function(MmoGameSplit) {
                         }, 15000);
                         return;
                     }
-                    for (let i = 0; i < returnsplits.length; i++) {
-                        const split = returnsplits[i];
-                        this.copySplitData(i, split);
-                        this.showNextQuestion(split);
-                        this.updatePercent(this.splits[split]);
-                    }
+
+                    this.copySplitData(0, split);
+                    this.showNextQuestion(split);
+                    this.updatePercent(this.splits[split]);
+
                     this.showCursor(sp, false);
                 }).fail((error) => {
                     this.showError("mmogametypequizsplit.asknextquestion");
