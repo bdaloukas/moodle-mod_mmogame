@@ -37,8 +37,8 @@
 
 define([''], function() {
     return class MmoGame {
-        // Define default properties with appropriate types
-        state; // State of the game
+        // Define default properties with appropriate types.
+        state; // State of the game.
         body;
         minFontSize;
         maxFontSize;
@@ -47,10 +47,10 @@ define([''], function() {
         padding;
         cIcons;
 
-        // Colors
+        // Colors.
         colorBackground;
 
-        // Timer variables
+        // Timer variables.
         timestart = 0;
         timeclose = 0;
 
@@ -79,9 +79,11 @@ define([''], function() {
             this.fontSize = size;
         }
 
-        // UI element creation methods
+        // UI element creation methods.
+
         /**
          * Creates a DOM element with specified attributes and styles.
+         *
          * @param {string} tag - The HTML tag to create (e.g., 'div', 'img').
          * @param {Object} options - Configuration for the element.
          * @param {HTMLElement} options.parent - Parent element where the new element will be appended.
@@ -93,22 +95,24 @@ define([''], function() {
         createDOMElement(tag, {parent, classnames = '', styles = {}, attributes = {}} = {}) {
             const element = document.createElement(tag);
 
-            // Apply classes
+            // Apply classes.
             if (classnames) {
                 element.classList.add(...classnames.split(/\s+/));
             }
 
-            // Apply styles
+            // Apply styles.
             Object.assign(element.style, styles);
 
-            // Apply attributes
-            Object.entries(attributes).forEach(([key, value]) => {
+            // Apply attributes.
+            Object.entries(attributes).forEach(function(entry) {
+                const key = entry[0];
+                const value = entry[1];
                 if (value !== undefined && value !== null) {
                     element.setAttribute(key, value);
                 }
             });
 
-            // Append to parent
+            // Append to parent.
             if (parent) {
                 parent.appendChild(element);
             }
@@ -128,17 +132,20 @@ define([''], function() {
          * @returns {HTMLElement} - The created <div> element.
          */
         createDiv(parent, classnames, left, top, width, height) {
-            return this.createDOMElement('div', {
-                parent,
-                classnames,
-                styles: {
-                    position: 'absolute',
-                    left: `${left}px`,
-                    top: `${top}px`,
-                    width: `${width}px`,
-                    height: `${height}px`,
-                },
-            });
+            return this.createDOMElement(
+                'div',
+                {
+                    parent,
+                    classnames,
+                    styles: {
+                        position: 'absolute',
+                        left: `${left}px`,
+                        top: `${top}px`,
+                        width: `${width}px`,
+                        height: `${height}px`,
+                    },
+                }
+            );
         }
 
         /**
@@ -160,12 +167,12 @@ define([''], function() {
                 top: `${top}px`,
             };
 
-            // Only add width to styles if it's not 0
+            // Only add width to styles if it's not 0.
             if (width !== 0) {
                 styles.width = `${width}px`;
             }
 
-            // Only add height to styles if it's not 0
+            // Only add height to styles if it's not 0.
             if (height !== 0) {
                 styles.height = `${height}px`;
             }
@@ -175,18 +182,22 @@ define([''], function() {
                 attributes.src = filename;
             }
 
-            return this.createDOMElement('img', {
-                parent,
-                classnames,
-                styles,
-                attributes,
-            });
+            return this.createDOMElement(
+                'img',
+                {
+                    parent,
+                    classnames,
+                    styles,
+                    attributes,
+                }
+            );
         }
 
-        // Game logic and utility methods
+        // Game logic and utility methods.
 
         /**
          * Compute sizes for icons and padding based on the screen dimensions.
+         *
          * @param {number} minIconSize
          * @param {number} maxIconSize
          * @param {number} cIcons
@@ -215,6 +226,7 @@ define([''], function() {
 
         /**
          * Creates a centered image button with automatic scaling.
+         *
          * @param {HTMLElement} parent - The parent element where the button will be appended.
          * @param {number} left - The left position of the container in pixels.
          * @param {number} top - The top position of the container in pixels.
@@ -350,6 +362,7 @@ define([''], function() {
 
         /**
          * Returns a contrasting color (black or white) based on brightness.
+         *
          * @param {Number} colorCode - The color code.
          * @returns {string} "#000000" or "#FFFFFF".
          */
@@ -366,6 +379,7 @@ define([''], function() {
 
         /**
          * Repairs <p> tags in a string by cleaning up unnecessary tags.
+         *
          * @param {string} text - The input string with potential <p> tags.
          * @returns {string} The cleaned-up string.
          */
@@ -378,6 +392,7 @@ define([''], function() {
 
         /**
          * Finds the best value based on a condition.
+         *
          * @param {number} low - The lower bound.
          * @param {number} high - The upper bound.
          * @param {function} condition - A condition to evaluate.
@@ -416,8 +431,10 @@ define([''], function() {
             let height = canvas.height;
             let strip = width / 5;
 
-            // Sort colors based on their contrast value using an arrow function
-            colors.sort((a, b) => this.getContrast(a) - this.getContrast(b));
+            // Sort colors based on their contrast value using an arrow function.
+            colors.sort(function(a, b) {
+                return this.getContrast(a) - this.getContrast(b);
+            }.bind(this));
 
             for (let i = 0; i < 5; i++) {
                 ctx.fillStyle = this.getColorHex(colors[i]);
@@ -445,7 +462,11 @@ define([''], function() {
         }
 
         sortColors(colors) {
-            return colors.sort((a, b) => this.getContrast(a) - this.getContrast(b));
+            return colors.sort(
+                function(a, b) {
+                    return this.getContrast(a) - this.getContrast(b);
+                }.bind(this)
+            );
         }
 
         computeDifClock(time) {
@@ -467,24 +488,24 @@ define([''], function() {
         drawRadio(canvas, color1, color2) {
             let ctx = canvas.getContext("2d");
 
-            // Ensure the canvas dimensions match its displayed size
+            // Ensure the canvas dimensions match its displayed size.
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
 
             let size = canvas.width;
             let height = canvas.height;
 
-            // Clear previous drawing
+            // Clear previous drawing.
             ctx.clearRect(0, 0, size, height);
 
-            // Draw outer circle
+            // Draw outer circle.
             ctx.beginPath();
             ctx.arc(size / 2, height / 2, Math.min(size, height) / 2, 0, 2 * Math.PI, false);
 
             ctx.fillStyle = this.getColorHex(color1);
             ctx.fill();
 
-            // Draw inner circle if checked
+            // Draw inner circle if checked.
             let checked = canvas.classList.contains("checked");
             if (checked) {
                 ctx.beginPath();
@@ -531,6 +552,7 @@ define([''], function() {
 
         /**
          * Retrieves localized strings.
+         *
          * @param {string} name - The name of the string.
          * @returns {string} The localized string.
          */
@@ -540,6 +562,7 @@ define([''], function() {
 
         /**
          * Retrieves user options from IndexedDB.
+         *
          * @param {string}name
          * @returns {Promise<Object>} A promise that resolves with the options.
          */
@@ -548,39 +571,42 @@ define([''], function() {
                 throw new Error("name must be a non-empty string");
             }
 
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('mmoGameDB', 1);
+            return new Promise(
+                function(resolve, reject) {
+                    const request = indexedDB.open('mmoGameDB', 1);
 
-                request.onupgradeneeded = function(event) {
-                    const db = event.target.result;
-                    // Create the "options" object store if it doesn't exist
-                    if (!db.objectStoreNames.contains('options')) {
-                        db.createObjectStore('options', {keyPath: 'name'});
-                    }
-                };
-
-                request.onsuccess = function(event) {
-                    const db = event.target.result;
-                    const transaction = db.transaction(['options'], 'readonly');
-                    const store = transaction.objectStore('options');
-
-                    const getRequest = store.get(name);
-                    getRequest.onsuccess = function(event) {
-                        resolve(event.target.result || null); // Return the full object or null if not found
+                    request.onupgradeneeded = function(event) {
+                        const db = event.target.result;
+                        // Create the "options" object store if it doesn't exist.
+                        if (!db.objectStoreNames.contains('options')) {
+                            db.createObjectStore('options', {keyPath: 'name'});
+                        }
                     };
-                    getRequest.onerror = function() {
-                        reject(new Error(`Failed to retrieve option: ${name}`));
-                    };
-                };
 
-                request.onerror = function() {
-                    reject(new Error('Failed to open database'));
-                };
-            });
+                    request.onsuccess = function(event) {
+                        const db = event.target.result;
+                        const transaction = db.transaction(['options'], 'readonly');
+                        const store = transaction.objectStore('options');
+
+                        const getRequest = store.get(name);
+                        getRequest.onsuccess = function(event) {
+                        resolve(event.target.result || null); // Return the full object or null if not found.
+                        };
+                        getRequest.onerror = function() {
+                            reject(new Error(`Failed to retrieve option: ${name}`));
+                        };
+                    };
+
+                    request.onerror = function() {
+                        reject(new Error('Failed to open database'));
+                    };
+                }.bind(this)
+            );
         }
 
         /**
          * Saves user options to IndexedDB.
+         *
          * @param {string}name
          * @param {object}data
          * @returns {Promise<void>} A promise that resolves when the save is complete.
@@ -593,50 +619,58 @@ define([''], function() {
                 throw new Error("data must be a non-null object");
             }
 
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('mmoGameDB', 1);
+            return new Promise(
+                function(resolve, reject) {
+                    const request = indexedDB.open('mmoGameDB', 1);
 
-                request.onupgradeneeded = function(event) {
-                    const db = event.target.result;
-                    // Create the "options" object store if it doesn't exist
-                    if (!db.objectStoreNames.contains('options')) {
-                        db.createObjectStore('options', {keyPath: 'name'});
-                    }
-                };
-
-                request.onsuccess = function(event) {
-                    const db = event.target.result;
-                    const transaction = db.transaction(['options'], 'readwrite');
-                    const store = transaction.objectStore('options');
-
-                    // Ensure the object contains the correct key
-                    const record = {name, ...data};
-
-                    const putRequest = store.put(record);
-                    putRequest.onsuccess = function() {
-                        resolve(true);
+                    request.onupgradeneeded = function(event) {
+                        const db = event.target.result;
+                        // Create the "options" object store if it doesn't exist.
+                        if (!db.objectStoreNames.contains('options')) {
+                            db.createObjectStore('options', {keyPath: 'name'});
+                        }
                     };
-                    putRequest.onerror = function() {
-                        reject(new Error(`Failed to save option: ${name}`));
-                    };
-                };
 
-                request.onerror = function() {
-                    reject(new Error('Failed to open database'));
-                };
-            });
+                    request.onsuccess = function(event) {
+                        const db = event.target.result;
+                        const transaction = db.transaction(['options'], 'readwrite');
+                        const store = transaction.objectStore('options');
+
+                        // Ensure the object contains the correct key.
+                        const record = {name, ...data};
+
+                        const putRequest = store.put(record);
+                        putRequest.onsuccess = function() {
+                            resolve(true);
+                        };
+                        putRequest.onerror = function() {
+                            reject(new Error(`Failed to save option: ${name}`));
+                        };
+                    };
+
+                    request.onerror = function() {
+                        reject(new Error('Failed to open database'));
+                    };
+                }.bind(this)
+            );
         }
 
         debounce(func, delay) {
             let timer;
             return function(...args) {
                 clearTimeout(timer);
-                timer = setTimeout(() => func.apply(this, args), delay);
+                timer = setTimeout(
+                    function() {
+                        func.apply(this, args);
+                    }.bind(this),
+                    delay
+                );
             };
         }
 
         /**
          * Displays an error message on the screen.
+         *
          * @param {string} name - The name of the error context.
          * @param {Error} [error] - The error object to display.
          */
@@ -658,18 +692,21 @@ define([''], function() {
             if (this.area !== undefined) {
                 this.body.removeChild(this.area);
             }
-            this.area = this.createDOMElement('div', {
-                parent: this.body,
-                classnames: 'mmogame-area',
-                styles: {
-                    position: 'absolute',
-                    left: `${this.padding}px`,
-                    top: `${top}px`,
-                    right: `${this.padding}px`,
-                    bottom: `${this.padding + bottomSpace}px`,
-                    overflow: 'hidden',
+            this.area = this.createDOMElement(
+                'div',
+                {
+                    parent: this.body,
+                    classnames: 'mmogame-area',
+                    styles: {
+                        position: 'absolute',
+                        left: `${this.padding}px`,
+                        top: `${top}px`,
+                        right: `${this.padding}px`,
+                        bottom: `${this.padding + bottomSpace}px`,
+                        overflow: 'hidden',
+                    }
                 }
-            });
+            );
 
             this.areaRect = {
                 left: this.padding,
@@ -688,23 +725,31 @@ define([''], function() {
             prefix = String(prefix);
 
             // Remove data-start and data-end attributes from opening <p ...> tags.
-            text = text.replace(/<p\b[^>]*>/gi, tag =>
-                tag.replace(/\sdata-(start|end)="[^"]*"/gi, '')
+            text = text.replace(
+                /<p\b[^>]*>/gi,
+                function(tag) {
+                    return tag.replace(/\sdata-(start|end)="[^"]*"/gi, '');
+                }
             );
 
             // If the whole string is exactly one <p ...>...</p> block,
-            // remove the outer <p> wrapper and prepend the prefix
+            // remove the outer <p> wrapper and prepend the prefix.
             const match = text.match(/^\s*<p\b[^>]*>([\s\S]*?)<\/p>\s*$/i);
             if (match) {
                 return prefix + match[1];
             }
 
-            // If at least one <p ...> exists, insert the prefix into the first one
+            // If at least one <p ...> exists, insert the prefix into the first one.
             if (/<p\b[^>]*>/i.test(text)) {
-                return text.replace(/<p\b[^>]*>/i, tag => `${tag}${prefix}`);
+                return text.replace(
+                    /<p\b[^>]*>/i,
+                    function(tag) {
+                        return `${tag}${prefix}`;
+                    }
+                );
             }
 
-            // If no <p> exists, simply prepend the prefix
+            // If no <p> exists, simply prepend the prefix.
             return prefix + text;
         }
 
@@ -712,13 +757,15 @@ define([''], function() {
             const template = document.createElement('template');
             template.innerHTML = String(html || '');
 
-            const allowedTags = new Set([
-                'B', 'STRONG', 'I', 'EM', 'U', 'BR',
-                'P', 'DIV', 'SPAN',
-                'SUB', 'SUP',
-                'UL', 'OL', 'LI',
-                'TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TH', 'TD'
-            ]);
+            const allowedTags = new Set(
+                [
+                    'B', 'STRONG', 'I', 'EM', 'U', 'BR',
+                    'P', 'DIV', 'SPAN',
+                    'SUB', 'SUP',
+                    'UL', 'OL', 'LI',
+                    'TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TH', 'TD'
+                ]
+            );
 
             /**
              * Clean node.
@@ -727,20 +774,24 @@ define([''], function() {
              * @returns {void}
              */
             function cleanNode(node) {
-                [...node.childNodes].forEach((child) => {
-                    if (child.nodeType === Node.ELEMENT_NODE) {
-                        if (!allowedTags.has(child.tagName)) {
-                            child.replaceWith(...child.childNodes);
-                            return;
+                [...node.childNodes].forEach(
+                    function(child) {
+                        if (child.nodeType === Node.ELEMENT_NODE) {
+                            if (!allowedTags.has(child.tagName)) {
+                                child.replaceWith(...child.childNodes);
+                                return;
+                            }
+
+                            [...child.attributes].forEach(
+                                function(attr) {
+                                    child.removeAttribute(attr.name);
+                                }
+                            );
+
+                            cleanNode(child);
                         }
-
-                        [...child.attributes].forEach((attr) => {
-                            child.removeAttribute(attr.name);
-                        });
-
-                        cleanNode(child);
                     }
-                });
+                );
             }
 
             cleanNode(template.content);
@@ -757,7 +808,8 @@ define([''], function() {
             if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
                 window.crypto.getRandomValues(bytes);
             } else {
-                for (let i = 0; i < bytes.length; i++) {
+                const n = bytes.length;
+                for (let i = 0; i < n; i++) {
                     bytes[i] = Math.floor(Math.random() * 256);
                 }
             }
@@ -767,9 +819,12 @@ define([''], function() {
             // eslint-disable-next-line no-bitwise
             bytes[8] = bytes[8] & 0x3f | 0x80;
 
-            const hex = Array.from(bytes, function(byte) {
-                return byte.toString(16).padStart(2, '0');
-            });
+            const hex = Array.from(
+                bytes,
+                function(byte) {
+                    return byte.toString(16).padStart(2, '0');
+                }
+            );
 
             return (
                 hex.slice(0, 4).join('') + '-' +
@@ -798,7 +853,7 @@ define([''], function() {
                 let c = colorError !== undefined ? this.getColorHex(colorError) : '#398439';
                 return "<svg width=\"" + size + "\" height=\"" + size +
                     "\" class=\"bi bi-x-lg\" viewBox=\"0 0 18 18\"> <path fill=\"" + c +
-                    `" d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 
+                    `" d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0
                 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/></svg>`;
             }
         }

@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// mmogame/type/quiz/js/mmogametypequiz.js
-
 /**
  * Defines shared quiz game behavior.
  *
@@ -49,9 +47,9 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * Initializes the game by loading required audio assets.
          */
         openGame() {
-            super.openGame(); // Call the parent class method
+            super.openGame(); // Call the parent class method.
 
-            // Optimized Audio Loading
+            // Optimized Audio Loading.
             this.audioYes = new Audio('assets/yes1.mp3');
             this.audioYes.load();
             this.audioNo = new Audio('assets/no1.mp3');
@@ -86,7 +84,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         createAnswerMultichoice(left, top, width, onlyMetrics, fontSize, disabled) {
             const n = this.answers ? this.answers.length : 0;
             const aChecked = this.answer;
-            const fragment = document.createDocumentFragment(); // ✅ Batch DOM updates
+            const fragment = document.createDocumentFragment(); // ✅ Batch DOM updates.
 
             const retSize = [0, 0];
             const checkboxSize = Math.round(fontSize);
@@ -94,7 +92,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             this.aItemLabel = Array(n);
             this.aItemCorrectX = new Array(n);
 
-            // Iterate over each answer
+            // Iterate over each answer.
             for (let i = 0; i < n; i++) {
                 const label = this.createDOMElement('label', {
                     parent: null,
@@ -123,7 +121,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 label.style.align = "left";
                 label.style.color = this.getContrastingColor(this.colorBackground);
 
-                // Create the checkbox
+                // Create the checkbox.
                 const checked = aChecked !== undefined && aChecked !== null && aChecked.includes(this.answersID[i]);
                 const item = this.createRadiobox(this.body, checkboxSize, this.colorBackground2, this.colorGrade,
                     checked, disabled);
@@ -132,16 +130,16 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 item.style.top = `${top}px`;
                 item.id = "mmogame_quiz_input" + i;
 
-                // Event listeners for interactions
-                item.addEventListener('click', () => {
+                // Event listeners for interactions.
+                item.addEventListener('click', function() {
                     if (!item.classList.contains("disabled")) {
                         this.onClickRadio(i, this.colorBackground2, this.colorGrade);
                     }
-                });
+                }.bind(this));
 
-                label.addEventListener('click', () => {
+                label.addEventListener('click', function() {
                     this.onClickRadio(i, this.colorBackground2, this.colorGrade);
-                });
+                }.bind(this));
 
                 fragment.appendChild(item);
                 this.area.appendChild(label);
@@ -155,11 +153,11 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 this.aItemCorrectX[i] = left + fontSize + this.padding;
                 this.aItemLabel[i] = label;
 
-                // Adjust positioning
+                // Adjust positioning.
                 top += Math.max(label.scrollHeight, fontSize) + this.padding;
             }
 
-            this.area.appendChild(fragment); // Batch insert into DOM
+            this.area.appendChild(fragment); // Batch insert into DOM.
 
             return onlyMetrics ? retSize : top;
         }
@@ -176,8 +174,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 return;
             }
 
-            // Update the selected radio button and deselect others
-            this.aItemAnswer.forEach((item, i) => {
+            // Update the selected radio button and deselect others.
+            this.aItemAnswer.forEach(function(item, i) {
                 const isDisabled = item.classList.contains("disabled");
                 if (i === index) {
                     item.classList.add("checked");
@@ -187,8 +185,8 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 }
 
                 this.drawRadio(item, isDisabled ? colorBack : 0xFFFFFF, color);
-            });
-            // Send the answer
+            }.bind(this));
+            // Send the answer.
             this.callSetAnswer();
         }
 
@@ -200,11 +198,11 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 return;
             }
 
-            this.aItemAnswer.forEach(item => {
+            this.aItemAnswer.forEach(function(item) {
                 item.classList.add("disabled");
-                item.setAttribute("disabled", "true"); // Ensuring proper disabling
-                this.drawRadio(item, this.colorGrade, this.colorBackground2); // Update styling
-            });
+                item.setAttribute("disabled", "true"); // Ensuring proper disabling.
+                this.drawRadio(item, this.colorGrade, this.colorBackground2); // Update styling.
+            }.bind(this));
         }
 
         getStringT(name) {
@@ -224,7 +222,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         createDivGradePercent(parent, prefixclassname, left, top,
                               createAddGrade, colorBackground) {
             const colorText = this.getContrastingColor(colorBackground);
-            // Create the main button container
+            // Create the main button container.
             const divMain = this.createDOMElement('div', {
                 parent: parent,
                 classnames: `${prefixclassname}-main`,
@@ -250,7 +248,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
             let lblAddGrade;
             if (createAddGrade) {
-                // Create the additional grade label (line3)
+                // Create the additional grade label (line3).
                 lblAddGrade = this.createDOMElement('div', {
                     parent: parent,
                     classnames: `${prefixclassname}-addgrade`,
@@ -270,7 +268,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 });
             }
 
-            // Create the ranking grade label (line1)
+            // Create the ranking grade label (line1).
             const lblRank = this.createDOMElement('div', {
                 parent: parent,
                 classnames: `${prefixclassname}-rank`,
@@ -288,7 +286,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 },
             });
 
-            // Create the main grade label (line2)
+            // Create the main grade label (line2).
             const lblGrade = this.createDOMElement('div', {
                 parent: parent,
                 classnames: `${prefixclassname}-grade`,
@@ -307,7 +305,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 },
             });
 
-            // Create the percentage label (line2)
+            // Create the percentage label (line2).
             let lblPercent;
             if (createAddGrade) {
                 lblPercent = this.createDOMElement('div', {
@@ -411,7 +409,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 return size;
             }
 
-            // Apply styling and position
+            // Apply styling and position.
             definitionDiv.style.background = this.getColorHex(this.colorBackground2);
             definitionDiv.style.color = this.getContrastingColor(this.colorBackground2);
             definitionDiv.style.left = `${left}px`;
@@ -432,14 +430,14 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
          * @param {string} subcommand
          */
         callSetAnswer(subcommand = '') {
-            // Clear existing timeout
+            // Clear existing timeout.
             if (this.timerTimeout !== undefined) {
                 clearTimeout(this.timerTimeout);
             }
 
             this.timerTimeout = undefined;
 
-            require(['core/ajax'], (Ajax) => {
+            require(['core/ajax'], function(Ajax) {
                 const params = {
                     sessionkey: this.sessionkey,
                     attemptkey: this.attemptkey,
@@ -448,14 +446,14 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                 };
 
                 Ajax.call([{
-                    methodname: 'mmogametype_quiz_set_answer', // API endpoint
+                    methodname: 'mmogametype_quiz_set_answer', // API endpoint.
                     args: params,
-                }])[0].done((response) => {
-                    this.processSetAnswer(JSON.parse(response)); // Process the server's response
-                }).fail((error) => {
+                }])[0].done(function(response) {
+                    this.processSetAnswer(JSON.parse(response));
+                }.bind(this)).fail(function(error) {
                     this.showError("mmogametypequizsplit.setanswer", error);
-                });
-            });
+                }.bind(this));
+            }.bind(this));
         }
 
         /**
@@ -466,7 +464,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         setColors(colors) {
             super.setColors(colors);
 
-            // Assign specific colors to UI elements
+            // Assign specific colors to UI elements.
             this.colorGrade = colors[2];
             this.colorGrade2 = colors[4];
         }
@@ -491,7 +489,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
 
                 if (nickname.length === 0) {
                     const filenameWithExt = avatarSrc.split('/').pop(); // Extract file name
-                    // Remove extension, fallback if no extension
+                    // Remove extension, fallback if no extension.
                     s = filenameWithExt.split('.').slice(0, -1).join('.') || filenameWithExt;
                 }
                 s = this.repairNickname(s);
@@ -520,7 +518,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
             for (let step = 1; step <= 2; step++) {
                 let defSize, ansSize;
                 this.fontSize = this.findbest(step === 1 ? this.minFontSize : this.minFontSize / 2, this.maxFontSize,
-                    (fontSize) => {
+                    function(fontSize) {
                         defSize = this.createDefinition(0, 0, definitionWidth, 0, true, fontSize,
                             json.definition);
                         if (defSize[0] > definitionWidth) {
@@ -535,7 +533,7 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
                         } else {
                             return defSize[1] < maxHeight && ansSize[1] < maxHeight ? -1 : 1;
                         }
-                    });
+                    }.bind(this));
                 if (defSize[0] <= definitionWidth && defSize[1] <= maxHeight && ansSize[1] <= maxHeight) {
                     break;
                 }
@@ -544,17 +542,27 @@ define(['mod_mmogame/mmogameui'], function(MmoGameUI) {
         }
 
         createNextButton(left, top) {
-            let btn = super.createImageButton(this.area, 'mmogame-quiz-next',
-                left, top, 0, this.iconSize, 'assets/next.svg');
+            let btn = super.createImageButton(
+                this.area,
+                'mmogame-quiz-next',
+                left,
+                top,
+                0,
+                this.iconSize,
+                'assets/next.svg'
+            );
             btn.title = this.getStringM('js_next_question');
-            btn.addEventListener("click", () => {
-                this.callGetAttempt();
-                this.area.removeChild(btn);
-            });
+            btn.addEventListener(
+                "click",
+                function() {
+                    this.callGetAttempt();
+                    this.area.removeChild(btn);
+                }.bind(this)
+            );
         }
 
         processGetAttempt(json) {
-            // Calculate time difference and set up the clock
+            // Calculate time difference and set up the clock.
             this.computeDifClock(json.time);
         }
     };

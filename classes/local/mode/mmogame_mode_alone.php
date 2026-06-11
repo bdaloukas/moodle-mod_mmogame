@@ -34,8 +34,8 @@ class mmogame_mode_alone {
     /**
      * Administrator can change numgame or state
      *
-     * @param stdClass $data
-     * @param mmogame $mmogame
+     * @param stdClass $data            // The data.
+     * @param mmogame $mmogame          // The mmogame object.
      */
     public static function setadmin(stdClass $data, mmogame $mmogame): void {
         $rgame = $mmogame->get_rgame();

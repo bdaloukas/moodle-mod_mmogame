@@ -190,13 +190,13 @@ class start_session extends external_api {
         $a = $mmogame->get_avatars($auserid);
         $avatars = $ids = [];
 
-        if ($info !== null && $info->avatarid != 0 && array_key_exists($info->avatarid, $a)) {
+        if ($info !== null && $info->avatarid !== 0 && array_key_exists($info->avatarid, $a)) {
             $avatars[] = $a[$info->avatarid];
             $ids[] = $info->avatarid;
             unset($a[$info->avatarid]);
             $count--;
         }
-        if ($count == 1) {
+        if (1 === $count ) {
             $ids[] = $id = array_rand($a, min($count, count($a)));
             $avatars[] = $a[$id];
         } else if ($count > 1) {
@@ -215,17 +215,19 @@ class start_session extends external_api {
     /**
      * Returns a list of color palettes and corresponding id
      *
-     * @param mmogame $mmogame
-     * @param int $count
-     * @param array $result
+     * @param mmogame $mmogame  The mmogame object
+     * @param int $count        How many palettes to return
+     * @param array $result     The array to put results
      * @return void
      */
     private static function compute_colorpalettes(mmogame $mmogame, int $count, array &$result): void {
         $pals = $mmogame->get_palettes();
 
-        while (count($pals) > $count) {
+        $n = count( $pals );
+        while ($n > $count) {
             $id = array_rand($pals);
             unset($pals[$id]);
+            $n = count($pals);
         }
 
         $colorpalettes = [];
@@ -240,7 +242,7 @@ class start_session extends external_api {
     /**
      * Returns error code
      *
-     * @param string $error
+     * @param string $error The error
      *
      * @return array
      */

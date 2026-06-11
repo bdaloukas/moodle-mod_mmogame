@@ -44,7 +44,7 @@ const MMOGAME_QUIZ_TOOL_5050 = 8;
  */
 abstract class mmogametype_quiz extends mmogame {
     /**
-     * return the name of table attempts.
+     * Return the name of table attempts.
      */
     public static function get_table_attempts(): string {
         return 'mmogame_quiz_attempts';
@@ -53,10 +53,10 @@ abstract class mmogametype_quiz extends mmogame {
     /**
      * Saves to array $ret information about the $attempt.
      *
-     * @param array $ret (returns info about the current attempt)
-     * @param ?stdClass $attempt
-     * @param string $subcommand
-     * @return ?stdClass
+     * @param array $ret            : Returns info about the current attempt.
+     * @param ?stdClass $attempt    : The row of mmogame_quiz_attempts.
+     * @param string $subcommand    : The subcommand eg tool1.
+     * @return ?stdClass            : The array of json.
      */
     public function append_json(array &$ret, ?stdClass $attempt, string $subcommand = ''): ?stdClass {
         $auserid = $this->get_auserid();
@@ -73,7 +73,7 @@ abstract class mmogametype_quiz extends mmogame {
         $ret['rankmastered'] = $this->get_rank($info->countmastered, 'countmastered');
         $ret['countqueries'] = $this->get_rstate()->countqueries;
 
-        if ($attempt === null) {
+        if (null === $attempt) {
             $attempt = new stdClass();
             $attempt->id = 0;
             $attempt->timestart = 0;
@@ -81,12 +81,12 @@ abstract class mmogametype_quiz extends mmogame {
             $attempt->queryid = 0;
             $attempt->useranswer = '';
         }
-        $ret['attemptkey'] = $attempt->id !== 0 ? $attempt->attemptkey : '';
+        $ret['attemptkey'] = 0 !== $attempt->id ? $attempt->attemptkey : '';
         $recquery = null;
-        if ($attempt->queryid != 0) {
+        if (0 !== $attempt->queryid) {
             $recquery = $this->get_qbank()->load_json($ret, '', $attempt->queryid, $attempt->layout, false);
         }
-        $ret['rankquery'] = $attempt->queryid !== null ? $this->get_selection()->get_rankquery($attempt->queryid) : null;
+        $ret['rankquery'] = null !== $attempt->queryid ? $this->get_selection()->get_rankquery($attempt->queryid) : null;
 
         $ret['timestart'] = $attempt->timestart;
         $ret['timeclose'] = $attempt->timeclose;
@@ -100,8 +100,8 @@ abstract class mmogametype_quiz extends mmogame {
      * Correct answers return number_of_answers - 1.
      * Incorrect answers return -1.
      *
-     * @param bool $iscorrect
-     * @param stdClass $query
+     * @param bool $iscorrect   : True if is correct answer.
+     * @param stdClass $query   : The query record.
      * @return int
      */
     protected function get_score_query_negative(bool $iscorrect, stdClass $query): int {
@@ -115,15 +115,15 @@ abstract class mmogametype_quiz extends mmogame {
     /**
      * Deletes info for a given mmogame and auser
      *
-     * @param mmogame_database $db
-     * @param stdClass $rgame
-     * @param ?int $auserid
+     * @param mmogame_database $db  : The database.
+     * @param stdClass $rgame       : The record of table mmogame.
+     * @param ?int $auserid         : The user.
      */
     public static function delete_auser(mmogame_database $db, stdClass $rgame, ?int $auserid): void {
         $select = 'mmogameid=?';
         $params = [$rgame->id];
 
-        if ($auserid !== null) {
+        if (null !== $auserid) {
             $select .= ' AND auserid=?';
             $params[] = $auserid;
         }

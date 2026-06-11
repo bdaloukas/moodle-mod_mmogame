@@ -42,7 +42,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
      * @throws dml_exception
      */
     public function get_attempt(): ?stdClass {
-        if ($this->rstate->state != MMOGAME_QUIZ_STATE_PLAY) {
+        if ($this->rstate->state !== MMOGAME_QUIZ_STATE_PLAY) {
             return null;
         }
 
@@ -58,7 +58,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
 
         if (count($attempts) > 0) {
             $attempt = reset($attempts);
-            if ($attempt->timestart == 0) {
+            if (0 === $attempt->timestart) {
                 // Not started, so update timestart.
                 $attempt->timestart = time();
                 $this->db->update_record(
@@ -73,7 +73,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             1,
             $this->compute_next_numattempt('mmogame_quiz_attempts', $this->get_auserid())
         );
-        if ($a === null) {
+        if (null === $a) {
             $this->set_errorcode('no_queries');
             return null;
         }
@@ -93,9 +93,9 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     /**
      * Processes the user's answer for a quiz question, with optional auto-grading and statistics updates.
      *
-     * @param stdClass $attempt
-     * @param stdClass $query
-     * @param ?string $useranswer
+     * @param stdClass $attempt     : The attempt record.
+     * @param stdClass $query       : The query.
+     * @param ?string $useranswer   : The answer of user.
      * @param array $ret (will contain all information)
      */
     public function set_answer(
@@ -170,8 +170,8 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     /**
      * Fill the array $ret with information about high scores.
      *
-     * @param int $count
-     * @param array $ret
+     * @param int $count        : Count of users wanted.
+     * @param array $ret        : The array to put info.
      */
     public function get_highscore(int $count, array &$ret): void {
 
@@ -200,15 +200,15 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
         // Prepare the final output.
         $output = [];
         foreach ($map2 as $data) {
-            if ($data->rank1 != 0 && $data->rank1 < $data->rank2) {
+            if (0 !== $data->rank1 && $data->rank1 < $data->rank2) {
                 $kind = 1;
                 $rank = $data->rank1;
                 $grade = $data->grade;
-            } else if ($data->rank2 != 0 && $data->rank2 < $data->rank1) {
+            } else if (0 !== $data->rank2 && $data->rank2 < $data->rank1) {
                 $kind = 2;
                 $rank = $data->rank2;
                 $grade = $data->countmastered;
-            } else if ($data->rank1 != 0 && $data->rank2 != 0 && $data->rank1 == $data->rank2) {
+            } else if (0 !== $data->rank1 && 0 !== $data->rank2 && $data->rank1 === $data->rank2) {
                 $kind = 12;
                 $rank = $data->rank1;
                 $grade = $data->grade;
@@ -233,10 +233,10 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     /**
      * Analyzes data based on $score_key and $rank_key
      * *
-     * @param string $scorekey
-     * @param string $rankkey
-     * @param int $count
-     * @param array $map
+     * @param string $scorekey      : The field name used for score.
+     * @param string $rankkey       : The field name used for rank.
+     * @param int $count            : The count of users wanted.
+     * @param array $map            : The returning map.
      * @return void
      */
     private function get_highscore_analyze(string $scorekey, string $rankkey, int $count, array &$map): void {
@@ -270,7 +270,7 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             $data->$rankkey = ++$rank;
 
             // Handle tied scores by reusing the previous rank.
-            if ($data->$scorekey == $score) {
+            if ($data->$scorekey === $score) {
                 $data->$rankkey = $rank;
             } else {
                 $score = $data->$rankkey;
@@ -293,10 +293,10 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
     /**
      * Updates the database and array $ret about the correctness of user's answer
      *
-     * @param array $ret
-     * @param ?string $attemptkey
-     * @param ?string $answer
-     * @param string $subcommand
+     * @param array $ret            : The array with info.
+     * @param ?string $attemptkey   : The attempt key.
+     * @param ?string $answer       : The answer of user.
+     * @param string $subcommand    : The subcommand e.g. tool1.
      * @return ?stdClass: the attempt
      */
     public function set_answer_mode(array &$ret, ?string $attemptkey, ?string $answer, string $subcommand = ''): ?stdClass {
@@ -307,21 +307,21 @@ class mmogametype_quiz_alone extends mmogametype_quiz {
             'mmogameid=? AND auserid=? AND attemptkey=?',
             [$this->get_id(), $this->auserid, $attemptkey]
         );
-        if ($attempt === null) {
+        if (null === $attempt) {
             // Invalid or expired attempt session.
             return null;
         }
 
         if (
-            $attempt->auserid != $this->auserid || $attempt->mmogameid != $this->rgame->id
-            || $attempt->numgame != $this->rgame->numgame
+            $attempt->auserid !== $this->auserid || $attempt->mmogameid !== $this->rgame->id
+            || $attempt->numgame !== $this->rgame->numgame
         ) {
             return null;
         }
         $this->set_attempt($attempt);
 
         $query = $this->qbank->load($attempt->queryid);
-        if (isset($subcommand) && $subcommand == 'tool2') {
+        if (isset($subcommand) && 'tool2' === $subcommand) {
             $ret['tool2'] = 1;
         }
         $this->set_answer($attempt, $query, $answer, $ret);

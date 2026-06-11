@@ -64,7 +64,7 @@ abstract class mmogame_qbank {
             $numattempt
         );
 
-        if (count($queries) == 0) {
+        if (0 === count($queries) ) {
             return null;
         }
 
@@ -172,12 +172,12 @@ abstract class mmogame_qbank {
         if ($rec !== null) {
             $a = ['id' => $rec->id];
             $a['countused'] = $rec->countused + 1;
-            if ($iscorrect && $rec->serialcorrects == 0) {
+            if ($iscorrect && 0 === $rec->serialcorrects ) {
                 $rec->serialcorrects = 1;
                 $addcountmastered = 1;
             } else if ($iscorrect && $rec->serialcorrects > 0) {
                 $rec->serialcorrects = $rec->serialcorrects + 1;
-            } else if ($iscorrect == 0) {
+            } else if (0 === $iscorrect ) {
                 if ($rec->serialcorrects > 0) {
                     $addcountmastered = -1;
                 }

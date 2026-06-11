@@ -69,7 +69,7 @@ class mmogametype_quiz_split_admin extends moodleform {
         $rgame = $this->mmogame->get_rgame();
 
         $state = $this->mmogame->get_state();
-        if ($state == 0) {
+        if (0 === $state) {
             $statename = get_string('state0', 'mmogametype_quiz');
         } else {
             $statename = get_string($rgame->mode . '_state' . $state, 'mmogametype_quiz');

@@ -28,9 +28,9 @@ namespace mmogametype_quiz\local;
 
 use coding_exception;
 use dml_exception;
+use mod_mmogame\local\database\mmogame_database;
 use mod_mmogame\local\mmogame;
 use mod_mmogame\local\mode\mmogame_mode_aduel;
-use mod_mmogame\local\database\mmogame_database;
 use stdClass;
 
 /**

@@ -24,8 +24,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
     function(MmoGameTypeQuiz) {
         return class MmoGameTypeQuizAduel extends MmoGameTypeQuiz {
 
-    player1; // Stores all info for player1
-    player2; // Stores all info for player2
+    player1; // Stores all info for player1.
+    player2; // Stores all info for player2.
     isWaitOpponent; // True if wait someone to answer a set of questions.
 
     // Timer variables.
@@ -37,7 +37,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
     timeoutWaitOpponent = 5000;
 
-    // Tools button
+    // Tools button.
     buttonHighScore;
     button5050;
     buttonSkip;
@@ -53,7 +53,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
     constructor() {
         super('aduel');
 
-        // Initialize core properties
+        // Initialize core properties.
         this.cIcons = (this.isVertical ? 5 : 8) + (this.hasHelp() ? 1 : 0);
 
         this.isWaitOpponent = false;
@@ -64,7 +64,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         const step = this.iconSize + this.padding;
 
         const nicknameHeight = Math.round(this.iconSize / 3);
-        const fragment = document.createDocumentFragment(); // Batch DOM updates
+        const fragment = document.createDocumentFragment(); // Batch DOM updates.
 
         let nickname, avatar;
         [nickname, avatar] = this.createNicknameAvatar(fragment, 'mmogame-quiz-aduel',
@@ -138,12 +138,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 'assets/cutred.svg');
         }
         this.buttonHighScore.style.visibility = 'hidden';
-        this.buttonHighScore.addEventListener("click", () => {
+        this.buttonHighScore.addEventListener("click", function() {
             this.sendGetHighScore();
-        });
-        this.button5050.addEventListener("click", () => {
+        }.bind(this));
+        this.button5050.addEventListener("click", function() {
             this.callGetAttempt({subcommand: this.TOOLS.t5050});
-        });
+        }.bind(this));
         this.button5050.title = this.getStringT('js_help_5050');
 
         leftButton += this.iconSize + this.padding;
@@ -158,9 +158,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 leftButton, this.padding + nicknameHeight, this.iconSize,
                 this.iconSize, 'assets/skip.svg');
         }
-        this.buttonSkip.addEventListener("click", () => {
+        this.buttonSkip.addEventListener("click", function() {
             this.callSetAnswer(this.TOOLS.skip);
-        });
+        }.bind(this));
         this.buttonSkip.title = this.getStringT('js_help_skip');
 
         if (this.isVertical) {
@@ -172,9 +172,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 leftButton, this.padding + nicknameHeight, this.iconSize,
                 this.iconSize, 'assets/wizard.svg');
         }
-        this.buttonWizard.addEventListener("click", () => {
+        this.buttonWizard.addEventListener("click", function() {
             this.callGetAttempt({'subcommand': this.TOOLS.wizard});
-        });
+        }.bind(this));
         this.buttonWizard.style.visibility = 'hidden';
         this.buttonWizard.title = this.getStringT('js_wizard');
 
@@ -186,10 +186,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.buttonHelp = this.createButtonHelp(fragment,
                     leftButton + this.iconSize + this.padding, this.padding + nicknameHeight);
             }
-            this.buttonHelp.addEventListener("click", () => this.onClickHelp());
+            this.buttonHelp.addEventListener("click", function() {
+                this.onClickHelp();
+            }.bind(this));
         }
 
-        this.body.appendChild(fragment); // Batch insert into DOM
+        this.body.appendChild(fragment); // Batch insert into DOM.
     }
 
     updateButtonTool(btn, tool) {
@@ -205,7 +207,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             window.document.title = json.name;
         }
         this.correct = undefined;
-        // Update game state
+        // Update game state.
         this.state = parseInt(json.state);
         const nicknameWidth = 2 * this.iconSize + this.padding;
         const nicknameHeight = Math.round(this.iconSize / 3);
@@ -223,9 +225,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
             if (this.buttonHelp !== undefined) {
                 this.buttonHelp.style.visibility = 'hidden';
             }
-            setTimeout(() => {
+            setTimeout(function() {
                 this.callGetAttempt();
-            }, 15000);
+            }.bind(this), 15000);
             return;
         } else {
             this.removeMessageDivs();
@@ -236,7 +238,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.savedColors = json.colors;
             this.colors = undefined;
         }
-        // Update the window title if a name is provided
+        // Update the window title if a name is provided.
         if (json.name) {
             document.title = json.name;
         }
@@ -271,9 +273,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
             this.hideTools();
             this.showGrade(json);
-            this.timeout = setTimeout(() => {
+            this.timeout = setTimeout(function() {
                 this.callGetAttempt();
-            }, this.timeoutWaitOpponent);
+            }.bind(this), this.timeoutWaitOpponent);
             return;
         }
         this.isWaitOpponent = false;
@@ -282,9 +284,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.answers = [];
             this.answersID = json.answerids;
 
-            json.answers.forEach((answer, index) => {
+            json.answers.forEach(function(answer, index) {
                 this.answers[index] = this.repairP(answer);
-            });
+            }.bind(this));
         }
         this.answer = json.answer !== undefined ? json.answer : null;
         this.definition = this.repairP(json.definition);
@@ -368,7 +370,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         let aduelAnswers = json.aduelPlayer === 2 && json.aduelUseranswer !== null ? json.aduelUseranswer.split(",") : '';
         let aCorrect = json.correct.split(",");
-        for (let i = 0; i < this.answersID.length; i++) {
+        const n = this.answersID.length;
+        for (let i = 0; i < n; i++) {
             if (this.answersID[i] === '') {
                 continue;
             }
@@ -502,13 +505,13 @@ define(['mmogametype_quiz/mmogametypequiz'],
         };
 
         require(['core/ajax'], (Ajax) => {
-            // Calling the service through the Moodle AJAX API
+            // Calling the service through the Moodle AJAX API.
             let getHighScore = Ajax.call([{
                 methodname: 'mmogametype_quiz_get_highscore',
                 args: params
             }]);
 
-            // Handling the response
+            // Handling the response.
             getHighScore[0].done((response) => {
                 this.createScreenHighScore(JSON.parse(response));
             }).fail((error) => {
@@ -593,7 +596,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         ctx.textAlign = "left";
         ctx.fillText(this.getStringM('js_name'), col3, y);
 
-        results.forEach(player => {
+        results.forEach(function(player) {
             y += row / 2 + this.padding;
 
             ctx.textAlign = "center";
@@ -609,7 +612,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 'assets/avatars/' + player.avatar);
 
             y += row / 2 - this.padding;
-        });
+        }.bind(this));
     }
 
     showHelpScreen(div) {
@@ -686,33 +689,35 @@ define(['mmogametype_quiz/mmogametypequiz'],
             }
             return;
         }
-        // Exit if labelTimer or timeclose are undefined
+        // Exit if labelTimer or timeclose are undefined.
         if (!this.divTimer || !this.timeclose) {
             return;
         }
 
-        // Calculate the remaining time in seconds
-        const now = Date.now() / 1000; // Get current time in seconds
+        // Calculate the remaining time in seconds.
+        const now = Date.now() / 1000; // Get current time in seconds.
         let remainingTime = Math.max(0, this.timeclose - now);
 
-        // If no time is remaining, clear the label and handle timeout
+        // If no time is remaining, clear the label and handle timeout.
         if (remainingTime === 0) {
             this.divTimer.textContent = '';
             this.onTimeout();
             return;
         }
 
-        // Format the remaining time as mm:ss
+        // Format the remaining time as mm:ss.
         const minutes = Math.floor(remainingTime / 60);
         const seconds = String(Math.floor(remainingTime % 60)).padStart(2, '0');
         this.divTimer.textContent = `${minutes}:${seconds}`;
 
-        // Set a timeout to update the timer every 500ms
-        this.timerTimeout = setTimeout(() => this.updateDivTimer(), 500);
+        // Set a timeout to update the timer every 500ms.
+        this.timerTimeout = setTimeout(function() {
+            this.updateDivTimer();
+        }.bind(this), 500);
     }
     createScreen(json, disabled) {
         if (this.endofgame) {
-            // Display end-of-game message and final grade
+            // Display end-of-game message and final grade.
             this.createDivMessage('mmogame-endofgame', this.getStringM('js_game_over'));
             this.showGrade(json);
             return;
@@ -720,14 +725,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
         this.removeAreaChildren();
 
-        // Render the screen layout based on orientation (vertical or horizontal)
+        // Render the screen layout based on orientation (vertical or horizontal).
         if (this.isVertical) {
             this.createScreenVertical(json, disabled);
         } else {
             this.createScreenHorizontal(json, disabled);
         }
 
-        // Display the current score
+        // Display the current score.
         this.showGrade(json);
     }
 
@@ -741,7 +746,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         this.createDefinition(0, 0, width - this.padding, this.stripTop - this.padding,
             false, this.fontSize, json.definition);
 
-        // Adjust strip dimensions
+        // Adjust strip dimensions.
         this.stripLeft = width + this.padding;
     }
 
@@ -754,7 +759,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
         const defSize = this.createDefinition(0, 0, this.areaRect.width, 0, false, this.fontSize, json.definition);
         this.stripTop = this.createAnswer(0, defSize[1] + this.padding, this.areaRect.width, false, this.fontSize, disabled);
 
-        // Adjust strip position
+        // Adjust strip position.
         this.stripLeft = 0;
     }
 

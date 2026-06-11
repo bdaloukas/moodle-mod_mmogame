@@ -37,7 +37,7 @@ use mod_mmogame\local\mmogame;
 /**
  * External API endpoint for saving answers from split-mode quiz attempts.
  */
-class send_answers_split extends external_api {
+    class send_answers_split extends external_api {
     /**
      * Returns description of method parameters
      * @return external_function_parameters

@@ -113,7 +113,7 @@ class mmogame_mode_aduel {
         } else {
             $pairs = [];
         }
-        if (count($pairs) == 0) {
+        if ( 0 === count($pairs) ) {
             // There are no open aduel. Create a new one.
             if ($maxalone > 0) {
                 $count = $db->count_records_select(
@@ -190,15 +190,15 @@ class mmogame_mode_aduel {
         $time = time();
         // Select the first that is no started.
         foreach ($recs as $rec) {
-            if ($rec->timeclose > $time || $rec->timeclose == 0) {
-                if ($rec->timestart == 0) {
+            if ($rec->timeclose > $time || 0 === $rec->timeclose) {
+                if (0 === $rec->timestart ) {
                     $rec->timestart = time();
                     $rec->timeclose = $rec->timestart + $aduel->timelimit;
                     $db->update_record($table, ['id' => $rec->id, 'timestart' => $rec->timestart, 'timeclose' => $rec->timeclose]);
                 }
                 return $rec;
             }
-            if ($rec->timestart == 0) {
+            if (0 === $rec->timestart ) {
                 $rec->timestart = $time;
                 $rec->timeclose = $time + $aduel->timelimit;
                 $db->update_record($table, ['id' => $rec->id, 'timestart' => $rec->timestart, 'timeclose' => $rec->timeclose]);

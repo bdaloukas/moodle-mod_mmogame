@@ -190,9 +190,9 @@ class mmogame_irt_1pl {
                     continue;
                 }
 
-                if ($x == 0) {
+                if (0 === $x) {
                     $count0++;
-                } else if ($x == 1) {
+                } else if ( 1 === $x) {
                     $count1++;
                 }
                 $p = 1 / (1 + exp(-($theta[$i] - $b[$j])));
@@ -225,7 +225,7 @@ class mmogame_irt_1pl {
 
                 $p = 1 / (1 + exp(-($theta[$i] - $b[$j])));
                 $var = $p * (1 - $p);
-                if ($var == 0) {
+                if ( 0 === $var ) {
                     continue;
                 }
 
@@ -376,7 +376,7 @@ class mmogame_irt_1pl {
                 'corrects' => $user->corrects,
                 'wrongs' => $user->wrongs,
                 'nulls' => count($mapqueries) - $user->count,
-                'percent' => ($user->count != 0 ? 100 * $user->corrects / $user->count : null),
+                'percent' => (0 !== $user->count ? 100 * $user->corrects / $user->count : null),
             ];
             $db->insert_record('mmogame_aa_irt_ausers', $new);
         }

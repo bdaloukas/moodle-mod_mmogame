@@ -72,12 +72,12 @@ class start_sessions extends external_api {
      * @throws restricted_context_exception
      */
     public static function execute(
-        int $mmogameid,
-        string $kinduser,
-        string $user,
-        int $countsplit,
-        int $countpalettes = 0,
-        int $countavatars = 0
+        int $mmogameid,         // The id of game.
+        string $kinduser,       // The kind of user e.g. guid.
+        string $user,           // The user (depends on kinduser).
+        int $countsplit,        // The count of split.
+        int $countpalettes = 0, // Count of paletted needed.
+        int $countavatars = 0   // Count of avatars used.
     ): array {
         // Validate the parameters.
         self::validate_parameters(self::execute_parameters(), [

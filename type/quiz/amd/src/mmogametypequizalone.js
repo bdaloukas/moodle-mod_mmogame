@@ -40,7 +40,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             const nicknameHeight = Math.round(this.iconSize / 3);
 
-            const fragment = document.createDocumentFragment(); // Batch DOM updates
+            const fragment = document.createDocumentFragment(); // Batch DOM updates.
 
             const [nickname, avatar] = this.createNicknameAvatar(fragment,
                 'mmogame-quiz-alone',
@@ -69,12 +69,14 @@ define(['mmogametype_quiz/mmogametypequiz'],
 
             if (this.hasHelp()) {
                 const button = this.createButtonHelp(fragment, this.padding + (i++) * step, this.padding + nicknameHeight);
-                button.addEventListener("click", () => this.onClickHelp());
+                button.addEventListener("click", function() {
+                    this.onClickHelp();
+                }.bind(this));
             }
 
             this.areaRect = {top: 2 * this.padding + this.iconSize + nicknameHeight};
 
-            this.body.appendChild(fragment); // Batch insert into DOM
+            this.body.appendChild(fragment); // Batch insert into DOM.
         }
 
         processSetAnswer(json) {
@@ -89,7 +91,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.disableInput();
 
             if (this.aItemAnswer !== undefined && json.correct !== undefined) {
-                for (let i = 0; i < this.aItemAnswer.length; i++) {
+                const n = this.aItemAnswer.length;
+                for (let i = 0; i < n; i++) {
                     this.aItemAnswer[i].classList.add("disabled");
                 }
             }
@@ -107,21 +110,21 @@ define(['mmogametype_quiz/mmogametypequiz'],
          */
         createScreen(json, disabled) {
             if (this.endofgame) {
-                // Display end-of-game message and final grade
+                // Display end-of-game message and final grade.
                 this.createDivMessage('mmogame-quiz-alone-endofgame', this.getStringM('js_game_over'));
                 this.showGrade(json);
                 return;
             }
 
             this.removeAreaChildren();
-            // Render the screen layout based on orientation (vertical or horizontal)
+            // Render the screen layout based on orientation (vertical or horizontal).
             if (this.isVertical) {
                 this.createScreenVertical(json, disabled);
             } else {
                 this.createScreenHorizontal(json, disabled);
             }
 
-            // Display the current grade
+            // Display the current grade.
             this.showGrade(json);
         }
 
@@ -144,7 +147,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 retDefinition[2].style.height = (topCreate - this.padding) + "px";
             }
 
-            // Adjust strip dimensions
+            // Adjust strip dimensions.
             this.stripLeft = width + this.padding;
             this.stripTop = maxHeight + this.padding;
         }
@@ -158,7 +161,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             const defSize = this.createDefinition(0, 0, this.areaRect.width, 0, false, this.fontSize, json.definition);
             this.stripTop = this.createAnswer(0, defSize[1] + this.padding, this.areaRect.width, false, this.fontSize, disabled);
 
-            // Adjust strip position
+            // Adjust strip position.
             this.stripLeft = 0;
         }
 
@@ -171,7 +174,7 @@ define(['mmogametype_quiz/mmogametypequiz'],
             const nicknameWidth = 2 * this.iconSize + this.padding;
             const nicknameHeight = this.iconSize / 3;
 
-            // Update game state
+            // Update game state.
             this.state = parseInt(json.state, 10);
             if (this.state === 0) {
                 json.qtype = '';
@@ -182,9 +185,9 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.updateNicknameAvatar(this.player, json.avatar, json.nickname, nicknameWidth, nicknameHeight);
                 this.showGrade(json);
                 this.createDivMessageStart(this.getStringM('js_wait_to_start'));
-                setTimeout(() => {
+                setTimeout(function() {
                     this.callGetAttempt();
-                }, 15000);
+                }.bind(this), 15000);
                 return;
             } else {
                 this.removeMessageDivs();
@@ -199,12 +202,12 @@ define(['mmogametype_quiz/mmogametypequiz'],
                 this.createArea(this.areaRect.top, 0);
             }
 
-            // Update the window title if a name is provided
+            // Update the window title if a name is provided.
             if (json.name) {
                 document.title = json.name;
             }
 
-            // Handle error messages from the server
+            // Handle error messages from the server.
             if (json.errorcode) {
                 this.createDivMessage('mmogame-error', json.errorcode);
                 return;
@@ -214,18 +217,18 @@ define(['mmogametype_quiz/mmogametypequiz'],
             this.attempt = json.attempt;
             this.attemptkey = json.attemptkey;
 
-            // Process question type and answers
+            // Process question type and answers.
             this.qtype = json.qtype;
             if (this.qtype === 'multichoice') {
                 this.answers = [];
                 this.answersID = json.answerids;
-                json.answers.forEach((answer, index) => {
-                    this.answers[index] = this.repairP(answer); // Process each answer
-                });
+                json.answers.forEach(function(answer, index) {
+                    this.answers[index] = this.repairP(answer);
+                }.bind(this));
             }
-            this.answer = json.answer ?? undefined;
+            this.answer = json.answer;
 
-            // Handle end-of-game scenarios
+            // Handle end-of-game scenarios.
             this.endofgame = json.endofgame !== undefined && json.endofgame !== 0;
             json.definition = this.repairP(json.definition);
             this.errorcode = json.errorcode;
@@ -258,7 +261,8 @@ define(['mmogametype_quiz/mmogametypequiz'],
         onServerAnswerMultichoice(json) {
             let foundCorrect = false;
             let aCorrect = json.correct.split(",");
-            for (let i = 0; i < this.answersID.length; i++) {
+            const n = this.answersID.length;
+            for (let i = 0; i < n; i++) {
                 if (this.answersID[i] === '') {
                     continue;
                 }

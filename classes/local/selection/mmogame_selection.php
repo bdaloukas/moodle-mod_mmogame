@@ -196,7 +196,7 @@ abstract class mmogame_selection {
                 ['id' => $auser->id, 'hashcompute' => md5($hashname)]
             );
             $rstate = $mmogame->get_rstate();
-            if (md5($hashname) != $rstate->hashcompute) {
+            if (md5($hashname) !== $rstate->hashcompute) {
                 $rstate->countqueries = $countqueries;
                 $rstate->hashcompute = md5($hashname);
                 $this->before_repair_state($ids);

@@ -49,7 +49,7 @@ class mmogame_selection_heuristic extends mmogame_selection {
         $sortnum = 1;
         $sort1 = 'serialcorrects, countused, countcorrect, timeerror, randkey';
         $sort2 = 'serialcorrects, countused, countcorrect, timeerror, nextattempt, randkey';
-        $sort = $sortnum == 2 ? $sort2 : $sort1;
+        $sort = 2 === $sortnum ? $sort2 : $sort1;
         $found = [];
         $recs = $db->get_records_select(
             'mmogame_aa_stats',

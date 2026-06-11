@@ -138,7 +138,7 @@ class get_attempt extends external_api {
                 ]
             );
         }
-        if ($mmogame->get_state() != 0) {
+        if (0 !== $mmogame->get_state()) {
             $attempt = $mmogame->get_attempt();
         } else {
             $attempt = false;

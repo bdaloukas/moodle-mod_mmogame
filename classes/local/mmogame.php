@@ -70,7 +70,7 @@ abstract class mmogame {
     public function __construct(mmogame_database $db, stdClass $rgame) {
         $this->db = $db;
 
-        if ($rgame->numgame == 0) {
+        if (0 === $rgame->numgame ) {
             $this->db->update_record('mmogame', ['id' => $rgame->id, 'numgame' => 1]);
             $rgame = $this->db->get_record_select('mmogame', 'id=?', [$rgame->id]);
         }
@@ -90,7 +90,7 @@ abstract class mmogame {
             $this->rstate = $this->db->get_record_select('mmogame_aa_states', 'id=?', [$id]);
         }
 
-        if ($rgame->qbank != '') {
+        if ('' !== $rgame->qbank ) {
             $classname = 'mod_mmogame\local\qbank\mmogame_qbank_' . $rgame->qbank;
             $this->qbank = new $classname($this);
         }
@@ -361,9 +361,9 @@ abstract class mmogame {
         bool $create,
         int $split
     ): ?stdClass {
-        if ($kinduser == 'usercode') {
+        if ('usercode' === $kinduser ) {
             return self::get_auser_from_usercode($db, $mmogameid, $user, $split);
-        } else if ($kinduser == 'guid') {
+        } else if ('guid' === $kinduser ) {
             return self::get_auser_from_guid($db, $mmogameid, $user, $create, $split);
         } else {
             return self::get_auser_from_db($db, $mmogameid, $kinduser, $user, $create, $split);
@@ -377,7 +377,7 @@ abstract class mmogame {
      * @return ?array
      */
     public function get_ausers_split(string $kinduser, string $user): ?array {
-        if ($kinduser == 'guid') {
+        if ('guid' === $kinduser ) {
             $rec = $this->db->get_record_select('mmogame_aa_users_guid', 'guid=?', [$user]);
             if ($rec === null) {
                 return null;
@@ -387,7 +387,7 @@ abstract class mmogame {
             $instanceid = intval($user);
         }
 
-        if ($instanceid == 0) {
+        if (0 === $instanceid ) {
             return null;
         }
 
@@ -476,7 +476,7 @@ abstract class mmogame {
         if (count($recs) === 0) {
             // All avatars are used in this numgame (players > avatars).
             $recs = $db->get_records_select('mmogame_aa_avatars', '', null, 'numused, randomkey', '*', 0, 1);
-            if (count($recs) == 0) {
+            if ( 0 === count($recs) ) {
                 return 0;
             }
         }
@@ -716,7 +716,7 @@ abstract class mmogame {
             while (count($set) < $maxcount) {
                 $n = min($maxcount - count($set), count($avatars));
                 $keys = array_rand($avatars, $n);
-                if ($n == 1) {
+                if (1 === $n ) {
                     $keys = [$keys];
                 }
                 shuffle($keys);
@@ -732,7 +732,7 @@ abstract class mmogame {
                     unset($avatars[$key]);
                 }
 
-                if (count($avatars) == 0) {
+                if (0 === count($avatars) ) {
                     $avatars = $avatars2;
                     $avatars2 = [];
                 }
@@ -838,9 +838,9 @@ abstract class mmogame {
 
             $user = $db->get_record_select('mmogame_aa_users', 'id=?', [$auserid]);
             if ($user !== null) {
-                if ($user->kind == 'usercode') {
+                if ('usercode' === $user->kind ) {
                     $rec = $db->get_record_select('mmogame_aa_users_code', 'id=?', [$user->instanceid]);
-                    if ($rec !== false && $rec->code != 0) {
+                    if ($rec !== false && 0 !== $rec->code ) {
                         $a['usercode'] = $rec->code;
                     }
                 }

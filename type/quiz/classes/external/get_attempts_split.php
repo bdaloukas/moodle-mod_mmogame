@@ -96,7 +96,7 @@ class get_attempts_split extends external_api {
         $mmogame = mmogame::create($db, $mmogameid);
         $state = $mmogame->get_state();
         $statetime = $mmogame->get_statetime();
-        if (count($ausers) == 0 || $state == 0 || $statetime == 0) {
+        if (0 === count($ausers) || 0 === $state || 0 === $statetime) {
 
             return [
                 'avatars' => [],

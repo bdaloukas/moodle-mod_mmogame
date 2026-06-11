@@ -32,8 +32,8 @@ abstract class mmogame_database {
     /**
      * Inserts a row into a plugin database table.
      *
-     * @param string               $table Unprefixed or prefixed table name.
-     * @param array<string, mixed> $a     Column values to insert.
+     * @param string               $table : Unprefixed or prefixed table name.
+     * @param array<string, mixed> $a     : Column values to insert.
      * @return int|null Inserted record ID, or null when the insert fails.
      */
     abstract public function insert_record(string $table, array $a): ?int;

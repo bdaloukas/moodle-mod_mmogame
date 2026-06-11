@@ -22,8 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_mmogame\local;
 use mod_mmogame\local\mmogame;
+use mod_mmogame\local\database\mmogame_database_moodle;
 
 require_once(dirname(__FILE__) . '/../../config.php');
 
@@ -46,7 +46,7 @@ if (! $mmogame = $DB->get_record('mmogame', ['id' => $cm->instance])) {
 // Check login and get context.
 require_login($course->id, false, $cm);
 
-$mmogame = mmogame::create(new local\database\mmogame_database_moodle(), $cm->instance);
+$mmogame = mmogame::create(new mmogame_database_moodle(), $cm->instance);
 
 if ($mmogame !== false) {
     require_once($CFG->dirroot . '/mod/mmogame/type/' . $mmogame->get_type() . '/view.php');

@@ -29,24 +29,26 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             const restHeight = window.innerHeight - topButton - countY * (this.iconSize + this.padding);
             const top = topButton + Math.round(restHeight / 2);
             const countX = 1;
-            let i = 0; // Counter for color palettes
+            let i = 0; // Counter for color palettes.
             const count = colorpalettes.length;
             this.canvasColor = undefined;
             const canvasSize = this.iconSize - this.padding * 3 / 2;
-            const parsedPalettes = colorpalettes.map(palette =>
-                palette.split(",").map(value => parseInt(value, 10) || 0)
-            );
+            const parsedPalettes = colorpalettes.map(function(palette) {
+                return palette.split(",").map(function(value) {
+                    return parseInt(value, 10) || 0;
+                });
+            });
             let acanvas = [];
             const fragment = document.createDocumentFragment();
             for (let iy = 0; iy < countY; iy++) {
                 for (let ix = 0; ix < countX; ix++) {
-                    // Check if we exceed available palettes or encounter invalid data
+                    // Check if we exceed available palettes or encounter invalid data.
                     if (i >= count || !parsedPalettes[i] || !colorpaletteids[i]) {
-                        i++; // Increment and continue if invalid
+                        i++; // Increment and continue if invalid.
                         continue;
                     }
 
-                    // Create a new canvas element
+                    // Create a new canvas element.
                     let canvas = document.createElement('canvas');
                     canvas.style.position = "absolute";
                     canvas.style.left = `${left + ix * (this.iconSize + this.padding)}px`;
@@ -58,17 +60,17 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
 
                     acanvas.push(canvas);
 
-                    // Append canvas to the area
+                    // Append canvas to the area.
                     fragment.appendChild(canvas);
 
-                    // Render the color palette on the canvas
+                    // Render the color palette on the canvas.
                     const palette = parsedPalettes[i];
                     this.showColorPalette(canvas, palette);
-                    // Get the palette ID and attach a click event listener
+                    // Get the palette ID and attach a click event listener.
                     let id = colorpaletteids[i];
-                    canvas.addEventListener("click", () => {
+                    canvas.addEventListener("click", function() {
                         this.gateUpdateColorPalette(canvas, id, palette);
-                    });
+                    }.bind(this));
 
                     i++;
                 }
@@ -118,11 +120,14 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             const gamepads = navigator.getGamepads();
 
             if (this.gateInfo !== undefined) {
-                this.gateInfo.textContent = Array.from(navigator.getGamepads()).filter(gp => gp !== null).length;
+                this.gateInfo.textContent = Array.from(navigator.getGamepads()).filter(function(gp) {
+                    return gp !== null;
+                }).length;
             }
 
             const n = this.splits !== undefined ? this.splits.length : 0;
-            for (let i = 0; i < gamepads.length; i++) {
+            const ng = gamepads.length;
+            for (let i = 0; i < ng; i++) {
                 if (!gamepads[i]) {
                     continue;
                 }
@@ -240,10 +245,10 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                     const avatarid = this.info.avatarids[pos];
                     const posAvatar = pos;
                     const split = this.splits.length;
-                    btn.addEventListener("click", () => {
+                    btn.addEventListener("click", function() {
                         this.splits[split].avatarpos = posAvatar;
                         this.gateUpdateAvatar(split, btn, avatarid);
-                    });
+                    }.bind(this));
                     avatarbuttons.push(btn);
                     pos++;
                 }
@@ -317,7 +322,9 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
         }
 
         updateScreen() {
-            requestAnimationFrame((t) => this.updateGamepads(t));
+            requestAnimationFrame(function(t) {
+                this.updateGamepads(t);
+            }.bind(this));
         }
 
         /**
@@ -329,7 +336,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
          * */
         createDivGradePercent(parent, left, showRank) {
             const colorText = this.getContrastingColor(this.colorBackground);
-            // Create the main button container
+            // Create the main button container.
             const divMain = this.createDOMElement('div', {
                 parent: parent,
                 classnames: 'mmogame-quiz-main',
@@ -353,7 +360,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
 
             const cellSize = showRank ? Math.round(this.iconSize / 2) : this.iconSize;
 
-            // Create the ranking grade label (line1)
+            // Create the ranking grade label (line1).
             let lblRank;
             if (showRank) {
                 lblRank = this.createDOMElement('div', {
@@ -375,7 +382,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 });
             }
 
-            // Create the main grade label (line2)
+            // Create the main grade label (line2).
             const lblGrade = this.createDOMElement('div', {
                 parent: parent,
                 classnames: `mmogame-grade`,
@@ -421,7 +428,8 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 pos = (pos + direction * steps + n) % n;
                 id = this.info.avatarids[this.gategetavatar(split, pos)];
                 let found = false;
-                for (let i = 0; i < this.splits.length; i++) {
+                const n = this.splits.length;
+                for (let i = 0; i < n; i++) {
                     if (i === split) {
                         continue;
                     }
@@ -446,11 +454,11 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
         updateGamepad(timestamp, split, gamepad) {
             const axes = gamepad.axes;
             // Using https://luser.github.io/gamepadtest/.
-            const axisX1 = axes?.[0] ?? 0; // Left stick X
-            const axisY1 = axes?.[1] ?? 0; // Left stick Y
-            /* Const axisX2 = axes?.[5] ?? 0; // Right stick X
-            const axisY2 = axes?.[2] ?? 0; // Right stick Y
-*/
+            // Left stick X.
+            const axisX1 = axes && axes[0] !== undefined ? axes[0] : 0;
+            // Left stick Y.
+            const axisY1 = axes && axes[1] !== undefined ? axes[1] : 0;
+
             if (axisX1 < -0.5) {
                 this.moveX(timestamp, split, 1, -1, 1);
             }
@@ -463,23 +471,6 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
             if (axisY1 > 0.5) {
                 this.moveY(timestamp, split, 1, 1, 1);
             }
-            /*
-                            // Second joystick.
-                            if (this.usesecondjoystick) {
-                                if (axisX2 < -0.5) {
-                                    this.moveX(timestamp, i, 2, -1, 1);
-                                }
-                                if (axisX2 > 0.5) {
-                                    this.moveX(timestamp, i, 2, 1, 1);
-                                }
-                                if (axisY2 < -0.5) {
-                                    this.moveY(timestamp, i, 2, -1, 1);
-                                }
-                                if (axisY2 > 0.5) {
-                                    this.moveY(timestamp, i, 2, 1, 1);
-                                }
-                            }
-            */
         }
 
         gateCreateSidebar() {
@@ -499,9 +490,12 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                     role: 'button',
                 },
             });
-            btn.addEventListener("click", () => {
-                this.play();
-            });
+            btn.addEventListener(
+                "click",
+                function() {
+                    this.play();
+                }.bind(this)
+            );
 
             this.gateInfo = this.createDOMElement('div', {
                 parent: this.body,
@@ -536,22 +530,25 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 }
                 sel.appendChild(option);
             }
-            sel.addEventListener("change", () => {
-                this.countAll = sel.value;
-                this.countY = Math.round(Math.sqrt(this.countAll));
-                this.countX = Math.ceil(this.countAll / this.countY);
+            sel.addEventListener(
+                "change",
+                function() {
+                    this.countAll = sel.value;
+                    this.countY = Math.round(Math.sqrt(this.countAll));
+                    this.countX = Math.ceil(this.countAll / this.countY);
 
-                document.body.textContent = '';
-                this.body = document.getElementsByTagName("body")[0];
-                this.area = undefined;
+                    document.body.textContent = '';
+                    this.body = document.getElementsByTagName("body")[0];
+                    this.area = undefined;
 
-                this.computeSizes(0);
-                this.gateSendStartSessions();
-            });
+                    this.computeSizes(0);
+                    this.gateSendStartSessions();
+                }.bind(this)
+            );
         }
 
         gateSendStartSessions() {
-            require(['core/ajax'], (Ajax) => {
+            require(['core/ajax'], function(Ajax) {
                 // Defining the parameters to be passed to the service.
                 let params = {
                     mmogameid: this.mmogameid,
@@ -561,27 +558,36 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                     countpalettes: this.countPalettes,
                     countavatars: this.countXavatars * this.countYavatars,
                 };
-                // Calling the service through the Moodle AJAX API
+                // Calling the service through the Moodle AJAX API.
                 let startSessions = Ajax.call([{
                     methodname: 'mod_mmogame_start_sessions',
                     args: params
                 }]);
-                // Handling the response
-                startSessions[0].done(({avatarids, avatars, colorpaletteids, colorpalettes, numavatars, sessionkeys}) => {
-                    this.info = {
-                        avatarids: avatarids,
-                        avatars: avatars,
-                        colorpaletteids: colorpaletteids,
-                        colorpalettes: colorpalettes,
-                        numavatars: numavatars,
-                    };
-                    this.sessionkeys = sessionkeys;
-                    this.gateCreateScreen();
-                }).fail((error) => {
+                // Handling the response.
+                startSessions[0].done(
+                    function(response) {
+                        const avatarids = response.avatarids;
+                        const avatars = response.avatars;
+                        const colorpaletteids = response.colorpaletteids;
+                        const colorpalettes = response.colorpalettes;
+                        const numavatars = response.numavatars;
+                        const sessionkeys = response.sessionkeys;
+
+                        this.info = {
+                            avatarids: avatarids,
+                            avatars: avatars,
+                            colorpaletteids: colorpaletteids,
+                            colorpalettes: colorpalettes,
+                            numavatars: numavatars,
+                        };
+                        this.sessionkeys = sessionkeys;
+                        this.gateCreateScreen();
+                    }.bind(this)
+                ).fail(function(error) {
                     this.showError('gateSendStartSessions', error);
                     return error;
-                });
-            });
+                }.bind(this));
+            }.bind(this));
         }
 
         async gateOpen(mmogameid, pin, kinduser, user) {
@@ -610,7 +616,7 @@ define(['mod_mmogame/mmogame', ''], function(MmoGame) {
                 return;
             }
             if (this.area !== undefined) {
-                this.area?.remove();
+                this.area.remove();
                 this.area = undefined;
             }
 
